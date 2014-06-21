@@ -24,7 +24,7 @@ ECE Department -- Carnegie Mellon University}
 
 \section{Introduction}
 
-\noindent YODA, Yet another Ontology Dialog Architecture is a sophisticated tool to allow developers to quickly build intelligent spoken dialog systems.
+\noindent YODA, Yet another Ontological Dialog Architecture is a sophisticated tool to allow developers to quickly build intelligent spoken dialog systems.
 This tutorial will introduce the major components and capabilities of Yoda by walking through the creation of a simple messaging calendar assistant.
 We envision this system as a smartphone app, which the user can use to message their friends and coordinate meetings.
 
@@ -37,26 +37,52 @@ A transactional dialog system allows the system to take actions on behalf of the
 
 The first step for a YODA system developer is to decide what databases it is intended to access and in what way, and what non-dialog actions their system can take (if it is transactional), and what types of objects it can talk about.
 
+If your intended system does not fit into the categories described here, YODA is probably not an appropriate dialog manager for your project.
+We appreciate your feedback about why you feel this is the case, and we hope to support a broader set of dialog systems in the future.
+Please email David at david.cohen@sv.cmu.edu .
+
+\section {Set up of the YODA directory}
+Your dialog system will be built on top of the skeleton YODA dialog system.
+Once you've installed YODA, believe it or not, your dialog system already exists! (run bin/launch.sh).
+
+Of course, this dialog system doesn't know very much - it knows what people and places are, but doesn't know about any particular person or place.
+The vast majority of your early work will be done in the yoda/ontology and yoda/interfaces directories.
+In the ontology folder, you will extend the dialog system's domain to allow it to talk about the objects you are interested in.
+In the interfaces directory, you will connect your dialog system to database resources it needs.
 
 \section {Build the Ontology}
 
 A YODA developer must then formalize the objects, actions and properties which are relevant to their domain by extending the YODA skeleton ontology with new classes, properties, values, and instances.
 Objects should be given appropriate slots, relations, and properties which correspond to the actual objects.
+There are several powerfull tools available for editing OWL ontologies, but we recommend protege, and all our examples are shown in protege.
+
+
 Figue 1 shows the specification of a person in the OWL skeleton ontology.
 Figure 2 shows the specification of a meeting, and of the domain action set-up-meeting.
 There are additional objects and actions that are defined for our meeting room reservation system, details of which can be found in the attached .owl file.
 
 
-
-
 \section {Define interfaces to External Databases}
-Some of the classes in the ontology should correspond one-to-one with the schema of a corresponding database.
-YODA supports SPARQL databases and provides limited support for less-expressive SQL databases.
-YODA requires a map between slots and properties which are shared by the domain ontology and the database schema.
-YODA only allows a one-to-one mapping of properties and slots, but allows certain properties to exist only in the database or only in the dialog manager.
+Classes in the ontology correspond to supporting databases.
 
-By default, the generated dialog system is allowed to insert objects into the database as well as retrieve objects from the database, but the engineer can limit the type of access allowed.
-Furthermore, for any classes which are not pre-defined by the designer, and for any classes that the system is not given permission to insert rows, the dialog system creates its own database for storing long-term memories about interactions.
+There are two types of supporting databases, corresponding to two primary functions:
+\begin{itemize}
+\item{\textbf{Long-term Memory Database:}Store objects from interactions in long-term memory to keep reasoning in working memory tractable while allowing for possible retrieval at a later date}
+\item{\textbf{Reference Database:} Store and index a large collection of reference objects (the standard use paradigm of a database)}
+\end{itemize}
+
+By default, every class defined in the ontology has no supporting reference database, and an independent long-term memory database.
+If the developer wants to provide a reference database they may do so.
+The developer can decide weather or not the dialog system is allowed to insert to that database.
+If the dialog system is not allowed to insert, then a separate long-term memory database will be automatically created.
+Otherwise, the reference database will provide both long-term memory and reference functions.
+
+Reference databases must be Sesame SPARQL databases.
+YODA requires a map between slots and properties which are shared by the domain ontology and the database schema.
+YODA only allows a one-to-one mapping of properties and slots, but allows certain properties to exist only in the reference database.
+
+Any database interface that does not have the default setting is defined by modifying the yoda/interfaces/database\_interfaces.txt file.
+
 
 \section {Define interfaces to Non-dialog actions}
 Similar to the database interface definitions, the developer can specify action interfaces to specify what information is needed to actually perform an action.
