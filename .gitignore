@@ -2,3 +2,5 @@
 *.pyc
 *.class
 *.jar
+*.iml
+*.idea
