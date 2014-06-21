@@ -22,5 +22,13 @@
 After building, to get started see tutorials/tutorial.pdf
 
 Build directions:
-This project is structured as a maven project which is supported by all the major IDEs.
+This project is structured as a maven project which is supported by all the major IDEs by importing the yoda/yoda/pom.xml file .
+
+To build the project:
+> cd yoda
+> mvn package
+
+To run the test file:
+> java -cp /home/cohend/yoda/yoda/target/yoda-1.0-SNAPSHOT.jar edu.cmu.sv.App
+
 
