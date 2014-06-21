@@ -1,0 +1,122 @@
+%File: formatting-instruction.tex
+\documentclass[10pt]{article}
+\usepackage{times}
+\usepackage{helvet}
+\usepackage{courier}
+\usepackage{graphicx}
+\usepackage{alltt}
+\frenchspacing
+\addtolength{\topmargin}{-.875in}
+\addtolength{\textheight}{1.75in}
+%% \setlength{\pdfpagewidth}{8.5in}
+%% \setlength{\pdfpageheight}{11in}
+\pdfinfo{
+/Title (Yoda Tutorial)
+/Author (David Cohen)}
+\setcounter{secnumdepth}{0}  
+\begin{document}
+
+\title{Yoda Easy Guide}
+\author{David Cohen\\
+ECE Department -- Carnegie Mellon University}
+\date{}
+\maketitle
+
+\section{Introduction}
+
+\noindent YODA, Yet another Ontology Dialog Architecture is a sophisticated tool to allow developers to quickly build intelligent spoken dialog systems.
+This tutorial will introduce the major components and capabilities of Yoda by walking through the creation of a simple messaging calendar assistant.
+We envision this system as a smartphone app, which the user can use to message their friends and coordinate meetings.
+
+
+\section {Understand Your Dialog System's Desired Functionality}
+The YODA dialog manager is designed to build dialog systems which combine the functions of information retrieval (IR), information entry, and transactional dialog systems.
+An IR dialog system's main purpose is to answer questions about a database of objects - such as restaurants, movies, or events in a calendar.
+An information entry system allows the user to create descriptions of objects for entry in a database - such as scheduling events in a calendar.
+A transactional dialog system allows the system to take actions on behalf of the user, such as making reservations or sending emails.
+
+The first step for a YODA system developer is to decide what databases it is intended to access and in what way, and what non-dialog actions their system can take (if it is transactional), and what types of objects it can talk about.
+
+
+\section {Build the Ontology}
+
+A YODA developer must then formalize the objects, actions and properties which are relevant to their domain by extending the YODA skeleton ontology with new classes, properties, values, and instances.
+Objects should be given appropriate slots, relations, and properties which correspond to the actual objects.
+Figue 1 shows the specification of a person in the OWL skeleton ontology.
+Figure 2 shows the specification of a meeting, and of the domain action set-up-meeting.
+There are additional objects and actions that are defined for our meeting room reservation system, details of which can be found in the attached .owl file.
+
+
+
+
+\section {Define interfaces to External Databases}
+Some of the classes in the ontology should correspond one-to-one with the schema of a corresponding database.
+YODA supports SPARQL databases and provides limited support for less-expressive SQL databases.
+YODA requires a map between slots and properties which are shared by the domain ontology and the database schema.
+YODA only allows a one-to-one mapping of properties and slots, but allows certain properties to exist only in the database or only in the dialog manager.
+
+By default, the generated dialog system is allowed to insert objects into the database as well as retrieve objects from the database, but the engineer can limit the type of access allowed.
+Furthermore, for any classes which are not pre-defined by the designer, and for any classes that the system is not given permission to insert rows, the dialog system creates its own database for storing long-term memories about interactions.
+
+\section {Define interfaces to Non-dialog actions}
+Similar to the database interface definitions, the developer can specify action interfaces to specify what information is needed to actually perform an action.
+
+\section {Build a lexicon for NLG}
+Initial linguistic information should be associated with each new class and instance.
+The two figures below show examples of the linguistic information associated with the objects specified above.
+The complete example is given in the attached owl file.
+
+The program TestLexicalEntry.java generates sample sentences based on the lexicon provided by the developer.
+The developer can use this program to test that their lexicon generates sensible sentences and covers the full variety of things the developer expects to be said about the object.
+Call it from the command line using: java TestLexicalEntry.java -e [entryID]
+
+
+\section {Train SLU and speech modules with artificial data}
+
+To build an initial SLU component, YODA takes the generated lexicon and creates a large training set.
+It adds artificial noise to the training set for robustness, and extends the training set using wordnet synonyms.
+It then trains a state-of-the-art SLU component based on this artificial data.
+
+To build an initial SLU component, run java GenerateInitialSLUComponent.java .
+Include -v in the command line arguments after the filename to see cross-validation results within the auto-generated corpus.
+
+The training data set is retained in yoda/SLU/artificial\_train.txt, and the domain-specific annotation scheme is described in yoda/SLU/annotation\_scheme.txt .
+As real data is collected, the SLU component can be improved by incorporating annotated real-world examples.
+
+To build an improved SLU component, put labeled real-world data in yoda/SLU/real\_data.txt in the same format as artificial\_rain.txt, then run: java GenerateImprovedSLUComponent.java .
+Include a -v in the arguments after the filename to see validation results and a comparison between the initial and the improved systems.
+
+It will likely be the case that as real data is collected, the developer will discover that the domain and lexicon definitions should be extended to improve coverage of users actully say.
+We recommend that this be done by extending the ontology rather than simply training the improved model.
+The purpose of the improved model is to improve the component's likelihood model for different utterances, not to compensate for poor coverage.
+
+To generate a language model based on the automatically generated sentences and the real data examples, run the script build\_language\_model.sh .
+
+
+\section {Build sensor interfaces}
+YODA dialog systems support situated interaction by defining sensor interfaces.
+Sensors can report the existance of new entities, and their properties and relations.
+The interfaces define a message protocol used to receive updates from the sensors.
+
+Some of the information provided in the protocol includes:
+\begin{itemize}
+\item Expected framerate
+\item Expected consistency of the sensor readings over time
+\item Type of confidence markup (N-best, Bayes net, full CPT)
+\item Overlap interface (Define the overlap between this sensor and other sensors)
+\item Relevance interface (Choose a strategy for defining how relevance to the ongoing discourse should be tracked for objects in this sensor stream)
+\item Expected recall of objects (effects dialog strategy)
+\item Expected precision (of some slot?)
+\end{itemize}
+
+\subsection {Sensor belief tracking in Yoda}
+YODA designers will explore belief-tracking and sensor fusion approaches that generalize to dynamic situated domains.
+
+\subsection {Long-term Memory and Discourse Relevance in YODA}
+YODA designers will explore different strategies for tracking objects' relevance to an ongoing discourse, and for using that relevance to move information between long-term and working memory.
+The different properties of different sensor types will be better suited for different relevance strategies.
+
+\bibliographystyle{acm}
+\bibliography{/home/cohend/Dropbox/Documents/bibtex_db}
+
+\end{document}
