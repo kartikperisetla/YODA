@@ -21,7 +21,7 @@ public class Database {
     Repository repository;
     RepositoryConnection connection;
     String baseURI = "http://sv.cmu.edu/yoda";
-    File ontologyFile = new File("/home/cohend/yoda/demo.turtle");
+    File ontologyFile = new File("/home/cohend/yoda/yoda_ontology.owl");
 
     public Database() {
         repository = new SailRepository(new MemoryStore());
