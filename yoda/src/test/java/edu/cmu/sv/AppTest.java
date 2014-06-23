@@ -1,5 +1,6 @@
 package edu.cmu.sv;
 
+import edu.cmu.sv.agent.DialogManager;
 import edu.cmu.sv.database.Database;
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -34,8 +35,12 @@ public class AppTest
      */
     public void testApp()
     {
-        System.out.println("creating a database");
-        Database database = new Database();
-        database.doSomething();
+
+
+
+
+
+//
+
     }
 }

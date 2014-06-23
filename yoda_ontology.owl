@@ -11,6 +11,42 @@
 
 #################################################################
 #
+#    Object Properties
+#
+#################################################################
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#hasLexicalEntry
+
+:hasLexicalEntry rdf:type owl:ObjectProperty ;
+                 
+                 rdfs:range [ rdf:type owl:Restriction ;
+                              owl:onProperty :hasLexicalEntry ;
+                              owl:someValuesFrom :LexicalEntry
+                            ] ;
+                 
+                 rdfs:domain [ rdf:type owl:Restriction ;
+                               owl:onProperty :hasLexicalEntry ;
+                               owl:someValuesFrom :LexicalSense
+                             ] .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#hasLexicalSense
+
+:hasLexicalSense rdf:type owl:ObjectProperty ;
+                 
+                 rdfs:range [ rdf:type owl:Restriction ;
+                              owl:onProperty :hasLexicalSense ;
+                              owl:someValuesFrom :LexicalSense
+                            ] .
+
+
+
+
+
+#################################################################
+#
 #    Classes
 #
 #################################################################
