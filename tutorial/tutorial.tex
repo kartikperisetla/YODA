@@ -5,6 +5,7 @@
 \usepackage{courier}
 \usepackage{graphicx}
 \usepackage{alltt}
+\usepackage{hyperref}
 \frenchspacing
 \addtolength{\topmargin}{-.875in}
 \addtolength{\textheight}{1.75in}
@@ -77,11 +78,15 @@ The developer can decide weather or not the dialog system is allowed to insert t
 If the dialog system is not allowed to insert, then a separate long-term memory database will be automatically created.
 Otherwise, the reference database will provide both long-term memory and reference functions.
 
-Reference databases must be Sesame SPARQL databases.
+Reference databases must be Sesame RDF databases.
+Many existing databases are in relational format and are accessed via SQL.
+These databases can be represented as RDF databases, as is described in \href{http://www.w3.org/2005/Incubator/rdb2rdf/RDB2RDF_SurveyReport.pdf}{A Survey of Current Approaches to Mapping of Relational Databases to RDF}.
 YODA requires a map between slots and properties which are shared by the domain ontology and the database schema.
 YODA only allows a one-to-one mapping of properties and slots, but allows certain properties to exist only in the reference database.
 
 Any database interface that does not have the default setting is defined by modifying the yoda/interfaces/DatabaseInterfaces.java file.
+
+
 
 
 \section {Define interfaces to Non-dialog actions}

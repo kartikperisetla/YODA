@@ -1,4 +1,7 @@
 *~
+*.aux
+*.log
+*.out
 *.pyc
 *.class
 *.jar

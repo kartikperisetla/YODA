@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class DialogManager implements Runnable {
     ConcurrentLinkedQueue<String> inputQueue;
+    SLUComponent slu = new SLUComponent();
 
     public DialogManager(ConcurrentLinkedQueue<String> inputQueue) {
         this.inputQueue = inputQueue;
@@ -21,6 +22,7 @@ public class DialogManager implements Runnable {
             String inputString = inputQueue.poll();
             if (inputString != null) {
                 System.out.println("dialog manager heard something!: " + inputString);
+                System.out.println(slu.matchInput(inputString));
             }
             try {
                 Thread.sleep(500); //
