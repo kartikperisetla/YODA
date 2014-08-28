@@ -28,28 +28,13 @@
 
 ###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#hasLexicalEntry
 
-:hasLexicalEntry rdf:type owl:ObjectProperty ;
-                 
-                 rdfs:domain [ rdf:type owl:Restriction ;
-                               owl:onProperty :hasLexicalEntry ;
-                               owl:someValuesFrom :LexicalSense
-                             ] ;
-                 
-                 rdfs:range [ rdf:type owl:Restriction ;
-                              owl:onProperty :hasLexicalEntry ;
-                              owl:someValuesFrom :LexicalEntry
-                            ] .
+:hasLexicalEntry rdf:type owl:ObjectProperty .
 
 
 
 ###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#hasLexicalSense
 
-:hasLexicalSense rdf:type owl:ObjectProperty ;
-                 
-                 rdfs:range [ rdf:type owl:Restriction ;
-                              owl:onProperty :hasLexicalSense ;
-                              owl:someValuesFrom :LexicalSense
-                            ] .
+:hasLexicalSense rdf:type owl:ObjectProperty .
 
 
 
@@ -62,14 +47,6 @@
 #################################################################
 
 
-###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#Action
-
-:Action rdf:type owl:Class ;
-        
-        rdfs:subClassOf :CanonicalClass .
-
-
-
 ###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#Animate
 
 :Animate rdf:type owl:Class ;
@@ -78,9 +55,39 @@
 
 
 
-###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#CanonicalClass
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#CancelMeeting
 
-:CanonicalClass rdf:type owl:Class .
+:CancelMeeting rdf:type owl:Class ;
+               
+               rdfs:subClassOf :HasMeeting ,
+                               :NonDialogTask .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#CreateMeeting
+
+:CreateMeeting rdf:type owl:Class ;
+               
+               rdfs:subClassOf :HasMeeting ,
+                               :NonDialogTask .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#DayOfWeek
+
+:DayOfWeek rdf:type owl:Class ;
+           
+           rdfs:subClassOf :Value .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#Email
+
+:Email rdf:type owl:Class ;
+       
+       rdfs:subClassOf :HasFromPerson ,
+                       :HasToPerson ,
+                       :NonPhysical .
 
 
 
@@ -92,6 +99,94 @@
 
 
 
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#HasDayOfWeek
+
+:HasDayOfWeek rdf:type owl:Class ;
+              
+              rdfs:subClassOf :ObjectByProperty .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#HasFromMeeting
+
+:HasFromMeeting rdf:type owl:Class ;
+                
+                rdfs:subClassOf :ObjectByProperty .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#HasFromPerson
+
+:HasFromPerson rdf:type owl:Class ;
+               
+               rdfs:subClassOf :ObjectByProperty .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#HasGender
+
+:HasGender rdf:type owl:Class ;
+           
+           rdfs:subClassOf :ObjectByProperty .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#HasMeeting
+
+:HasMeeting rdf:type owl:Class ;
+            
+            rdfs:subClassOf :ObjectByProperty .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#HasPerson
+
+:HasPerson rdf:type owl:Class ;
+           
+           rdfs:subClassOf :ObjectByProperty .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#HasPlace
+
+:HasPlace rdf:type owl:Class ;
+          
+          rdfs:subClassOf :ObjectByProperty .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#HasTime
+
+:HasTime rdf:type owl:Class ;
+         
+         rdfs:subClassOf :ObjectByProperty .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#HasTimeOfDay
+
+:HasTimeOfDay rdf:type owl:Class ;
+              
+              rdfs:subClassOf :ObjectByProperty .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#HasToMeeting
+
+:HasToMeeting rdf:type owl:Class ;
+              
+              rdfs:subClassOf :ObjectByProperty .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#HasToPerson
+
+:HasToPerson rdf:type owl:Class ;
+             
+             rdfs:subClassOf :ObjectByProperty .
+
+
+
 ###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#Inanimate
 
 :Inanimate rdf:type owl:Class ;
@@ -100,27 +195,38 @@
 
 
 
-###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#LexicalEntry
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#Meeting
 
-:LexicalEntry rdf:type owl:Class ;
-              
-              rdfs:subClassOf :LexicalItem .
+:Meeting rdf:type owl:Class ;
+         
+         rdfs:subClassOf :HasPerson ,
+                         :HasPlace ,
+                         :HasTime ,
+                         :NonPhysical .
 
 
 
-###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#LexicalItem
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#ModifyMeeting
 
-:LexicalItem rdf:type owl:Class ;
+:ModifyMeeting rdf:type owl:Class ;
+               
+               rdfs:subClassOf :HasFromMeeting ,
+                               :HasToMeeting ,
+                               :NonDialogTask .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#NonDialogTask
+
+:NonDialogTask rdf:type owl:Class .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#NonPhysical
+
+:NonPhysical rdf:type owl:Class ;
              
-             rdfs:subClassOf owl:Thing .
-
-
-
-###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#LexicalSense
-
-:LexicalSense rdf:type owl:Class ;
-              
-              rdfs:subClassOf :LexicalItem .
+             rdfs:subClassOf :Object .
 
 
 
@@ -128,7 +234,13 @@
 
 :Object rdf:type owl:Class ;
         
-        rdfs:subClassOf :CanonicalClass .
+        rdfs:subClassOf :Object .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#ObjectByProperty
+
+:ObjectByProperty rdf:type owl:Class .
 
 
 
@@ -136,7 +248,42 @@
 
 :Person rdf:type owl:Class ;
         
-        rdfs:subClassOf :Animate .
+        rdfs:subClassOf :Animate ,
+                        :HasGender .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#Place
+
+:Place rdf:type owl:Class ;
+       
+       rdfs:subClassOf :Inanimate .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#SendEmail
+
+:SendEmail rdf:type owl:Class ;
+           
+           rdfs:subClassOf :NonDialogTask .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#Time
+
+:Time rdf:type owl:Class ;
+      
+      rdfs:subClassOf :HasDayOfWeek ,
+                      :HasTimeOfDay ,
+                      :NonPhysical .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#TimeOfDay
+
+:TimeOfDay rdf:type owl:Class ;
+           
+           rdfs:subClassOf :Value .
 
 
 
@@ -145,6 +292,14 @@
 :Value rdf:type owl:Class ;
        
        rdfs:subClassOf owl:Thing .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#WordFamily
+
+:WordFamily rdf:type owl:Class ;
+            
+            rdfs:subClassOf owl:Thing .
 
 
 

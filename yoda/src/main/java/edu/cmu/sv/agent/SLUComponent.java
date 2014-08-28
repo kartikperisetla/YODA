@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 public class SLUComponent {
 
     public Map<String, String> matchInput(String inputString){
-        Map<String, String> ans = new HashMap<String, String>();
+        Map<String, String> ans = new HashMap<>();
         Pattern queryPattern = Pattern.compile("describe (?<name>.+)");
         Matcher matcher = queryPattern.matcher(inputString);
         if (matcher.matches()) {

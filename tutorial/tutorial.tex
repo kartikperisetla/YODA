@@ -6,7 +6,9 @@
 \usepackage{graphicx}
 \usepackage{alltt}
 \usepackage{hyperref}
-\frenchspacing
+\usepackage{minted}
+%% \usepackage{upquote}
+\frenchspacing                 
 \addtolength{\topmargin}{-.875in}
 \addtolength{\textheight}{1.75in}
 %% \setlength{\pdfpagewidth}{8.5in}
@@ -31,36 +33,321 @@ We envision this system as a smartphone app, which the user can use to message t
 
 
 \section {Understand Your Dialog System's Desired Functionality}
-The YODA dialog manager is designed to build dialog systems which combine the functions of information retrieval (IR), information entry, and transactional dialog systems.
+The YODA dialog manager is designed to build dialog systems which combine the functions of information retrieval, and information entry dialog systems.
 An IR dialog system's main purpose is to answer questions about a database of objects - such as restaurants, movies, or events in a calendar.
 An information entry system allows the user to create descriptions of objects for entry in a database - such as scheduling events in a calendar.
-A transactional dialog system allows the system to take actions on behalf of the user, such as making reservations or sending emails.
+More complex systems can be built on top of these two basic functions.
+For example, a transactional dialog system, which may take actions on behalf of the user such as making reservations or sending emails, is just an information entry system with additional functionality after the appropriate information has been entered.
 
-The first step for a YODA system developer is to decide what databases it is intended to access and in what way, and what non-dialog actions their system can take (if it is transactional), and what types of objects it can talk about.
+The first step for a YODA system developer is to decide what databases it is intended to access and in what way.
+This involves enumerating the types of things the system can talk about, and how it can talk about them.
+We'll do this informally at first, then more formally in section \ref{ontology-section}
 
-If your intended system does not fit into the categories described here, YODA is probably not an appropriate dialog manager for your project.
-We appreciate your feedback about why you feel this is the case, and we hope to support a broader set of dialog systems in the future.
-Please email David at david.cohen@sv.cmu.edu .
+Our demonstration system can talk about people, meetings, times, and emails.
+Every meeting has a time and several attendees.
+Every email has a sender, a recipient, and some text content.
+We want the system to be able to set up a meeting, as well as answer basic queries about meetings.
+We also want the system to be able to answer basic queries about emails, and listen to and send dictated emails.
 
-\section {Set up of the YODA directory}
-Your dialog system will be built on top of the skeleton YODA dialog system.
-Once you've installed YODA, believe it or not, your dialog system already exists! (run bin/launch.sh).
+%% \section {Set up of the YODA directory}
+%% Your dialog system will be built on top of the skeleton YODA dialog system.
+%% Once you've installed YODA, believe it or not, your dialog system already exists! (run bin/launch.sh).
 
-Of course, this dialog system doesn't know very much - it knows what people and places are, but doesn't know about any particular person or place.
-The vast majority of your early work will be done in the yoda/ontology and yoda/interfaces directories.
-In the ontology folder, you will extend the dialog system's domain to allow it to talk about the objects you are interested in.
-In the interfaces directory, you will connect your dialog system to database resources it needs.
+%% Of course, this dialog system doesn't know very much - it knows what people and places are, but doesn't know about any particular person or place.
+%% The vast majority of your early work will be done in the yoda/ontology and yoda/interfaces directories.
+%% In the ontology folder, you will extend the dialog system's domain to allow it to talk about the objects you are interested in.
+%% In the interfaces directory, you will connect your dialog system to database resources it needs.
 
-\section {Build the Ontology}
+\section {Build the Ontology} \label{ontology-section}
 
 A YODA developer must then formalize the objects, actions and properties which are relevant to their domain by extending the YODA skeleton ontology with new classes, properties, values, and instances.
 Objects should be given appropriate slots, relations, and properties which correspond to the actual objects.
 There are several powerfull tools available for editing OWL ontologies, but we recommend protege, and all our examples are shown in protege.
 
 
-Figue 1 shows the specification of a person in the OWL skeleton ontology.
-Figure 2 shows the specification of a meeting, and of the domain action set-up-meeting.
-There are additional objects and actions that are defined for our meeting room reservation system, details of which can be found in the attached .owl file.
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=150px]{sample-ontology-screenshot}
+  \caption{YODA sample domain ontology}
+  \label{sample-ontology-figure}
+\end{figure}
+
+Figure \ref{sample-ontology-figure} shows the class hierarchy for the domain ontology.
+
+\section {Define the Dialog Functionality} \label{dialog-management-section}
+
+\subsection {Dialog Tasks}
+The developer defines what dialog tasks
+
+\subsection {Non-dialog Tasks}
+Several aspects of a non-dialog task will effect how the dialog manager interacts with them.
+In addition to implementing the execution of these tasks, the developer must define the information relevant for dialog management.
+
+
+\begin{figure}[ht*]
+\centering
+\rule{\textwidth}{1pt}
+\small
+\begin{minted}[linenos=true]{java}
+public class NonDialogTaskPreferences {
+    // if explicit confirmation is always required before the 
+    // task is executed, set alwaysRequireConfirmation to true
+    public boolean alwaysRequireConfirmation;
+
+    // all the rewards and penalties are given as positive 
+    // numbers, penalties are converted to negative numbers for
+    // decision-making
+    public double penaltyForDelay;
+    public double rewardForCorrectExecution;
+    public double penaltyForIncorrectExecution;
+
+    // define the slots that are required to be defined by the
+    // user before execution is possible
+    public Set<String> slotsRequired;
+
+    public NonDialogTaskPreferences(
+        boolean alwaysRequireConfirmation, 
+        double penaltyForDelay, 
+        double rewardForCorrectExecution, 
+        double penaltyForIncorrectExecution, 
+        Set<String> slotsRequired) {
+        this.alwaysRequireConfirmation = 
+            alwaysRequireConfirmation;
+        this.penaltyForDelay = penaltyForDelay;
+        this.rewardForCorrectExecution = 
+            rewardForCorrectExecution;
+        this.penaltyForIncorrectExecution = 
+            penaltyForIncorrectExecution;
+        this.slotsRequired = slotsRequired;
+    }
+}
+\end{minted}
+\rule{\textwidth}{1pt}
+\caption{The NonDialogTask interface}
+\label{NonDialogTaskPreferences-code-figure}
+\end{figure}
+
+Figure \ref{NonDialogTaskPreferences-code-figure} shows the definition for the NonDialogTaskPreferences class.
+It contains several parameters which determine the reward and penalty (negative reward) received by the system for executing a task, delaying execution of a task, and incorrectly executing a task or executing a task with incorrect parameters.
+These preferences are used by the dialog manager to perform decision-theoretic dialog management, and may be used to train reinforcement-learning dialog managers in the future.
+
+There is another parameter, alwaysRequireConfirmation, that can be set to true if the dialog manager is required to get a confirmation from the user before performing an non-dialog task.
+Depending on the cost / benefit tradeoff, the dialog manager may decide to request a confirmation before executing a non-dialog task even if the flag is not set, and setting a high penalty for incorrect execution can make explicit confirmation requests more likely, but setting the flag allows the designer to enforce strict transparency.
+
+In our Figure \ref{SendEmailTask-code-figure} line 5-7, we show the preferences declaration for the send-email task.
+Here, we set alwaysRequireConfirmation to true, so the user will always be asked for explicit confirmation before an email is sent, as in the following example:
+
+\begin{alltt}
+\textbf{User} Send an email to Jerry.
+\textbf{System} You want me to send an email to Jerry, right?
+\textbf{User} Yes.
+\textbf{System} Ok.
+\textbf{System} <executes task>
+\end{alltt}
+
+In our Figure \ref{CreateMeetingTask-code-figure} line 5-10, we show the preferences declaration for the create-meeting task.
+Here, we set alwaysRequireConfirmation to false, so the system is allowed to perform the task without an explicit confirmation, as in the following example:
+
+\begin{alltt}
+\textbf{User} Set up a meeting this afternoon with Jerry in my office.
+\textbf{System} Ok.
+\textbf{System} <executes task>
+\end{alltt}
+
+The last parameter of the NonDialogTaskPreferences class sets requirements for what must be specified for a task to be executable.
+As is shown in the preference declarations from Figures \ref{SendEmailTask-code-figure} and \ref{CreateMeetingTask-code-figure}, sending an email only requires a sender, while creating a meeting requires a description of a meeting with at least one time, place, and attendee.
+The dialog manager will not consider executing a task until all its required slots are filled, and will instead engage in slot-filling dialog, as in the following example:
+
+\begin{alltt}
+\textbf{User} Set up a meeting this afternoon.
+\textbf{System} Where will this meeting be?
+\textbf{User} In my office.
+\textbf{System} Who is this meeting with?
+\textbf{User} Jerry.
+\textbf{System} Ok.
+\textbf{System} <executes task>
+\end{alltt}
+
+
+After basic preferences have been defined, the NonDialogTask interface, shown in figure \ref{NonDialogTask-interface-code-figure}, must be implemented for each non-dialog task.
+Two implementations of this are shown in this tutorial, SendEmailTask is shown in figure \ref{SendEmailTask-code-figure}, and CreateMeetingTask is shown in figure \ref{CreateMeetingTask-code-figure}
+
+\begin{figure}[ht*]
+\centering
+\rule{\textwidth}{1pt}
+\small
+\begin{minted}[linenos=true]{java}
+public interface NonDialogTask {
+
+    public enum TaskStatus {SUCCESSFULLY_COMPLETED, 
+      CURRENTLY_EXECUTING_BLOCKING,
+      CURRENTLY_EXECUTING_NOT_BLOCKING, FAILED}
+
+    // return preferences object
+    public NonDialogTaskPreferences getPreferences();
+
+    // the probability that the taskSpec can be executed (0-1)
+    public double assessExecutability(SemanticsModel taskSpec);
+
+    // return the string ID of the executing task (taskID)
+    public String execute(SemanticsModel taskSpec);
+
+    // return the string status indicator for the taskID
+    public TaskStatus status(String taskID);
+
+}
+\end{minted}
+\rule{\textwidth}{1pt}
+\caption{The NonDialogTask interface}
+\label{NonDialogTask-interface-code-figure}
+\end{figure}
+
+
+The assessExecutability method is a task-specific method for informing the dialog manager how likely it is a task will succeed.
+For example, sending an email may be guarenteed to fail if the device does not have working internet.
+For situated agents such as robots, there is always some non-negligible chance that an attempted physical action will fail.
+The dialog manager will incorporate these probabilities into its decision-making process.
+Intuitively, it will hesitate to perform actions which are likely to fail, and eagerly execute actions which are likely to succeed.
+
+The execute method executes the actual task.
+This will call developer-defined functions and libraries to actually send emails, reserve meeting rooms, etc.
+
+The status method checks a task's status, which can be one of the following:
+\begin{itemize}
+\item SUCCESSFULLY\_COMPLETED
+\item CURRENTLY\_EXECUTING\_BLOCKING
+\item CURRENTLY\_EXECUTING\_NOT\_BLOCKING
+\item FAILED
+\end{itemize}
+
+When a task is blocking, the dialog system is temporarily de-activated.
+In this tutorial, we assume that a separate module is called for email dication, so the send-email task is blocking.
+
+\begin{figure}[ht*]
+\centering
+\rule{\textwidth}{1pt}
+\small
+\begin{minted}[linenos=true]{java}
+public class SendEmailTask implements NonDialogTask {
+    private static Integer instanceCounter = 0;
+    private static Map<String, TaskStatus> executionStatus = 
+        new HashMap<>();
+    private static NonDialogTaskPreferences preferences = 
+        new NonDialogTaskPreferences(true, 1, 20, 20,
+            new HashSet<>(Arrays.asList("hasToPerson")));
+
+    @Override
+    public NonDialogTaskPreferences getPreferences() {
+        return preferences;
+    }
+
+    @Override
+    public double assessExecutability(SemanticsModel taskSpec) {
+        // this works because assessExecutability is never
+        // called unless all the required slots are present
+        return 1.0;
+    }
+
+    @Override
+    public String execute(SemanticsModel taskSpec) {
+        System.out.println("Executing task: send email");
+        System.out.println(taskSpec);
+        String ans = "SendEmailTask:"+instanceCounter.
+            toString();
+        instanceCounter += 1;
+        // There is no real implementation, so we just set 
+        // the status to successfully completed
+        executionStatus.put(ans,
+            TaskStatus.SUCCESSFULLY_COMPLETED);
+
+        /*
+         * In the envisioned implementation, a separate
+         * dictation program would run while the other 
+         * program is run, the dialog manager should block, as
+         * in the following commented lines
+         */
+        // executionStatus.put(ans,
+        //    TaskStatus.CURRENTLY_EXECUTING_BLOCKING);
+        // dictationProgram.run();
+
+        System.out.println("taskID: "+ans);
+        return ans;
+    }
+
+    @Override
+    public TaskStatus status(String taskID) {
+        return executionStatus.get(taskID);
+    }
+}
+\end{minted}
+\rule{\textwidth}{1pt}
+\caption{The SendEmailTask implementation}
+\label{SendEmailTask-code-figure}
+\end{figure}
+
+
+
+
+
+\begin{figure}[ht*]
+\centering
+\rule{\textwidth}{1pt}
+\small
+\begin{minted}[linenos=true]{java}
+public class CreateMeetingTask implements NonDialogTask {
+    private static Integer instanceCounter = 0;
+    private static Map<String, TaskStatus> executionStatus = 
+        new HashMap<>();
+    private static NonDialogTaskPreferences preferences =
+            new NonDialogTaskPreferences(false, 1, 20, 15,
+                    new HashSet<>(Arrays.asList(
+                        "hasMeeting.hasTime", 
+                        "hasMeeting.hasPlace", 
+                        "hasMeeting.hasPerson")));
+
+    @Override
+    public NonDialogTaskPreferences getPreferences() {
+        return preferences;
+    }
+
+    @Override
+    public double assessExecutability(SemanticsModel taskSpec) {
+        return 1.0;
+    }
+
+    @Override
+    public String execute(SemanticsModel taskSpec) {
+        System.out.println("Executing task: create meeting");
+        System.out.println(taskSpec);
+        String ans = "CreateMeetingTask:"+instanceCounter.
+            toString();
+        instanceCounter += 1;
+        // There is no real implementation, so we just set the
+        // status to successfully completed
+        executionStatus.put(ans, 
+            TaskStatus.SUCCESSFULLY_COMPLETED);
+        System.out.println("taskID: "+ans);
+        return ans;
+    }
+
+    @Override
+    public TaskStatus status(String taskID) {
+        return executionStatus.get(taskID);
+    }
+}
+\end{minted}
+\rule{\textwidth}{1pt}
+\caption{The SendEmailTask implementation}
+\label{CreateMeetingTask-code-figure}
+\end{figure}
+
+
+
+
+
+
+
+
 
 
 \section {Define interfaces to External Databases}

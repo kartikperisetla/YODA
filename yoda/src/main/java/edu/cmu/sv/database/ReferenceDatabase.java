@@ -29,7 +29,7 @@ public class ReferenceDatabase {
         Database.Operation newOperation = new Database.Operation(operation.getTransactionType(), operation.getVariables(), operation.getClassConstraints(), operation.getTriples());
 
         // translate class constraints
-        Map<String, String> newClassConstraints = new HashMap<String, String>();
+        Map<String, String> newClassConstraints = new HashMap<>();
         for (String key : operation.getClassConstraints().keySet()){
             if (URItoURIMap.containsKey(operation.getClassConstraints().get(key))){
                 newClassConstraints.put(key, URItoURIMap.get(operation.getClassConstraints().get(key)));
@@ -40,14 +40,14 @@ public class ReferenceDatabase {
         newOperation.setClassConstraints(newClassConstraints);
 
         // translate triples
-        Set<ImmutableTriple<String, String, String>> newTriples = new HashSet<ImmutableTriple<String, String, String>>();
+        Set<ImmutableTriple<String, String, String>> newTriples = new HashSet<>();
         for (ImmutableTriple<String, String, String> oldTriple : operation.getTriples()){
             String newSubj = oldTriple.getLeft();
             String newPredicate = oldTriple.getMiddle();
             String newObj = oldTriple.getRight();
             // pred / object translations first
-            if (predicateObjectToPredicateObjectMap.containsKey(new ImmutablePair<String, String>(newPredicate, newObj))){
-                ImmutablePair<String, String> dummy = predicateObjectToPredicateObjectMap.get(new ImmutablePair<String, String>(newPredicate, newObj));
+            if (predicateObjectToPredicateObjectMap.containsKey(new ImmutablePair<>(newPredicate, newObj))){
+                ImmutablePair<String, String> dummy = predicateObjectToPredicateObjectMap.get(new ImmutablePair<>(newPredicate, newObj));
                 newPredicate = dummy.getLeft();
                 newObj = dummy.getRight();
             }
@@ -61,7 +61,7 @@ public class ReferenceDatabase {
             if (URItoURIMap.containsKey(newObj)){
                 newSubj = URItoURIMap.get(newObj);
             }
-            newTriples.add(new ImmutableTriple<String, String, String>(newSubj, newPredicate, newObj));
+            newTriples.add(new ImmutableTriple<>(newSubj, newPredicate, newObj));
         }
         newOperation.setTriples(newTriples);
 

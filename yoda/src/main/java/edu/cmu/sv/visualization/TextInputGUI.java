@@ -28,12 +28,9 @@ public class TextInputGUI {
         textField = new JTextField();
         frame.getContentPane().add(textField, BorderLayout.CENTER);
         button = new JButton("Submit");
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                outputQueue.add(textField.getText());
-                textField.setText("");
-            }
+        button.addActionListener(actionEvent -> {
+            outputQueue.add(textField.getText());
+            textField.setText("");
         });
         frame.getContentPane().add(button, BorderLayout.SOUTH);
         frame.pack();
@@ -41,12 +38,7 @@ public class TextInputGUI {
     }
 
     public void go(){
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                createAndShowGUI();
-            }
-        });
+        javax.swing.SwingUtilities.invokeLater(this::createAndShowGUI);
     }
 
 }
