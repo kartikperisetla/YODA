@@ -1,5 +1,6 @@
 %File: formatting-instruction.tex
 \documentclass[10pt]{article}
+\usepackage{enumitem}
 \usepackage{times}
 \usepackage{helvet}
 \usepackage{courier}
@@ -32,31 +33,136 @@ This tutorial will introduce the major components and capabilities of Yoda by wa
 We envision this system as a smartphone app, which the user can use to message their friends and coordinate meetings.
 
 
-\section {Understand Your Dialog System's Desired Functionality}
-The YODA dialog manager is designed to build dialog systems which combine the functions of information retrieval, and information entry dialog systems.
-An IR dialog system's main purpose is to answer questions about a database of objects - such as restaurants, movies, or events in a calendar.
-An information entry system allows the user to create descriptions of objects for entry in a database - such as scheduling events in a calendar.
-More complex systems can be built on top of these two basic functions.
-For example, a transactional dialog system, which may take actions on behalf of the user such as making reservations or sending emails, is just an information entry system with additional functionality after the appropriate information has been entered.
+\section {YODA's Dialog Functionality}
+The YODA dialog manager is designed to build dialog systems which combine the functions of information retrieval (IR), and information entry (IE).
+An IR dialog system's main purpose is to answer questions about a database of objects, such as restaurants, movies, or events in a calendar.
+A situated environment is also represented as a database, and IR dialog patterns still apply to asking questions about the environment.
 
-The first step for a YODA system developer is to decide what databases it is intended to access and in what way.
-This involves enumerating the types of things the system can talk about, and how it can talk about them.
-We'll do this informally at first, then more formally in section \ref{ontology-section}
+An IE dialog system allows the user to describe objects and to have those descriptions used to modify the system's database, for example, adding new calendar events to a schedule.
+IE dialog patterns extend to command-and-control dialog, interactive grounding in partially-observed situated environments, crowdsourcing databases, and many other applications.
+
+The following list shows the initial major categories of discourse unit supported by YODA:
+
+\begin{itemize}[nolistsep]
+\item Information Retrieval
+  \begin{itemize}[nolistsep]
+  \item YN Question
+  \item WH Question
+  \item Search
+  \end{itemize}
+\item Information Entry
+  \begin{itemize}[nolistsep]
+  \item Command
+  \item Offer
+  \item Statement
+  \end{itemize}
+\end{itemize}
+
+A discourse unit is a dialog task, characterized by its DU-type and its semantic content.
+A discourse unit will stretch over multiple utterances, including initial presentations and related clarification, grounding dialog.
+
+One of the major expected contributions of the YODA dialog manager is to support multiple discourse units gracefully.
+This will enable dialog systems which can maintain context across tasks, and support multiple simultaneous tasks.
+
+YODA supports complex dialog systems by providing interfaces for specifying what types of discourse units are allowed for what types of database objects, as well as providing interfaces to non-dialog tasks which can be triggered by discourse units.
 
 Our demonstration system can talk about people, meetings, times, and emails.
 Every meeting has a time and several attendees.
 Every email has a sender, a recipient, and some text content.
-We want the system to be able to set up a meeting, as well as answer basic queries about meetings.
-We also want the system to be able to answer basic queries about emails, and listen to and send dictated emails.
+We want the system to be able to set up a meeting, as well as answer basic queries about a user's schedule.
+We also want the system to be able to answer basic queries about their inbox, and to allow the user to dictate emails.
 
-%% \section {Set up of the YODA directory}
-%% Your dialog system will be built on top of the skeleton YODA dialog system.
-%% Once you've installed YODA, believe it or not, your dialog system already exists! (run bin/launch.sh).
+To keep the example simple, and to play to YODA's strengths, we assume that email dictation is handled by an external component, which the YODA dialog manager triggers as appropriate.
+The main reasons for this are: 1) a dialog system should not perform understanding on dictated text, so the processing of a dictated email is different than the processing of normal dialog; and 2) different ASR components will be appropriate for dictated email versus standard dialog.
 
-%% Of course, this dialog system doesn't know very much - it knows what people and places are, but doesn't know about any particular person or place.
-%% The vast majority of your early work will be done in the yoda/ontology and yoda/interfaces directories.
-%% In the ontology folder, you will extend the dialog system's domain to allow it to talk about the objects you are interested in.
-%% In the interfaces directory, you will connect your dialog system to database resources it needs.
+\section {SLU Input} \label{slu-section}
+
+The dialog manager takes as input an n-best list of hierarchical semantic parse results (defined by YODAs SemanticsModel class) along with corresponding confidence values.
+Our utterance representation is designed to allow natural utterances such as fragments and clarification utterances to be interpreted usefully, while still retaining principled semantic expressiveness.
+
+We use an incomplete list of common semantic roles to denote the relationship between an action and the various entities under discussion.
+In the near term, these will likely include:
+
+\begin{itemize}[nolistsep]
+\item Agent (often Subject in English syntax)
+\item Patient (often Direct Object in English syntax)
+\item Recipient (ofteg Indirect Object in English syntax)
+\item FromLocation
+\item ToLocation
+\item Location
+\item FromTime
+\item ToTime
+\item Time
+\end{itemize}
+
+
+\begin{figure}[ht*]
+  \small
+  \centering
+  \begin{minipage}{200px}
+    \noindent a) ``I want to set up a meeting''
+    \begin{minted}[frame=lines]{python}
+{ dialogAct: "command",
+  action: "Create",
+  patient: {
+    class: "Meeting"
+    number: "singular"
+    refType: "indefinite"
+  }
+}
+    \end{minted}
+
+    \noindent b) ``From two to three''
+    \begin{minted}[frame=lines]{python}
+{ dialogAct: "fragment",
+  fromTime: {
+    class: "Time"
+    hour: "two"
+  }
+  toTime: {
+    class: "Time"
+    hour: "three"
+  }
+}
+    \end{minted}
+
+    \noindent c) ``With Sam''
+    \begin{minted}[frame=lines]{python}
+{ dialogAct: "fragment",
+  adjunct: {
+    class: "Person"
+    nameGiven: "Sam"
+  }
+}
+    \end{minted}
+
+  \end{minipage}
+
+
+  \caption{SLU input examples}
+  \label{slu-example-figure}
+\end{figure}
+
+
+The utterance semantic representation also includes a dialog act, a polarity, and possibly other slots in the future.
+Some example utterances and corresponding semantic representations in JSON format are shown in Figure \ref{slu-example-figure}.
+Each role can either be unfilled, or filled with an object description.
+
+Exampla a) shows a complete sentence and its interpretation.
+Notice that ``want'' is not used to determine the sentence's action, rather it is interpreted as an indirect command.
+Similarly, ``why don't you X ?'' should be interpreted as a command, rather than a WH question.
+
+Example b) shows how two times can be represented within a single utterance.
+
+Example c) shows the format that recognized named entities should be given in.
+The nameGiven slot within an object description is filled by the exact string used in the utterance.
+This string is then used to resolve the reference within later understanding modules.
+The same nameGiven slot is used for a named place, company, country, and so on.
+
+The exact set of slots available to an object description correspond to the properties defined within the ontology.
+We also intend to provide an interface to support domain-specific higher-level understanding such as assessing fuzzy properties and resolving demonstratives for reference resolution.
+Details of this are outside the scope of this tutorial.
+
 
 \section {Build the Ontology} \label{ontology-section}
 
@@ -350,89 +456,86 @@ public class CreateMeetingTask implements NonDialogTask {
 
 
 
-\section {Define interfaces to External Databases}
-Classes in the ontology correspond to supporting databases.
+%% \section {Define interfaces to External Databases}
+%% Classes in the ontology correspond to supporting databases.
 
-There are two types of supporting databases, corresponding to two primary functions:
-\begin{itemize}
-\item{\textbf{Long-term Memory Database:}Store objects from interactions in long-term memory to keep reasoning in working memory tractable while allowing for possible retrieval at a later date}
-\item{\textbf{Reference Database:} Store and index a large collection of reference objects (the standard use paradigm of a database)}
-\end{itemize}
+%% There are two types of supporting databases, corresponding to two primary functions:
+%% \begin{itemize}
+%% \item{\textbf{Long-term Memory Database:}Store objects from interactions in long-term memory to keep reasoning in working memory tractable while allowing for possible retrieval at a later date}
+%% \item{\textbf{Reference Database:} Store and index a large collection of reference objects (the standard use paradigm of a database)}
+%% \end{itemize}
 
-By default, every class defined in the ontology has no supporting reference database, and an independent long-term memory database.
-If the developer wants to provide a reference database they may do so.
-The developer can decide weather or not the dialog system is allowed to insert to that database.
-If the dialog system is not allowed to insert, then a separate long-term memory database will be automatically created.
-Otherwise, the reference database will provide both long-term memory and reference functions.
+%% By default, every class defined in the ontology has no supporting reference database, and an independent long-term memory database.
+%% If the developer wants to provide a reference database they may do so.
+%% The developer can decide weather or not the dialog system is allowed to insert to that database.
+%% If the dialog system is not allowed to insert, then a separate long-term memory database will be automatically created.
+%% Otherwise, the reference database will provide both long-term memory and reference functions.
 
-Reference databases must be Sesame RDF databases.
-Many existing databases are in relational format and are accessed via SQL.
-These databases can be represented as RDF databases, as is described in \href{http://www.w3.org/2005/Incubator/rdb2rdf/RDB2RDF_SurveyReport.pdf}{A Survey of Current Approaches to Mapping of Relational Databases to RDF}.
-YODA requires a map between slots and properties which are shared by the domain ontology and the database schema.
-YODA only allows a one-to-one mapping of properties and slots, but allows certain properties to exist only in the reference database.
+%% Reference databases must be Sesame RDF databases.
+%% Many existing databases are in relational format and are accessed via SQL.
+%% These databases can be represented as RDF databases, as is described in \href{http://www.w3.org/2005/Incubator/rdb2rdf/RDB2RDF_SurveyReport.pdf}{A Survey of Current Approaches to Mapping of Relational Databases to RDF}.
+%% YODA requires a map between slots and properties which are shared by the domain ontology and the database schema.
+%% YODA only allows a one-to-one mapping of properties and slots, but allows certain properties to exist only in the reference database.
 
-Any database interface that does not have the default setting is defined by modifying the yoda/interfaces/DatabaseInterfaces.java file.
-
-
+%% Any database interface that does not have the default setting is defined by modifying the yoda/interfaces/DatabaseInterfaces.java file.
 
 
-\section {Define interfaces to Non-dialog actions}
-Similar to the database interface definitions, the developer can specify action interfaces to specify what information is needed to actually perform an action.
-
-\section {Build a lexicon for NLG}
-Initial linguistic information should be associated with each new class and instance.
-The two figures below show examples of the linguistic information associated with the objects specified above.
-The complete example is given in the attached owl file.
-
-The program TestLexicalEntry.java generates sample sentences based on the lexicon provided by the developer.
-The developer can use this program to test that their lexicon generates sensible sentences and covers the full variety of things the developer expects to be said about the object.
-Call it from the command line using: java TestLexicalEntry.java -e [entryID]
 
 
-\section {Train SLU and speech modules with artificial data}
+%% \section {Build a lexicon for NLG}
+%% Initial linguistic information should be associated with each new class and instance.
+%% The two figures below show examples of the linguistic information associated with the objects specified above.
+%% The complete example is given in the attached owl file.
 
-To build an initial SLU component, YODA takes the generated lexicon and creates a large training set.
-It adds artificial noise to the training set for robustness, and extends the training set using wordnet synonyms.
-It then trains a state-of-the-art SLU component based on this artificial data.
-
-To build an initial SLU component, run java GenerateInitialSLUComponent.java .
-Include -v in the command line arguments after the filename to see cross-validation results within the auto-generated corpus.
-
-The training data set is retained in yoda/SLU/artificial\_train.txt, and the domain-specific annotation scheme is described in yoda/SLU/annotation\_scheme.txt .
-As real data is collected, the SLU component can be improved by incorporating annotated real-world examples.
-
-To build an improved SLU component, put labeled real-world data in yoda/SLU/real\_data.txt in the same format as artificial\_rain.txt, then run: java GenerateImprovedSLUComponent.java .
-Include a -v in the arguments after the filename to see validation results and a comparison between the initial and the improved systems.
-
-It will likely be the case that as real data is collected, the developer will discover that the domain and lexicon definitions should be extended to improve coverage of users actully say.
-We recommend that this be done by extending the ontology rather than simply training the improved model.
-The purpose of the improved model is to improve the component's likelihood model for different utterances, not to compensate for poor coverage.
-
-To generate a language model based on the automatically generated sentences and the real data examples, run the script build\_language\_model.sh .
+%% The program TestLexicalEntry.java generates sample sentences based on the lexicon provided by the developer.
+%% The developer can use this program to test that their lexicon generates sensible sentences and covers the full variety of things the developer expects to be said about the object.
+%% Call it from the command line using: java TestLexicalEntry.java -e [entryID]
 
 
-\section {Build sensor interfaces}
-YODA dialog systems support situated interaction by defining sensor interfaces.
-Sensors can report the existance of new entities, and their properties and relations.
-The interfaces define a message protocol used to receive updates from the sensors.
+%% \section {Train SLU and speech modules with artificial data}
 
-Some of the information provided in the protocol includes:
-\begin{itemize}
-\item Expected framerate
-\item Expected consistency of the sensor readings over time
-\item Type of confidence markup (N-best, Bayes net, full CPT)
-\item Overlap interface (Define the overlap between this sensor and other sensors)
-\item Relevance interface (Choose a strategy for defining how relevance to the ongoing discourse should be tracked for objects in this sensor stream)
-\item Expected recall of objects (effects dialog strategy)
-\item Expected precision (of some slot?)
-\end{itemize}
+%% To build an initial SLU component, YODA takes the generated lexicon and creates a large training set.
+%% It adds artificial noise to the training set for robustness, and extends the training set using wordnet synonyms.
+%% It then trains a state-of-the-art SLU component based on this artificial data.
 
-\subsection {Sensor belief tracking in Yoda}
-YODA designers will explore belief-tracking and sensor fusion approaches that generalize to dynamic situated domains.
+%% To build an initial SLU component, run java GenerateInitialSLUComponent.java .
+%% Include -v in the command line arguments after the filename to see cross-validation results within the auto-generated corpus.
 
-\subsection {Long-term Memory and Discourse Relevance in YODA}
-YODA designers will explore different strategies for tracking objects' relevance to an ongoing discourse, and for using that relevance to move information between long-term and working memory.
-The different properties of different sensor types will be better suited for different relevance strategies.
+%% The training data set is retained in yoda/SLU/artificial\_train.txt, and the domain-specific annotation scheme is described in yoda/SLU/annotation\_scheme.txt .
+%% As real data is collected, the SLU component can be improved by incorporating annotated real-world examples.
+
+%% To build an improved SLU component, put labeled real-world data in yoda/SLU/real\_data.txt in the same format as artificial\_rain.txt, then run: java GenerateImprovedSLUComponent.java .
+%% Include a -v in the arguments after the filename to see validation results and a comparison between the initial and the improved systems.
+
+%% It will likely be the case that as real data is collected, the developer will discover that the domain and lexicon definitions should be extended to improve coverage of users actully say.
+%% We recommend that this be done by extending the ontology rather than simply training the improved model.
+%% The purpose of the improved model is to improve the component's likelihood model for different utterances, not to compensate for poor coverage.
+
+%% To generate a language model based on the automatically generated sentences and the real data examples, run the script build\_language\_model.sh .
+
+
+%% \section {Build sensor interfaces}
+%% YODA dialog systems support situated interaction by defining sensor interfaces.
+%% Sensors can report the existance of new entities, and their properties and relations.
+%% The interfaces define a message protocol used to receive updates from the sensors.
+
+%% Some of the information provided in the protocol includes:
+%% \begin{itemize}
+%% \item Expected framerate
+%% \item Expected consistency of the sensor readings over time
+%% \item Type of confidence markup (N-best, Bayes net, full CPT)
+%% \item Overlap interface (Define the overlap between this sensor and other sensors)
+%% \item Relevance interface (Choose a strategy for defining how relevance to the ongoing discourse should be tracked for objects in this sensor stream)
+%% \item Expected recall of objects (effects dialog strategy)
+%% \item Expected precision (of some slot?)
+%% \end{itemize}
+
+%% \subsection {Sensor belief tracking in Yoda}
+%% YODA designers will explore belief-tracking and sensor fusion approaches that generalize to dynamic situated domains.
+
+%% \subsection {Long-term Memory and Discourse Relevance in YODA}
+%% YODA designers will explore different strategies for tracking objects' relevance to an ongoing discourse, and for using that relevance to move information between long-term and working memory.
+%% The different properties of different sensor types will be better suited for different relevance strategies.
 
 \bibliographystyle{acm}
 \bibliography{/home/cohend/Dropbox/Documents/bibtex_db}
