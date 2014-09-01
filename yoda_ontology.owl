@@ -16,6 +16,38 @@
 #################################################################
 
 
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#hasAgent
+
+:hasAgent rdf:type owl:ObjectProperty ;
+          
+          rdfs:subPropertyOf :hasFromRole .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#hasAtRole
+
+:hasAtRole rdf:type owl:ObjectProperty ;
+           
+           rdfs:subPropertyOf :hasSemanticRole .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#hasDestination
+
+:hasDestination rdf:type owl:ObjectProperty ;
+                
+                rdfs:subPropertyOf :hasToRole .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#hasFromRole
+
+:hasFromRole rdf:type owl:ObjectProperty ;
+             
+             rdfs:subPropertyOf :hasSemanticRole .
+
+
+
 ###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#hasGender
 
 :hasGender rdf:type owl:ObjectProperty ;
@@ -23,6 +55,14 @@
            rdfs:domain :Animate ;
            
            rdfs:range :Gender .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#hasInstrument
+
+:hasInstrument rdf:type owl:ObjectProperty ;
+               
+               rdfs:subPropertyOf :hasViaRole .
 
 
 
@@ -35,6 +75,76 @@
 ###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#hasLexicalSense
 
 :hasLexicalSense rdf:type owl:ObjectProperty .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#hasLocation
+
+:hasLocation rdf:type owl:ObjectProperty ;
+             
+             rdfs:subPropertyOf :hasAtRole .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#hasPatient
+
+:hasPatient rdf:type owl:ObjectProperty ;
+            
+            rdfs:subPropertyOf :hasAtRole .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#hasRecipient
+
+:hasRecipient rdf:type owl:ObjectProperty ;
+              
+              rdfs:subPropertyOf :hasToRole .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#hasSemanticRole
+
+:hasSemanticRole rdf:type owl:ObjectProperty .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#hasSource
+
+:hasSource rdf:type owl:ObjectProperty ;
+           
+           rdfs:subPropertyOf :hasFromRole .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#hasTheme
+
+:hasTheme rdf:type owl:ObjectProperty ;
+          
+          rdfs:subPropertyOf :hasViaRole .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#hasTime
+
+:hasTime rdf:type owl:ObjectProperty ;
+         
+         rdfs:subPropertyOf :hasAtRole .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#hasToRole
+
+:hasToRole rdf:type owl:ObjectProperty ;
+           
+           rdfs:subPropertyOf :hasSemanticRole .
+
+
+
+###  http://www.semanticweb.org/cohend/ontologies/2014/5/untitled-ontology-2#hasViaRole
+
+:hasViaRole rdf:type owl:ObjectProperty ;
+            
+            rdfs:subPropertyOf :hasSemanticRole .
 
 
 

@@ -35,6 +35,9 @@ We envision this system as a smartphone app, which the user can use to message t
 
 \section {YODA's Dialog Functionality}
 The YODA dialog manager is designed to build dialog systems which combine the functions of information retrieval (IR), and information entry (IE).
+To support these primary functions robustly, YODA implements belief tracking and clarification strategies.
+
+\subsection {High-level Functionality}
 An IR dialog system's main purpose is to answer questions about a database of objects, such as restaurants, movies, or events in a calendar.
 A situated environment is also represented as a database, and IR dialog patterns still apply to asking questions about the environment.
 
@@ -74,6 +77,92 @@ We also want the system to be able to answer basic queries about their inbox, an
 
 To keep the example simple, and to play to YODA's strengths, we assume that email dictation is handled by an external component, which the YODA dialog manager triggers as appropriate.
 The main reasons for this are: 1) a dialog system should not perform understanding on dictated text, so the processing of a dictated email is different than the processing of normal dialog; and 2) different ASR components will be appropriate for dictated email versus standard dialog.
+
+
+\subsection{Clarification Dialog}
+
+The initial implementation will support the following types of Clarification dialog acts:
+
+\begin{itemize}[nolistsep]
+\item Give Clarification
+  \begin{itemize}[nolistsep]
+  \item Provide Value
+  \item Provide Role
+  \item Correct Value
+  \item Correct Role
+  \item Reject Value
+  \item Reject Role
+  \end{itemize}
+\item Ask Clarification
+  \begin{itemize}[nolistsep]
+  \item Non-hearing
+  \item Non-understanding
+  \item Disambiguate Role
+  \item Disambiguate Value
+  \item Request Confirm Role
+  \item Request Confirm Value
+  \end{itemize}
+\end{itemize}
+
+The SLU component will often parse clarification acts as fragments.
+It is then the role of the dialog state tracker to re-interpret the act as a clarification act.
+
+The designer should set up the slots in their domain to inherit from standard semantic roles.
+This will allow the system to automatically generate sensical clarification requests, and to interpret clarification dialog acts correctly.
+In our example domain, the Email class has a hasEmailRecipient slot, which inherits from the hasRecipient semantic role.
+`Recipient' is a standard semantic role, and YODA can automatically build an SLU system to detect recipients for the SendEmail action.
+Furthermore, YODA can automatically engage in clarification dialog related to the hasEmailParticipant slot, based on built-in clarification behavior for the standard Recipient role.
+
+\begin{verbatim}
+User: (poor ASR) <NOISE> Sam an email
+(SLU result)
+confidence = .4
+{
+ action=send
+ recipient=Sam
+ theme=email
+}
+
+System: Do you want me to send an email to Sam?
+ - OR -
+System: Do you want me to send Sam an email?
+\end{verbatim}
+
+In the above example, the NLG component knows how to generate its clarification request without the designer providing templates because the email and recipient both inherit from standard semantic roles.
+
+There is additional power and complexity due to the distributed nature of slots in YODA.
+There is ambiguity as to weather the recipient is a parameter of the send action, or a parameter of the email object.
+In the representation we choose here, emails have recipients.
+So behind the scenes, the utterance's recipient becomes the theme's EmailRecipient.
+
+The following examples are more complicated.
+They demonstrate the unavoidable ambiguity in utterances that describe complex tasks, and show how YODA deals with that ambiguity.
+
+
+\begin{verbatim}
+User: Move the meeting from three to four
+{
+ action: MoveMeeting
+ theme: {class: meeting
+         startTime: 3
+         endTime: 4
+        }
+}
+
+ - OR -
+
+(actual intended)
+{
+ action: MoveMeeting
+ theme: meeting
+ fromTime: 3
+ toTime: 4
+}
+\end{verbatim}
+
+Meeting objects have startTime and endTime slots, which inherit from the fromTime and toTime roles respectively.
+
+
 
 \section {SLU Input} \label{slu-section}
 
