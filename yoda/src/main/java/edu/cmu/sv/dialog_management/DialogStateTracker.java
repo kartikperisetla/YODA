@@ -1,4 +1,4 @@
-package edu.cmu.sv.dialog_state;
+package edu.cmu.sv.dialog_management;
 
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.StringDistribution;

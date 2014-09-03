@@ -1,9 +1,8 @@
 package edu.cmu.sv.dialog_management;
 
-import edu.cmu.sv.dialog_act.DialogAct;
-import edu.cmu.sv.dialog_state.DialogStateTracker;
-import edu.cmu.sv.dialog_state.DiscourseUnit;
 import edu.cmu.sv.utils.Combination;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,10 +35,10 @@ public class DialogManager {
             }
 
             // 2) create a dialog act descriptor for each possible dialog act
-            Map<DialogAct.DA_TYPE, Set<Map<String, String>>> descriptors = new HashMap<>();
+            Set<Pair<DialogAct.DA_TYPE, Map<String, String>>> descriptors = new HashSet<>();
             for (DialogAct.DA_TYPE daType : DialogAct.dialogActContentSpec.keySet()){
                 Map<String, String> parameters = DialogAct.dialogActContentSpec.get(daType);
-                Map updatedParameters = new HashMap<>();
+                Map<String, Set<String>> updatedParameters = new HashMap<>();
                 for (String key : parameters.keySet()){
                     if (parameters.get(key)=="value")
                         updatedParameters.put(key, values);
@@ -48,10 +47,18 @@ public class DialogManager {
                     else
                         throw new Error("unsupported parameter type for dialog act descriptor");
                 }
-                descriptors.put(daType, Combination.possibleBindings(updatedParameters));
+                for (Map<String, String> binding : Combination.possibleBindings(updatedParameters)) {
+                    descriptors.add(new ImmutablePair<>(daType, binding));
+                }
             }
 
             // 3) for each dialog act descriptor, evaluate expected reward
+
+            for (Pair<DialogAct.DA_TYPE, Map<String, String>> descriptor : descriptors){
+                Double predictedConfidence = DU.predictJointConfidenceAfterClarification(descriptor);
+
+            }
+
 
             // select the best dialog act descriptor, add it to the DU's it belongs to
         }

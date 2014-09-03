@@ -1,6 +1,4 @@
-package edu.cmu.sv.dialog_act;
-
-import org.openrdf.query.algebra.Str;
+package edu.cmu.sv.dialog_management;
 
 import java.util.*;
 
@@ -21,7 +19,7 @@ public class DialogAct {
 
     // expected *Relative* improvement in different types of confidence
     public static Map<DA_TYPE, Double> expectedJointConfidenceGain = new HashMap<>();
-    public static Map<DA_TYPE, Double> expectedMarginalConfidenceGain = new HashMap<>();
+    public static Map<DA_TYPE, Double> expectedValueConfidenceGain = new HashMap<>();
     public static Map<DA_TYPE, Double> expectedRoleConfidenceGain = new HashMap<>();
     public static Map<DA_TYPE, Double> expectedConfirmationConfidenceGain = new HashMap<>();
 
@@ -31,33 +29,33 @@ public class DialogAct {
     static {
         //// Define expected improvements in information from clarification dialog acts
         // these dialog acts are expected to improve joint confidence
-        expectedJointConfidenceGain.put(DA_TYPE.NON_HEARING, .6);
-        expectedJointConfidenceGain.put(DA_TYPE.NON_UNDERSTANDING, .6);
-        expectedJointConfidenceGain.put(DA_TYPE.ASK_REPEAT, .6);
-        expectedJointConfidenceGain.put(DA_TYPE.ASK_REPHRASE, .6);
+        expectedJointConfidenceGain.put(DA_TYPE.NON_HEARING, .2);
+        expectedJointConfidenceGain.put(DA_TYPE.NON_UNDERSTANDING, .2);
+        expectedJointConfidenceGain.put(DA_TYPE.ASK_REPEAT, .2);
+        expectedJointConfidenceGain.put(DA_TYPE.ASK_REPHRASE, .2);
 
         // these dialog acts are expected to improve marginal confidence
-        expectedMarginalConfidenceGain.put(DA_TYPE.REQUEST_CONFIRM_VALUE, .6);
-        expectedMarginalConfidenceGain.put(DA_TYPE.DISAMBIGUATE_VALUE, .6);
+        expectedValueConfidenceGain.put(DA_TYPE.REQUEST_CONFIRM_VALUE, .5);
+        expectedValueConfidenceGain.put(DA_TYPE.DISAMBIGUATE_VALUE, .5);
 
         // these dialog acts are expected to decrease ambiguity about role membership
-        expectedRoleConfidenceGain.put(DA_TYPE.DISAMBIGUATE_ROLE, .6);
-        expectedRoleConfidenceGain.put(DA_TYPE.REQUEST_CONFIRM_ROLE, .6);
+        expectedRoleConfidenceGain.put(DA_TYPE.REQUEST_CONFIRM_ROLE, .5);
+        expectedRoleConfidenceGain.put(DA_TYPE.DISAMBIGUATE_ROLE, .5);
 
         // expected to cause confirmation (sometimes required, can dramatically reduce uncertainty)
-        expectedConfirmationConfidenceGain.put(DA_TYPE.REQUEST_CONFIRM_VALUE, .6);
+        expectedConfirmationConfidenceGain.put(DA_TYPE.REQUEST_CONFIRM_VALUE, .9);
 
 
         //// Define DA dialogActContentSpec
-        Map twoRoles = new HashMap();
+        Map<String, String> twoRoles = new HashMap<>();
         twoRoles.put("r1", "role");
         twoRoles.put("r2", "role");
-        Map oneRole = new HashMap();
+        Map<String, String> oneRole = new HashMap<>();
         oneRole.put("r1", "role");
-        Map twoValues = new HashMap();
+        Map<String, String> twoValues = new HashMap<>();
         twoValues.put("v1", "value");
         twoValues.put("v2", "value");
-        Map oneValue = new HashMap();
+        Map<String, String> oneValue = new HashMap<>();
         oneValue.put("v1", "value");
         dialogActContentSpec.put(DA_TYPE.ACKNOWLEDGEMENT, new HashMap<>());
         dialogActContentSpec.put(DA_TYPE.NON_HEARING, new HashMap<>());

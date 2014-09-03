@@ -1,6 +1,8 @@
 package edu.cmu.sv.utils;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by David Cohen on 9/2/14.
@@ -11,12 +13,26 @@ import java.util.Map;
 public class StringDistribution{
     private Map<String, Double> internalDistribution;
 
+    public String getTopHypothesis(){
+        String ans = null;
+        Double maxProb = -1.0;
+        for (String key : internalDistribution.keySet()){
+            if (internalDistribution.get(key) > maxProb){
+                maxProb = internalDistribution.get(key);
+                ans = key;
+            }
+        }
+        return ans;
+    }
+
     public boolean containsKey(String key){
         return internalDistribution.containsKey(key);
     }
 
     public Double get(String key){
-        return internalDistribution.get(key);
+        if (internalDistribution.containsKey(key))
+            return internalDistribution.get(key);
+        return 0.0;
     }
 
     public void normalize(){
@@ -26,6 +42,11 @@ public class StringDistribution{
                 internalDistribution.put(key, internalDistribution.get(key) / total);
             }
         }
+    }
+
+    public Collection<String> keySet() {return internalDistribution.keySet();}
+    public Collection<Double> values(){
+        return internalDistribution.values();
     }
 
     /*
