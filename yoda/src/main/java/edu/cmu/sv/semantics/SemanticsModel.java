@@ -12,9 +12,14 @@ public class SemanticsModel {
     Map<String, String> slots;
     Map<String, SemanticsModel> children;
 
+    public SemanticsModel() {
+        slots = new HashMap<>();
+        children = new HashMap<>();
+    }
+
     /*
-    * This may return a slot value, or some local identifier for a child semantics model, or null
-    * */
+        * This may return a slot value, or some local identifier for a child semantics model, or null
+        * */
     public String getSlotPathFiller(String slotPath){
         String[] fillerPath = slotPath.split("\\.");
         SemanticsModel tmp = this;

@@ -1,6 +1,7 @@
 package edu.cmu.sv.utils;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,6 +13,10 @@ import java.util.Set;
  */
 public class StringDistribution{
     private Map<String, Double> internalDistribution;
+
+    public StringDistribution() {
+        internalDistribution = new HashMap<>();
+    }
 
     public String getTopHypothesis(){
         String ans = null;

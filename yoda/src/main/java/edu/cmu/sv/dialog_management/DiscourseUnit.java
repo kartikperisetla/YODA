@@ -76,9 +76,9 @@ public class DiscourseUnit {
                     }
                 }
                 Optional<Double> maxSummedMarginalValueWeight = summedMarginalsAcrossAllRoles.keySet().stream().
-                        filter((x) -> hypotheses.get(topJointHypothesis).getAllSlotFillers().containsKey(x)).
+                        filter((x) -> hypotheses.get(topJointHypothesis).getAllSlotFillers().get(role).contains(x)).
                         filter((x) -> x != null).
-                        map((x) -> summedMarginalsAcrossAllRoles.get(x)).
+                        map(summedMarginalsAcrossAllRoles::get).
                         max(Comparator.comparingDouble((x) -> x));
                 Double maxMarginalImprovement = 1.0 - (maxSummedMarginalValueWeight.isPresent() ?
                         maxSummedMarginalValueWeight.get() : 1.0);
@@ -87,6 +87,13 @@ public class DiscourseUnit {
             }
         }
         return topJointConfidence;
+    }
+
+    //TODO: Need to implement actual discourse unit state tracking
+    public void updateDiscourseUnit(Map<String, SemanticsModel> utterances,
+                                  StringDistribution weights, Float timeStamp) {
+        hypotheses = utterances;
+        hypothesisDistribution = weights;
     }
 
 }

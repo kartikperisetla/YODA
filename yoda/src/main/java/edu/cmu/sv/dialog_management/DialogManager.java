@@ -1,6 +1,11 @@
 package edu.cmu.sv.dialog_management;
 
+import edu.cmu.sv.task_interface.DialogTask;
+import edu.cmu.sv.task_interface.DialogTaskPreferences;
+import edu.cmu.sv.task_interface.WHQuestionTask;
+import edu.cmu.sv.task_interface.YNQuestionTask;
 import edu.cmu.sv.utils.Combination;
+import edu.cmu.sv.utils.StringDistribution;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -8,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by David Cohen on 9/2/14.
@@ -19,15 +25,29 @@ import java.util.Set;
  */
 public class DialogManager {
     private DialogStateTracker tracker;
+    // map dialog acts to the classes that handle the corresponding dialog tasks
+    private static Map<String, DialogTask> dialogActTaskRegistry = new HashMap<>();
 
+    static{
+        dialogActTaskRegistry.put("YNQuestion", new YNQuestionTask());
+        dialogActTaskRegistry.put("WHQuestion", new WHQuestionTask());
+    }
+
+    public DialogManager() {
+        tracker = new DialogStateTracker();
+    }
+
+    public DialogStateTracker getTracker() {
+        return tracker;
+    }
 
     public void evaluateActions(){
         Set<DiscourseUnit> discourseUnits = tracker.getDiscourseUnits();
 
-
         for (DiscourseUnit DU : discourseUnits) {
             // 1) collect roles and values across this DU
             Map<String, Set<String>> roleValuePairs = DU.getAllSlotValuePairs();
+
             // 1-a) determine the set of values
             Set<String> values = new HashSet<>();
             for (String role : roleValuePairs.keySet()){
@@ -37,31 +57,61 @@ public class DialogManager {
             // 2) create a dialog act descriptor for each possible dialog act
             Set<Pair<DialogAct.DA_TYPE, Map<String, String>>> descriptors = new HashSet<>();
             for (DialogAct.DA_TYPE daType : DialogAct.dialogActContentSpec.keySet()){
+//                System.out.println("daType:"+daType);
                 Map<String, String> parameters = DialogAct.dialogActContentSpec.get(daType);
+//                System.out.println("parameters:"+parameters);
                 Map<String, Set<String>> updatedParameters = new HashMap<>();
                 for (String key : parameters.keySet()){
-                    if (parameters.get(key)=="value")
+                    if (parameters.get(key).equals("value"))
                         updatedParameters.put(key, values);
-                    else if (parameters.get(key)=="role")
+                    else if (parameters.get(key).equals("role"))
                         updatedParameters.put(key, roleValuePairs.keySet());
                     else
                         throw new Error("unsupported parameter type for dialog act descriptor");
                 }
-                for (Map<String, String> binding : Combination.possibleBindings(updatedParameters)) {
-                    descriptors.add(new ImmutablePair<>(daType, binding));
-                }
+                descriptors.addAll(Combination.possibleBindings(updatedParameters).stream().
+                        map(binding -> new ImmutablePair<>(daType, binding)).
+                        collect(Collectors.toList()));
             }
+            System.out.println("DialogManager.evaluateActions: descriptors:\n"+descriptors);
 
             // 3) for each dialog act descriptor, evaluate expected reward
-
+            Map<Pair<DialogAct.DA_TYPE, Map<String, String>>, Double> descriptorExpectedReward = new HashMap<>();
+            StringDistribution dialogActDistribution = DU.marginalSlotPathDistribution("dialogAct");
             for (Pair<DialogAct.DA_TYPE, Map<String, String>> descriptor : descriptors){
                 Double predictedConfidence = DU.predictJointConfidenceAfterClarification(descriptor);
+                descriptorExpectedReward.put(descriptor,
+                        dialogActTaskExpectedReward(predictedConfidence, dialogActDistribution, true));
+            }
 
+            Double doNothingReward = dialogActTaskExpectedReward(
+                    DU.hypothesisDistribution.get(
+                            DU.hypothesisDistribution.getTopHypothesis()),
+                    dialogActDistribution, false);
+
+            System.out.println("-----");
+            System.out.println("do nothing reward: "+doNothingReward);
+
+            for (Pair<DialogAct.DA_TYPE, Map<String, String>> descriptor : descriptors) {
+                System.out.println("-----");
+                System.out.println(descriptorExpectedReward.get(descriptor));
+                System.out.println(descriptor);
             }
 
 
-            // select the best dialog act descriptor, add it to the DU's it belongs to
         }
+    }
+
+    Double dialogActTaskExpectedReward(Double confidence, StringDistribution dialogActDistribution, boolean takeTurn){
+        Double expectedReward = 0.0;
+        for (String dialogAct : dialogActDistribution.keySet()){
+            DialogTaskPreferences preferences = dialogActTaskRegistry.get(dialogAct).getPreferences();
+            expectedReward += dialogActDistribution.get(dialogAct)*
+                    ((preferences.rewardForCorrectExecution * confidence) -
+                            (takeTurn ? (preferences.penaltyForDelay * confidence) : 0) -
+                            (preferences.penaltyForIncorrectExecution * (1 - confidence)));
+        }
+        return expectedReward;
     }
 
 }

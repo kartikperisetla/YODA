@@ -27,6 +27,7 @@ public class Combination {
     public static <T> Set<Map<String, T>> possibleBindings(Map<String, Set<T>> keysAndValues){
         Set<Map<String, T>> ans = new HashSet<>();
         if (keysAndValues.size()==0){
+            ans.add(new HashMap<String, T>());
             return ans;
         }
         String key = new LinkedList<>(keysAndValues.keySet()).get(0);
