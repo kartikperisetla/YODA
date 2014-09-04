@@ -5,14 +5,12 @@ import edu.cmu.sv.task_interface.DialogTaskPreferences;
 import edu.cmu.sv.task_interface.WHQuestionTask;
 import edu.cmu.sv.task_interface.YNQuestionTask;
 import edu.cmu.sv.utils.Combination;
+import edu.cmu.sv.utils.NBest;
 import edu.cmu.sv.utils.StringDistribution;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -70,6 +68,7 @@ public class DialogManager {
                         throw new Error("unsupported parameter type for dialog act descriptor");
                 }
                 descriptors.addAll(Combination.possibleBindings(updatedParameters).stream().
+                        filter(x -> new HashSet<>(x.values()).size()==x.size()).
                         map(binding -> new ImmutablePair<>(daType, binding)).
                         collect(Collectors.toList()));
             }
@@ -92,10 +91,11 @@ public class DialogManager {
             System.out.println("-----");
             System.out.println("do nothing reward: "+doNothingReward);
 
-            for (Pair<DialogAct.DA_TYPE, Map<String, String>> descriptor : descriptors) {
+            for (Pair<Pair<DialogAct.DA_TYPE, Map<String, String>>, Double> descriptorRewardPair :
+                    NBest.keepBeam(descriptorExpectedReward, 5)) {
                 System.out.println("-----");
-                System.out.println(descriptorExpectedReward.get(descriptor));
-                System.out.println(descriptor);
+                System.out.println(descriptorRewardPair.getKey());
+                System.out.println(descriptorRewardPair.getValue());
             }
 
 

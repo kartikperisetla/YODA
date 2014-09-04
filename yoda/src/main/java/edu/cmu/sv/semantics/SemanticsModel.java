@@ -34,15 +34,15 @@ public class SemanticsModel {
         return tmp.slots.get(fillerPath[fillerPath.length-1]);
     }
 
-    public Map<String, Set<String>> getAllSlotFillers(){
-        Map<String, Set<String>> ans = new HashMap<>();
+    public Map<String, String> getAllSlotFillers(){
+        Map<String, String> ans = new HashMap<>();
         // collect top level slots/fillers
         for (String slot : slots.keySet()){
-            ans.put(slot, new HashSet<>(Arrays.asList(slots.get(slot))));
+            ans.put(slot, slots.get(slot));
         }
         // collect recursively
         for (String childID : children.keySet()){
-            Map<String, Set<String>> childSlotFillers = children.get(childID).getAllSlotFillers();
+            Map<String, String> childSlotFillers = children.get(childID).getAllSlotFillers();
             for (String key : childSlotFillers.keySet()){
                 ans.put(childID+"."+key, childSlotFillers.get(key));
             }

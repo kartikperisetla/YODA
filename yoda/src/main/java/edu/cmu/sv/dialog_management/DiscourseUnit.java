@@ -30,11 +30,11 @@ public class DiscourseUnit {
     public Map<String, Set<String>> getAllSlotValuePairs(){
         Map<String, Set<String>> ans = new HashMap<>();
         for (SemanticsModel semanticsModel : hypotheses.values()){
-            Map<String, Set<String>> modelSlotValues = semanticsModel.getAllSlotFillers();
+            Map<String, String> modelSlotValues = semanticsModel.getAllSlotFillers();
             for (String key : modelSlotValues.keySet()){
                 if (!ans.containsKey(key))
                     ans.put(key, new HashSet<>());
-                ans.get(key).addAll(modelSlotValues.get(key));
+                ans.get(key).add(modelSlotValues.get(key));
             }
         }
         return ans;
@@ -68,22 +68,39 @@ public class DiscourseUnit {
             }
         } else if (DialogAct.expectedRoleConfidenceGain.containsKey(dialogActDescriptor.getKey())){
             for (String role : dialogActDescriptor.getValue().values()) {
-                StringDistribution summedMarginalsAcrossAllRoles = new StringDistribution();
-                for (String slot : hypotheses.get(topJointHypothesis).getAllSlotFillers().keySet()){
-                    StringDistribution marginal = marginalSlotPathDistribution(slot);
-                    for (String key : marginal.keySet()){
-                        summedMarginalsAcrossAllRoles.extend(key, marginal.get(key));
-                    }
+                StringDistribution roleMarginal = marginalSlotPathDistribution(role);
+                String topValue = roleMarginal.getTopHypothesis();
+                Double currentConfidence = roleMarginal.get(topValue);
+                Double topOtherConfidence = 0.0;
+                for (String otherSlot : getAllSlotValuePairs().keySet()){
+                    if (otherSlot.equals(role))
+                        continue;
+                    topOtherConfidence = Double.max(topOtherConfidence,
+                            marginalSlotPathDistribution(otherSlot).get(topValue));
                 }
-                Optional<Double> maxSummedMarginalValueWeight = summedMarginalsAcrossAllRoles.keySet().stream().
-                        filter((x) -> hypotheses.get(topJointHypothesis).getAllSlotFillers().get(role).contains(x)).
-                        filter((x) -> x != null).
-                        map(summedMarginalsAcrossAllRoles::get).
-                        max(Comparator.comparingDouble((x) -> x));
-                Double maxMarginalImprovement = 1.0 - (maxSummedMarginalValueWeight.isPresent() ?
-                        maxSummedMarginalValueWeight.get() : 1.0);
-                topJointConfidence += Double.max(maxMarginalImprovement, 0.0) * maxJointImprovement *
+                Double maxMarginalImprovement = Double.min(1.0, topOtherConfidence / (1-currentConfidence));
+                topJointConfidence += maxJointImprovement*maxMarginalImprovement*
                         DialogAct.expectedRoleConfidenceGain.get(dialogActDescriptor.getKey());
+
+
+
+                //// begin old implementation
+//                StringDistribution summedMarginalsAcrossAllRoles = new StringDistribution();
+//                for (String slot : hypotheses.get(topJointHypothesis).getAllSlotFillers().keySet()){
+//                    StringDistribution marginal = marginalSlotPathDistribution(slot);
+//                    for (String key : marginal.keySet()){
+//                        summedMarginalsAcrossAllRoles.extend(key, marginal.get(key));
+//                    }
+//                }
+//                Optional<Double> maxSummedMarginalValueWeight = summedMarginalsAcrossAllRoles.keySet().stream().
+//                        filter((x) -> marginalSlotPathDistribution(role).containsKey(x)).
+//                        filter((x) -> x != null).
+//                        map(summedMarginalsAcrossAllRoles::get).
+//                        max(Comparator.comparingDouble((x) -> x));
+//                Double maxMarginalImprovement = 1.0 - (maxSummedMarginalValueWeight.isPresent() ?
+//                        maxSummedMarginalValueWeight.get() : 1.0);
+//                topJointConfidence += Double.max(maxMarginalImprovement, 0.0) * maxJointImprovement *
+//                        DialogAct.expectedRoleConfidenceGain.get(dialogActDescriptor.getKey());
             }
         }
         return topJointConfidence;

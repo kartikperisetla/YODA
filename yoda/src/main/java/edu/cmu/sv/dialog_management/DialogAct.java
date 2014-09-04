@@ -29,10 +29,10 @@ public class DialogAct {
     static {
         //// Define expected improvements in information from clarification dialog acts
         // these dialog acts are expected to improve joint confidence
-        expectedJointConfidenceGain.put(DA_TYPE.NON_HEARING, .2);
-        expectedJointConfidenceGain.put(DA_TYPE.NON_UNDERSTANDING, .2);
-        expectedJointConfidenceGain.put(DA_TYPE.ASK_REPEAT, .2);
-        expectedJointConfidenceGain.put(DA_TYPE.ASK_REPHRASE, .2);
+        expectedJointConfidenceGain.put(DA_TYPE.NON_HEARING, .6);
+        expectedJointConfidenceGain.put(DA_TYPE.NON_UNDERSTANDING, .6);
+        expectedJointConfidenceGain.put(DA_TYPE.ASK_REPEAT, .6);
+        expectedJointConfidenceGain.put(DA_TYPE.ASK_REPHRASE, .6);
 
         // these dialog acts are expected to improve marginal confidence
         expectedValueConfidenceGain.put(DA_TYPE.REQUEST_CONFIRM_VALUE, .5);
