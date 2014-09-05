@@ -38,7 +38,7 @@ public class TestClarificationDialog {
         weights.extend("hyp2", .6);
 
         dialogManager.getTracker().updateDialogState(utterances, weights, (float)0);
-        dialogManager.evaluateActions();
+        dialogManager.evaluateClarificationActions();
     }
 
 

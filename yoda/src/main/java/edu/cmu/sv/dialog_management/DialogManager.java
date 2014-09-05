@@ -39,7 +39,7 @@ public class DialogManager {
         return tracker;
     }
 
-    public void evaluateActions(){
+    public List<Pair<Pair<DialogAct.DA_TYPE, Map<String, String>>, Double>> evaluateClarificationActions(){
         Set<DiscourseUnit> discourseUnits = tracker.getDiscourseUnits();
 
         for (DiscourseUnit DU : discourseUnits) {
@@ -72,7 +72,7 @@ public class DialogManager {
                         map(binding -> new ImmutablePair<>(daType, binding)).
                         collect(Collectors.toList()));
             }
-            System.out.println("DialogManager.evaluateActions: descriptors:\n"+descriptors);
+//            System.out.println("DialogManager.evaluateClarificationActions: descriptors:\n"+descriptors);
 
             // 3) for each dialog act descriptor, evaluate expected reward
             Map<Pair<DialogAct.DA_TYPE, Map<String, String>>, Double> descriptorExpectedReward = new HashMap<>();
@@ -88,18 +88,21 @@ public class DialogManager {
                             DU.hypothesisDistribution.getTopHypothesis()),
                     dialogActDistribution, false);
 
-            System.out.println("-----");
-            System.out.println("do nothing reward: "+doNothingReward);
+//            System.out.println("-----");
+//            System.out.println("do nothing reward: "+doNothingReward);
+//            for (Pair<Pair<DialogAct.DA_TYPE, Map<String, String>>, Double> descriptorRewardPair :
+//                    NBest.keepBeam(descriptorExpectedReward, 5)) {
+//                System.out.println("-----");
+//                System.out.println(descriptorRewardPair.getKey());
+//                System.out.println(descriptorRewardPair.getValue());
+//            }
 
-            for (Pair<Pair<DialogAct.DA_TYPE, Map<String, String>>, Double> descriptorRewardPair :
-                    NBest.keepBeam(descriptorExpectedReward, 5)) {
-                System.out.println("-----");
-                System.out.println(descriptorRewardPair.getKey());
-                System.out.println(descriptorRewardPair.getValue());
-            }
-
-
+            descriptorExpectedReward.put(null, doNothingReward);
+            List<Pair<Pair<DialogAct.DA_TYPE, Map<String, String>>, Double>> ans =
+                    NBest.keepBeam(descriptorExpectedReward, 5);
+            return ans;
         }
+        return null;
     }
 
     Double dialogActTaskExpectedReward(Double confidence, StringDistribution dialogActDistribution, boolean takeTurn){
