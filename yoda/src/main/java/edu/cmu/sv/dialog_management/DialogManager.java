@@ -99,7 +99,7 @@ public class DialogManager {
 
             descriptorExpectedReward.put(null, doNothingReward);
             List<Pair<Pair<DialogAct.DA_TYPE, Map<String, String>>, Double>> ans =
-                    NBest.keepBeam(descriptorExpectedReward, 5);
+                    NBest.keepBeam(descriptorExpectedReward, 6);
             return ans;
         }
         return null;

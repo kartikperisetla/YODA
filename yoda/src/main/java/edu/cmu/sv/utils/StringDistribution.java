@@ -65,4 +65,10 @@ public class StringDistribution{
             internalDistribution.put(key,value);
     }
 
+    @Override
+    public String toString() {
+        return "StringDistribution{" +
+                "internalDistribution=" + internalDistribution +
+                '}';
+    }
 }
