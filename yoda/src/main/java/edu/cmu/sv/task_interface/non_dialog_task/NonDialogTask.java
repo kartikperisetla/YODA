@@ -1,8 +1,6 @@
-package edu.cmu.sv.task_interface;
+package edu.cmu.sv.task_interface.non_dialog_task;
 
 import edu.cmu.sv.semantics.SemanticsModel;
-
-import java.util.Set;
 
 /**
  * Created by David Cohen on 8/27/14.

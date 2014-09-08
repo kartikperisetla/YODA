@@ -16,14 +16,14 @@ import java.util.Set;
  *
  */
 public class DialogStateTracker {
-    Set<DiscourseUnit> discourseUnits;
+    DiscourseUnit discourseUnit;
 
     public DialogStateTracker() {
-        discourseUnits = new HashSet<>();
+        discourseUnit = new DiscourseUnit();
     }
 
-    public Set<DiscourseUnit> getDiscourseUnits() {
-        return discourseUnits;
+    public DiscourseUnit getDiscourseUnit() {
+        return discourseUnit;
     }
 
 
@@ -33,10 +33,7 @@ public class DialogStateTracker {
                                   StringDistribution weights, Float timeStamp){
         //For now, we assume that there is only one discourse unit,
         //and every utterance is added to it.
-        if (discourseUnits.isEmpty())
-            discourseUnits.add(new DiscourseUnit());
-        DiscourseUnit DUOfInterest = new LinkedList<>(discourseUnits).get(0);
-        DUOfInterest.updateDiscourseUnit(utterances, weights, timeStamp);
+        discourseUnit.updateDiscourseUnit(utterances, weights, timeStamp);
     }
 
 }

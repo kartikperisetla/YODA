@@ -41,12 +41,22 @@ public class SemanticsModel {
             ans.put(slot, slots.get(slot));
         }
         // collect recursively
-        for (String childID : children.keySet()){
-            Map<String, String> childSlotFillers = children.get(childID).getAllSlotFillers();
+        for (String slot : slots.keySet()){
+            if (!children.containsKey(slots.get(slot)))
+                continue;
+            Map<String, String> childSlotFillers = children.get(slots.get(slot)).getAllSlotFillers();
             for (String key : childSlotFillers.keySet()){
-                ans.put(childID+"."+key, childSlotFillers.get(key));
+                ans.put(slot+"."+key, childSlotFillers.get(key));
             }
         }
+//
+//
+//        for (String childID : children.keySet()){
+//            Map<String, String> childSlotFillers = children.get(childID).getAllSlotFillers();
+//            for (String key : childSlotFillers.keySet()){
+//                ans.put(childID+"."+key, childSlotFillers.get(key));
+//            }
+//        }
         return ans;
     }
 

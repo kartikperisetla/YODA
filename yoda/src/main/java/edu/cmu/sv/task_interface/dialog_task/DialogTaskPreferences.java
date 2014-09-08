@@ -1,4 +1,4 @@
-package edu.cmu.sv.task_interface;
+package edu.cmu.sv.task_interface.dialog_task;
 
 /**
  * Created by David Cohen on 9/3/14.
