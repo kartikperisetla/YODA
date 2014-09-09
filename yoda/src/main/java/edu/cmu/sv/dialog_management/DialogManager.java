@@ -1,16 +1,12 @@
 package edu.cmu.sv.dialog_management;
 
-import edu.cmu.sv.dialog_management.dialog_act.DialogAct;
-import edu.cmu.sv.dialog_management.dialog_act.RequestConfirmValue;
-import edu.cmu.sv.dialog_management.dialog_act.RequestDisambiguateRole;
-import edu.cmu.sv.dialog_management.dialog_act.RequestRephrase;
+import edu.cmu.sv.dialog_management.dialog_act.*;
 import edu.cmu.sv.utils.Combination;
 import edu.cmu.sv.utils.NBest;
 import edu.cmu.sv.utils.StringDistribution;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by David Cohen on 9/2/14.
@@ -22,15 +18,6 @@ import java.util.stream.Collectors;
  */
 public class DialogManager {
     private DialogStateTracker tracker;
-    // map dialog acts to the classes that handle the corresponding dialog tasks
-    private static Set<Class <? extends DialogAct>> dialogActRegistry = new HashSet<>();
-    private static Map<String, DialogAct> dialogActTaskRegistry = new HashMap<>();
-
-    static{
-        dialogActRegistry.add(RequestConfirmValue.class);
-        dialogActRegistry.add(RequestDisambiguateRole.class);
-        dialogActRegistry.add(RequestRephrase.class);
-    }
 
     public DialogManager() {
         tracker = new DialogStateTracker();
@@ -56,7 +43,7 @@ public class DialogManager {
         }
 
         Map<DialogAct, Double> descriptorExpectedReward = new HashMap<>();
-        for (Class <? extends DialogAct> cls : dialogActRegistry) {
+        for (Class <? extends DialogAct> cls : DialogRegistry.systemOutputDialogActs) {
             // 2) create a dialog act instance for each possible dialog act
             Set<DialogAct> possibleDialogActs = new HashSet<>();
             Map<String, String> parameters = cls.newInstance().getParameters();
