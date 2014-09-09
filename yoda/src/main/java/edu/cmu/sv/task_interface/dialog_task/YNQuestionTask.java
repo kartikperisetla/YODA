@@ -9,7 +9,7 @@ import edu.cmu.sv.task_interface.dialog_task.DialogTaskPreferences;
  * This task answers a yes/no question by performing appropriate database lookups
  */
 public class YNQuestionTask implements DialogTask {
-    DialogTaskPreferences preferences = new DialogTaskPreferences(1.0, 5.0, 3.0);
+    private static DialogTaskPreferences preferences = new DialogTaskPreferences(1.0, 5.0, 3.0);
 
     @Override
     public DialogTaskPreferences getPreferences() {

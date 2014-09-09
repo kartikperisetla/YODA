@@ -17,6 +17,15 @@ public class SemanticsModel {
         children = new HashMap<>();
     }
 
+    public SemanticsModel deepCopy(){
+        SemanticsModel ans = new SemanticsModel();
+        for (String key : slots.keySet())
+            ans.getSlots().put(key, slots.get(key));
+        for (String key : children.keySet())
+            ans.getChildren().put(key, children.get(key).deepCopy());
+        return ans;
+    }
+
     /*
         * This may return a slot value, or some local identifier for a child semantics model, or null
         * */

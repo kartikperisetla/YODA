@@ -1,5 +1,6 @@
 package edu.cmu.sv.dialog_management;
 
+import com.google.common.collect.Iterables;
 import edu.cmu.sv.dialog_management.dialog_act.*;
 import edu.cmu.sv.task_interface.dialog_task.DialogTask;
 import edu.cmu.sv.task_interface.dialog_task.WHQuestionTask;
@@ -21,6 +22,9 @@ import java.util.Set;
  *
  */
 public class DialogRegistry {
+    // map from string identifier to dialog act
+    public static Map<String, Class <? extends DialogAct>> dialogActNameMap = new HashMap<>();
+
     // the full set of dialog acts available to the system
     public static Set<Class <? extends DialogAct>> systemOutputDialogActs = new HashSet<>();
 
@@ -28,8 +32,8 @@ public class DialogRegistry {
     public static Set<Class <? extends DialogAct>> discourseUnitDialogActs = new HashSet<>();
 
     // map NDU to the classes that handle the corresponding dialog tasks
-    public static Map<Class <? extends DialogAct>, Class <? extends DialogTask>> dialogTaskRegistry =
-            new HashMap<>();
+    public static Map<Class <? extends DialogAct>, Set<Class <? extends DialogTask>>>
+            dialogTaskRegistry = new HashMap<>();
 
     // map dialog acts to the classes that handle the corresponding non-dialog tasks
     public static Map<Class <? extends DialogAct>, Set<Class <? extends NonDialogTask>>>
@@ -44,12 +48,21 @@ public class DialogRegistry {
         discourseUnitDialogActs.add(YNQuestion.class);
         discourseUnitDialogActs.add(Command.class);
 
-        dialogTaskRegistry.put(WHQuestion.class, WHQuestionTask.class);
-        dialogTaskRegistry.put(YNQuestion.class, YNQuestionTask.class);
+        dialogTaskRegistry.put(WHQuestion.class, new HashSet<>());
+        dialogTaskRegistry.get(WHQuestion.class).add(WHQuestionTask.class);
+        dialogTaskRegistry.put(YNQuestion.class, new HashSet<>());
+        dialogTaskRegistry.get(YNQuestion.class).add(YNQuestionTask.class);
 
         nonDialogTaskRegistry.put(Command.class, new HashSet<>());
         nonDialogTaskRegistry.get(Command.class).add(CreateMeetingTask.class);
         nonDialogTaskRegistry.get(Command.class).add(SendEmailTask.class);
+
+        for (Class<? extends DialogAct> cls : Iterables.concat(discourseUnitDialogActs,
+                systemOutputDialogActs)) {
+            dialogActNameMap.put(cls.getCanonicalName(), cls);
+        }
+        System.out.println("DialogRegistry.dialogActNameMap:"+dialogActNameMap);
+
     }
 
 }
