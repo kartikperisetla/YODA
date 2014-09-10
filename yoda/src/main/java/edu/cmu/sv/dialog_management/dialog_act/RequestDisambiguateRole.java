@@ -25,7 +25,15 @@ public class RequestDisambiguateRole implements DialogAct {
                 DU, .5, boundVariables.get("r1"), null);
         expectedConfidence = RewardAndCostCalculator.predictConfidenceAfterRoleGain(
                 DU, .4, boundVariables.get("r2"), expectedConfidence);
-        return expectedConfidence;
+
+        Double relativeConfidenceGain = RewardAndCostCalculator.predictedJointToRelative(DU, expectedConfidence);
+
+        try {
+            return RewardAndCostCalculator.clarificationDialogActReward(DU, relativeConfidenceGain);
+        } catch (IllegalAccessException | InstantiationException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override

@@ -57,6 +57,16 @@ public class RewardAndCostCalculator {
         return totalReward;
     }
 
+    public static Double predictedJointToRelative(DiscourseUnit DU, Double predictedJoint){
+        Double currentConfidence = DU.getHypothesisDistribution().get(
+                DU.getHypothesisDistribution().getTopHypothesis());
+        Double relativeConfidenceGain = 0.0;
+        if (currentConfidence<1.0)
+            relativeConfidenceGain = (predictedJoint-currentConfidence)/(1 - currentConfidence);
+        assert relativeConfidenceGain >= 0 && relativeConfidenceGain <= 1.0;
+        return relativeConfidenceGain;
+    }
+
     /*
     * To compute the reward for a clarification dialog act,
     * estimate the improvement in reward to all possible dialog and non-dialog tasks
@@ -100,8 +110,6 @@ public class RewardAndCostCalculator {
         }
         return totalReward;
     }
-
-
 
 
 

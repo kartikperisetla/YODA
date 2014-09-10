@@ -37,7 +37,14 @@ public class RequestConfirmValue implements DialogAct{
     public Double reward(DiscourseUnit DU) {
         Double expectedConfidence = RewardAndCostCalculator.predictConfidenceAfterValueGain(
                 DU, .5, boundVariables.get("v1"), null);
-        return expectedConfidence;
+
+        Double relativeConfidenceGain = RewardAndCostCalculator.predictedJointToRelative(DU, expectedConfidence);
+        try {
+            return RewardAndCostCalculator.clarificationDialogActReward(DU, relativeConfidenceGain);
+        } catch (IllegalAccessException | InstantiationException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override
