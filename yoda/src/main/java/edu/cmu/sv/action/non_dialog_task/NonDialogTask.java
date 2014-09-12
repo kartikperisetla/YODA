@@ -24,7 +24,9 @@ public interface NonDialogTask extends Action{
     }
 
     // interpret result as the probability that the taskSpec can be executed (must be 0-1)
-    public double assessExecutability();
+    public default double assessExecutability(){
+        return 1;
+    }
 
     // return the string identifier of the executing task (taskID)
     public String execute(SemanticsModel taskSpec);

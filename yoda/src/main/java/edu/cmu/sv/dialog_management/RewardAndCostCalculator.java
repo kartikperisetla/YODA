@@ -11,10 +11,17 @@ import edu.cmu.sv.utils.StringDistribution;
 /**
  * Created by David Cohen on 9/8/14.
  *
- * Contains standard functions that are used to compute reward and utility for possible system actions
+ * Contains standard values and functions that are used to compute utility for possible system actions
+ *
+ * The basic rule-of-thumb is that 1 reward ~= the reward for successfully executing a dialog task.
+ * To set a reward for some other condition, estimate the relative importance of that condition
+ * compared to successfully completing a dialog task.
  *
  */
 public class RewardAndCostCalculator {
+    public static double penaltyForContradictingUser = .5;
+    public static double penaltyForObligingUserAction = 2;
+    public static double penaltyForObligingUserPhrase = .5;
 
     public static Double nonDialogTaskReward(DiscourseUnit DU, NonDialogTask nonDialogTask){
         Double totalReward = 0.0;

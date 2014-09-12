@@ -24,7 +24,9 @@ public interface DialogTask extends Action{
 
     // interpret result as the probability that the taskSpec can be executed (must be 0-1)
     // if it isn't executable, then the task spec is probably 'nonsense', since this is a dialog task
-    public double assessExecutability();
+    public default double assessExecutability(){
+        return 1.0;
+    }
 
     // eventually add other stuff to actually implement basic IR / IE.
     public void execute();

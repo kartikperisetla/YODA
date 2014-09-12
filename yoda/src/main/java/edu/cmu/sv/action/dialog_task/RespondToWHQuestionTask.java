@@ -6,7 +6,7 @@ import edu.cmu.sv.semantics.SemanticsModel;
  * Created by David Cohen on 9/3/14.
  */
 public class RespondToWHQuestionTask implements DialogTask {
-    private static DialogTaskPreferences preferences = new DialogTaskPreferences(1,5,3);
+    private static DialogTaskPreferences preferences = new DialogTaskPreferences(.5,1,2);
     private SemanticsModel taskSpec = null;
 
     @Override
@@ -29,8 +29,4 @@ public class RespondToWHQuestionTask implements DialogTask {
         return taskSpec;
     }
 
-    @Override
-    public double assessExecutability() {
-        return 0;
-    }
 }

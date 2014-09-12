@@ -27,12 +27,7 @@ public class CreateMeetingTask implements NonDialogTask {
 
     @Override
     public SemanticsModel getTaskSpec() {
-        return null;
-    }
-
-    @Override
-    public double assessExecutability() {
-        return 1.0;
+        return taskSpec;
     }
 
     @Override

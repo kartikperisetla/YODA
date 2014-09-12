@@ -61,7 +61,6 @@ public class DialogRegistry {
                 clarificationDialogActs)) {
             dialogActNameMap.put(cls.getSimpleName(), cls);
         }
-        System.out.println("DialogRegistry.dialogActNameMap:"+dialogActNameMap);
 
     }
 

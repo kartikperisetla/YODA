@@ -50,7 +50,8 @@ public class RequestConfirmValue implements DialogAct{
 
     @Override
     public Double cost(DiscourseUnit DU) {
-        return 1.5;
+        // we oblige the user to a simple yes/no, which is < one phrase
+        return RewardAndCostCalculator.penaltyForObligingUserPhrase*.75;
     }
 
     @Override

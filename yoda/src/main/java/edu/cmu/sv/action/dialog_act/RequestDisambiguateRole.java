@@ -39,7 +39,8 @@ public class RequestDisambiguateRole implements DialogAct {
 
     @Override
     public Double cost(DiscourseUnit DU) {
-        return 1.0;
+        // we oblige the user to a single phrase response
+       return RewardAndCostCalculator.penaltyForObligingUserPhrase*1;
     }
 
     @Override

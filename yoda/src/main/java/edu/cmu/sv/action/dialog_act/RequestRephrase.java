@@ -21,8 +21,8 @@ public class RequestRephrase implements DialogAct {
 
     @Override
     public Double cost(DiscourseUnit DU) {
-        // this dialog act imposes a high cost because it requires significant effort from the user
-        return 2.0;
+        // a complete rephrase will typically involve Subj + Obj + Verb
+        return RewardAndCostCalculator.penaltyForObligingUserPhrase*3;
     }
 
     @Override

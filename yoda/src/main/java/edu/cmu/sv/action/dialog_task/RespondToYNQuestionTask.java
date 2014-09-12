@@ -8,7 +8,7 @@ import edu.cmu.sv.semantics.SemanticsModel;
  * This task answers a yes/no question by performing appropriate database lookups
  */
 public class RespondToYNQuestionTask implements DialogTask {
-    private static DialogTaskPreferences preferences = new DialogTaskPreferences(1,5,3);
+    private static DialogTaskPreferences preferences = new DialogTaskPreferences(.5,1,2);
     private SemanticsModel taskSpec = null;
 
     @Override
@@ -31,8 +31,4 @@ public class RespondToYNQuestionTask implements DialogTask {
         return taskSpec;
     }
 
-    @Override
-    public double assessExecutability() {
-        return 0;
-    }
 }

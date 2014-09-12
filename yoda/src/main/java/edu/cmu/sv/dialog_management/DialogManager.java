@@ -86,14 +86,14 @@ public class DialogManager {
             SemanticsModel hypothesis = DU.getHypotheses().get(hypothesisID);
             Class<? extends DialogAct> daClass = DialogRegistry.dialogActNameMap.
                     get(hypothesis.getSlotPathFiller("dialogAct"));
-            System.out.println("dialogAct: "+hypothesis.getSlotPathFiller("dialogAct")+
-                    ", daClass: "+daClass);
+
             // add contribution from dialog tasks
             if (DialogRegistry.dialogTaskRegistry.containsKey(daClass)) {
                 for (Class<? extends DialogTask> taskClass : DialogRegistry.dialogTaskRegistry.get(daClass)) {
                     DialogTask task = taskClass.newInstance();
                     task.setTaskSpec(hypothesis.deepCopy());
                     Double expectedReward = RewardAndCostCalculator.dialogTaskReward(DU, task);
+                    Double cost =
                     actionExpectedReward.put(task, expectedReward);
                 }
             }

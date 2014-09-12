@@ -1,6 +1,7 @@
 package edu.cmu.sv.action.dialog_act;
 
 import edu.cmu.sv.dialog_management.DiscourseUnit;
+import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
 
 import java.util.Map;
 
@@ -17,7 +18,7 @@ public class Rejection implements DialogAct{
 
     @Override
     public Double cost(DiscourseUnit DU) {
-        return 0.0;
+       return RewardAndCostCalculator.penaltyForContradictingUser;
     }
 
     @Override

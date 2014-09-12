@@ -30,12 +30,6 @@ public class SendEmailTask implements NonDialogTask {
     }
 
     @Override
-    public double assessExecutability() {
-        // this works because assessExecutability is never called unless all the required slots are present
-        return 1.0;
-    }
-
-    @Override
     public String execute(SemanticsModel taskSpec) {
         System.out.println("Executing task: send email");
         System.out.println(taskSpec);
