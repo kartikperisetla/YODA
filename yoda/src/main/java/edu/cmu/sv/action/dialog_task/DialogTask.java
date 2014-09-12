@@ -1,5 +1,6 @@
-package edu.cmu.sv.task_interface.dialog_task;
+package edu.cmu.sv.action.dialog_task;
 
+import edu.cmu.sv.action.Action;
 import edu.cmu.sv.semantics.SemanticsModel;
 
 /**
@@ -9,9 +10,7 @@ import edu.cmu.sv.semantics.SemanticsModel;
  * Define the penalties and rewards for dialog tasks.
  *
  */
-public interface DialogTask {
-    public enum TaskStatus {SUCCESSFULLY_COMPLETED, CURRENTLY_EXECUTING_BLOCKING, CURRENTLY_EXECUTING_NOT_BLOCKING, FAILED}
-
+public interface DialogTask extends Action{
     // return preferences object
     public DialogTaskPreferences getPreferences();
 
@@ -19,12 +18,15 @@ public interface DialogTask {
     public void setTaskSpec(SemanticsModel taskSpec);
     public SemanticsModel getTaskSpec();
     // a generic function to see if the important parameters for this task match up
-    public boolean meetsTaskSpec(SemanticsModel otherSpec);
+    public default boolean meetsTaskSpec(SemanticsModel otherSpec){
+        return otherSpec.equals(getTaskSpec());
+    };
 
     // interpret result as the probability that the taskSpec can be executed (must be 0-1)
     // if it isn't executable, then the task spec is probably 'nonsense', since this is a dialog task
     public double assessExecutability();
 
     // eventually add other stuff to actually implement basic IR / IE.
+    public void execute();
 
 }

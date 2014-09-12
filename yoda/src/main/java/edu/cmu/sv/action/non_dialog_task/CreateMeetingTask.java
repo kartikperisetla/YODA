@@ -1,4 +1,4 @@
-package edu.cmu.sv.task_interface.non_dialog_task;
+package edu.cmu.sv.action.non_dialog_task;
 
 import edu.cmu.sv.semantics.SemanticsModel;
 
@@ -13,6 +13,7 @@ public class CreateMeetingTask implements NonDialogTask {
     private static NonDialogTaskPreferences preferences =
             new NonDialogTaskPreferences(false, 1, 20, 15,
                     new HashSet<>(Arrays.asList("hasMeeting.hasTime", "hasMeeting.hasPlace", "hasMeeting.hasPerson")));
+    private SemanticsModel taskSpec = null;
 
     @Override
     public NonDialogTaskPreferences getPreferences() {
@@ -20,7 +21,17 @@ public class CreateMeetingTask implements NonDialogTask {
     }
 
     @Override
-    public double assessExecutability(SemanticsModel taskSpec) {
+    public void setTaskSpec(SemanticsModel taskSpec) {
+        this.taskSpec = taskSpec;
+    }
+
+    @Override
+    public SemanticsModel getTaskSpec() {
+        return null;
+    }
+
+    @Override
+    public double assessExecutability() {
         return 1.0;
     }
 

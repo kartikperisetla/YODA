@@ -1,6 +1,10 @@
 package edu.cmu.sv.dialog_management;
 
-import edu.cmu.sv.dialog_management.dialog_act.*;
+import edu.cmu.sv.action.Action;
+import edu.cmu.sv.action.dialog_act.*;
+import edu.cmu.sv.semantics.SemanticsModel;
+import edu.cmu.sv.action.dialog_task.DialogTask;
+import edu.cmu.sv.action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.utils.Combination;
 import edu.cmu.sv.utils.NBest;
 import edu.cmu.sv.utils.StringDistribution;
@@ -32,7 +36,7 @@ public class DialogManager {
     * Select the best dialog act given all the possible classes and bindings
     *
     * */
-    public List<Pair<DialogAct, Double>> selectDialogAct() throws IllegalAccessException, InstantiationException {
+    public List<Pair<Action, Double>> selectAction() throws IllegalAccessException, InstantiationException {
         DiscourseUnit DU = tracker.getDiscourseUnit();
         // 1) collect roles and values across this DU
         Map<String, Set<String>> roleValuePairs = DU.getAllSlotValuePairs();
@@ -42,8 +46,10 @@ public class DialogManager {
             values.addAll(roleValuePairs.get(role));
         }
 
-        Map<DialogAct, Double> descriptorExpectedReward = new HashMap<>();
-        for (Class <? extends DialogAct> cls : DialogRegistry.systemOutputDialogActs) {
+        Map<Action, Double> actionExpectedReward = new HashMap<>();
+
+        //// Get reward for clarification acts
+        for (Class <? extends DialogAct> cls : DialogRegistry.clarificationDialogActs) {
             // 2) create a dialog act instance for each possible dialog act
             Set<DialogAct> possibleDialogActs = new HashSet<>();
             Map<String, String> parameters = cls.newInstance().getParameters();
@@ -62,41 +68,49 @@ public class DialogManager {
                 // don't allow multiple parameters to have the same value
                 if (binding.values().size()!=new HashSet<>(binding.values()).size())
                     continue;
-                DialogAct dum = cls.newInstance();
-                dum = dum.bindVariables(binding);
-                possibleDialogActs.add(dum);
+                DialogAct clarificationDialogAct = cls.newInstance();
+                clarificationDialogAct = clarificationDialogAct.bindVariables(binding);
+                possibleDialogActs.add(clarificationDialogAct);
             }
 
             // 3) for each dialog act descriptor, evaluate expected reward
-            StringDistribution dialogActDistribution = DU.marginalSlotPathDistribution("dialogAct");
             for (DialogAct dialogAct : possibleDialogActs) {
                 Double expectedReward = dialogAct.reward(DU);
                 Double expectedCost = dialogAct.cost(DU);
-                descriptorExpectedReward.put(dialogAct, expectedReward - expectedCost);
+                actionExpectedReward.put(dialogAct, expectedReward - expectedCost);
             }
-
         }
 
-//        System.out.println("DialogManager.selectAction: descriptorExpectedReward:");
-//        for (DialogAct dialogAct : descriptorExpectedReward.keySet()){
-//            System.out.println(descriptorExpectedReward.get(dialogAct));
-//            System.out.println(dialogAct);
-//        }
+        //// Get expected rewards from dialog and non-dialog tasks
+        for (String hypothesisID : DU.getHypotheses().keySet()) {
+            SemanticsModel hypothesis = DU.getHypotheses().get(hypothesisID);
+            Class<? extends DialogAct> daClass = DialogRegistry.dialogActNameMap.
+                    get(hypothesis.getSlotPathFiller("dialogAct"));
+            System.out.println("dialogAct: "+hypothesis.getSlotPathFiller("dialogAct")+
+                    ", daClass: "+daClass);
+            // add contribution from dialog tasks
+            if (DialogRegistry.dialogTaskRegistry.containsKey(daClass)) {
+                for (Class<? extends DialogTask> taskClass : DialogRegistry.dialogTaskRegistry.get(daClass)) {
+                    DialogTask task = taskClass.newInstance();
+                    task.setTaskSpec(hypothesis.deepCopy());
+                    Double expectedReward = RewardAndCostCalculator.dialogTaskReward(DU, task);
+                    actionExpectedReward.put(task, expectedReward);
+                }
+            }
+            // add contribution from non dialog tasks
+            if (DialogRegistry.nonDialogTaskRegistry.containsKey(daClass)) {
+                for (Class<? extends NonDialogTask> taskClass : DialogRegistry.nonDialogTaskRegistry.get(daClass)) {
+                    NonDialogTask task = taskClass.newInstance();
+                    task.setTaskSpec(hypothesis.deepCopy());
+                    Double expectedReward = RewardAndCostCalculator.nonDialogTaskReward(DU, task);
+                    actionExpectedReward.put(task, expectedReward);
+                }
+            }
+        }
 
-        return NBest.keepBeam(descriptorExpectedReward, 5);
+        return NBest.keepBeam(actionExpectedReward, 100);
     }
 
-//
-//    Double dialogActTaskExpectedReward(Double confidence, StringDistribution dialogActDistribution, boolean takeTurn){
-//        Double expectedReward = 0.0;
-//        for (String dialogAct : dialogActDistribution.keySet()){
-//            DialogTaskPreferences preferences = dialogActTaskRegistry.get(dialogAct).getPreferences();
-//            expectedReward += dialogActDistribution.get(dialogAct)*
-//                    ((preferences.rewardForCorrectExecution * confidence) -
-//                            (takeTurn ? (preferences.penaltyForDelay * confidence) : 0) -
-//                            (preferences.penaltyForIncorrectExecution * (1 - confidence)));
-//        }
-//        return expectedReward;
-//    }
+
 
 }

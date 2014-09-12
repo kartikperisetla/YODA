@@ -1,11 +1,11 @@
 package edu.cmu.sv;
 
-import edu.cmu.sv.dialog_management.dialog_act.DialogAct;
+import edu.cmu.sv.action.Action;
+import edu.cmu.sv.action.dialog_act.DialogAct;
 import edu.cmu.sv.dialog_management.DialogManager;
-import edu.cmu.sv.dialog_management.dialog_act.RequestDisambiguateRole;
+import edu.cmu.sv.action.dialog_act.RequestDisambiguateRole;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.StringDistribution;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
 
@@ -49,20 +49,18 @@ public class TestClarificationDialog {
             this.bestActionDescriptor = bestActionDescriptor;
         }
 
-        private EvaluationResult evaluate(List<Pair<DialogAct, Double>> nBestActions){
+        private EvaluationResult evaluate(List<Pair<Action, Double>> nBestActions){
             boolean correctInTopNActions = false;
             boolean correctIsTopAction = false;
             double topConfidence = nBestActions.get(0).getRight();
             int correctActionRank = -1;
             double correctActionRelativeReward = 0.0;
             for (int i = 0; i < nBestActions.size(); i++) {
-                Pair<DialogAct, Double> candidateActionAndReward = nBestActions.get(i);
+                Pair<Action, Double> candidateActionAndReward = nBestActions.get(i);
                 if (candidateActionAndReward.getLeft()==null)
                     continue;
                 // right now I don't distinguish between parameters
-                if (candidateActionAndReward.getLeft().getBindings().equals(bestActionDescriptor.getBindings()) &&
-                        new HashSet<>(candidateActionAndReward.getLeft().getBindings().values()).
-                                equals(new HashSet<>(bestActionDescriptor.getBindings().values()))) {
+                if (candidateActionAndReward.getLeft().evaluationMatch(bestActionDescriptor)) {
                     if (i==0)
                         correctIsTopAction = true;
                     correctInTopNActions = true;
@@ -85,7 +83,7 @@ public class TestClarificationDialog {
         for (TestCase testCase : testCases) {
             DialogManager dialogManager = new DialogManager();
             dialogManager.getTracker().updateDialogState(testCase.hypotheses, testCase.hypothesisDistribution, (float) 0);
-            List<Pair<DialogAct, Double>> topActions = dialogManager.selectDialogAct();
+            List<Pair<Action, Double>> topActions = dialogManager.selectAction();
             System.out.println("Test case evaluation:");
             System.out.println(testCase.evaluate(topActions));
         }

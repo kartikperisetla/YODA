@@ -1,5 +1,6 @@
-package edu.cmu.sv.dialog_management.dialog_act;
+package edu.cmu.sv.action.dialog_act;
 
+import edu.cmu.sv.action.Action;
 import edu.cmu.sv.dialog_management.DiscourseUnit;
 
 import java.util.*;
@@ -15,7 +16,7 @@ import java.util.*;
  *   - include templates used for NLG and SLU
  *
  */
-public interface DialogAct {
+public interface DialogAct extends Action {
     public Double reward(DiscourseUnit DU);
     public Double cost(DiscourseUnit DU);
     public Map<String, String> getParameters();

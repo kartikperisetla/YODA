@@ -1,4 +1,4 @@
-package edu.cmu.sv.dialog_management.dialog_act;
+package edu.cmu.sv.action.dialog_act;
 
 import edu.cmu.sv.dialog_management.DiscourseUnit;
 

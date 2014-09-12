@@ -1,4 +1,4 @@
-package edu.cmu.sv.task_interface.non_dialog_task;
+package edu.cmu.sv.action.non_dialog_task;
 
 import edu.cmu.sv.semantics.SemanticsModel;
 
@@ -12,6 +12,17 @@ public class SendEmailTask implements NonDialogTask {
     private static Map<String, TaskStatus> executionStatus = new HashMap<>();
     private static NonDialogTaskPreferences preferences = new NonDialogTaskPreferences(true, 1, 20, 20,
             new HashSet<>(Arrays.asList("hasToPerson")));
+    private SemanticsModel taskSpec = null;
+
+    @Override
+    public void setTaskSpec(SemanticsModel taskSpec) {
+        this.taskSpec = taskSpec;
+    }
+
+    @Override
+    public SemanticsModel getTaskSpec() {
+        return taskSpec;
+    }
 
     @Override
     public NonDialogTaskPreferences getPreferences() {
@@ -19,7 +30,7 @@ public class SendEmailTask implements NonDialogTask {
     }
 
     @Override
-    public double assessExecutability(SemanticsModel taskSpec) {
+    public double assessExecutability() {
         // this works because assessExecutability is never called unless all the required slots are present
         return 1.0;
     }

@@ -1,15 +1,12 @@
-package edu.cmu.sv.dialog_management.dialog_act;
+package edu.cmu.sv.dialog_management;
 
-import edu.cmu.sv.dialog_management.DialogRegistry;
-import edu.cmu.sv.dialog_management.DiscourseUnit;
+import edu.cmu.sv.action.dialog_act.DialogAct;
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.task_interface.dialog_task.DialogTask;
-import edu.cmu.sv.task_interface.dialog_task.DialogTaskPreferences;
-import edu.cmu.sv.task_interface.non_dialog_task.NonDialogTask;
-import edu.cmu.sv.task_interface.non_dialog_task.NonDialogTaskPreferences;
+import edu.cmu.sv.action.dialog_task.DialogTask;
+import edu.cmu.sv.action.dialog_task.DialogTaskPreferences;
+import edu.cmu.sv.action.non_dialog_task.NonDialogTask;
+import edu.cmu.sv.action.non_dialog_task.NonDialogTaskPreferences;
 import edu.cmu.sv.utils.StringDistribution;
-
-import java.util.Set;
 
 /**
  * Created by David Cohen on 9/8/14.
@@ -88,24 +85,28 @@ public class RewardAndCostCalculator {
             Class<? extends DialogAct> daClass = DialogRegistry.dialogActNameMap.
                     get(hypothesis.getSlotPathFiller("dialogAct"));
             // add contribution from dialog tasks
-            for (Class<? extends DialogTask> taskClass : DialogRegistry.dialogTaskRegistry.get(daClass)){
-                DialogTaskPreferences preferences = taskClass.newInstance().getPreferences();
-                predictedRewardDifference += predictedConfidence * preferences.rewardForCorrectExecution;
-                predictedRewardDifference -= (1 - predictedConfidence) * preferences.penaltyForIncorrectExecution;
-                predictedRewardDifference -= currentConfidence * preferences.rewardForCorrectExecution;
-                predictedRewardDifference += (1 - currentConfidence) * preferences.penaltyForIncorrectExecution;
-                totalReward += currentConfidence * predictedRewardDifference /
-                        DialogRegistry.dialogTaskRegistry.get(daClass).size();
+            if (DialogRegistry.dialogTaskRegistry.containsKey(daClass)) {
+                for (Class<? extends DialogTask> taskClass : DialogRegistry.dialogTaskRegistry.get(daClass)) {
+                    DialogTaskPreferences preferences = taskClass.newInstance().getPreferences();
+                    predictedRewardDifference += predictedConfidence * preferences.rewardForCorrectExecution;
+                    predictedRewardDifference -= (1 - predictedConfidence) * preferences.penaltyForIncorrectExecution;
+                    predictedRewardDifference -= currentConfidence * preferences.rewardForCorrectExecution;
+                    predictedRewardDifference += (1 - currentConfidence) * preferences.penaltyForIncorrectExecution;
+                    totalReward += currentConfidence * predictedRewardDifference /
+                            DialogRegistry.dialogTaskRegistry.get(daClass).size();
+                }
             }
             // add contribution from non-dialog tasks
-            for (Class<? extends NonDialogTask> taskClass : DialogRegistry.nonDialogTaskRegistry.get(daClass)){
-                NonDialogTaskPreferences preferences = taskClass.newInstance().getPreferences();
-                predictedRewardDifference += predictedConfidence * preferences.rewardForCorrectExecution;
-                predictedRewardDifference -= (1 - predictedConfidence) * preferences.penaltyForIncorrectExecution;
-                predictedRewardDifference -= currentConfidence * preferences.rewardForCorrectExecution;
-                predictedRewardDifference += (1 - currentConfidence) * preferences.penaltyForIncorrectExecution;
-                totalReward += currentConfidence * predictedRewardDifference /
-                        DialogRegistry.nonDialogTaskRegistry.get(daClass).size();
+            if (DialogRegistry.nonDialogTaskRegistry.containsKey(daClass)) {
+                for (Class<? extends NonDialogTask> taskClass : DialogRegistry.nonDialogTaskRegistry.get(daClass)) {
+                    NonDialogTaskPreferences preferences = taskClass.newInstance().getPreferences();
+                    predictedRewardDifference += predictedConfidence * preferences.rewardForCorrectExecution;
+                    predictedRewardDifference -= (1 - predictedConfidence) * preferences.penaltyForIncorrectExecution;
+                    predictedRewardDifference -= currentConfidence * preferences.rewardForCorrectExecution;
+                    predictedRewardDifference += (1 - currentConfidence) * preferences.penaltyForIncorrectExecution;
+                    totalReward += currentConfidence * predictedRewardDifference /
+                            DialogRegistry.nonDialogTaskRegistry.get(daClass).size();
+                }
             }
         }
         return totalReward;

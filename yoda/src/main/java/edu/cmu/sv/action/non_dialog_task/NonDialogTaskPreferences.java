@@ -1,4 +1,4 @@
-package edu.cmu.sv.task_interface.non_dialog_task;
+package edu.cmu.sv.action.non_dialog_task;
 
 import java.util.Set;
 

@@ -1,4 +1,4 @@
-package edu.cmu.sv.dialog_management.dialog_act;
+package edu.cmu.sv.action.dialog_act;
 
 import edu.cmu.sv.dialog_management.DiscourseUnit;
 
@@ -8,11 +8,10 @@ import java.util.Map;
  * Created by David Cohen on 9/8/14.
  */
 public class Command implements DialogAct {
-    @Override
-    public Double reward(DiscourseUnit DU) {
-        return null;
-    }
 
+    // command is not executable by the system
+    @Override
+    public Double reward(DiscourseUnit DU) {return null;}
     @Override
     public Double cost(DiscourseUnit DU) {
         return null;
