@@ -120,6 +120,8 @@ public class RewardAndCostCalculator {
     }
 
 
+//    public static StringDistribution predictedConfidenceGainFromJointClarification(DiscourseUnit DU)
+
 
     public static Double predictConfidenceAfterJointGain(DiscourseUnit DU, Double factor, Double topJointConfidence){
         assert 0.0 <= factor && 1.0 >= factor;
