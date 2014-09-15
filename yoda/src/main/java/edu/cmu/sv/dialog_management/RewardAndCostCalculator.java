@@ -8,6 +8,10 @@ import edu.cmu.sv.action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.action.non_dialog_task.NonDialogTaskPreferences;
 import edu.cmu.sv.utils.StringDistribution;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 /**
  * Created by David Cohen on 9/8/14.
  *
@@ -21,7 +25,8 @@ import edu.cmu.sv.utils.StringDistribution;
 public class RewardAndCostCalculator {
     public static double penaltyForContradictingUser = .5;
     public static double penaltyForObligingUserAction = 2;
-    public static double penaltyForObligingUserPhrase = .5;
+    public static double penaltyForObligingUserPhrase = .1;
+    public static double penaltyForSpeakingPhrase = .1;
 
     public static Double nonDialogTaskReward(DiscourseUnit DU, NonDialogTask nonDialogTask){
         Double totalReward = 0.0;
@@ -61,22 +66,13 @@ public class RewardAndCostCalculator {
         return totalReward;
     }
 
-    public static Double predictedJointToRelative(DiscourseUnit DU, Double predictedJoint){
-        Double currentConfidence = DU.getHypothesisDistribution().get(
-                DU.getHypothesisDistribution().getTopHypothesis());
-        Double relativeConfidenceGain = 0.0;
-        if (currentConfidence<1.0)
-            relativeConfidenceGain = (predictedJoint-currentConfidence)/(1 - currentConfidence);
-        assert relativeConfidenceGain >= 0 && relativeConfidenceGain <= 1.0;
-        return relativeConfidenceGain;
-    }
-
     /*
     * To compute the reward for a clarification dialog act,
     * estimate the improvement in reward to all possible dialog and non-dialog tasks
     * that relate to all the available DU hypotheses.
     * */
-    public static Double clarificationDialogActReward(DiscourseUnit DU, Double predictedRelativeConfidenceGain)
+    public static Double clarificationDialogActReward(DiscourseUnit DU,
+                                                      StringDistribution predictedRelativeConfidenceGain)
             throws IllegalAccessException, InstantiationException {
         Double totalReward = 0.0;
 
@@ -85,7 +81,8 @@ public class RewardAndCostCalculator {
         for (String hypothesisID : DU.getHypotheses().keySet()){
             SemanticsModel hypothesis = DU.getHypotheses().get(hypothesisID);
             Double currentConfidence = DU.getHypothesisDistribution().get(hypothesisID);
-            Double predictedConfidence = currentConfidence + (1-currentConfidence)*predictedRelativeConfidenceGain;
+            Double predictedConfidence = currentConfidence + (1-currentConfidence)*
+                    predictedRelativeConfidenceGain.get(hypothesisID);
 
             // predict the difference in expected reward after clarification
             Double predictedRewardDifference = 0.0;
@@ -120,58 +117,97 @@ public class RewardAndCostCalculator {
     }
 
 
-//    public static StringDistribution predictedConfidenceGainFromJointClarification(DiscourseUnit DU)
-
-
-    public static Double predictConfidenceAfterJointGain(DiscourseUnit DU, Double factor, Double topJointConfidence){
-        assert 0.0 <= factor && 1.0 >= factor;
-        String topJointHypothesis = DU.getHypothesisDistribution().getTopHypothesis();
-        topJointConfidence = topJointConfidence == null ?
-                DU.getHypothesisDistribution().get(topJointHypothesis) :
-                topJointConfidence;
-        Double maxJointImprovement = (1.0-topJointConfidence);
-        return topJointConfidence + maxJointImprovement*factor;
+    public static StringDistribution predictedConfidenceGainFromJointClarification(DiscourseUnit DU){
+        double relativeImprovement = .5; // every hypothesis is expected to improve by 50% relative if it is correct
+        StringDistribution ans = new StringDistribution();
+        for (String key : DU.getHypotheses().keySet()){
+            ans.extend(key, relativeImprovement);
+        }
+        return ans;
     }
 
-    public static Double predictConfidenceAfterValueGain(DiscourseUnit DU, Double factor, String value,
-                                                         Double topJointConfidence){
-        assert 0.0 <= factor && 1.0 >= factor;
-        String topJointHypothesis = DU.getHypothesisDistribution().getTopHypothesis();
-        topJointConfidence = topJointConfidence == null ?
-                DU.getHypothesisDistribution().get(topJointHypothesis) :
-                topJointConfidence;
-        Double maxJointImprovement = (1.0-topJointConfidence);
-        for (String slot : DU.getHypotheses().get(topJointHypothesis).getAllSlotFillers().keySet()) {
-            if (DU.getHypotheses().get(topJointHypothesis).getSlots().get(slot)!=null &&
-                    DU.getHypotheses().get(topJointHypothesis).getSlots().get(slot).equals(value)) {
-                StringDistribution marginal = DU.marginalSlotPathDistribution(slot);
-                Double maxMarginalImprovement = (1.0 - marginal.get(value));
-                topJointConfidence += maxJointImprovement*maxMarginalImprovement*factor;
+    public static StringDistribution predictConfidenceGainFromValueDisambiguation(DiscourseUnit DU, String v1,
+                                                                                  String v2){
+        StringDistribution ans1 = predictConfidenceGainFromValueConfirmation(DU, v1);
+        StringDistribution ans2 = predictConfidenceGainFromValueConfirmation(DU, v2);
+        StringDistribution ans = new StringDistribution();
+        for (String key : ans1.keySet()){
+            ans.extend(key, (1 - (1-ans1.get(key))*(1-ans2.get(key))));
+        }
+        return ans;
+    }
+
+    public static StringDistribution predictConfidenceGainFromRoleDisambiguation(DiscourseUnit DU, String r1,
+                                                                                  String r2){
+        StringDistribution ans1 = predictConfidenceGainFromRoleConfirmation(DU, r1);
+        StringDistribution ans2 = predictConfidenceGainFromRoleConfirmation(DU, r2);
+        StringDistribution ans = new StringDistribution();
+        for (String key : ans1.keySet()){
+            ans.extend(key, (1 - (1-ans1.get(key))*(1-ans2.get(key))));
+        }
+        return ans;
+    }
+
+
+    public static StringDistribution predictConfidenceGainFromValueConfirmation(DiscourseUnit DU, String value){
+        double limit = .9; // we will never predict 100% confidence gain
+        StringDistribution ans = new StringDistribution();
+        Map<String, Boolean> hasValueMap = DU.getHypotheses().keySet().stream().collect(Collectors.toMap(
+                x->x, x->DU.getHypotheses().get(x).getAllSlotFillers().values().contains(value)
+        ));
+
+        for (String key : DU.getHypotheses().keySet()){
+            if (DU.getHypothesisDistribution().get(key) >= 1.0) {
+                ans.extend(key, 0.0);
+            }
+            else if (hasValueMap.get(key)) {
+                ans.extend(key, limit *
+                        DU.getHypotheses().keySet().stream().
+                                filter(x -> !hasValueMap.get(x)).
+                                map(x -> DU.getHypothesisDistribution().get(x)).
+                                reduce(0.0, (x,y) -> x+y) * 1.0 /
+                        DU.getHypotheses().keySet().stream().
+                                filter(x -> !x.equals(key)).
+                                map(x -> DU.getHypothesisDistribution().get(x)).
+                                reduce(0.0, (x,y) -> x+y) /
+                        hasValueMap.values().stream().filter(x -> x).count());
+            } else {
+                ans.extend(key, 0.0);
             }
         }
-        return topJointConfidence;
+//        System.out.println("RewardAndCostCalculator.predictConfidenceGainFromValueConfirmation: ans:\n"+ans);
+        return ans;
     }
 
-    public static Double predictConfidenceAfterRoleGain(DiscourseUnit DU, Double factor, String role,
-                                                        Double topJointConfidence){
-        assert 0.0 <= factor && 1.0 >= factor;
-        String topJointHypothesis = DU.getHypothesisDistribution().getTopHypothesis();
-        topJointConfidence = topJointConfidence == null ?
-                DU.getHypothesisDistribution().get(topJointHypothesis) :
-                topJointConfidence;
-        Double maxJointImprovement = (1.0-topJointConfidence);
-        StringDistribution roleMarginal = DU.marginalSlotPathDistribution(role);
-        String topValue = roleMarginal.getTopHypothesis();
-        Double topOtherConfidence = 0.0;
-        for (String otherSlot : DU.getAllSlotValuePairs().keySet()){
-            if (otherSlot.equals(role))
-                continue;
-            topOtherConfidence = Double.max(topOtherConfidence,
-                    DU.marginalSlotPathDistribution(otherSlot).get(topValue));
+    /*
+    * Confirming a role is confirming that the role is filled,
+    * it does not confirm anything about the value that fills it
+    * */
+    public static StringDistribution predictConfidenceGainFromRoleConfirmation(DiscourseUnit DU, String role){
+        double limit = .9;
+        StringDistribution ans = new StringDistribution();
+        Map<String, Boolean> roleFilledMap = DU.getHypotheses().keySet().stream().collect(Collectors.toMap(
+                x->x, x->DU.getHypotheses().get(x).getAllSlotFillers().keySet().contains(role)
+        ));
+        for (String key : DU.getHypotheses().keySet()){
+            if (DU.getHypothesisDistribution().get(key) >= 1.0)
+                ans.extend(key, 0.0);
+            else if (roleFilledMap.get(key)) {
+                ans.extend(key, limit *
+                        DU.getHypotheses().keySet().stream().
+                                filter(x -> !roleFilledMap.get(x)).
+                                map(x -> DU.getHypothesisDistribution().get(x)).
+                                reduce(0.0, (x, y) -> x + y) * 1.0 /
+                        DU.getHypotheses().keySet().stream().
+                                filter(x -> !x.equals(key)).
+                                map(x -> DU.getHypothesisDistribution().get(x)).
+                                reduce(0.0, (x, y) -> x + y) /
+                        roleFilledMap.values().stream().filter(x -> x).count());
+            } else {
+                ans.extend(key, 0.0);
+            }
         }
-        Double maxMarginalImprovement = topOtherConfidence;
-        topJointConfidence += maxJointImprovement*maxMarginalImprovement*factor;
-        return topJointConfidence;
+        return ans;
     }
 
 }

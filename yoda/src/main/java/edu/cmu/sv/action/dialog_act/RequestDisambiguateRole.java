@@ -21,16 +21,10 @@ public class RequestDisambiguateRole implements DialogAct {
 
     @Override
     public Double reward(DiscourseUnit DU) {
-        // slightly more likely to improve confidence for r1 than r2
-        Double expectedConfidence = RewardAndCostCalculator.predictConfidenceAfterRoleGain(
-                DU, .5, boundVariables.get("r1"), null);
-        expectedConfidence = RewardAndCostCalculator.predictConfidenceAfterRoleGain(
-                DU, .4, boundVariables.get("r2"), expectedConfidence);
-
-        Double relativeConfidenceGain = RewardAndCostCalculator.predictedJointToRelative(DU, expectedConfidence);
-
         try {
-            return RewardAndCostCalculator.clarificationDialogActReward(DU, relativeConfidenceGain);
+            return RewardAndCostCalculator.clarificationDialogActReward(DU,
+                    RewardAndCostCalculator.predictConfidenceGainFromRoleDisambiguation(DU,
+                            boundVariables.get("r1"), boundVariables.get("r2")));
         } catch (IllegalAccessException | InstantiationException e) {
             e.printStackTrace();
         }
@@ -40,7 +34,8 @@ public class RequestDisambiguateRole implements DialogAct {
     @Override
     public Double cost(DiscourseUnit DU) {
         // we oblige the user to a single phrase response
-       return RewardAndCostCalculator.penaltyForObligingUserPhrase*1;
+       return RewardAndCostCalculator.penaltyForObligingUserPhrase*1 +
+               RewardAndCostCalculator.penaltyForSpeakingPhrase *2;
     }
 
     @Override

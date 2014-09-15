@@ -36,12 +36,10 @@ public class RequestConfirmValue implements DialogAct{
 
     @Override
     public Double reward(DiscourseUnit DU) {
-        Double expectedConfidence = RewardAndCostCalculator.predictConfidenceAfterValueGain(
-                DU, .5, boundVariables.get("v1"), null);
-
-        Double relativeConfidenceGain = RewardAndCostCalculator.predictedJointToRelative(DU, expectedConfidence);
         try {
-            return RewardAndCostCalculator.clarificationDialogActReward(DU, relativeConfidenceGain);
+            return RewardAndCostCalculator.clarificationDialogActReward(DU,
+                    RewardAndCostCalculator.predictConfidenceGainFromValueConfirmation(DU,
+                            boundVariables.get("v1")));
         } catch (IllegalAccessException | InstantiationException e) {
             e.printStackTrace();
         }
@@ -51,7 +49,8 @@ public class RequestConfirmValue implements DialogAct{
     @Override
     public Double cost(DiscourseUnit DU) {
         // we oblige the user to a simple yes/no, which is < one phrase
-        return RewardAndCostCalculator.penaltyForObligingUserPhrase*.75;
+        return RewardAndCostCalculator.penaltyForObligingUserPhrase*.75 +
+                RewardAndCostCalculator.penaltyForSpeakingPhrase *1;
     }
 
     @Override

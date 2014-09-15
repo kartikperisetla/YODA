@@ -125,6 +125,7 @@ public class TestActionSelection {
             dialogManager.getTracker().updateDialogState(testCase.hypotheses, testCase.hypothesisDistribution, (float) 0);
             List<Pair<Action, Double>> topActions = dialogManager.selectAction();
             System.out.println("Test case evaluation:");
+//            topActions.forEach(System.out::println);
             EvaluationResult result = testCase.evaluate(topActions);
             evaluationResults.add(result);
             result.printSummary();
@@ -167,8 +168,12 @@ public class TestActionSelection {
 
         SemanticsModel hyp1;
         SemanticsModel hyp2;
+        SemanticsModel hyp3;
+        SemanticsModel hyp4;
         SemanticsModel child1;
         SemanticsModel child2;
+        SemanticsModel child3;
+        SemanticsModel child4;
 
         // test case 0: role ambiguity with different depths
         utterances = new HashMap<>();
@@ -245,7 +250,7 @@ public class TestActionSelection {
         hyp1.getChildren().put("meeting0", child1);
         child1.getSlots().put("endTime", "t1");
         utterances.put("hyp1", hyp1);
-        weights.extend("hyp1", .1);
+        weights.extend("hyp1", .25);
 
         hyp2 = new SemanticsModel();
         child2 = new SemanticsModel();
@@ -255,7 +260,27 @@ public class TestActionSelection {
         hyp2.getSlots().put("toTime", "t1");
         hyp2.getChildren().put("meeting1", child2);
         utterances.put("hyp2", hyp2);
-        weights.extend("hyp2", .1);
+        weights.extend("hyp2", .25);
+
+        hyp3 = new SemanticsModel();
+        child3 = new SemanticsModel();
+        hyp3.getSlots().put("dialogAct", "YNQuestion");
+        hyp3.getSlots().put("theme", "meeting2");
+        hyp3.getSlots().put("fromTime", "t0");
+        hyp3.getChildren().put("meeting2", child3);
+        child3.getSlots().put("endTime", "t1");
+        utterances.put("hyp3", hyp3);
+        weights.extend("hyp3", .25);
+
+        hyp4 = new SemanticsModel();
+        child4 = new SemanticsModel();
+        hyp4.getSlots().put("dialogAct", "YNQuestion");
+        hyp4.getSlots().put("theme", "meeting3");
+        hyp4.getSlots().put("fromTime", "t0");
+        hyp4.getSlots().put("toTime", "t1");
+        hyp4.getChildren().put("meeting3", child4);
+        utterances.put("hyp4", hyp4);
+        weights.extend("hyp4", .25);
 
         testCase = new TestCase(utterances, weights, bestDialogAction);
         ans.add(testCase);

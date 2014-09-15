@@ -15,14 +15,20 @@ public class RequestRephrase implements DialogAct {
 
     @Override
     public Double reward(DiscourseUnit DU) {
-        // expect a large improvement in overall top joint confidence
-        return RewardAndCostCalculator.predictConfidenceAfterJointGain(DU, .7, null);
+        try{
+        return RewardAndCostCalculator.clarificationDialogActReward(DU,
+                RewardAndCostCalculator.predictedConfidenceGainFromJointClarification(DU));
+        } catch (IllegalAccessException | InstantiationException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override
     public Double cost(DiscourseUnit DU) {
         // a complete rephrase will typically involve Subj + Obj + Verb
-        return RewardAndCostCalculator.penaltyForObligingUserPhrase*3;
+        return RewardAndCostCalculator.penaltyForObligingUserPhrase*3 +
+                RewardAndCostCalculator.penaltyForSpeakingPhrase *1;
     }
 
     @Override
