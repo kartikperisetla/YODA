@@ -40,8 +40,10 @@ public class DialogRegistry {
             nonDialogTaskRegistry = new HashMap<>();
 
     static{
+        clarificationDialogActs.add(RequestConfirmRole.class);
         clarificationDialogActs.add(RequestConfirmValue.class);
         clarificationDialogActs.add(RequestDisambiguateRole.class);
+        clarificationDialogActs.add(RequestDisambiguateValue.class);
         clarificationDialogActs.add(RequestRephrase.class);
 
         discourseUnitDialogActs.add(WHQuestion.class);

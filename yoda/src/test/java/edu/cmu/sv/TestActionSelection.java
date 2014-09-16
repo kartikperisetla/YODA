@@ -1,13 +1,14 @@
 package edu.cmu.sv;
 
 import edu.cmu.sv.action.Action;
-import edu.cmu.sv.action.dialog_act.RequestConfirmValue;
-import edu.cmu.sv.action.dialog_act.RequestRephrase;
+import edu.cmu.sv.action.dialog_act.*;
 import edu.cmu.sv.action.dialog_task.DialogTask;
 import edu.cmu.sv.action.dialog_task.RespondToWHQuestionTask;
 import edu.cmu.sv.action.dialog_task.RespondToYNQuestionTask;
+import edu.cmu.sv.action.non_dialog_task.CreateMeetingTask;
+import edu.cmu.sv.action.non_dialog_task.NonDialogTask;
+import edu.cmu.sv.action.non_dialog_task.SendEmailTask;
 import edu.cmu.sv.dialog_management.DialogManager;
-import edu.cmu.sv.action.dialog_act.RequestDisambiguateRole;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.EvaluationTools;
 import edu.cmu.sv.utils.StringDistribution;
@@ -343,6 +344,133 @@ public class TestActionSelection {
         hyp2.getChildren().put("meeting1", child2);
         utterances.put("hyp2", hyp2);
         weights.extend("hyp2", .1);
+
+        testCase = new TestCase(utterances, weights, bestDialogAction);
+        ans.add(testCase);
+
+
+        // test case 5: send an email
+        utterances = new HashMap<>();
+        weights = new StringDistribution();
+        bestDialogAction = new SendEmailTask();
+
+        hyp1 = new SemanticsModel();
+        child1 = new SemanticsModel();
+        hyp1.getSlots().put("dialogAct", "Command");
+        hyp1.getSlots().put("action", "Send");
+        hyp1.getSlots().put("theme", "email0");
+        hyp1.getSlots().put("recipient", "p0");
+        hyp1.getChildren().put("email0", child1);
+        child1.getSlots().put("class", "Email");
+        child1.getSlots().put("number", "<SG>");
+        child1.getSlots().put("ref-type", "<INDEF>");
+        utterances.put("hyp1", hyp1);
+        weights.extend("hyp1", .9);
+
+        ((NonDialogTask) bestDialogAction).setTaskSpec(hyp1.deepCopy());
+
+        hyp2 = new SemanticsModel();
+        child2 = new SemanticsModel();
+        hyp2.getSlots().put("dialogAct", "YNQuestion");
+        hyp2.getSlots().put("theme", "meeting1");
+        hyp2.getSlots().put("fromTime", "t0");
+        hyp2.getSlots().put("toTime", "t1");
+        hyp2.getChildren().put("meeting1", child2);
+        utterances.put("hyp2", hyp2);
+        weights.extend("hyp2", .1);
+
+        testCase = new TestCase(utterances, weights, bestDialogAction);
+        ans.add(testCase);
+
+        // test case 5: create a meeting
+        utterances = new HashMap<>();
+        weights = new StringDistribution();
+        bestDialogAction = new CreateMeetingTask();
+
+        hyp1 = new SemanticsModel();
+        child1 = new SemanticsModel();
+        hyp1.getSlots().put("dialogAct", "Command");
+        hyp1.getSlots().put("action", "Create");
+        hyp1.getSlots().put("theme", "meeting0");
+        hyp1.getSlots().put("recipient", "p0");
+        hyp1.getChildren().put("meeting0", child1);
+        child1.getSlots().put("class", "Meeting");
+        child1.getSlots().put("number", "<SG>");
+        child1.getSlots().put("ref-type", "<INDEF>");
+        utterances.put("hyp1", hyp1);
+        weights.extend("hyp1", .9);
+
+        ((NonDialogTask) bestDialogAction).setTaskSpec(hyp1.deepCopy());
+
+        hyp2 = new SemanticsModel();
+        child2 = new SemanticsModel();
+        hyp2.getSlots().put("dialogAct", "YNQuestion");
+        hyp2.getSlots().put("theme", "meeting1");
+        hyp2.getSlots().put("fromTime", "t0");
+        hyp2.getSlots().put("toTime", "t1");
+        hyp2.getChildren().put("meeting1", child2);
+        utterances.put("hyp2", hyp2);
+        weights.extend("hyp2", .1);
+
+        testCase = new TestCase(utterances, weights, bestDialogAction);
+        ans.add(testCase);
+
+        // test case 6: requestConfirmRole
+        utterances = new HashMap<>();
+        weights = new StringDistribution();
+        bestDialogActionParameters = new HashMap<>();
+        bestDialogActionParameters.put("r1", "fromTime");
+        bestDialogAction = new RequestConfirmRole().bindVariables(bestDialogActionParameters);
+
+        hyp1 = new SemanticsModel();
+        hyp1.getSlots().put("dialogAct", "WHQuestion");
+        hyp1.getSlots().put("fromTime", "t0");
+        utterances.put("hyp1", hyp1);
+        weights.extend("hyp1", .4);
+
+        hyp2 = new SemanticsModel();
+        hyp2.getSlots().put("dialogAct", "WHQuestion");
+        hyp2.getSlots().put("toTime", "t0");
+        utterances.put("hyp2", hyp2);
+        weights.extend("hyp2", .25);
+
+        hyp3 = new SemanticsModel();
+        hyp3.getSlots().put("dialogAct", "WHQuestion");
+        hyp3.getSlots().put("atTime", "t0");
+        utterances.put("hyp3", hyp3);
+        weights.extend("hyp3", .25);
+
+        hyp4 = new SemanticsModel();
+        hyp4.getSlots().put("dialogAct", "YNQuestion");
+        hyp4.getSlots().put("fromTime", "t0");
+        utterances.put("hyp4", hyp4);
+        weights.extend("hyp4", .10);
+
+        testCase = new TestCase(utterances, weights, bestDialogAction);
+        ans.add(testCase);
+
+
+        // test case 7: request disambiguate value
+        utterances = new HashMap<>();
+        weights = new StringDistribution();
+        bestDialogActionParameters = new HashMap<>();
+        bestDialogActionParameters.put("v1", "t0");
+        bestDialogActionParameters.put("v2", "t1");
+        bestDialogAction = new RequestDisambiguateValue().bindVariables(bestDialogActionParameters);
+
+        hyp1 = new SemanticsModel();
+        hyp1.getSlots().put("dialogAct", "WHQuestion");
+        hyp1.getSlots().put("fromTime", "t0");
+        hyp2.getSlots().put("endTime", "t2");
+        utterances.put("hyp1", hyp1);
+        weights.extend("hyp1", .6);
+
+        hyp2 = new SemanticsModel();
+        hyp2.getSlots().put("dialogAct", "WHQuestion");
+        hyp2.getSlots().put("fromTime", "t1");
+        hyp2.getSlots().put("endTime", "t2");
+        utterances.put("hyp2", hyp2);
+        weights.extend("hyp2", .4);
 
         testCase = new TestCase(utterances, weights, bestDialogAction);
         ans.add(testCase);

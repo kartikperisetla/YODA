@@ -11,7 +11,7 @@ public class SendEmailTask implements NonDialogTask {
     private static Integer instanceCounter = 0;
     private static Map<String, TaskStatus> executionStatus = new HashMap<>();
     private static NonDialogTaskPreferences preferences = new NonDialogTaskPreferences(true, 1, 20, 20,
-            new HashSet<>(Arrays.asList("hasToPerson")));
+            new HashSet<>(Arrays.asList()));
     private SemanticsModel taskSpec = null;
 
     @Override
@@ -43,6 +43,19 @@ public class SendEmailTask implements NonDialogTask {
         // dictationProgram.run();
         System.out.println("taskID: "+ans);
         return ans;
+    }
+
+    @Override
+    public double assessExecutability() {
+        if (taskSpec==null)
+            return 0;
+        if (taskSpec.getSlotPathFiller("action")!=null &&
+                taskSpec.getSlotPathFiller("action").equals("Send") &&
+                taskSpec.getSlotPathFiller("theme.class")!=null &&
+                taskSpec.getSlotPathFiller("theme.class").equals("Email") &&
+                taskSpec.getSlotPathFiller("recipient")!=null)
+            return 1.0;
+        return 0;
     }
 
     @Override

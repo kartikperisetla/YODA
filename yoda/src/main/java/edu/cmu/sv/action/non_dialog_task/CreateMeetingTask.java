@@ -12,7 +12,7 @@ public class CreateMeetingTask implements NonDialogTask {
     private static Map<String, TaskStatus> executionStatus = new HashMap<>();
     private static NonDialogTaskPreferences preferences =
             new NonDialogTaskPreferences(false, 1, 20, 15,
-                    new HashSet<>(Arrays.asList("hasMeeting.hasTime", "hasMeeting.hasPlace", "hasMeeting.hasPerson")));
+                    new HashSet<>(Arrays.asList()));
     private SemanticsModel taskSpec = null;
 
     @Override
@@ -23,6 +23,18 @@ public class CreateMeetingTask implements NonDialogTask {
     @Override
     public void setTaskSpec(SemanticsModel taskSpec) {
         this.taskSpec = taskSpec;
+    }
+
+    @Override
+    public double assessExecutability() {
+        if (taskSpec==null)
+            return 0;
+        if (taskSpec.getSlotPathFiller("action")!=null &&
+                taskSpec.getSlotPathFiller("action").equals("Create") &&
+                taskSpec.getSlotPathFiller("theme.class")!=null &&
+                taskSpec.getSlotPathFiller("theme.class").equals("Meeting"))
+            return 1.0;
+        return 0;
     }
 
     @Override
