@@ -1,6 +1,6 @@
 package edu.cmu.sv.action.dialog_act;
 
-import edu.cmu.sv.dialog_management.DiscourseUnit;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
 
 import java.util.HashMap;

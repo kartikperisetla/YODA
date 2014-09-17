@@ -1,12 +1,10 @@
-package edu.cmu.sv.dialog_management;
+package edu.cmu.sv.dialog_state_tracking;
 
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.StringDistribution;
 
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by David Cohen on 9/2/14.

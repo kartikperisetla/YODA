@@ -2,6 +2,8 @@ package edu.cmu.sv.dialog_management;
 
 import edu.cmu.sv.action.Action;
 import edu.cmu.sv.action.dialog_act.*;
+import edu.cmu.sv.dialog_state_tracking.DialogStateTracker;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.action.dialog_task.DialogTask;
 import edu.cmu.sv.action.non_dialog_task.NonDialogTask;
