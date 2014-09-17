@@ -7,10 +7,10 @@ import edu.cmu.sv.action.dialog_task.DialogTask;
 import edu.cmu.sv.action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.utils.Combination;
 import edu.cmu.sv.utils.NBest;
-import edu.cmu.sv.utils.StringDistribution;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by David Cohen on 9/2/14.
@@ -39,12 +39,15 @@ public class DialogManager {
     public List<Pair<Action, Double>> selectAction() throws IllegalAccessException, InstantiationException {
         DiscourseUnit DU = tracker.getDiscourseUnit();
         // 1) collect roles and values across this DU
-        Map<String, Set<String>> roleValuePairs = DU.getAllSlotValuePairs();
+        Map<String, Set<String>> roleValuePairs = DU.getAllNonSpecialSlotValueLeafPairs();
         // 1-a) determine the set of values
-        Set<String> values = new HashSet<>();
+        Set<String> possibleValueBindings = new HashSet<>();
         for (String role : roleValuePairs.keySet()) {
-            values.addAll(roleValuePairs.get(role));
+            possibleValueBindings.addAll(roleValuePairs.get(role));
         }
+        Set<String> possibleRoleBindings = roleValuePairs.keySet().stream().
+                filter(x -> possibleValueBindings.containsAll(roleValuePairs.get(x))).
+                collect(Collectors.toSet());
 
         Map<Action, Double> actionExpectedReward = new HashMap<>();
 
@@ -58,9 +61,9 @@ public class DialogManager {
             Map<String, Set<String>> updatedParameters = new HashMap<>();
             for (String key : parameters.keySet()) {
                 if (parameters.get(key).equals("value"))
-                    updatedParameters.put(key, values);
+                    updatedParameters.put(key, possibleValueBindings);
                 else if (parameters.get(key).equals("role"))
-                    updatedParameters.put(key, roleValuePairs.keySet());
+                    updatedParameters.put(key, possibleRoleBindings);
                 else
                     throw new Error("unsupported parameter type for dialog act descriptor");
             }
@@ -93,7 +96,6 @@ public class DialogManager {
                     DialogTask task = taskClass.newInstance();
                     task.setTaskSpec(hypothesis.deepCopy());
                     Double expectedReward = RewardAndCostCalculator.dialogTaskReward(DU, task);
-                    Double cost =
                     actionExpectedReward.put(task, expectedReward);
                 }
             }
@@ -108,7 +110,7 @@ public class DialogManager {
             }
         }
 
-        return NBest.keepBeam(actionExpectedReward, 100);
+        return NBest.keepBeam(actionExpectedReward, 1000);
     }
 
 

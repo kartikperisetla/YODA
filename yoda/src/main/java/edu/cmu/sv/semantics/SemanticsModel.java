@@ -43,17 +43,19 @@ public class SemanticsModel {
         return tmp.slots.get(fillerPath[fillerPath.length-1]);
     }
 
-    public Map<String, String> getAllSlotFillers(){
+    public Map<String, String> getAllNonSpecialSlotFillerLeafPairs(){
         Map<String, String> ans = new HashMap<>();
         // collect top level slots/fillers
+        // (exclude non-leaf pairs and special values (marked by surrounding arrow brackets))
         for (String slot : slots.keySet()){
-            ans.put(slot, slots.get(slot));
+            if (!children.containsKey(slots.get(slot)) && !slots.get(slot).matches("\\<.*\\>"))
+                ans.put(slot, slots.get(slot));
         }
         // collect recursively
         for (String slot : slots.keySet()){
             if (!children.containsKey(slots.get(slot)))
                 continue;
-            Map<String, String> childSlotFillers = children.get(slots.get(slot)).getAllSlotFillers();
+            Map<String, String> childSlotFillers = children.get(slots.get(slot)).getAllNonSpecialSlotFillerLeafPairs();
             for (String key : childSlotFillers.keySet()){
                 ans.put(slot+"."+key, childSlotFillers.get(key));
             }
@@ -61,7 +63,7 @@ public class SemanticsModel {
 //
 //
 //        for (String childID : children.keySet()){
-//            Map<String, String> childSlotFillers = children.get(childID).getAllSlotFillers();
+//            Map<String, String> childSlotFillers = children.get(childID).getAllNonSpecialSlotFillerLeafPairs();
 //            for (String key : childSlotFillers.keySet()){
 //                ans.put(childID+"."+key, childSlotFillers.get(key));
 //            }

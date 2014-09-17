@@ -14,6 +14,7 @@ import edu.cmu.sv.utils.EvaluationTools;
 import edu.cmu.sv.utils.StringDistribution;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Test;
 
 import java.util.*;
@@ -121,12 +122,13 @@ public class TestActionSelection {
 
         List<TestCase> testCases = basicClarificationTestSet();
         List<EvaluationResult> evaluationResults = new LinkedList<>();
+        SummaryStatistics rewardStatistics = new SummaryStatistics();
         for (TestCase testCase : testCases) {
             DialogManager dialogManager = new DialogManager();
             dialogManager.getTracker().updateDialogState(testCase.hypotheses, testCase.hypothesisDistribution, (float) 0);
             List<Pair<Action, Double>> topActions = dialogManager.selectAction();
+            topActions.stream().map(Pair::getRight).forEach(rewardStatistics::addValue);
             System.out.println("Test case evaluation:");
-//            topActions.forEach(System.out::println);
             EvaluationResult result = testCase.evaluate(topActions);
             evaluationResults.add(result);
             result.printSummary();
@@ -145,6 +147,11 @@ public class TestActionSelection {
         System.out.println("Mean reward difference: "+evaluationResults.stream().
                 map(EvaluationResult::getCorrectActionRewardDifference).mapToDouble(x -> x).
                 average().getAsDouble());
+
+        System.out.println("Mean normalized reward difference: "+evaluationResults.stream().
+                map(EvaluationResult::getCorrectActionRewardDifference).mapToDouble(x -> x).
+                average().getAsDouble() / rewardStatistics.getStandardDeviation());
+
 
         System.out.println("Mean correct action rank: "+evaluationResults.stream().
                 map(EvaluationResult::getCorrectActionRank).mapToDouble(x->x).
@@ -382,7 +389,7 @@ public class TestActionSelection {
         testCase = new TestCase(utterances, weights, bestDialogAction);
         ans.add(testCase);
 
-        // test case 5: create a meeting
+        // test case 6: create a meeting
         utterances = new HashMap<>();
         weights = new StringDistribution();
         bestDialogAction = new CreateMeetingTask();
@@ -415,7 +422,7 @@ public class TestActionSelection {
         testCase = new TestCase(utterances, weights, bestDialogAction);
         ans.add(testCase);
 
-        // test case 6: requestConfirmRole
+        // test case 7: requestConfirmRole
         utterances = new HashMap<>();
         weights = new StringDistribution();
         bestDialogActionParameters = new HashMap<>();
@@ -450,7 +457,7 @@ public class TestActionSelection {
         ans.add(testCase);
 
 
-        // test case 7: request disambiguate value
+        // test case 8: request disambiguate value
         utterances = new HashMap<>();
         weights = new StringDistribution();
         bestDialogActionParameters = new HashMap<>();
@@ -461,7 +468,7 @@ public class TestActionSelection {
         hyp1 = new SemanticsModel();
         hyp1.getSlots().put("dialogAct", "WHQuestion");
         hyp1.getSlots().put("fromTime", "t0");
-        hyp2.getSlots().put("endTime", "t2");
+        hyp1.getSlots().put("endTime", "t2");
         utterances.put("hyp1", hyp1);
         weights.extend("hyp1", .6);
 

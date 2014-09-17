@@ -42,10 +42,10 @@ public class DiscourseUnit {
     /*
     Collect all the slot-value pairs that occur in this Discourse Unit
     * */
-    public Map<String, Set<String>> getAllSlotValuePairs(){
+    public Map<String, Set<String>> getAllNonSpecialSlotValueLeafPairs(){
         Map<String, Set<String>> ans = new HashMap<>();
         for (SemanticsModel semanticsModel : hypotheses.values()){
-            Map<String, String> modelSlotValues = semanticsModel.getAllSlotFillers();
+            Map<String, String> modelSlotValues = semanticsModel.getAllNonSpecialSlotFillerLeafPairs();
             for (String key : modelSlotValues.keySet()){
                 if (!ans.containsKey(key))
                     ans.put(key, new HashSet<>());

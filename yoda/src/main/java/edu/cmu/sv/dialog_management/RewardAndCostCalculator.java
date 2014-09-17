@@ -8,7 +8,6 @@ import edu.cmu.sv.action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.action.non_dialog_task.NonDialogTaskPreferences;
 import edu.cmu.sv.utils.StringDistribution;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -116,7 +115,6 @@ public class RewardAndCostCalculator {
         return totalReward;
     }
 
-
     public static StringDistribution predictedConfidenceGainFromJointClarification(DiscourseUnit DU){
         double relativeImprovement = .5; // every hypothesis is expected to improve by 50% relative if it is correct
         StringDistribution ans = new StringDistribution();
@@ -128,32 +126,97 @@ public class RewardAndCostCalculator {
 
     public static StringDistribution predictConfidenceGainFromValueDisambiguation(DiscourseUnit DU, String v1,
                                                                                   String v2){
-        StringDistribution ans1 = predictConfidenceGainFromValueConfirmation(DU, v1);
-        StringDistribution ans2 = predictConfidenceGainFromValueConfirmation(DU, v2);
+        double limit = .9;
         StringDistribution ans = new StringDistribution();
-        for (String key : ans1.keySet()){
-            ans.extend(key, (1 - (1-ans1.get(key))*(1-ans2.get(key))));
+        Map<String, Boolean> hasV1Map = DU.getHypotheses().keySet().stream().collect(Collectors.toMap(
+                x->x, x->DU.getHypotheses().get(x).getAllNonSpecialSlotFillerLeafPairs().values().contains(v1)));
+        Map<String, Boolean> hasV2Map = DU.getHypotheses().keySet().stream().collect(Collectors.toMap(
+                x->x, x->DU.getHypotheses().get(x).getAllNonSpecialSlotFillerLeafPairs().values().contains(v2)));
+
+        for (String key : DU.getHypotheses().keySet()) {
+            if (DU.getHypothesisDistribution().get(key) >= 1.0) {
+                ans.extend(key, 0.0);
+            }
+            else if ((hasV1Map.get(key) && hasV2Map.get(key)) || (!hasV1Map.get(key) && !hasV2Map.get(key)))
+                ans.extend(key, 0.0);
+            else if (hasV1Map.get(key)){ // !hasV2Map.get(key) is necessarily true
+                ans.extend(key,limit *
+                                DU.getHypothesisDistribution().keySet().stream().
+                                        filter(x -> !hasV1Map.get(x)).
+                                        map(x -> DU.getHypothesisDistribution().get(x)).
+                                        reduce(0.0, (x,y) -> x+y) * 1.0 /
+                                (1.0 - DU.getHypothesisDistribution().get(key)) /
+                                DU.getHypothesisDistribution().keySet().stream().
+                                        filter(x -> hasV1Map.get(x) && !hasV2Map.get(x)).
+                                        count());
+            }
+            else if (hasV2Map.get(key)){
+                ans.extend(key,limit *
+                                DU.getHypothesisDistribution().keySet().stream().
+                                        filter(x -> !hasV2Map.get(x)).
+                                        map(x -> DU.getHypothesisDistribution().get(x)).
+                                        reduce(0.0, (x,y) -> x+y) * 1.0 /
+                                (1.0 - DU.getHypothesisDistribution().get(key)) /
+                                DU.getHypothesisDistribution().keySet().stream().
+                                        filter(x -> hasV2Map.get(x) && !hasV1Map.get(x)).
+                                        count());
+            }
         }
-        return ans;
+
+            return ans;
     }
 
     public static StringDistribution predictConfidenceGainFromRoleDisambiguation(DiscourseUnit DU, String r1,
                                                                                   String r2){
-        StringDistribution ans1 = predictConfidenceGainFromRoleConfirmation(DU, r1);
-        StringDistribution ans2 = predictConfidenceGainFromRoleConfirmation(DU, r2);
+        double limit = .9;
         StringDistribution ans = new StringDistribution();
-        for (String key : ans1.keySet()){
-            ans.extend(key, (1 - (1-ans1.get(key))*(1-ans2.get(key))));
+        Map<String, Boolean> hasR1Map = DU.getHypotheses().keySet().stream().collect(Collectors.toMap(
+                x->x, x->DU.getHypotheses().get(x).getAllNonSpecialSlotFillerLeafPairs().keySet().contains(r1)));
+        Map<String, Boolean> hasR2Map = DU.getHypotheses().keySet().stream().collect(Collectors.toMap(
+                x->x, x->DU.getHypotheses().get(x).getAllNonSpecialSlotFillerLeafPairs().keySet().contains(r2)));
+
+        for (String key : DU.getHypotheses().keySet()) {
+            if (DU.getHypothesisDistribution().get(key) >= 1.0) {
+                ans.extend(key, 0.0);
+            }
+            else if ((hasR1Map.get(key) && hasR2Map.get(key)) || (!hasR1Map.get(key) && !hasR2Map.get(key)))
+                ans.extend(key, 0.0);
+            else if (hasR1Map.get(key)){ // !hasR2Map.get(key) is necessarily true
+                ans.extend(key,limit *
+                        DU.getHypothesisDistribution().keySet().stream().
+                                filter(x -> !hasR1Map.get(x)).
+                                map(x -> DU.getHypothesisDistribution().get(x)).
+                                reduce(0.0, (x,y) -> x+y) * 1.0 /
+                        (1.0 - DU.getHypothesisDistribution().get(key)) /
+                        DU.getHypothesisDistribution().keySet().stream().
+                                filter(x -> hasR1Map.get(x) && !hasR2Map.get(x)).
+                                count());
+            }
+            else if (hasR2Map.get(key)){
+                ans.extend(key,limit *
+                        DU.getHypothesisDistribution().keySet().stream().
+                                filter(x -> !hasR2Map.get(x)).
+                                map(x -> DU.getHypothesisDistribution().get(x)).
+                                reduce(0.0, (x,y) -> x+y) * 1.0 /
+                        (1.0 - DU.getHypothesisDistribution().get(key)) /
+                        DU.getHypothesisDistribution().keySet().stream().
+                                filter(x -> hasR2Map.get(x) && !hasR1Map.get(x)).
+                                count());
+            }
         }
+
         return ans;
     }
 
-
+    /*
+    * Confirming a value is confirming that some role is filled by it,
+    * it does not confirm anything about which role it fills
+    * */
     public static StringDistribution predictConfidenceGainFromValueConfirmation(DiscourseUnit DU, String value){
-        double limit = .9; // we will never predict 100% confidence gain
+        double limit = .8; // we will never predict 100% confidence gain
         StringDistribution ans = new StringDistribution();
         Map<String, Boolean> hasValueMap = DU.getHypotheses().keySet().stream().collect(Collectors.toMap(
-                x->x, x->DU.getHypotheses().get(x).getAllSlotFillers().values().contains(value)
+                x->x, x->DU.getHypotheses().get(x).getAllNonSpecialSlotFillerLeafPairs().values().contains(value)
         ));
 
         for (String key : DU.getHypotheses().keySet()){
@@ -166,10 +229,7 @@ public class RewardAndCostCalculator {
                                 filter(x -> !hasValueMap.get(x)).
                                 map(x -> DU.getHypothesisDistribution().get(x)).
                                 reduce(0.0, (x,y) -> x+y) * 1.0 /
-                        DU.getHypotheses().keySet().stream().
-                                filter(x -> !x.equals(key)).
-                                map(x -> DU.getHypothesisDistribution().get(x)).
-                                reduce(0.0, (x,y) -> x+y) /
+                        (1.0 - DU.getHypothesisDistribution().get(key)) /
                         hasValueMap.values().stream().filter(x -> x).count());
             } else {
                 ans.extend(key, 0.0);
@@ -184,10 +244,10 @@ public class RewardAndCostCalculator {
     * it does not confirm anything about the value that fills it
     * */
     public static StringDistribution predictConfidenceGainFromRoleConfirmation(DiscourseUnit DU, String role){
-        double limit = .9;
+        double limit = .8;
         StringDistribution ans = new StringDistribution();
         Map<String, Boolean> roleFilledMap = DU.getHypotheses().keySet().stream().collect(Collectors.toMap(
-                x->x, x->DU.getHypotheses().get(x).getAllSlotFillers().keySet().contains(role)
+                x->x, x->DU.getHypotheses().get(x).getAllNonSpecialSlotFillerLeafPairs().keySet().contains(role)
         ));
         for (String key : DU.getHypotheses().keySet()){
             if (DU.getHypothesisDistribution().get(key) >= 1.0)
@@ -198,10 +258,7 @@ public class RewardAndCostCalculator {
                                 filter(x -> !roleFilledMap.get(x)).
                                 map(x -> DU.getHypothesisDistribution().get(x)).
                                 reduce(0.0, (x, y) -> x + y) * 1.0 /
-                        DU.getHypotheses().keySet().stream().
-                                filter(x -> !x.equals(key)).
-                                map(x -> DU.getHypothesisDistribution().get(x)).
-                                reduce(0.0, (x, y) -> x + y) /
+                        (1.0 - DU.getHypothesisDistribution().get(key)) /
                         roleFilledMap.values().stream().filter(x -> x).count());
             } else {
                 ans.extend(key, 0.0);

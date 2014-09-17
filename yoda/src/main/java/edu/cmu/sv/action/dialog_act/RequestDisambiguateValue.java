@@ -52,4 +52,11 @@ public class RequestDisambiguateValue implements DialogAct{
         boundVariables = bindings;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "RequestDisambiguateValue{" +
+                "boundVariables=" + boundVariables +
+                '}';
+    }
 }

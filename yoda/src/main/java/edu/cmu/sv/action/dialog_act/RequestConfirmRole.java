@@ -49,4 +49,11 @@ public class RequestConfirmRole implements DialogAct {
         boundVariables = bindings;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "RequestConfirmRole{" +
+                "boundVariables=" + boundVariables +
+                '}';
+    }
 }
