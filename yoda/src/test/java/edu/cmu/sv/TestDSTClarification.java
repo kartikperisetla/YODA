@@ -9,6 +9,9 @@ import java.util.*;
 
 /**
  * Created by David Cohen on 9/17/14.
+ *
+ * Run test cases to demonstrate basic clarification dialog state tracking behavior.
+ *
  */
 public class TestDSTClarification {
 
