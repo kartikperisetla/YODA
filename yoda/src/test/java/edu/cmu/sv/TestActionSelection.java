@@ -199,7 +199,7 @@ public class TestActionSelection {
         hyp1.getChildren().put("meeting0", child1);
         child1.getSlots().put("endTime", "t1");
         utterances.put("hyp1", hyp1);
-        weights.extend("hyp1", .6);
+        weights.put("hyp1", .6);
 
         hyp2 = new SemanticsModel();
         child2 = new SemanticsModel();
@@ -209,7 +209,7 @@ public class TestActionSelection {
         hyp2.getSlots().put("toTime", "t1");
         hyp2.getChildren().put("meeting1", child2);
         utterances.put("hyp2", hyp2);
-        weights.extend("hyp2", .4);
+        weights.put("hyp2", .4);
 
         testCase = new TestCase(utterances, weights, bestDialogAction);
         ans.add(testCase);
@@ -227,7 +227,7 @@ public class TestActionSelection {
         hyp1.getChildren().put("meeting0", child1);
         child1.getSlots().put("endTime", "t1");
         utterances.put("hyp1", hyp1);
-        weights.extend("hyp1", .9);
+        weights.put("hyp1", .9);
 
         ((DialogTask) bestDialogAction).setTaskSpec(hyp1.deepCopy());
 
@@ -239,7 +239,7 @@ public class TestActionSelection {
         hyp2.getSlots().put("toTime", "t1");
         hyp2.getChildren().put("meeting1", child2);
         utterances.put("hyp2", hyp2);
-        weights.extend("hyp2", .1);
+        weights.put("hyp2", .1);
 
         testCase = new TestCase(utterances, weights, bestDialogAction);
         ans.add(testCase);
@@ -258,7 +258,7 @@ public class TestActionSelection {
         hyp1.getChildren().put("meeting0", child1);
         child1.getSlots().put("endTime", "t1");
         utterances.put("hyp1", hyp1);
-        weights.extend("hyp1", .25);
+        weights.put("hyp1", .25);
 
         hyp2 = new SemanticsModel();
         child2 = new SemanticsModel();
@@ -268,7 +268,7 @@ public class TestActionSelection {
         hyp2.getSlots().put("toTime", "t1");
         hyp2.getChildren().put("meeting1", child2);
         utterances.put("hyp2", hyp2);
-        weights.extend("hyp2", .25);
+        weights.put("hyp2", .25);
 
         hyp3 = new SemanticsModel();
         child3 = new SemanticsModel();
@@ -278,7 +278,7 @@ public class TestActionSelection {
         hyp3.getChildren().put("meeting2", child3);
         child3.getSlots().put("endTime", "t1");
         utterances.put("hyp3", hyp3);
-        weights.extend("hyp3", .25);
+        weights.put("hyp3", .25);
 
         hyp4 = new SemanticsModel();
         child4 = new SemanticsModel();
@@ -288,7 +288,7 @@ public class TestActionSelection {
         hyp4.getSlots().put("toTime", "t1");
         hyp4.getChildren().put("meeting3", child4);
         utterances.put("hyp4", hyp4);
-        weights.extend("hyp4", .25);
+        weights.put("hyp4", .25);
 
         testCase = new TestCase(utterances, weights, bestDialogAction);
         ans.add(testCase);
@@ -309,7 +309,7 @@ public class TestActionSelection {
         hyp1.getChildren().put("meeting0", child1);
         child1.getSlots().put("endTime", "t1");
         utterances.put("hyp1", hyp1);
-        weights.extend("hyp1", .6);
+        weights.put("hyp1", .6);
 
         hyp2 = new SemanticsModel();
         child2 = new SemanticsModel();
@@ -319,7 +319,7 @@ public class TestActionSelection {
         hyp2.getChildren().put("meeting1", child2);
         child2.getSlots().put("endTime", "t2");
         utterances.put("hyp2", hyp2);
-        weights.extend("hyp2", .4);
+        weights.put("hyp2", .4);
 
         testCase = new TestCase(utterances, weights, bestDialogAction);
         ans.add(testCase);
@@ -338,7 +338,7 @@ public class TestActionSelection {
         hyp1.getChildren().put("meeting0", child1);
         child1.getSlots().put("endTime", "t1");
         utterances.put("hyp1", hyp1);
-        weights.extend("hyp1", .9);
+        weights.put("hyp1", .9);
 
         ((DialogTask) bestDialogAction).setTaskSpec(hyp1.deepCopy());
 
@@ -350,7 +350,7 @@ public class TestActionSelection {
         hyp2.getSlots().put("toTime", "t1");
         hyp2.getChildren().put("meeting1", child2);
         utterances.put("hyp2", hyp2);
-        weights.extend("hyp2", .1);
+        weights.put("hyp2", .1);
 
         testCase = new TestCase(utterances, weights, bestDialogAction);
         ans.add(testCase);
@@ -372,7 +372,7 @@ public class TestActionSelection {
         child1.getSlots().put("number", "<SG>");
         child1.getSlots().put("ref-type", "<INDEF>");
         utterances.put("hyp1", hyp1);
-        weights.extend("hyp1", .9);
+        weights.put("hyp1", .9);
 
         ((NonDialogTask) bestDialogAction).setTaskSpec(hyp1.deepCopy());
 
@@ -384,7 +384,7 @@ public class TestActionSelection {
         hyp2.getSlots().put("toTime", "t1");
         hyp2.getChildren().put("meeting1", child2);
         utterances.put("hyp2", hyp2);
-        weights.extend("hyp2", .1);
+        weights.put("hyp2", .1);
 
         testCase = new TestCase(utterances, weights, bestDialogAction);
         ans.add(testCase);
@@ -405,7 +405,7 @@ public class TestActionSelection {
         child1.getSlots().put("number", "<SG>");
         child1.getSlots().put("ref-type", "<INDEF>");
         utterances.put("hyp1", hyp1);
-        weights.extend("hyp1", .9);
+        weights.put("hyp1", .9);
 
         ((NonDialogTask) bestDialogAction).setTaskSpec(hyp1.deepCopy());
 
@@ -417,7 +417,7 @@ public class TestActionSelection {
         hyp2.getSlots().put("toTime", "t1");
         hyp2.getChildren().put("meeting1", child2);
         utterances.put("hyp2", hyp2);
-        weights.extend("hyp2", .1);
+        weights.put("hyp2", .1);
 
         testCase = new TestCase(utterances, weights, bestDialogAction);
         ans.add(testCase);
@@ -433,25 +433,25 @@ public class TestActionSelection {
         hyp1.getSlots().put("dialogAct", "WHQuestion");
         hyp1.getSlots().put("fromTime", "t0");
         utterances.put("hyp1", hyp1);
-        weights.extend("hyp1", .4);
+        weights.put("hyp1", .4);
 
         hyp2 = new SemanticsModel();
         hyp2.getSlots().put("dialogAct", "WHQuestion");
         hyp2.getSlots().put("toTime", "t0");
         utterances.put("hyp2", hyp2);
-        weights.extend("hyp2", .25);
+        weights.put("hyp2", .25);
 
         hyp3 = new SemanticsModel();
         hyp3.getSlots().put("dialogAct", "WHQuestion");
         hyp3.getSlots().put("atTime", "t0");
         utterances.put("hyp3", hyp3);
-        weights.extend("hyp3", .25);
+        weights.put("hyp3", .25);
 
         hyp4 = new SemanticsModel();
         hyp4.getSlots().put("dialogAct", "YNQuestion");
         hyp4.getSlots().put("fromTime", "t0");
         utterances.put("hyp4", hyp4);
-        weights.extend("hyp4", .10);
+        weights.put("hyp4", .10);
 
         testCase = new TestCase(utterances, weights, bestDialogAction);
         ans.add(testCase);
@@ -470,14 +470,14 @@ public class TestActionSelection {
         hyp1.getSlots().put("fromTime", "t0");
         hyp1.getSlots().put("endTime", "t2");
         utterances.put("hyp1", hyp1);
-        weights.extend("hyp1", .6);
+        weights.put("hyp1", .6);
 
         hyp2 = new SemanticsModel();
         hyp2.getSlots().put("dialogAct", "WHQuestion");
         hyp2.getSlots().put("fromTime", "t1");
         hyp2.getSlots().put("endTime", "t2");
         utterances.put("hyp2", hyp2);
-        weights.extend("hyp2", .4);
+        weights.put("hyp2", .4);
 
         testCase = new TestCase(utterances, weights, bestDialogAction);
         ans.add(testCase);

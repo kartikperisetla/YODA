@@ -33,7 +33,7 @@ public class DiscourseUnit {
     public StringDistribution marginalSlotPathDistribution(String slotPath){
         StringDistribution ans = new StringDistribution();
         for (String hypothesis : hypotheses.keySet()){
-            ans.extend(hypotheses.get(hypothesis).getSlotPathFiller(slotPath), hypothesisDistribution.get(hypothesis));
+            ans.put(hypotheses.get(hypothesis).getSlotPathFiller(slotPath), hypothesisDistribution.get(hypothesis));
         }
         return ans;
     }

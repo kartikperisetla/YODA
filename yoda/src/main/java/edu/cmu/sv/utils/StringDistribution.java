@@ -1,9 +1,10 @@
 package edu.cmu.sv.utils;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.primitives.Doubles;
+
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Created by David Cohen on 9/2/14.
@@ -25,6 +26,19 @@ public class StringDistribution{
         return ans;
     }
 
+    /*
+    * Return the keys ordered from highest probability to lowest
+    * */
+    public List<String> sortedHypotheses(){
+        return internalDistribution.keySet().stream().
+                sorted(Comparator.comparing((Function<String, Double>)
+                        internalDistribution::get).reversed()).
+                        collect(Collectors.toList());
+    }
+
+    public void remove(String key){
+       internalDistribution.remove(key);
+    }
 
     /*
     * Set a key to value, and adjust the other values so that the result is normalized
@@ -88,7 +102,7 @@ public class StringDistribution{
     * If the key is already in the distribution, add value to it
     * Otherwise, create the key and set it to value
     * */
-    public void extend(String key, Double value){
+    public void put(String key, Double value){
         if (internalDistribution.containsKey(key))
             internalDistribution.put(key, internalDistribution.get(key)+value);
         else

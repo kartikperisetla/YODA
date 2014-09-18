@@ -120,7 +120,7 @@ public class RewardAndCostCalculator {
         double relativeImprovement = .5; // every hypothesis is expected to improve by 50% relative if it is correct
         StringDistribution ans = new StringDistribution();
         for (String key : DU.getHypotheses().keySet()){
-            ans.extend(key, relativeImprovement);
+            ans.put(key, relativeImprovement);
         }
         return ans;
     }
@@ -136,31 +136,31 @@ public class RewardAndCostCalculator {
 
         for (String key : DU.getHypotheses().keySet()) {
             if (DU.getHypothesisDistribution().get(key) >= 1.0) {
-                ans.extend(key, 0.0);
+                ans.put(key, 0.0);
             }
             else if ((hasV1Map.get(key) && hasV2Map.get(key)) || (!hasV1Map.get(key) && !hasV2Map.get(key)))
-                ans.extend(key, 0.0);
+                ans.put(key, 0.0);
             else if (hasV1Map.get(key)){ // !hasV2Map.get(key) is necessarily true
-                ans.extend(key,limit *
-                                DU.getHypothesisDistribution().keySet().stream().
-                                        filter(x -> !hasV1Map.get(x)).
-                                        map(x -> DU.getHypothesisDistribution().get(x)).
-                                        reduce(0.0, (x,y) -> x+y) * 1.0 /
-                                (1.0 - DU.getHypothesisDistribution().get(key)) /
-                                DU.getHypothesisDistribution().keySet().stream().
-                                        filter(x -> hasV1Map.get(x) && !hasV2Map.get(x)).
-                                        count());
+                ans.put(key, limit *
+                        DU.getHypothesisDistribution().keySet().stream().
+                                filter(x -> !hasV1Map.get(x)).
+                                map(x -> DU.getHypothesisDistribution().get(x)).
+                                reduce(0.0, (x, y) -> x + y) * 1.0 /
+                        (1.0 - DU.getHypothesisDistribution().get(key)) /
+                        DU.getHypothesisDistribution().keySet().stream().
+                                filter(x -> hasV1Map.get(x) && !hasV2Map.get(x)).
+                                count());
             }
             else if (hasV2Map.get(key)){
-                ans.extend(key,limit *
-                                DU.getHypothesisDistribution().keySet().stream().
-                                        filter(x -> !hasV2Map.get(x)).
-                                        map(x -> DU.getHypothesisDistribution().get(x)).
-                                        reduce(0.0, (x,y) -> x+y) * 1.0 /
-                                (1.0 - DU.getHypothesisDistribution().get(key)) /
-                                DU.getHypothesisDistribution().keySet().stream().
-                                        filter(x -> hasV2Map.get(x) && !hasV1Map.get(x)).
-                                        count());
+                ans.put(key, limit *
+                        DU.getHypothesisDistribution().keySet().stream().
+                                filter(x -> !hasV2Map.get(x)).
+                                map(x -> DU.getHypothesisDistribution().get(x)).
+                                reduce(0.0, (x, y) -> x + y) * 1.0 /
+                        (1.0 - DU.getHypothesisDistribution().get(key)) /
+                        DU.getHypothesisDistribution().keySet().stream().
+                                filter(x -> hasV2Map.get(x) && !hasV1Map.get(x)).
+                                count());
             }
         }
 
@@ -178,27 +178,27 @@ public class RewardAndCostCalculator {
 
         for (String key : DU.getHypotheses().keySet()) {
             if (DU.getHypothesisDistribution().get(key) >= 1.0) {
-                ans.extend(key, 0.0);
+                ans.put(key, 0.0);
             }
             else if ((hasR1Map.get(key) && hasR2Map.get(key)) || (!hasR1Map.get(key) && !hasR2Map.get(key)))
-                ans.extend(key, 0.0);
+                ans.put(key, 0.0);
             else if (hasR1Map.get(key)){ // !hasR2Map.get(key) is necessarily true
-                ans.extend(key,limit *
+                ans.put(key, limit *
                         DU.getHypothesisDistribution().keySet().stream().
                                 filter(x -> !hasR1Map.get(x)).
                                 map(x -> DU.getHypothesisDistribution().get(x)).
-                                reduce(0.0, (x,y) -> x+y) * 1.0 /
+                                reduce(0.0, (x, y) -> x + y) * 1.0 /
                         (1.0 - DU.getHypothesisDistribution().get(key)) /
                         DU.getHypothesisDistribution().keySet().stream().
                                 filter(x -> hasR1Map.get(x) && !hasR2Map.get(x)).
                                 count());
             }
             else if (hasR2Map.get(key)){
-                ans.extend(key,limit *
+                ans.put(key, limit *
                         DU.getHypothesisDistribution().keySet().stream().
                                 filter(x -> !hasR2Map.get(x)).
                                 map(x -> DU.getHypothesisDistribution().get(x)).
-                                reduce(0.0, (x,y) -> x+y) * 1.0 /
+                                reduce(0.0, (x, y) -> x + y) * 1.0 /
                         (1.0 - DU.getHypothesisDistribution().get(key)) /
                         DU.getHypothesisDistribution().keySet().stream().
                                 filter(x -> hasR2Map.get(x) && !hasR1Map.get(x)).
@@ -222,18 +222,18 @@ public class RewardAndCostCalculator {
 
         for (String key : DU.getHypotheses().keySet()){
             if (DU.getHypothesisDistribution().get(key) >= 1.0) {
-                ans.extend(key, 0.0);
+                ans.put(key, 0.0);
             }
             else if (hasValueMap.get(key)) {
-                ans.extend(key, limit *
+                ans.put(key, limit *
                         DU.getHypotheses().keySet().stream().
                                 filter(x -> !hasValueMap.get(x)).
                                 map(x -> DU.getHypothesisDistribution().get(x)).
-                                reduce(0.0, (x,y) -> x+y) * 1.0 /
+                                reduce(0.0, (x, y) -> x + y) * 1.0 /
                         (1.0 - DU.getHypothesisDistribution().get(key)) /
                         hasValueMap.values().stream().filter(x -> x).count());
             } else {
-                ans.extend(key, 0.0);
+                ans.put(key, 0.0);
             }
         }
 //        System.out.println("RewardAndCostCalculator.predictConfidenceGainFromValueConfirmation: ans:\n"+ans);
@@ -252,9 +252,9 @@ public class RewardAndCostCalculator {
         ));
         for (String key : DU.getHypotheses().keySet()){
             if (DU.getHypothesisDistribution().get(key) >= 1.0)
-                ans.extend(key, 0.0);
+                ans.put(key, 0.0);
             else if (roleFilledMap.get(key)) {
-                ans.extend(key, limit *
+                ans.put(key, limit *
                         DU.getHypotheses().keySet().stream().
                                 filter(x -> !roleFilledMap.get(x)).
                                 map(x -> DU.getHypothesisDistribution().get(x)).
@@ -262,7 +262,7 @@ public class RewardAndCostCalculator {
                         (1.0 - DU.getHypothesisDistribution().get(key)) /
                         roleFilledMap.values().stream().filter(x -> x).count());
             } else {
-                ans.extend(key, 0.0);
+                ans.put(key, 0.0);
             }
         }
         return ans;

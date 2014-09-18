@@ -32,5 +32,4 @@ public class NBest {
         }
         return ans;
     }
-
 }
