@@ -1,6 +1,7 @@
 package edu.cmu.sv;
 
 import edu.cmu.sv.dialog_state_tracking.DSTTester;
+import edu.cmu.sv.dialog_state_tracking.Turn;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.StringDistribution;
 import org.junit.Test;
@@ -39,7 +40,7 @@ public class TestDSTClarification {
     */
     DSTTester testCase1() {
         DSTTester testCase;
-        DSTTester.Turn currentTurn;
+        Turn currentTurn;
         DSTTester.EvaluationState correctState;
         SemanticsModel sm1;
         SemanticsModel sm2;
@@ -86,7 +87,7 @@ public class TestDSTClarification {
         sluDistribution.put("hyp1", .6);
         sluDistribution.put("hyp2", .4);
 
-        currentTurn = new DSTTester.Turn("user", null, sluHypotheses, sluDistribution);
+        currentTurn = new Turn("user", null, sluHypotheses, sluDistribution);
         correctState = new DSTTester.EvaluationState(sm1.deepCopy(), new SemanticsModel(), new SemanticsModel());
         testCase.getTurns().put(currentTurn, (float) 0.0);
         testCase.getEvaluationStates().put(correctState, (float) 0.0);
@@ -110,7 +111,7 @@ public class TestDSTClarification {
         grandChildSM.getSlots().put("hour", "ten");
         childSM.getChildren().put("Z", grandChildSM);
 
-        currentTurn = new DSTTester.Turn("system", sm3.deepCopy(), null, null);
+        currentTurn = new Turn("system", sm3.deepCopy(), null, null);
         correctState = new DSTTester.EvaluationState(sm1.deepCopy(), sm3.deepCopy(), sm3.deepCopy());
         testCase.getTurns().put(currentTurn, (float) 1.0);
         testCase.getEvaluationStates().put(correctState, (float) 1.0);
@@ -130,7 +131,7 @@ public class TestDSTClarification {
         sluDistribution = new StringDistribution();
         sluDistribution.put("hyp1", 1.0);
 
-        currentTurn = new DSTTester.Turn("user", null, sluHypotheses, sluDistribution);
+        currentTurn = new Turn("user", null, sluHypotheses, sluDistribution);
         correctState = new DSTTester.EvaluationState(sm2.deepCopy(), sm3.deepCopy(), sm3.deepCopy());
         testCase.getTurns().put(currentTurn, (float) 2.0);
         testCase.getEvaluationStates().put(correctState, (float) 2.0);
@@ -150,7 +151,7 @@ public class TestDSTClarification {
     */
     DSTTester testCase2() {
         DSTTester testCase;
-        DSTTester.Turn currentTurn;
+        Turn currentTurn;
         DSTTester.EvaluationState correctState;
         SemanticsModel sm1;
         SemanticsModel sm2;
@@ -177,7 +178,7 @@ public class TestDSTClarification {
         childSM.getSlots().put("class", "Time");
         childSM.getSlots().put("hour", "two");
 
-        currentTurn = new DSTTester.Turn("system", sm1.deepCopy(), null, null);
+        currentTurn = new Turn("system", sm1.deepCopy(), null, null);
         correctState = new DSTTester.EvaluationState(new SemanticsModel(), sm1.deepCopy(), sm1.deepCopy());
         testCase.getTurns().put(currentTurn, (float) 0.0);
         testCase.getEvaluationStates().put(correctState, (float) 0.0);
@@ -196,14 +197,14 @@ public class TestDSTClarification {
         sluDistribution.put("hyp1", .6);
         sluDistribution.put("hyp2", .4);
 
-        currentTurn = new DSTTester.Turn("user", null, sluHypotheses, sluDistribution);
+        currentTurn = new Turn("user", null, sluHypotheses, sluDistribution);
         correctState = new DSTTester.EvaluationState(sm2.deepCopy(), new SemanticsModel(), sm1.deepCopy());
         testCase.getTurns().put(currentTurn, (float) 1.0);
         testCase.getEvaluationStates().put(correctState, (float) 1.0);
 
         /// Turn 3
         // (the system repeats itself)
-        currentTurn = new DSTTester.Turn("system", sm1.deepCopy(), null, null);
+        currentTurn = new Turn("system", sm1.deepCopy(), null, null);
         correctState = new DSTTester.EvaluationState(sm2.deepCopy(), sm1.deepCopy(), sm1.deepCopy());
         testCase.getTurns().put(currentTurn, (float) 2.0);
         testCase.getEvaluationStates().put(correctState, (float) 2.0);
@@ -224,7 +225,7 @@ public class TestDSTClarification {
     */
     DSTTester testCase3() {
         DSTTester testCase;
-        DSTTester.Turn currentTurn;
+        Turn currentTurn;
         DSTTester.EvaluationState correctState;
         SemanticsModel sm1;
         SemanticsModel sm2;
@@ -282,7 +283,7 @@ public class TestDSTClarification {
         sluDistribution.put("hyp2", .3);
         sluDistribution.put("hyp3", .3);
 
-        currentTurn = new DSTTester.Turn("user", null, sluHypotheses, sluDistribution);
+        currentTurn = new Turn("user", null, sluHypotheses, sluDistribution);
         correctState = new DSTTester.EvaluationState(sm1.deepCopy(), new SemanticsModel(), new SemanticsModel());
         testCase.getTurns().put(currentTurn, (float) 0.0);
         testCase.getEvaluationStates().put(correctState, (float) 0.0);
@@ -314,7 +315,7 @@ public class TestDSTClarification {
         sm5.getSlots().put("atTime", "<REQUESTED>");
         
         
-        currentTurn = new DSTTester.Turn("system", sm4, null, null);
+        currentTurn = new Turn("system", sm4, null, null);
         correctState = new DSTTester.EvaluationState(sm1.deepCopy(), sm5.deepCopy(), sm5.deepCopy());
         testCase.getTurns().put(currentTurn, (float) 1.0);
         testCase.getEvaluationStates().put(correctState, (float) 1.0);
@@ -372,7 +373,7 @@ public class TestDSTClarification {
         childSM.getSlots().put("class", "Place");
         childSM.getSlots().put("name", "Samsung");
 
-        currentTurn = new DSTTester.Turn("user", null, sluHypotheses, sluDistribution);
+        currentTurn = new Turn("user", null, sluHypotheses, sluDistribution);
         correctState = new DSTTester.EvaluationState(sm1.deepCopy(), sm5.deepCopy(), sm5.deepCopy());
         testCase.getTurns().put(currentTurn, (float) 2.0);
         testCase.getEvaluationStates().put(correctState, (float) 2.0);

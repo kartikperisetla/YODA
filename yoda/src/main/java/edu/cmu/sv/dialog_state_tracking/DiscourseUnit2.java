@@ -14,13 +14,13 @@ import java.util.Map;
  * Created by David Cohen on 9/17/14.
  */
 public class DiscourseUnit2 {
-    static int BEAM_WIDTH = 10;
+    static final int BEAM_WIDTH = 10;
     StringDistribution hypothesisDistribution;
     Map<String, SemanticsModel> spokenByThem;
     Map<String, SemanticsModel> understoodByThem;
     SemanticsModel spokenByMe;
-    float timeOfLastActByThem;
-    float timeOfLastActByMe;
+    Float timeOfLastActByThem;
+    Float timeOfLastActByMe;
 
     public DiscourseUnit2() {
         hypothesisDistribution = new StringDistribution();
@@ -31,6 +31,16 @@ public class DiscourseUnit2 {
         spokenByThem.put("initial_hypothesis", blank.deepCopy());
         understoodByThem = new HashMap<>();
         understoodByThem.put("initial_hypothesis", blank.deepCopy());
+        timeOfLastActByThem = null;
+        timeOfLastActByMe = null;
+    }
+    public void clear(){
+        hypothesisDistribution = new StringDistribution();
+        spokenByMe = new SemanticsModel();
+        spokenByThem = new HashMap<>();
+        understoodByThem = new HashMap<>();
+        timeOfLastActByThem = null;
+        timeOfLastActByMe = null;
     }
 
     /*
@@ -169,5 +179,13 @@ public class DiscourseUnit2 {
         this.timeOfLastActByMe = timeOfLastActByMe;
     }
 
-
+    @Override
+    public String toString() {
+        return "DiscourseUnit2{" +
+                "hypothesisDistribution=" + hypothesisDistribution +
+                "\nspokenByThem=" + spokenByThem +
+                "\nunderstoodByThem=" + understoodByThem +
+                "\nspokenByMe=" + spokenByMe +
+                '}';
+    }
 }

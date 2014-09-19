@@ -1,7 +1,6 @@
 package edu.cmu.sv.dialog_state_tracking;
 
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.utils.StringDistribution;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -16,23 +15,6 @@ import java.util.*;
 public class DSTTester {
     Map<Turn, Float> turns = new HashMap<>();
     Map<EvaluationState, Float> evaluationStates = new HashMap<>();
-
-    /*
-    * Turn contains an SLU result / SLU ground truth for a single user/system turn
-    * */
-    public static class Turn{
-        Map<String, SemanticsModel> hypotheses;
-        SemanticsModel systemUtterance;
-        StringDistribution hypothesisDistribution;
-        String speaker;
-
-        public Turn(String speaker, SemanticsModel systemUtterance, Map<String, SemanticsModel> hypotheses, StringDistribution hypothesisDistribution) {
-            this.hypotheses = hypotheses;
-            this.systemUtterance = systemUtterance;
-            this.hypothesisDistribution = hypothesisDistribution;
-            this.speaker = speaker;
-        }
-    }
 
     /*
     * EvaluationState Describes a single dialog state,
@@ -58,7 +40,7 @@ public class DSTTester {
                         DU.getUnderstoodByThem().get(DUHypothesisID).equals(understoodByThem) &&
                         DU.getSpokenByMe().equals(spokenByMe)) {
                     rank = i;
-                    relativeLikelihood = topLikelihood * 1.0 / DU.getHypothesisDistribution().get(DUHypothesisID);
+                    relativeLikelihood = DU.getHypothesisDistribution().get(DUHypothesisID) * 1.0 / topLikelihood;
                     break;
                 }
             }
@@ -134,7 +116,7 @@ public class DSTTester {
     }
 
     public EvaluationResult evaluate(){
-        DiscourseUnit2 DU = new DiscourseUnit2();
+        DialogStateTracker2 dst = new DialogStateTracker2();
         Float startTime = turns.values().stream().min(Float::compare).orElse((float)0)-1;
         Float endTime = turns.values().stream().max(Float::compare).orElse((float)0)+1;
         List<Integer> correctHypothesisRanks = new LinkedList<>();
@@ -146,15 +128,17 @@ public class DSTTester {
         for (Float t = startTime; t < endTime; t+=(float).1) {
             for (Turn turn : turns.keySet()){
                 if (turns.get(turn) < t && !turnsDone.contains(turn)){
-                    DU.updateDiscourseUnit(turn.hypotheses, turn.systemUtterance,
-                            turn.hypothesisDistribution,
-                            turn.speaker, turns.get(turn));
-                    turnsDone.add(turn);
+                    try {
+                        dst.updateDialogState(turn, t);
+                        turnsDone.add(turn);
+                    } catch (IllegalAccessException | InstantiationException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             for (EvaluationState groundTruth : evaluationStates.keySet()){
                 if (evaluationStates.get(groundTruth) < t && !evaluationStatesDone.contains(groundTruth)){
-                    Pair<Integer, Double> result = groundTruth.evaluate(DU);
+                    Pair<Integer, Double> result = groundTruth.evaluate(dst.getDiscourseUnit());
                     correctHypothesisRanks.add(result.getLeft());
                     correctHypothesisRelativeLikelihoods.add(result.getRight());
                     evaluationStatesDone.add(groundTruth);

@@ -27,6 +27,29 @@ public class SemanticsModel {
     }
 
     /*
+    * Extend this model with other, overwriting values as necessary
+    * */
+    public void extend(SemanticsModel other){
+        // pointer map maps other.ptr -> this.ptr for equivalent pointers
+        Map<String, String> pointerMap = new HashMap<>();
+        for (String otherKey : other.slots.keySet()){
+            String otherValue = other.slots.get(otherKey);
+            String currentValue = slots.get(otherKey);
+            if (other.children.containsKey(otherKey)){
+                if (null==currentValue){
+                    children.put(otherKey, other.children.get(otherValue).deepCopy());
+                    slots.put(otherKey, other.slots.get(otherKey));
+                } else {
+                    children.get(currentValue).extend(other.children.get(otherValue));
+                }
+            } else {
+                slots.put(otherKey, other.slots.get(otherKey));
+            }
+        }
+    }
+
+
+    /*
         * This may return a slot value, or some local identifier for a child semantics model, or null
         * */
     public String getSlotPathFiller(String slotPath){
@@ -60,14 +83,6 @@ public class SemanticsModel {
                 ans.put(slot+"."+key, childSlotFillers.get(key));
             }
         }
-//
-//
-//        for (String childID : children.keySet()){
-//            Map<String, String> childSlotFillers = children.get(childID).getAllNonSpecialSlotFillerLeafPairs();
-//            for (String key : childSlotFillers.keySet()){
-//                ans.put(childID+"."+key, childSlotFillers.get(key));
-//            }
-//        }
         return ans;
     }
 
@@ -75,16 +90,8 @@ public class SemanticsModel {
         return slots;
     }
 
-    public void setSlots(Map<String, String> slots) {
-        this.slots = slots;
-    }
-
     public Map<String, SemanticsModel> getChildren() {
         return children;
-    }
-
-    public void setChildren(Map<String, SemanticsModel> children) {
-        this.children = children;
     }
 
     @Override
@@ -105,5 +112,17 @@ public class SemanticsModel {
         int result = slots != null ? slots.hashCode() : 0;
         result = 31 * result + (children != null ? children.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        String ans = "";
+        for (String slot: slots.keySet()){
+            if (children.containsKey(slots.get(slot))){
+                ans += slot + "\n";
+                ans += children.get(slots.get(slot)).toString().replaceAll("\\n", "\n    ");
+            }
+        }
+        return ans;
     }
 }

@@ -24,9 +24,6 @@ public class DialogStateTracker {
         return discourseUnit;
     }
 
-
-
-    // TODO: implement real dialog state tracking
     public void updateDialogState(Map<String, SemanticsModel> utterances,
                                   StringDistribution weights, Float timeStamp){
         //For now, we assume that there is only one discourse unit,
