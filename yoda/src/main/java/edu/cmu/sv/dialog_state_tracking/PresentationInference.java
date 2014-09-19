@@ -66,9 +66,6 @@ public class PresentationInference implements DiscourseUnitUpdateInference {
             newUnderstoodByThem.extend(turn.systemUtterance);
             ans.getUnderstoodByThem().put(newDUHypothesisID, newUnderstoodByThem);
             ans.getSpokenByMe().extend(turn.systemUtterance);
-
-            System.out.println("PresentationInference, after system first turn:");
-            System.out.println(ans);
         }
 
 

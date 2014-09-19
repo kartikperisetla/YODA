@@ -35,9 +35,9 @@ public class SemanticsModel {
         for (String otherKey : other.slots.keySet()){
             String otherValue = other.slots.get(otherKey);
             String currentValue = slots.get(otherKey);
-            if (other.children.containsKey(otherKey)){
+            if (other.children.containsKey(otherValue)){
                 if (null==currentValue){
-                    children.put(otherKey, other.children.get(otherValue).deepCopy());
+                    children.put(otherValue, other.children.get(otherValue).deepCopy());
                     slots.put(otherKey, other.slots.get(otherKey));
                 } else {
                     children.get(currentValue).extend(other.children.get(otherValue));
@@ -117,12 +117,22 @@ public class SemanticsModel {
     @Override
     public String toString() {
         String ans = "";
+        boolean started = false;
         for (String slot: slots.keySet()){
             if (children.containsKey(slots.get(slot))){
-                ans += slot + "\n";
+                if (started)
+                    ans += "\n"+ slot;
+                else
+                    ans += slot;
                 ans += children.get(slots.get(slot)).toString().replaceAll("\\n", "\n    ");
+            } else {
+                if (started)
+                    ans += "\n"+slot + " -> " + slots.get(slot);
+                else
+                    ans += slot + " -> " + slots.get(slot);
             }
+            started = true;
         }
-        return ans;
+        return ans.trim();
     }
 }
