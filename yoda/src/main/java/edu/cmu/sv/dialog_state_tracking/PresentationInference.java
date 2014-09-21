@@ -1,13 +1,9 @@
 package edu.cmu.sv.dialog_state_tracking;
 
-import edu.cmu.sv.action.dialog_act.DialogAct;
-import edu.cmu.sv.action.dialog_act.Fragment;
+import edu.cmu.sv.system_action.dialog_act.DialogAct;
+import edu.cmu.sv.system_action.dialog_act.Fragment;
 import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.utils.StringDistribution;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by David Cohen on 9/19/14.

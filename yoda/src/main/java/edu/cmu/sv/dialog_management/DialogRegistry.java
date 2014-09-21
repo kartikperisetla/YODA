@@ -1,13 +1,13 @@
 package edu.cmu.sv.dialog_management;
 
 import com.google.common.collect.Iterables;
-import edu.cmu.sv.action.dialog_act.*;
-import edu.cmu.sv.action.dialog_task.DialogTask;
-import edu.cmu.sv.action.dialog_task.RespondToWHQuestionTask;
-import edu.cmu.sv.action.dialog_task.RespondToYNQuestionTask;
-import edu.cmu.sv.action.non_dialog_task.CreateMeetingTask;
-import edu.cmu.sv.action.non_dialog_task.NonDialogTask;
-import edu.cmu.sv.action.non_dialog_task.SendEmailTask;
+import edu.cmu.sv.system_action.dialog_act.*;
+import edu.cmu.sv.system_action.dialog_task.DialogTask;
+import edu.cmu.sv.system_action.dialog_task.RespondToWHQuestionTask;
+import edu.cmu.sv.system_action.dialog_task.RespondToYNQuestionTask;
+import edu.cmu.sv.system_action.non_dialog_task.CreateMeetingTask;
+import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
+import edu.cmu.sv.system_action.non_dialog_task.SendEmailTask;
 
 import java.util.HashMap;
 import java.util.HashSet;

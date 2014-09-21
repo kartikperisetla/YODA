@@ -1,12 +1,12 @@
 package edu.cmu.sv.dialog_management;
 
-import edu.cmu.sv.action.Action;
-import edu.cmu.sv.action.dialog_act.*;
+import edu.cmu.sv.system_action.SystemAction;
+import edu.cmu.sv.system_action.dialog_act.*;
 import edu.cmu.sv.dialog_state_tracking.DialogStateTracker;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.action.dialog_task.DialogTask;
-import edu.cmu.sv.action.non_dialog_task.NonDialogTask;
+import edu.cmu.sv.system_action.dialog_task.DialogTask;
+import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.utils.Combination;
 import edu.cmu.sv.utils.NBest;
 import org.apache.commons.lang3.tuple.Pair;
@@ -38,7 +38,7 @@ public class DialogManager {
     * Select the best dialog act given all the possible classes and bindings
     *
     * */
-    public List<Pair<Action, Double>> selectAction() throws IllegalAccessException, InstantiationException {
+    public List<Pair<SystemAction, Double>> selectAction() throws IllegalAccessException, InstantiationException {
         DiscourseUnit DU = tracker.getDiscourseUnit();
         // 1) collect roles and values across this DU
         Map<String, Set<String>> roleValuePairs = DU.getAllNonSpecialSlotValueLeafPairs();
@@ -51,7 +51,7 @@ public class DialogManager {
                 filter(x -> possibleValueBindings.containsAll(roleValuePairs.get(x))).
                 collect(Collectors.toSet());
 
-        Map<Action, Double> actionExpectedReward = new HashMap<>();
+        Map<SystemAction, Double> actionExpectedReward = new HashMap<>();
 
         //// Get reward for clarification acts
         for (Class <? extends DialogAct> cls : DialogRegistry.clarificationDialogActs) {

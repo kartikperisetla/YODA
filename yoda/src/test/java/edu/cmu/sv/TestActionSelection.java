@@ -1,13 +1,13 @@
 package edu.cmu.sv;
 
-import edu.cmu.sv.action.Action;
-import edu.cmu.sv.action.dialog_act.*;
-import edu.cmu.sv.action.dialog_task.DialogTask;
-import edu.cmu.sv.action.dialog_task.RespondToWHQuestionTask;
-import edu.cmu.sv.action.dialog_task.RespondToYNQuestionTask;
-import edu.cmu.sv.action.non_dialog_task.CreateMeetingTask;
-import edu.cmu.sv.action.non_dialog_task.NonDialogTask;
-import edu.cmu.sv.action.non_dialog_task.SendEmailTask;
+import edu.cmu.sv.system_action.SystemAction;
+import edu.cmu.sv.system_action.dialog_act.*;
+import edu.cmu.sv.system_action.dialog_task.DialogTask;
+import edu.cmu.sv.system_action.dialog_task.RespondToWHQuestionTask;
+import edu.cmu.sv.system_action.dialog_task.RespondToYNQuestionTask;
+import edu.cmu.sv.system_action.non_dialog_task.CreateMeetingTask;
+import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
+import edu.cmu.sv.system_action.non_dialog_task.SendEmailTask;
 import edu.cmu.sv.dialog_management.DialogManager;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.EvaluationTools;
@@ -31,9 +31,9 @@ public class TestActionSelection {
         boolean correctInTopNActions;
         int correctActionRank;
         double correctActionRewardDifference; // reward(correct action) / reward(top action)
-        Pair<Class<? extends Action>, Class<? extends Action>> confusion;
+        Pair<Class<? extends SystemAction>, Class<? extends SystemAction>> confusion;
 
-        private EvaluationResult(boolean correctIsTopAction, boolean correctInTopNActions, int correctActionRank, double correctActionRewardDifference, Pair<Class<? extends Action>, Class<? extends Action>> confusion) {
+        private EvaluationResult(boolean correctIsTopAction, boolean correctInTopNActions, int correctActionRank, double correctActionRewardDifference, Pair<Class<? extends SystemAction>, Class<? extends SystemAction>> confusion) {
             this.correctIsTopAction = correctIsTopAction;
             this.correctInTopNActions = correctInTopNActions;
             this.correctActionRank = correctActionRank;
@@ -57,7 +57,7 @@ public class TestActionSelection {
             return correctActionRewardDifference;
         }
 
-        public Pair<Class<? extends Action>, Class<? extends Action>> getConfusion() {
+        public Pair<Class<? extends SystemAction>, Class<? extends SystemAction>> getConfusion() {
             return confusion;
         }
 
@@ -77,22 +77,22 @@ public class TestActionSelection {
     private class TestCase{
         Map<String, SemanticsModel> hypotheses;
         StringDistribution hypothesisDistribution;
-        Action bestActionDescriptor;
+        SystemAction bestActionDescriptor;
 
-        private TestCase(Map<String, SemanticsModel> hypotheses, StringDistribution hypothesisDistribution, Action bestActionDescriptor) {
+        private TestCase(Map<String, SemanticsModel> hypotheses, StringDistribution hypothesisDistribution, SystemAction bestActionDescriptor) {
             this.hypotheses = hypotheses;
             this.hypothesisDistribution = hypothesisDistribution;
             this.bestActionDescriptor = bestActionDescriptor;
         }
 
-        private EvaluationResult evaluate(List<Pair<Action, Double>> nBestActions){
+        private EvaluationResult evaluate(List<Pair<SystemAction, Double>> nBestActions){
             boolean correctInTopNActions = false;
             boolean correctIsTopAction = false;
             double topConfidence = nBestActions.get(0).getRight();
             int correctActionRank = -1;
             double correctActionRewardDifference = 0.0;
             for (int i = 0; i < nBestActions.size(); i++) {
-                Pair<Action, Double> candidateActionAndReward = nBestActions.get(i);
+                Pair<SystemAction, Double> candidateActionAndReward = nBestActions.get(i);
                 if (candidateActionAndReward.getLeft()==null)
                     continue;
                 // right now I don't distinguish between parameters
@@ -106,7 +106,7 @@ public class TestActionSelection {
                 }
             }
 
-            Pair<Class<? extends Action>, Class<? extends Action>> confusion = null;
+            Pair<Class<? extends SystemAction>, Class<? extends SystemAction>> confusion = null;
             if (!bestActionDescriptor.getClass().equals(nBestActions.get(0).getLeft().getClass()))
                 confusion = new ImmutablePair<>(bestActionDescriptor.getClass(),
                         nBestActions.get(0).getLeft().getClass());
@@ -126,7 +126,7 @@ public class TestActionSelection {
         for (TestCase testCase : testCases) {
             DialogManager dialogManager = new DialogManager();
             dialogManager.getTracker().updateDialogState(testCase.hypotheses, testCase.hypothesisDistribution, (float) 0);
-            List<Pair<Action, Double>> topActions = dialogManager.selectAction();
+            List<Pair<SystemAction, Double>> topActions = dialogManager.selectAction();
             topActions.stream().map(Pair::getRight).forEach(rewardStatistics::addValue);
             System.out.println("Test case evaluation:");
             EvaluationResult result = testCase.evaluate(topActions);
@@ -172,7 +172,7 @@ public class TestActionSelection {
         StringDistribution weights;
         TestCase testCase;
         Map<String, String> bestDialogActionParameters;
-        Action bestDialogAction;
+        SystemAction bestDialogAction;
 
         SemanticsModel hyp1;
         SemanticsModel hyp2;

@@ -1,12 +1,12 @@
 package edu.cmu.sv.dialog_management;
 
-import edu.cmu.sv.action.dialog_act.DialogAct;
+import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.action.dialog_task.DialogTask;
-import edu.cmu.sv.action.dialog_task.DialogTaskPreferences;
-import edu.cmu.sv.action.non_dialog_task.NonDialogTask;
-import edu.cmu.sv.action.non_dialog_task.NonDialogTaskPreferences;
+import edu.cmu.sv.system_action.dialog_task.DialogTask;
+import edu.cmu.sv.system_action.dialog_task.DialogTaskPreferences;
+import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
+import edu.cmu.sv.system_action.non_dialog_task.NonDialogTaskPreferences;
 import edu.cmu.sv.utils.StringDistribution;
 
 import java.util.Map;
