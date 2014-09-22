@@ -1,5 +1,6 @@
 package edu.cmu.sv.dialog_management;
 
+import edu.cmu.sv.database.Database;
 import edu.cmu.sv.system_action.SystemAction;
 import edu.cmu.sv.system_action.dialog_act.*;
 import edu.cmu.sv.dialog_state_tracking.DialogStateTracker;
@@ -11,6 +12,7 @@ import edu.cmu.sv.utils.Combination;
 import edu.cmu.sv.utils.NBest;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,9 +26,11 @@ import java.util.stream.Collectors;
  */
 public class DialogManager {
     private DialogStateTracker tracker;
+    private Database db;
 
     public DialogManager() {
         tracker = new DialogStateTracker();
+        db = new Database();
     }
 
     public DialogStateTracker getTracker() {
@@ -38,7 +42,7 @@ public class DialogManager {
     * Select the best dialog act given all the possible classes and bindings
     *
     * */
-    public List<Pair<SystemAction, Double>> selectAction() throws IllegalAccessException, InstantiationException {
+    public List<Pair<SystemAction, Double>> selectAction() throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
         DiscourseUnit DU = tracker.getDiscourseUnit();
         // 1) collect roles and values across this DU
         Map<String, Set<String>> roleValuePairs = DU.getAllNonSpecialSlotValueLeafPairs();
@@ -95,7 +99,7 @@ public class DialogManager {
             // add contribution from dialog tasks
             if (DialogRegistry.dialogTaskRegistry.containsKey(daClass)) {
                 for (Class<? extends DialogTask> taskClass : DialogRegistry.dialogTaskRegistry.get(daClass)) {
-                    DialogTask task = taskClass.newInstance();
+                    DialogTask task = taskClass.getDeclaredConstructor(Database.class).newInstance(db);
                     task.setTaskSpec(hypothesis.deepCopy());
                     Double expectedReward = RewardAndCostCalculator.dialogTaskReward(DU, task);
                     actionExpectedReward.put(task, expectedReward);

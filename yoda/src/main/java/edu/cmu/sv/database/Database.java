@@ -14,6 +14,7 @@ import org.openrdf.sail.memory.MemoryStore;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -110,19 +111,15 @@ public class Database {
 
     }
 
-    public void doSomething(){
-        String queryString = "SELECT ?x ?y ?z WHERE {?x ?y ?z} ";
+    public Set<String> runQuerySelectX(String queryString){
+        Set<String> ans = new HashSet<>();
         try {
             TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
             TupleQueryResult result = query.evaluate();
 
-
             while (result.hasNext()){
                 BindingSet bindings = result.next();
-                Value valueOfX = bindings.getValue("x");
-                Value valueOfY = bindings.getValue("y");
-                Value valueOfZ = bindings.getValue("z");
-                System.out.println(valueOfX.stringValue() + " " + valueOfY.stringValue() + " " + valueOfZ.stringValue());
+                ans.add(bindings.getValue("x").stringValue());
             }
 
         } catch (RepositoryException e) {
@@ -132,6 +129,7 @@ public class Database {
         } catch (QueryEvaluationException e) {
             e.printStackTrace();
         }
+        return ans;
     }
 
 }

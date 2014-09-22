@@ -1,5 +1,6 @@
 package edu.cmu.sv;
 
+import edu.cmu.sv.database.Database;
 import edu.cmu.sv.system_action.SystemAction;
 import edu.cmu.sv.system_action.dialog_act.*;
 import edu.cmu.sv.system_action.dialog_task.DialogTask;
@@ -17,6 +18,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Test;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -118,9 +120,9 @@ public class TestActionSelection {
     }
 
     @Test
-    public void Test() throws InstantiationException, IllegalAccessException {
-
-        List<TestCase> testCases = basicClarificationTestSet();
+    public void Test() throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        Database db = new Database();
+        List<TestCase> testCases = basicClarificationTestSet(db);
         List<EvaluationResult> evaluationResults = new LinkedList<>();
         SummaryStatistics rewardStatistics = new SummaryStatistics();
         for (TestCase testCase : testCases) {
@@ -166,7 +168,7 @@ public class TestActionSelection {
 
     }
 
-    private List<TestCase> basicClarificationTestSet(){
+    private List<TestCase> basicClarificationTestSet(Database db){
         List<TestCase> ans = new LinkedList<>();
         Map<String, SemanticsModel> utterances;
         StringDistribution weights;
@@ -217,7 +219,7 @@ public class TestActionSelection {
         // test case 1: respond to WH question
         utterances = new HashMap<>();
         weights = new StringDistribution();
-        bestDialogAction = new RespondToWHQuestionTask();
+        bestDialogAction = new RespondToWHQuestionTask(db);
 
         hyp1 = new SemanticsModel();
         child1 = new SemanticsModel();
@@ -328,7 +330,7 @@ public class TestActionSelection {
         // test case 4: respond to YN question
         utterances = new HashMap<>();
         weights = new StringDistribution();
-        bestDialogAction = new RespondToYNQuestionTask();
+        bestDialogAction = new RespondToYNQuestionTask(db);
 
         hyp1 = new SemanticsModel();
         child1 = new SemanticsModel();
