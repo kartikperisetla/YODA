@@ -111,6 +111,9 @@ public class Database {
 
     }
 
+    /*
+    * Run a sparql query on the database and return all values for the variable x
+    * */
     public Set<String> runQuerySelectX(String queryString){
         Set<String> ans = new HashSet<>();
         try {

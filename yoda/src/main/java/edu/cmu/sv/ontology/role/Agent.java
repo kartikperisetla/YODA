@@ -1,8 +1,8 @@
 package edu.cmu.sv.ontology.role;
 
 /**
- * Created by cohend on 9/20/14.
+ * Created by David Cohen on 9/20/14.
  */
-public class Agent implements FromRole {
+public class Agent implements Role {
     // define domain and range
 }
