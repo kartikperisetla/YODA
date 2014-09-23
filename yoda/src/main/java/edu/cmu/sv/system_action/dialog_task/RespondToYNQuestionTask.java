@@ -10,6 +10,7 @@ import edu.cmu.sv.utils.StringDistribution;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by David Cohen on 9/3/14.
@@ -45,8 +46,9 @@ public class RespondToYNQuestionTask implements DialogTask {
         }
 
         //// check for query validity
-        String action = taskSpec.getSlots().get("action");
+        String action = taskSpec.getSlots().get("verb");
         if (action==null){
+            System.out.println("there is no verb, so I should ask for one");
             //todo: return a "what about X?" utterance
         }
 
@@ -57,10 +59,20 @@ public class RespondToYNQuestionTask implements DialogTask {
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
-        if ()
+
+        Set<Class <? extends Role>> missingRoles = requiredRoles.stream().
+                filter(x -> !taskSpec.getSlots().containsKey(x.getSimpleName())).
+                collect(Collectors.toSet());
+
+        if (!missingRoles.isEmpty()){
+            //todo: request a role that's currently missing
+            System.out.println("at this point I should request a role which is missing");
+        }
 
         // query the entire statement
-
+        // don't make use of the descriptions / bindings which have already been collected
+        // todo: give a response
+        System.out.println("query result:"+sparqlTools.ynQuestionResult(db, taskSpec));
 
 
     }

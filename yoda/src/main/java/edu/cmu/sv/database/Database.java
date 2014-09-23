@@ -1,14 +1,12 @@
 package edu.cmu.sv.database;
 
-import org.apache.commons.lang3.tuple.ImmutableTriple;
+
 import org.openrdf.model.Value;
 import org.openrdf.query.*;
-import org.openrdf.query.algebra.InsertData;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.sail.memory.MemoryStore;
 
@@ -19,96 +17,42 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by cohend on 6/21/14.
+ * Created by David Cohen on 6/21/14.
  */
 public class Database {
 
-    public static class Operation {
-        String transactionType;
-        Set<String> variables;
-        Map<String, String> classConstraints;
-        Set<ImmutableTriple<String, String, String>> triples;
-
-        public String getTransactionType() {
-            return transactionType;
-        }
-
-        public void setTransactionType(String transactionType) {
-            this.transactionType = transactionType;
-        }
-
-        public Set<String> getVariables() {
-            return variables;
-        }
-
-        public void setVariables(Set<String> variables) {
-            this.variables = variables;
-        }
-
-        public Map<String, String> getClassConstraints() {
-            return classConstraints;
-        }
-
-        public void setClassConstraints(Map<String, String> classConstraints) {
-            this.classConstraints = classConstraints;
-        }
-
-        public Set<ImmutableTriple<String, String, String>> getTriples() {
-            return triples;
-        }
-
-        public void setTriples(Set<ImmutableTriple<String, String, String>> triples) {
-            this.triples = triples;
-        }
-
-        public Operation(String transactionType, Set<String> variables, Map<String, String> classConstraints, Set<ImmutableTriple<String, String, String>> triples) {
-            this.transactionType = transactionType;
-            this.variables = variables;
-            this.classConstraints = classConstraints;
-            this.triples = triples;
-        }
-
-        public String getSPARQL(){
-            String ans = "";
-            if (transactionType.equals("query")) {
-                ans += "SELECT ";
-                for (String v : variables){
-                    ans += "?"+v+" ";
-                }
-                ans += "WHERE {";
-            }
-            for (String key: classConstraints.keySet()){
-                ans += key+" rdf:type "+classConstraints.get(key)+" ";
-            }
-            for (ImmutableTriple triple : triples){
-                ans += triple.getLeft() + " " + triple.getMiddle() + " " + triple.getRight() + " ";
-            }
-            ans += "}";
-            return ans;
-        }
-
-    }
-
-
     Repository repository;
     RepositoryConnection connection;
-    String baseURI = "http://sv.cmu.edu/yoda";
-    File ontologyFile = new File("/home/cohend/yoda/yoda_ontology.owl");
+    public static String baseURI = "http://sv.cmu.edu/yoda#";
+//    File ontologyFile = new File("/home/cohend/yoda/yoda_ontology.owl");
 
     public Database() {
         repository = new SailRepository(new MemoryStore());
         try {
             repository.initialize();
             connection = repository.getConnection();
-            connection.add(ontologyFile, baseURI, RDFFormat.TURTLE); //load up some turtle file
+//            connection.add(ontologyFile, baseURI, RDFFormat.TURTLE); //load up some turtle file
         } catch (RepositoryException e) {
             e.printStackTrace();
-        } catch (RDFParseException e) {
+        } /*catch (RDFParseException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
+    }
+
+
+
+    public void insertTriple(String subject, String predicate, String object)
+            throws MalformedQueryException, RepositoryException, UpdateExecutionException {
+        String prefixes = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
+                "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
+                "PREFIX base: <"+baseURI+">\n";
+        String updateString = prefixes+"INSERT DATA \n{ base:"+subject+" "+predicate+" base:"+object+" }";
+//        System.out.println("attempting the following sparql update string:\n"+updateString);
+        Update update = connection.prepareUpdate(QueryLanguage.SPARQL, updateString, baseURI);
+        update.execute();
     }
 
     /*
@@ -125,14 +69,31 @@ public class Database {
                 ans.add(bindings.getValue("x").stringValue());
             }
 
-        } catch (RepositoryException e) {
-            e.printStackTrace();
-        } catch (MalformedQueryException e) {
-            e.printStackTrace();
-        } catch (QueryEvaluationException e) {
+        } catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {
             e.printStackTrace();
         }
         return ans;
+    }
+
+    public void outputEntireDatabase(){
+        System.out.println("Outputting Entire Database");
+        String queryString = "SELECT ?x ?y ?z WHERE {?x ?y ?z} ";
+        try {
+            TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+            TupleQueryResult result = query.evaluate();
+
+
+            while (result.hasNext()){
+                BindingSet bindings = result.next();
+                Value valueOfX = bindings.getValue("x");
+                Value valueOfY = bindings.getValue("y");
+                Value valueOfZ = bindings.getValue("z");
+                System.out.println(valueOfX.stringValue() + " " + valueOfY.stringValue() + " " + valueOfZ.stringValue());
+            }
+
+        } catch (RepositoryException | MalformedQueryException | QueryEvaluationException e) {
+            e.printStackTrace();
+        }
     }
 
 }

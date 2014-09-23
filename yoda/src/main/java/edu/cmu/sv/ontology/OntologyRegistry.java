@@ -1,5 +1,6 @@
 package edu.cmu.sv.ontology;
 
+import edu.cmu.sv.ontology.action.Exist;
 import edu.cmu.sv.ontology.action.Verb;
 import edu.cmu.sv.ontology.action.Create;
 import edu.cmu.sv.ontology.action.HasProperty;
@@ -25,6 +26,7 @@ public class OntologyRegistry {
     static{
         actionClasses.add(Create.class);
         actionClasses.add(HasProperty.class);
+        actionClasses.add(Exist.class);
 
         roleClasses.add(Agent.class);
         roleClasses.add(Patient.class);
