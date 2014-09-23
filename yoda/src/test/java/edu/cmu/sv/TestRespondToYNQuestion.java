@@ -1,12 +1,18 @@
 package edu.cmu.sv;
 
+import com.google.common.collect.Iterables;
 import edu.cmu.sv.database.Database;
+import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_task.RespondToYNQuestionTask;
 import org.junit.Test;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.UpdateExecutionException;
 import org.openrdf.repository.RepositoryException;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by David Cohen on 9/21/14.
@@ -18,9 +24,14 @@ import org.openrdf.repository.RepositoryException;
 public class TestRespondToYNQuestion {
 
     @Test
-    public void test(){
+    public void test() throws RepositoryException, MalformedQueryException, UpdateExecutionException {
         // Set up sample database
         Database db = new Database();
+        Set<Class> databaseClasses = new HashSet<>(OntologyRegistry.objectClasses);
+        databaseClasses.addAll(OntologyRegistry.actionClasses);
+        Set<Class> databaseProperties = new HashSet<>(OntologyRegistry.roleClasses);
+        databaseProperties.addAll(OntologyRegistry.propertyClasses);
+        db.generateClassHierarchy(databaseClasses, databaseProperties);
         addTestContent(db);
         db.outputEntireDatabase();
 

@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * Created by David Cohen on 9/23/14.
  */
-public class Exist implements Verb {
+public class Exist extends Verb {
     @Override
     public Set<Class<? extends Role>> getRequiredRoles() {
         return new HashSet<>(Arrays.asList(Patient.class));

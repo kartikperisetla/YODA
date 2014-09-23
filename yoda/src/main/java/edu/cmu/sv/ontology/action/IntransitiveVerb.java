@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * Created by David Cohen on 9/22/14.
  */
-public class IntransitiveVerb implements Verb {
+public class IntransitiveVerb extends Verb {
     public Set<Class <? extends Role>> getRequiredRoles(){
         return new HashSet<>(Arrays.asList(Agent.class));
     }

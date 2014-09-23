@@ -21,10 +21,7 @@ public class sparqlTools {
     * For now, this can only be a flat reference, no nested information.
     * */
     public static StringDistribution possibleReferents(Database db, SemanticsModel description){
-        String prefixes = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
-                "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
-                "PREFIX base: <"+db.baseURI+">\n";
-        String queryString = prefixes + "SELECT ?x WHERE { ";
+        String queryString = Database.prefixes + "SELECT ?x WHERE { ";
         for (String slot : description.getSlots().keySet()){
             if (slot.equals("class"))
                 queryString += "?x rdf:type base:"+description.getSlots().get(slot) + " . ";

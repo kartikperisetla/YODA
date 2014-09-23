@@ -1,7 +1,9 @@
 package edu.cmu.sv.ontology.misc;
 
+import edu.cmu.sv.ontology.Thing;
+
 /**
- * Created by cohend on 9/20/14.
+ * Created by David Cohen on 9/20/14.
  */
-public interface Conjunction {
+public abstract class Conjunction extends Thing {
 }

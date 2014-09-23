@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * Created by David Cohen on 9/22/14.
  */
-public class TransitiveVerb implements Verb {
+public class TransitiveVerb extends Verb {
     @Override
     public Set<Class<? extends Role>> getRequiredRoles() {
         return new HashSet<>(Arrays.asList(Agent.class, Patient.class));
