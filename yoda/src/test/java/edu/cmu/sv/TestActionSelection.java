@@ -3,6 +3,7 @@ package edu.cmu.sv;
 import edu.cmu.sv.database.Database;
 import edu.cmu.sv.system_action.SystemAction;
 import edu.cmu.sv.system_action.dialog_act.clarification_dialog_acts.*;
+import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestVerbRole;
 import edu.cmu.sv.system_action.dialog_task.DialogTask;
 import edu.cmu.sv.system_action.dialog_task.RespondToWHQuestionTask;
 import edu.cmu.sv.system_action.dialog_task.RespondToYNQuestionTask;
@@ -88,6 +89,9 @@ public class TestActionSelection {
         }
 
         private EvaluationResult evaluate(List<Pair<SystemAction, Double>> nBestActions){
+            if (nBestActions.size()==0){
+                return new EvaluationResult(false, false, -1, Double.NaN, null);
+            }
             boolean correctInTopNActions = false;
             boolean correctIsTopAction = false;
             double topConfidence = nBestActions.get(0).getRight();
@@ -113,7 +117,7 @@ public class TestActionSelection {
                 confusion = new ImmutablePair<>(bestActionDescriptor.getClass(),
                         nBestActions.get(0).getLeft().getClass());
 
-//            nBestActions.forEach(System.out::println);
+            nBestActions.forEach(System.out::println);
             return new EvaluationResult(correctIsTopAction, correctInTopNActions, correctActionRank, correctActionRewardDifference, confusion);
         }
 
@@ -185,169 +189,61 @@ public class TestActionSelection {
         SemanticsModel child3;
         SemanticsModel child4;
 
-        // test case 0: role ambiguity with different depths
+//        // test case 0: role ambiguity with different depths
+//        utterances = new HashMap<>();
+//        weights = new StringDistribution();
+//        bestDialogActionParameters = new HashMap<>();
+//        bestDialogActionParameters.put("r1", "theme.endTime");
+//        bestDialogActionParameters.put("r2", "toTime");
+//        bestDialogAction = new RequestDisambiguateRole().bindVariables(bestDialogActionParameters);
+//
+//        hyp1 = new SemanticsModel();
+//        child1 = new SemanticsModel();
+//        hyp1.getSlots().put("dialogAct", "WHQuestion");
+//        hyp1.getSlots().put("Theme", "meeting0");
+//        hyp1.getSlots().put("fromTime", "t0");
+//        hyp1.getChildren().put("meeting0", child1);
+//        child1.getSlots().put("endTime", "t1");
+//        utterances.put("hyp1", hyp1);
+//        weights.put("hyp1", .6);
+//
+//        hyp2 = new SemanticsModel();
+//        child2 = new SemanticsModel();
+//        hyp2.getSlots().put("dialogAct", "WHQuestion");
+//        hyp2.getSlots().put("Theme", "meeting1");
+//        hyp2.getSlots().put("fromTime", "t0");
+//        hyp2.getSlots().put("toTime", "t1");
+//        hyp2.getChildren().put("meeting1", child2);
+//        utterances.put("hyp2", hyp2);
+//        weights.put("hyp2", .4);
+//
+//        testCase = new TestCase(utterances, weights, bestDialogAction);
+//        ans.add(testCase);
+
+        // test case 1: request patient
         utterances = new HashMap<>();
         weights = new StringDistribution();
         bestDialogActionParameters = new HashMap<>();
-        bestDialogActionParameters.put("r1", "theme.endTime");
-        bestDialogActionParameters.put("r2", "toTime");
-        bestDialogAction = new RequestDisambiguateRole().bindVariables(bestDialogActionParameters);
-
-        hyp1 = new SemanticsModel();
-        child1 = new SemanticsModel();
-        hyp1.getSlots().put("dialogAct", "WHQuestion");
-        hyp1.getSlots().put("theme", "meeting0");
-        hyp1.getSlots().put("fromTime", "t0");
-        hyp1.getChildren().put("meeting0", child1);
-        child1.getSlots().put("endTime", "t1");
-        utterances.put("hyp1", hyp1);
-        weights.put("hyp1", .6);
-
-        hyp2 = new SemanticsModel();
-        child2 = new SemanticsModel();
-        hyp2.getSlots().put("dialogAct", "WHQuestion");
-        hyp2.getSlots().put("theme", "meeting1");
-        hyp2.getSlots().put("fromTime", "t0");
-        hyp2.getSlots().put("toTime", "t1");
-        hyp2.getChildren().put("meeting1", child2);
-        utterances.put("hyp2", hyp2);
-        weights.put("hyp2", .4);
-
-        testCase = new TestCase(utterances, weights, bestDialogAction);
-        ans.add(testCase);
-
-        // test case 1: respond to WH question
-        utterances = new HashMap<>();
-        weights = new StringDistribution();
-        bestDialogAction = new RespondToWHQuestionTask(db);
-
-        hyp1 = new SemanticsModel();
-        child1 = new SemanticsModel();
-        hyp1.getSlots().put("dialogAct", "WHQuestion");
-        hyp1.getSlots().put("theme", "meeting0");
-        hyp1.getSlots().put("fromTime", "t0");
-        hyp1.getChildren().put("meeting0", child1);
-        child1.getSlots().put("endTime", "t1");
-        utterances.put("hyp1", hyp1);
-        weights.put("hyp1", .9);
-
-        ((DialogTask) bestDialogAction).setTaskSpec(hyp1.deepCopy());
-
-        hyp2 = new SemanticsModel();
-        child2 = new SemanticsModel();
-        hyp2.getSlots().put("dialogAct", "WHQuestion");
-        hyp2.getSlots().put("theme", "meeting1");
-        hyp2.getSlots().put("fromTime", "t0");
-        hyp2.getSlots().put("toTime", "t1");
-        hyp2.getChildren().put("meeting1", child2);
-        utterances.put("hyp2", hyp2);
-        weights.put("hyp2", .1);
-
-        testCase = new TestCase(utterances, weights, bestDialogAction);
-        ans.add(testCase);
-
-
-        // test case 2: ask for a rephrase
-        utterances = new HashMap<>();
-        weights = new StringDistribution();
-        bestDialogAction = new RequestRephrase().bindVariables(new HashMap<>());
-
-        hyp1 = new SemanticsModel();
-        child1 = new SemanticsModel();
-        hyp1.getSlots().put("dialogAct", "WHQuestion");
-        hyp1.getSlots().put("theme", "meeting0");
-        hyp1.getSlots().put("fromTime", "t0");
-        hyp1.getChildren().put("meeting0", child1);
-        child1.getSlots().put("endTime", "t1");
-        utterances.put("hyp1", hyp1);
-        weights.put("hyp1", .25);
-
-        hyp2 = new SemanticsModel();
-        child2 = new SemanticsModel();
-        hyp2.getSlots().put("dialogAct", "WHQuestion");
-        hyp2.getSlots().put("theme", "meeting1");
-        hyp2.getSlots().put("fromTime", "t0");
-        hyp2.getSlots().put("toTime", "t1");
-        hyp2.getChildren().put("meeting1", child2);
-        utterances.put("hyp2", hyp2);
-        weights.put("hyp2", .25);
-
-        hyp3 = new SemanticsModel();
-        child3 = new SemanticsModel();
-        hyp3.getSlots().put("dialogAct", "YNQuestion");
-        hyp3.getSlots().put("theme", "meeting2");
-        hyp3.getSlots().put("fromTime", "t0");
-        hyp3.getChildren().put("meeting2", child3);
-        child3.getSlots().put("endTime", "t1");
-        utterances.put("hyp3", hyp3);
-        weights.put("hyp3", .25);
-
-        hyp4 = new SemanticsModel();
-        child4 = new SemanticsModel();
-        hyp4.getSlots().put("dialogAct", "YNQuestion");
-        hyp4.getSlots().put("theme", "meeting3");
-        hyp4.getSlots().put("fromTime", "t0");
-        hyp4.getSlots().put("toTime", "t1");
-        hyp4.getChildren().put("meeting3", child4);
-        utterances.put("hyp4", hyp4);
-        weights.put("hyp4", .25);
-
-        testCase = new TestCase(utterances, weights, bestDialogAction);
-        ans.add(testCase);
-
-
-        // test case 3: value ambiguity
-        utterances = new HashMap<>();
-        weights = new StringDistribution();
-        bestDialogActionParameters = new HashMap<>();
-        bestDialogActionParameters.put("v1", "t1");
-        bestDialogAction = new RequestConfirmValue().bindVariables(bestDialogActionParameters);
-
-        hyp1 = new SemanticsModel();
-        child1 = new SemanticsModel();
-        hyp1.getSlots().put("dialogAct", "WHQuestion");
-        hyp1.getSlots().put("theme", "meeting0");
-        hyp1.getSlots().put("fromTime", "t0");
-        hyp1.getChildren().put("meeting0", child1);
-        child1.getSlots().put("endTime", "t1");
-        utterances.put("hyp1", hyp1);
-        weights.put("hyp1", .6);
-
-        hyp2 = new SemanticsModel();
-        child2 = new SemanticsModel();
-        hyp2.getSlots().put("dialogAct", "WHQuestion");
-        hyp2.getSlots().put("theme", "meeting1");
-        hyp2.getSlots().put("fromTime", "t0");
-        hyp2.getChildren().put("meeting1", child2);
-        child2.getSlots().put("endTime", "t2");
-        utterances.put("hyp2", hyp2);
-        weights.put("hyp2", .4);
-
-        testCase = new TestCase(utterances, weights, bestDialogAction);
-        ans.add(testCase);
-
-
-        // test case 4: respond to YN question
-        utterances = new HashMap<>();
-        weights = new StringDistribution();
-        bestDialogAction = new RespondToYNQuestionTask(db);
+        bestDialogActionParameters.put("r1", "Patient");
+        bestDialogActionParameters.put("v1", "Exist");
+        bestDialogAction = new RequestVerbRole().bindVariables(bestDialogActionParameters);
 
         hyp1 = new SemanticsModel();
         child1 = new SemanticsModel();
         hyp1.getSlots().put("dialogAct", "YNQuestion");
-        hyp1.getSlots().put("theme", "meeting0");
+        hyp1.getSlots().put("verb", "Exist");
+        hyp1.getSlots().put("Agent", "meeting0");
         hyp1.getSlots().put("fromTime", "t0");
         hyp1.getChildren().put("meeting0", child1);
         child1.getSlots().put("endTime", "t1");
         utterances.put("hyp1", hyp1);
         weights.put("hyp1", .9);
 
-        ((DialogTask) bestDialogAction).setTaskSpec(hyp1.deepCopy());
-
         hyp2 = new SemanticsModel();
         child2 = new SemanticsModel();
         hyp2.getSlots().put("dialogAct", "YNQuestion");
-        hyp2.getSlots().put("theme", "meeting1");
+        hyp1.getSlots().put("verb", "Exist");
+        hyp2.getSlots().put("Agent", "meeting1");
         hyp2.getSlots().put("fromTime", "t0");
         hyp2.getSlots().put("toTime", "t1");
         hyp2.getChildren().put("meeting1", child2);
@@ -356,133 +252,244 @@ public class TestActionSelection {
 
         testCase = new TestCase(utterances, weights, bestDialogAction);
         ans.add(testCase);
-
-
-        // test case 5: send an email
-        utterances = new HashMap<>();
-        weights = new StringDistribution();
-        bestDialogAction = new SendEmailTask();
-
-        hyp1 = new SemanticsModel();
-        child1 = new SemanticsModel();
-        hyp1.getSlots().put("dialogAct", "Command");
-        hyp1.getSlots().put("action", "Send");
-        hyp1.getSlots().put("theme", "email0");
-        hyp1.getSlots().put("recipient", "p0");
-        hyp1.getChildren().put("email0", child1);
-        child1.getSlots().put("class", "Email");
-        child1.getSlots().put("number", "<SG>");
-        child1.getSlots().put("ref-type", "<INDEF>");
-        utterances.put("hyp1", hyp1);
-        weights.put("hyp1", .9);
-
-        ((NonDialogTask) bestDialogAction).setTaskSpec(hyp1.deepCopy());
-
-        hyp2 = new SemanticsModel();
-        child2 = new SemanticsModel();
-        hyp2.getSlots().put("dialogAct", "YNQuestion");
-        hyp2.getSlots().put("theme", "meeting1");
-        hyp2.getSlots().put("fromTime", "t0");
-        hyp2.getSlots().put("toTime", "t1");
-        hyp2.getChildren().put("meeting1", child2);
-        utterances.put("hyp2", hyp2);
-        weights.put("hyp2", .1);
-
-        testCase = new TestCase(utterances, weights, bestDialogAction);
-        ans.add(testCase);
-
-        // test case 6: create a meeting
-        utterances = new HashMap<>();
-        weights = new StringDistribution();
-        bestDialogAction = new CreateMeetingTask();
-
-        hyp1 = new SemanticsModel();
-        child1 = new SemanticsModel();
-        hyp1.getSlots().put("dialogAct", "Command");
-        hyp1.getSlots().put("action", "Create");
-        hyp1.getSlots().put("theme", "meeting0");
-        hyp1.getSlots().put("recipient", "p0");
-        hyp1.getChildren().put("meeting0", child1);
-        child1.getSlots().put("class", "Meeting");
-        child1.getSlots().put("number", "<SG>");
-        child1.getSlots().put("ref-type", "<INDEF>");
-        utterances.put("hyp1", hyp1);
-        weights.put("hyp1", .9);
-
-        ((NonDialogTask) bestDialogAction).setTaskSpec(hyp1.deepCopy());
-
-        hyp2 = new SemanticsModel();
-        child2 = new SemanticsModel();
-        hyp2.getSlots().put("dialogAct", "YNQuestion");
-        hyp2.getSlots().put("theme", "meeting1");
-        hyp2.getSlots().put("fromTime", "t0");
-        hyp2.getSlots().put("toTime", "t1");
-        hyp2.getChildren().put("meeting1", child2);
-        utterances.put("hyp2", hyp2);
-        weights.put("hyp2", .1);
-
-        testCase = new TestCase(utterances, weights, bestDialogAction);
-        ans.add(testCase);
-
-        // test case 7: requestConfirmRole
-        utterances = new HashMap<>();
-        weights = new StringDistribution();
-        bestDialogActionParameters = new HashMap<>();
-        bestDialogActionParameters.put("r1", "fromTime");
-        bestDialogAction = new RequestConfirmRole().bindVariables(bestDialogActionParameters);
-
-        hyp1 = new SemanticsModel();
-        hyp1.getSlots().put("dialogAct", "WHQuestion");
-        hyp1.getSlots().put("fromTime", "t0");
-        utterances.put("hyp1", hyp1);
-        weights.put("hyp1", .4);
-
-        hyp2 = new SemanticsModel();
-        hyp2.getSlots().put("dialogAct", "WHQuestion");
-        hyp2.getSlots().put("toTime", "t0");
-        utterances.put("hyp2", hyp2);
-        weights.put("hyp2", .25);
-
-        hyp3 = new SemanticsModel();
-        hyp3.getSlots().put("dialogAct", "WHQuestion");
-        hyp3.getSlots().put("atTime", "t0");
-        utterances.put("hyp3", hyp3);
-        weights.put("hyp3", .25);
-
-        hyp4 = new SemanticsModel();
-        hyp4.getSlots().put("dialogAct", "YNQuestion");
-        hyp4.getSlots().put("fromTime", "t0");
-        utterances.put("hyp4", hyp4);
-        weights.put("hyp4", .10);
-
-        testCase = new TestCase(utterances, weights, bestDialogAction);
-        ans.add(testCase);
-
-
-        // test case 8: request disambiguate value
-        utterances = new HashMap<>();
-        weights = new StringDistribution();
-        bestDialogActionParameters = new HashMap<>();
-        bestDialogActionParameters.put("v1", "t0");
-        bestDialogActionParameters.put("v2", "t1");
-        bestDialogAction = new RequestDisambiguateValue().bindVariables(bestDialogActionParameters);
-
-        hyp1 = new SemanticsModel();
-        hyp1.getSlots().put("dialogAct", "WHQuestion");
-        hyp1.getSlots().put("fromTime", "t0");
-        hyp1.getSlots().put("endTime", "t2");
-        utterances.put("hyp1", hyp1);
-        weights.put("hyp1", .6);
-
-        hyp2 = new SemanticsModel();
-        hyp2.getSlots().put("dialogAct", "WHQuestion");
-        hyp2.getSlots().put("fromTime", "t1");
-        hyp2.getSlots().put("endTime", "t2");
-        utterances.put("hyp2", hyp2);
-        weights.put("hyp2", .4);
-
-        testCase = new TestCase(utterances, weights, bestDialogAction);
-        ans.add(testCase);
+//
+//
+//        // test case 2: ask for a rephrase
+//        utterances = new HashMap<>();
+//        weights = new StringDistribution();
+//        bestDialogAction = new RequestRephrase().bindVariables(new HashMap<>());
+//
+//        hyp1 = new SemanticsModel();
+//        child1 = new SemanticsModel();
+//        hyp1.getSlots().put("dialogAct", "WHQuestion");
+//        hyp1.getSlots().put("Theme", "meeting0");
+//        hyp1.getSlots().put("fromTime", "t0");
+//        hyp1.getChildren().put("meeting0", child1);
+//        child1.getSlots().put("endTime", "t1");
+//        utterances.put("hyp1", hyp1);
+//        weights.put("hyp1", .25);
+//
+//        hyp2 = new SemanticsModel();
+//        child2 = new SemanticsModel();
+//        hyp2.getSlots().put("dialogAct", "WHQuestion");
+//        hyp2.getSlots().put("Theme", "meeting1");
+//        hyp2.getSlots().put("fromTime", "t0");
+//        hyp2.getSlots().put("toTime", "t1");
+//        hyp2.getChildren().put("meeting1", child2);
+//        utterances.put("hyp2", hyp2);
+//        weights.put("hyp2", .25);
+//
+//        hyp3 = new SemanticsModel();
+//        child3 = new SemanticsModel();
+//        hyp3.getSlots().put("dialogAct", "YNQuestion");
+//        hyp3.getSlots().put("Theme", "meeting2");
+//        hyp3.getSlots().put("fromTime", "t0");
+//        hyp3.getChildren().put("meeting2", child3);
+//        child3.getSlots().put("endTime", "t1");
+//        utterances.put("hyp3", hyp3);
+//        weights.put("hyp3", .25);
+//
+//        hyp4 = new SemanticsModel();
+//        child4 = new SemanticsModel();
+//        hyp4.getSlots().put("dialogAct", "YNQuestion");
+//        hyp4.getSlots().put("Theme", "meeting3");
+//        hyp4.getSlots().put("fromTime", "t0");
+//        hyp4.getSlots().put("toTime", "t1");
+//        hyp4.getChildren().put("meeting3", child4);
+//        utterances.put("hyp4", hyp4);
+//        weights.put("hyp4", .25);
+//
+//        testCase = new TestCase(utterances, weights, bestDialogAction);
+//        ans.add(testCase);
+//
+//
+//        // test case 3: value ambiguity
+//        utterances = new HashMap<>();
+//        weights = new StringDistribution();
+//        bestDialogActionParameters = new HashMap<>();
+//        bestDialogActionParameters.put("v1", "t1");
+//        bestDialogAction = new RequestConfirmValue().bindVariables(bestDialogActionParameters);
+//
+//        hyp1 = new SemanticsModel();
+//        child1 = new SemanticsModel();
+//        hyp1.getSlots().put("dialogAct", "WHQuestion");
+//        hyp1.getSlots().put("Theme", "meeting0");
+//        hyp1.getSlots().put("fromTime", "t0");
+//        hyp1.getChildren().put("meeting0", child1);
+//        child1.getSlots().put("endTime", "t1");
+//        utterances.put("hyp1", hyp1);
+//        weights.put("hyp1", .6);
+//
+//        hyp2 = new SemanticsModel();
+//        child2 = new SemanticsModel();
+//        hyp2.getSlots().put("dialogAct", "WHQuestion");
+//        hyp2.getSlots().put("Theme", "meeting1");
+//        hyp2.getSlots().put("fromTime", "t0");
+//        hyp2.getChildren().put("meeting1", child2);
+//        child2.getSlots().put("endTime", "t2");
+//        utterances.put("hyp2", hyp2);
+//        weights.put("hyp2", .4);
+//
+//        testCase = new TestCase(utterances, weights, bestDialogAction);
+//        ans.add(testCase);
+//
+//
+//        // test case 4: respond to YN question
+//        utterances = new HashMap<>();
+//        weights = new StringDistribution();
+//        bestDialogAction = new RespondToYNQuestionTask(db);
+//
+//        hyp1 = new SemanticsModel();
+//        child1 = new SemanticsModel();
+//        hyp1.getSlots().put("dialogAct", "YNQuestion");
+//        hyp1.getSlots().put("Theme", "meeting0");
+//        hyp1.getSlots().put("fromTime", "t0");
+//        hyp1.getChildren().put("meeting0", child1);
+//        child1.getSlots().put("endTime", "t1");
+//        utterances.put("hyp1", hyp1);
+//        weights.put("hyp1", .9);
+//
+//        ((DialogTask) bestDialogAction).setTaskSpec(hyp1.deepCopy());
+//
+//        hyp2 = new SemanticsModel();
+//        child2 = new SemanticsModel();
+//        hyp2.getSlots().put("dialogAct", "YNQuestion");
+//        hyp2.getSlots().put("Theme", "meeting1");
+//        hyp2.getSlots().put("fromTime", "t0");
+//        hyp2.getSlots().put("toTime", "t1");
+//        hyp2.getChildren().put("meeting1", child2);
+//        utterances.put("hyp2", hyp2);
+//        weights.put("hyp2", .1);
+//
+//        testCase = new TestCase(utterances, weights, bestDialogAction);
+//        ans.add(testCase);
+//
+//
+//        // test case 5: send an email
+//        utterances = new HashMap<>();
+//        weights = new StringDistribution();
+//        bestDialogAction = new SendEmailTask(db);
+//
+//        hyp1 = new SemanticsModel();
+//        child1 = new SemanticsModel();
+//        hyp1.getSlots().put("dialogAct", "Command");
+//        hyp1.getSlots().put("verb", "Send");
+//        hyp1.getSlots().put("Theme", "email0");
+//        hyp1.getSlots().put("recipient", "p0");
+//        hyp1.getChildren().put("email0", child1);
+//        child1.getSlots().put("class", "Email");
+//        child1.getSlots().put("number", "<SG>");
+//        child1.getSlots().put("ref-type", "<INDEF>");
+//        utterances.put("hyp1", hyp1);
+//        weights.put("hyp1", .9);
+//
+//        ((NonDialogTask) bestDialogAction).setTaskSpec(hyp1.deepCopy());
+//
+//        hyp2 = new SemanticsModel();
+//        child2 = new SemanticsModel();
+//        hyp2.getSlots().put("dialogAct", "YNQuestion");
+//        hyp2.getSlots().put("Theme", "meeting1");
+//        hyp2.getSlots().put("fromTime", "t0");
+//        hyp2.getSlots().put("toTime", "t1");
+//        hyp2.getChildren().put("meeting1", child2);
+//        utterances.put("hyp2", hyp2);
+//        weights.put("hyp2", .1);
+//
+//        testCase = new TestCase(utterances, weights, bestDialogAction);
+//        ans.add(testCase);
+//
+//        // test case 6: create a meeting
+//        utterances = new HashMap<>();
+//        weights = new StringDistribution();
+//        bestDialogAction = new CreateMeetingTask(db);
+//
+//        hyp1 = new SemanticsModel();
+//        child1 = new SemanticsModel();
+//        hyp1.getSlots().put("dialogAct", "Command");
+//        hyp1.getSlots().put("verb", "Create");
+//        hyp1.getSlots().put("Theme", "meeting0");
+//        hyp1.getSlots().put("recipient", "p0");
+//        hyp1.getChildren().put("meeting0", child1);
+//        child1.getSlots().put("class", "Meeting");
+//        child1.getSlots().put("number", "<SG>");
+//        child1.getSlots().put("ref-type", "<INDEF>");
+//        utterances.put("hyp1", hyp1);
+//        weights.put("hyp1", .9);
+//
+//        ((NonDialogTask) bestDialogAction).setTaskSpec(hyp1.deepCopy());
+//
+//        hyp2 = new SemanticsModel();
+//        child2 = new SemanticsModel();
+//        hyp2.getSlots().put("dialogAct", "YNQuestion");
+//        hyp2.getSlots().put("Theme", "meeting1");
+//        hyp2.getSlots().put("fromTime", "t0");
+//        hyp2.getSlots().put("toTime", "t1");
+//        hyp2.getChildren().put("meeting1", child2);
+//        utterances.put("hyp2", hyp2);
+//        weights.put("hyp2", .1);
+//
+//        testCase = new TestCase(utterances, weights, bestDialogAction);
+//        ans.add(testCase);
+//
+//        // test case 7: requestConfirmRole
+//        utterances = new HashMap<>();
+//        weights = new StringDistribution();
+//        bestDialogActionParameters = new HashMap<>();
+//        bestDialogActionParameters.put("r1", "fromTime");
+//        bestDialogAction = new RequestConfirmRole().bindVariables(bestDialogActionParameters);
+//
+//        hyp1 = new SemanticsModel();
+//        hyp1.getSlots().put("dialogAct", "WHQuestion");
+//        hyp1.getSlots().put("fromTime", "t0");
+//        utterances.put("hyp1", hyp1);
+//        weights.put("hyp1", .4);
+//
+//        hyp2 = new SemanticsModel();
+//        hyp2.getSlots().put("dialogAct", "WHQuestion");
+//        hyp2.getSlots().put("toTime", "t0");
+//        utterances.put("hyp2", hyp2);
+//        weights.put("hyp2", .25);
+//
+//        hyp3 = new SemanticsModel();
+//        hyp3.getSlots().put("dialogAct", "WHQuestion");
+//        hyp3.getSlots().put("atTime", "t0");
+//        utterances.put("hyp3", hyp3);
+//        weights.put("hyp3", .25);
+//
+//        hyp4 = new SemanticsModel();
+//        hyp4.getSlots().put("dialogAct", "YNQuestion");
+//        hyp4.getSlots().put("fromTime", "t0");
+//        utterances.put("hyp4", hyp4);
+//        weights.put("hyp4", .10);
+//
+//        testCase = new TestCase(utterances, weights, bestDialogAction);
+//        ans.add(testCase);
+//
+//
+//        // test case 8: request disambiguate value
+//        utterances = new HashMap<>();
+//        weights = new StringDistribution();
+//        bestDialogActionParameters = new HashMap<>();
+//        bestDialogActionParameters.put("v1", "t0");
+//        bestDialogActionParameters.put("v2", "t1");
+//        bestDialogAction = new RequestDisambiguateValue().bindVariables(bestDialogActionParameters);
+//
+//        hyp1 = new SemanticsModel();
+//        hyp1.getSlots().put("dialogAct", "WHQuestion");
+//        hyp1.getSlots().put("fromTime", "t0");
+//        hyp1.getSlots().put("endTime", "t2");
+//        utterances.put("hyp1", hyp1);
+//        weights.put("hyp1", .6);
+//
+//        hyp2 = new SemanticsModel();
+//        hyp2.getSlots().put("dialogAct", "WHQuestion");
+//        hyp2.getSlots().put("fromTime", "t1");
+//        hyp2.getSlots().put("endTime", "t2");
+//        utterances.put("hyp2", hyp2);
+//        weights.put("hyp2", .4);
+//
+//        testCase = new TestCase(utterances, weights, bestDialogAction);
+//        ans.add(testCase);
 
 
         return ans;

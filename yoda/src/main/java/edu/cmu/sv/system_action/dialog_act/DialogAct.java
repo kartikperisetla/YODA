@@ -1,5 +1,6 @@
 package edu.cmu.sv.system_action.dialog_act;
 
+import edu.cmu.sv.database.Database;
 import edu.cmu.sv.system_action.SystemAction;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 
@@ -16,12 +17,18 @@ import java.util.*;
  *   - include templates used for NLG and SLU
  *
  */
-public interface DialogAct extends SystemAction {
+public abstract class DialogAct extends SystemAction {
+    public abstract Double reward(DiscourseUnit DU);
+    public abstract Double cost(DiscourseUnit DU);
+    public abstract Map<String, String> getParameters();
+    public abstract Map<String, String> getBindings();
+    public abstract DialogAct bindVariables(Map<String, String> bindings);
 
-    public Double reward(DiscourseUnit DU);
-    public Double cost(DiscourseUnit DU);
-    public Map<String, String> getParameters();
-    public Map<String, String> getBindings();
-    public DialogAct bindVariables(Map<String, String> bindings);
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName()+ "{" +
+                "boundVariables=" + getBindings() +
+                '}';
+    }
 
 }

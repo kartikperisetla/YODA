@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Created by David Cohen on 9/19/14.
  */
-public class Fragment implements DialogAct {
+public class Fragment extends DialogAct {
     @Override
     public Double reward(DiscourseUnit DU) {
         return null;

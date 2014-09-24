@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Created by David Cohen on 9/24/14.
  */
-public class RequestVerb implements DialogAct{
+public class RequestVerb extends DialogAct{
     private Map<String, String> boundVariables = null;
     static Map<String, String> parameters = new HashMap<>(); // parameters are empty for this DA
     static{

@@ -4,22 +4,23 @@ import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by David Cohen on 9/8/14.
  */
-public class RequestRephrase implements DialogAct {
+public class RequestRephrase extends DialogAct {
     private Map<String, String> boundVariables = null;
     static Map<String, String> parameters = new HashMap<>(); // parameters are empty for this DA
 
     @Override
     public Double reward(DiscourseUnit DU) {
         try{
-        return RewardAndCostCalculator.clarificationDialogActReward(DU,
+        return RewardAndCostCalculator.clarificationDialogActReward(db, DU,
                 RewardAndCostCalculator.predictedConfidenceGainFromJointClarification(DU));
-        } catch (IllegalAccessException | InstantiationException e) {
+        } catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return null;
@@ -46,12 +47,5 @@ public class RequestRephrase implements DialogAct {
     public DialogAct bindVariables(Map<String, String> bindings) {
         boundVariables = bindings;
         return this;
-    }
-
-    @Override
-    public String toString() {
-        return "RequestRephrase{" +
-                "boundVariables=" + boundVariables +
-                '}';
     }
 }

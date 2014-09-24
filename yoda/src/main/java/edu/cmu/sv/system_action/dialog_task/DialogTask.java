@@ -22,9 +22,8 @@ import java.util.stream.Collectors;
  * Define the penalties and rewards for dialog tasks.
  *
  */
-public abstract class DialogTask implements SystemAction {
-    protected SemanticsModel taskSpec = null;
-    protected Database db;
+public abstract class DialogTask extends SystemAction {
+    protected SemanticsModel taskSpec;
 
     // return preferences object
     public abstract DialogTaskPreferences getPreferences();
@@ -121,16 +120,14 @@ public abstract class DialogTask implements SystemAction {
         return new HashSet<>();
     }
 
-    public Map<DialogAct, Double> enumerateAndEvaluateSlotFillingActions(){
-        Map<DialogAct, Double> ans = new HashMap<>();
+    public Collection<DialogAct> enumerateAndEvaluateSlotFillingActions(){
+        Collection<DialogAct> ans = new HashSet<>();
         DialogAct rV = requestVerb();
         if (null!=rV){
-            ans.put(rV, RewardAndCostCalculator.rewardForNecessarySlotFilling);
+            ans.add(rV);
             return ans;
         }
-        Collection<DialogAct> missingVerbRoleRequests = requestMissingRequiredVerbRoles();
-        missingVerbRoleRequests.stream().
-                forEach(x -> ans.put(x, RewardAndCostCalculator.rewardForNecessarySlotFilling));
+        ans.addAll(requestMissingRequiredVerbRoles());
         return ans;
     }
 

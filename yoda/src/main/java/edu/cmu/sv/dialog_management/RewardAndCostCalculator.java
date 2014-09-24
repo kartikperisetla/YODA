@@ -1,5 +1,6 @@
 package edu.cmu.sv.dialog_management;
 
+import edu.cmu.sv.database.Database;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.semantics.SemanticsModel;
@@ -9,6 +10,7 @@ import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTaskPreferences;
 import edu.cmu.sv.utils.StringDistribution;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -28,8 +30,15 @@ public class RewardAndCostCalculator {
     public static double penaltyForObligingUserPhrase = .1;
     public static double penaltyForSpeakingPhrase = .1;
 
-    public static double rewardForNecessarySlotFilling = 1;
-
+    /*
+    * Calculate the expected reward improvement for performing a slot-filling task
+    * */
+    public static Double executabilityRewardGain(DialogTask dialogTask, double executabilityRelativeGain){
+        double executability = dialogTask.assessExecutability();
+        double predictedExecutability = 1.0 - (1.0 - executabilityRelativeGain ) * (1.0 - executability);
+        return (dialogTask.getPreferences().rewardForCorrectExecution * predictedExecutability) -
+                (dialogTask.getPreferences().rewardForCorrectExecution * executability);
+    }
 
     public static Double nonDialogTaskReward(DiscourseUnit DU, NonDialogTask nonDialogTask){
         Double totalReward = 0.0;
@@ -74,9 +83,9 @@ public class RewardAndCostCalculator {
     * estimate the improvement in reward to all possible dialog and non-dialog tasks
     * that relate to all the available DU hypotheses.
     * */
-    public static Double clarificationDialogActReward(DiscourseUnit DU,
+    public static Double clarificationDialogActReward(Database db, DiscourseUnit DU,
                                                       StringDistribution predictedRelativeConfidenceGain)
-            throws IllegalAccessException, InstantiationException {
+            throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
         Double totalReward = 0.0;
 
         // sum up the predicted rewards supposing that each current hypothesis is true,
@@ -94,7 +103,7 @@ public class RewardAndCostCalculator {
             // add contribution from dialog tasks
             if (DialogRegistry.dialogTaskRegistry.containsKey(daClass)) {
                 for (Class<? extends DialogTask> taskClass : DialogRegistry.dialogTaskRegistry.get(daClass)) {
-                    DialogTaskPreferences preferences = taskClass.newInstance().getPreferences();
+                    DialogTaskPreferences preferences = taskClass.getConstructor(Database.class).newInstance(db).getPreferences();
                     predictedRewardDifference += predictedConfidence * preferences.rewardForCorrectExecution;
                     predictedRewardDifference -= (1 - predictedConfidence) * preferences.penaltyForIncorrectExecution;
                     predictedRewardDifference -= currentConfidence * preferences.rewardForCorrectExecution;
@@ -106,7 +115,7 @@ public class RewardAndCostCalculator {
             // add contribution from non-dialog tasks
             if (DialogRegistry.nonDialogTaskRegistry.containsKey(daClass)) {
                 for (Class<? extends NonDialogTask> taskClass : DialogRegistry.nonDialogTaskRegistry.get(daClass)) {
-                    NonDialogTaskPreferences preferences = taskClass.newInstance().getPreferences();
+                    NonDialogTaskPreferences preferences = taskClass.getConstructor(Database.class).newInstance(db).getPreferences();
                     predictedRewardDifference += predictedConfidence * preferences.rewardForCorrectExecution;
                     predictedRewardDifference -= (1 - predictedConfidence) * preferences.penaltyForIncorrectExecution;
                     predictedRewardDifference -= currentConfidence * preferences.rewardForCorrectExecution;

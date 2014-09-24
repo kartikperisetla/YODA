@@ -1,5 +1,6 @@
 package edu.cmu.sv.system_action;
 
+import edu.cmu.sv.database.Database;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.system_action.dialog_task.DialogTask;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
@@ -9,13 +10,14 @@ import java.util.HashSet;
 /**
  * Created by David Cohen on 9/11/14.
  */
-public interface SystemAction {
+public abstract class SystemAction {
+    protected Database db;
     /**
      * "this" is the ground truth correct action
      * evaluationMatch returns true if other is an acceptable match
      * for the purposes of some current evaluation
      */
-    public default boolean evaluationMatch(SystemAction other){
+    public boolean evaluationMatch(SystemAction other){
         if (!this.getClass().equals(other.getClass()))
             return false;
         if (this instanceof DialogAct) {

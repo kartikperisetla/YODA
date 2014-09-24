@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Created by David Cohen on 9/8/14.
  */
-public class Command implements DialogAct {
+public class Command extends DialogAct {
 
     // command is not executable by the system
     @Override

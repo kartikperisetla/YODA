@@ -1,16 +1,6 @@
 package edu.cmu.sv.system_action.dialog_task;
 
 import edu.cmu.sv.database.Database;
-import edu.cmu.sv.ontology.OntologyRegistry;
-import edu.cmu.sv.ontology.verb.Verb;
-import edu.cmu.sv.ontology.role.Role;
-import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.utils.StringDistribution;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Created by David Cohen on 9/3/14.
@@ -32,6 +22,13 @@ public class RespondToYNQuestionTask extends DialogTask {
         // don't make use of the descriptions / bindings which have already been collected
         // todo: generate a dialog act
         System.out.println("query result:"+sparqlTools.ynQuestionResult(db, taskSpec));
+    }
+
+    @Override
+    public double assessExecutability() {
+        if (requestVerb()!=null || requestMissingRequiredVerbRoles().size()>0)
+            return 0.0;
+        return 1.0;
     }
 
     @Override

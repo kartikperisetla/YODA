@@ -4,13 +4,14 @@ import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by David Cohen on 9/15/14.
  */
-public class RequestDisambiguateValue implements DialogAct {
+public class RequestDisambiguateValue extends DialogAct {
     private Map<String, String> boundVariables = null;
     static Map<String, String> parameters = new HashMap<>();
     static {
@@ -22,10 +23,10 @@ public class RequestDisambiguateValue implements DialogAct {
     @Override
     public Double reward(DiscourseUnit DU) {
         try {
-            return RewardAndCostCalculator.clarificationDialogActReward(DU,
+            return RewardAndCostCalculator.clarificationDialogActReward(db, DU,
                     RewardAndCostCalculator.predictConfidenceGainFromValueDisambiguation(DU,
                             boundVariables.get("v1"), boundVariables.get("v2")));
-        } catch (IllegalAccessException | InstantiationException e) {
+        } catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return null;
@@ -54,10 +55,4 @@ public class RequestDisambiguateValue implements DialogAct {
         return this;
     }
 
-    @Override
-    public String toString() {
-        return "RequestDisambiguateValue{" +
-                "boundVariables=" + boundVariables +
-                '}';
-    }
 }

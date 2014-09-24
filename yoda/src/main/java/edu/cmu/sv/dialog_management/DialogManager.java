@@ -90,7 +90,27 @@ public class DialogManager {
             }
         }
 
-        //// Get expected rewards from dialog and non-dialog tasks
+        //// Get the expected rewards from slot-filling dialog acts,
+        for (String hypothesisID : DU.getHypotheses().keySet()) {
+            SemanticsModel hypothesis = DU.getHypotheses().get(hypothesisID);
+            Class<? extends DialogAct> daClass = DialogRegistry.dialogActNameMap.
+                    get(hypothesis.getSlotPathFiller("dialogAct"));
+            // add contribution from dialog tasks
+            if (DialogRegistry.dialogTaskRegistry.containsKey(daClass)) {
+                for (Class<? extends DialogTask> taskClass : DialogRegistry.dialogTaskRegistry.get(daClass)) {
+                    DialogTask task = taskClass.getDeclaredConstructor(Database.class).newInstance(db);
+                    task.setTaskSpec(hypothesis.deepCopy());
+                    Collection<DialogAct> slotFillingDialogActs = task.enumerateAndEvaluateSlotFillingActions();
+                    for (DialogAct slotFillingDialogAct : slotFillingDialogActs){
+                        Double expectedReward = RewardAndCostCalculator.
+                                executabilityRewardGain(task, 1.0/slotFillingDialogActs.size()) *
+                                DU.getHypothesisDistribution().get(hypothesisID);
+                        actionExpectedReward.put(slotFillingDialogAct, expectedReward);
+                    }
+                }
+            }
+        }
+        //// Get expected rewards for executing dialog and non-dialog tasks
         for (String hypothesisID : DU.getHypotheses().keySet()) {
             SemanticsModel hypothesis = DU.getHypotheses().get(hypothesisID);
             Class<? extends DialogAct> daClass = DialogRegistry.dialogActNameMap.
@@ -108,7 +128,7 @@ public class DialogManager {
             // add contribution from non dialog tasks
             if (DialogRegistry.nonDialogTaskRegistry.containsKey(daClass)) {
                 for (Class<? extends NonDialogTask> taskClass : DialogRegistry.nonDialogTaskRegistry.get(daClass)) {
-                    NonDialogTask task = taskClass.newInstance();
+                    NonDialogTask task = taskClass.getDeclaredConstructor(Database.class).newInstance(db);
                     task.setTaskSpec(hypothesis.deepCopy());
                     Double expectedReward = RewardAndCostCalculator.nonDialogTaskReward(DU, task);
                     actionExpectedReward.put(task, expectedReward);
@@ -116,7 +136,7 @@ public class DialogManager {
             }
         }
 
-        return NBest.keepBeam(actionExpectedReward, 1000);
+        return NBest.keepBeam(actionExpectedReward, 10000);
     }
 
 

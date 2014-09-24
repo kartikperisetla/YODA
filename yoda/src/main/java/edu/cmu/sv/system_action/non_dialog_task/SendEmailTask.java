@@ -1,5 +1,6 @@
 package edu.cmu.sv.system_action.non_dialog_task;
 
+import edu.cmu.sv.database.Database;
 import edu.cmu.sv.semantics.SemanticsModel;
 
 import java.util.*;
@@ -7,21 +8,14 @@ import java.util.*;
 /**
  * Created by David Cohen on 8/28/14.
  */
-public class SendEmailTask implements NonDialogTask {
+public class SendEmailTask extends NonDialogTask {
     private static Integer instanceCounter = 0;
     private static Map<String, TaskStatus> executionStatus = new HashMap<>();
     private static NonDialogTaskPreferences preferences = new NonDialogTaskPreferences(true, 1, 20, 20,
             new HashSet<>(Arrays.asList()));
-    private SemanticsModel taskSpec = null;
 
-    @Override
-    public void setTaskSpec(SemanticsModel taskSpec) {
-        this.taskSpec = taskSpec;
-    }
-
-    @Override
-    public SemanticsModel getTaskSpec() {
-        return taskSpec;
+    public SendEmailTask(Database db) {
+        this.db = db;
     }
 
     @Override

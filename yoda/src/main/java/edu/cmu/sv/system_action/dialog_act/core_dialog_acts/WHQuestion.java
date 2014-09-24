@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Created by David Cohen on 9/8/14.
  */
-public class WHQuestion implements DialogAct {
+public class WHQuestion extends DialogAct {
     @Override
     public Double reward(DiscourseUnit DU) {
         return null;

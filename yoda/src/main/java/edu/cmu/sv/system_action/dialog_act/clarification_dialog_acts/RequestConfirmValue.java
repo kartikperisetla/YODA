@@ -4,13 +4,14 @@ import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by David Cohen on 9/8/14.
  */
-public class RequestConfirmValue implements DialogAct {
+public class RequestConfirmValue extends DialogAct {
     private Map<String, String> boundVariables = null;
     static Map<String, String> parameters = new HashMap<>();
     static {
@@ -38,10 +39,10 @@ public class RequestConfirmValue implements DialogAct {
     @Override
     public Double reward(DiscourseUnit DU) {
         try {
-            return RewardAndCostCalculator.clarificationDialogActReward(DU,
+            return RewardAndCostCalculator.clarificationDialogActReward(db, DU,
                     RewardAndCostCalculator.predictConfidenceGainFromValueConfirmation(DU,
                             boundVariables.get("v1")));
-        } catch (IllegalAccessException | InstantiationException e) {
+        } catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return null;
@@ -52,10 +53,5 @@ public class RequestConfirmValue implements DialogAct {
         // we oblige the user to a simple yes/no, which is < one phrase
         return RewardAndCostCalculator.penaltyForObligingUserPhrase*.75 +
                 RewardAndCostCalculator.penaltyForSpeakingPhrase *1;
-    }
-
-    @Override
-    public String toString() {
-        return "RequestConfirmValue{" + "boundVariables=" + boundVariables +'}';
     }
 }

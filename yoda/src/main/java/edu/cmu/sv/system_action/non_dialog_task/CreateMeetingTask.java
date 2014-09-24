@@ -1,5 +1,6 @@
 package edu.cmu.sv.system_action.non_dialog_task;
 
+import edu.cmu.sv.database.Database;
 import edu.cmu.sv.semantics.SemanticsModel;
 
 import java.util.*;
@@ -7,23 +8,22 @@ import java.util.*;
 /**
  * Created by David Cohen on 8/28/14.
  */
-public class CreateMeetingTask implements NonDialogTask {
+public class CreateMeetingTask extends NonDialogTask {
     private static Integer instanceCounter = 0;
     private static Map<String, TaskStatus> executionStatus = new HashMap<>();
     private static NonDialogTaskPreferences preferences =
             new NonDialogTaskPreferences(false, 1, 20, 15,
                     new HashSet<>(Arrays.asList()));
-    private SemanticsModel taskSpec = null;
+
+    public CreateMeetingTask(Database db) {
+        this.db = db;
+    }
 
     @Override
     public NonDialogTaskPreferences getPreferences() {
         return preferences;
     }
 
-    @Override
-    public void setTaskSpec(SemanticsModel taskSpec) {
-        this.taskSpec = taskSpec;
-    }
 
     @Override
     public double assessExecutability() {

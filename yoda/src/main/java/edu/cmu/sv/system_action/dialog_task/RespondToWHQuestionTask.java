@@ -8,9 +8,6 @@ import edu.cmu.sv.semantics.SemanticsModel;
  */
 public class RespondToWHQuestionTask extends DialogTask {
     private static DialogTaskPreferences preferences = new DialogTaskPreferences(.5,1,2);
-    private SemanticsModel taskSpec = null;
-
-    private Database db;
 
     public RespondToWHQuestionTask(Database db) {
         this.db = db;
@@ -24,16 +21,6 @@ public class RespondToWHQuestionTask extends DialogTask {
     @Override
     public DialogTaskPreferences getPreferences() {
         return preferences;
-    }
-
-    @Override
-    public void setTaskSpec(SemanticsModel taskSpec) {
-        this.taskSpec = taskSpec;
-    }
-
-    @Override
-    public SemanticsModel getTaskSpec() {
-        return taskSpec;
     }
 
 }

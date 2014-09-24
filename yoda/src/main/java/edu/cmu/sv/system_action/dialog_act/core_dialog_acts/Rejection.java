@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Created by David Cohen on 9/11/14.
  */
-public class Rejection implements DialogAct {
+public class Rejection extends DialogAct {
     // template "No."
 
     @Override
