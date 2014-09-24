@@ -1,13 +1,14 @@
-package edu.cmu.sv.system_action.dialog_act;
+package edu.cmu.sv.system_action.dialog_act.core_dialog_acts;
 
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
+import edu.cmu.sv.system_action.dialog_act.DialogAct;
 
 import java.util.Map;
 
 /**
- * Created by David Cohen on 9/8/14.
+ * Created by David Cohen on 9/19/14.
  */
-public class YNQuestion implements DialogAct {
+public class Fragment implements DialogAct {
     @Override
     public Double reward(DiscourseUnit DU) {
         return null;

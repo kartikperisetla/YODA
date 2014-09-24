@@ -6,7 +6,7 @@ import edu.cmu.sv.semantics.SemanticsModel;
 /**
  * Created by David Cohen on 9/11/14.
  */
-public class RespondToCommandTask implements DialogTask {
+public class RespondToCommandTask extends DialogTask {
     private Database db;
 
     public RespondToCommandTask(Database db) {

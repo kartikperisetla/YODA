@@ -1,4 +1,4 @@
-package edu.cmu.sv.ontology.action;
+package edu.cmu.sv.ontology.verb;
 
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.role.Role;

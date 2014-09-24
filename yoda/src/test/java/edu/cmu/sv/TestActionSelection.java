@@ -2,7 +2,7 @@ package edu.cmu.sv;
 
 import edu.cmu.sv.database.Database;
 import edu.cmu.sv.system_action.SystemAction;
-import edu.cmu.sv.system_action.dialog_act.*;
+import edu.cmu.sv.system_action.dialog_act.clarification_dialog_acts.*;
 import edu.cmu.sv.system_action.dialog_task.DialogTask;
 import edu.cmu.sv.system_action.dialog_task.RespondToWHQuestionTask;
 import edu.cmu.sv.system_action.dialog_task.RespondToYNQuestionTask;

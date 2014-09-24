@@ -1,7 +1,8 @@
-package edu.cmu.sv.system_action.dialog_act;
+package edu.cmu.sv.system_action.dialog_act.clarification_dialog_acts;
 
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
+import edu.cmu.sv.system_action.dialog_act.DialogAct;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,22 +10,15 @@ import java.util.Map;
 /**
  * Created by David Cohen on 9/8/14.
  */
-public class RequestDisambiguateRole implements DialogAct {
+public class RequestRephrase implements DialogAct {
     private Map<String, String> boundVariables = null;
-    static Map<String, String> parameters = new HashMap<>();
-    static {
-        parameters.put("r1", "role");
-        parameters.put("r2", "role");
-    }
-
-    // Template: "<r1>, or <r2>?"
+    static Map<String, String> parameters = new HashMap<>(); // parameters are empty for this DA
 
     @Override
     public Double reward(DiscourseUnit DU) {
-        try {
-            return RewardAndCostCalculator.clarificationDialogActReward(DU,
-                    RewardAndCostCalculator.predictConfidenceGainFromRoleDisambiguation(DU,
-                            boundVariables.get("r1"), boundVariables.get("r2")));
+        try{
+        return RewardAndCostCalculator.clarificationDialogActReward(DU,
+                RewardAndCostCalculator.predictedConfidenceGainFromJointClarification(DU));
         } catch (IllegalAccessException | InstantiationException e) {
             e.printStackTrace();
         }
@@ -33,9 +27,9 @@ public class RequestDisambiguateRole implements DialogAct {
 
     @Override
     public Double cost(DiscourseUnit DU) {
-        // we oblige the user to a single phrase response
-       return RewardAndCostCalculator.penaltyForObligingUserPhrase*1 +
-               RewardAndCostCalculator.penaltyForSpeakingPhrase *2;
+        // a complete rephrase will typically involve Subj + Obj + Verb
+        return RewardAndCostCalculator.penaltyForObligingUserPhrase*3 +
+                RewardAndCostCalculator.penaltyForSpeakingPhrase *1;
     }
 
     @Override
@@ -56,7 +50,8 @@ public class RequestDisambiguateRole implements DialogAct {
 
     @Override
     public String toString() {
-        return "RequestDisambiguateRole{" + "boundVariables=" + boundVariables +'}';
+        return "RequestRephrase{" +
+                "boundVariables=" + boundVariables +
+                '}';
     }
-
 }

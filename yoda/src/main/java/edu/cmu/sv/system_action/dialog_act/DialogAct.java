@@ -17,6 +17,7 @@ import java.util.*;
  *
  */
 public interface DialogAct extends SystemAction {
+
     public Double reward(DiscourseUnit DU);
     public Double cost(DiscourseUnit DU);
     public Map<String, String> getParameters();

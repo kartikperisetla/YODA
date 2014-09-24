@@ -2,6 +2,10 @@ package edu.cmu.sv.dialog_management;
 
 import com.google.common.collect.Iterables;
 import edu.cmu.sv.system_action.dialog_act.*;
+import edu.cmu.sv.system_action.dialog_act.clarification_dialog_acts.*;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Command;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.WHQuestion;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.YNQuestion;
 import edu.cmu.sv.system_action.dialog_task.DialogTask;
 import edu.cmu.sv.system_action.dialog_task.RespondToWHQuestionTask;
 import edu.cmu.sv.system_action.dialog_task.RespondToYNQuestionTask;

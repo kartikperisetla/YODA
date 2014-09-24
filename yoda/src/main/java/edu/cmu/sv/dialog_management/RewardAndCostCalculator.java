@@ -28,6 +28,9 @@ public class RewardAndCostCalculator {
     public static double penaltyForObligingUserPhrase = .1;
     public static double penaltyForSpeakingPhrase = .1;
 
+    public static double rewardForNecessarySlotFilling = 1;
+
+
     public static Double nonDialogTaskReward(DiscourseUnit DU, NonDialogTask nonDialogTask){
         Double totalReward = 0.0;
         Double probabilityCorrect = 0.0;

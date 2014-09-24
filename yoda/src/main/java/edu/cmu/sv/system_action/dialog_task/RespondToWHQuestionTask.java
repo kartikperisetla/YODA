@@ -6,7 +6,7 @@ import edu.cmu.sv.semantics.SemanticsModel;
 /**
  * Created by David Cohen on 9/3/14.
  */
-public class RespondToWHQuestionTask implements DialogTask {
+public class RespondToWHQuestionTask extends DialogTask {
     private static DialogTaskPreferences preferences = new DialogTaskPreferences(.5,1,2);
     private SemanticsModel taskSpec = null;
 

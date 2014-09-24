@@ -1,8 +1,7 @@
 package edu.cmu.sv.database;
 
 
-import com.sun.corba.se.impl.activation.RepositoryImpl;
-import edu.cmu.sv.ontology.action.Verb;
+import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.ontology.property.Property;
 import edu.cmu.sv.ontology.role.Role;
 import org.openrdf.model.Value;
@@ -11,7 +10,6 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.sail.Sail;
 import org.openrdf.sail.inferencer.fc.ForwardChainingRDFSInferencer;
 import org.openrdf.sail.memory.MemoryStore;
 

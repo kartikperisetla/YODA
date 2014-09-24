@@ -1,9 +1,9 @@
 package edu.cmu.sv.ontology;
 
-import edu.cmu.sv.ontology.action.Exist;
-import edu.cmu.sv.ontology.action.Verb;
-import edu.cmu.sv.ontology.action.Create;
-import edu.cmu.sv.ontology.action.HasProperty;
+import edu.cmu.sv.ontology.verb.Exist;
+import edu.cmu.sv.ontology.verb.Verb;
+import edu.cmu.sv.ontology.verb.Create;
+import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.ontology.object.*;
 import edu.cmu.sv.ontology.property.HasName;
 import edu.cmu.sv.ontology.property.Property;

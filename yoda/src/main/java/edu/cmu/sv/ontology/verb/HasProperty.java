@@ -1,4 +1,4 @@
-package edu.cmu.sv.ontology.action;
+package edu.cmu.sv.ontology.verb;
 
 /**
  * Created by David Cohen on 9/21/14.

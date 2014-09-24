@@ -1,24 +1,22 @@
-package edu.cmu.sv.system_action.dialog_act;
+package edu.cmu.sv.system_action.dialog_act.core_dialog_acts;
 
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
-import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
+import edu.cmu.sv.system_action.dialog_act.DialogAct;
 
 import java.util.Map;
 
 /**
- * Created by David Cohen on 9/11/14.
+ * Created by David Cohen on 9/8/14.
  */
-public class Rejection implements DialogAct{
-    // template "No."
-
+public class WHQuestion implements DialogAct {
     @Override
     public Double reward(DiscourseUnit DU) {
-        return 0.0;
+        return null;
     }
 
     @Override
     public Double cost(DiscourseUnit DU) {
-       return RewardAndCostCalculator.penaltyForContradictingUser;
+        return null;
     }
 
     @Override

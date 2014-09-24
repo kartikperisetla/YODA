@@ -1,6 +1,7 @@
-package edu.cmu.sv.system_action.dialog_act;
+package edu.cmu.sv.system_action.dialog_act.core_dialog_acts;
 
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
+import edu.cmu.sv.system_action.dialog_act.DialogAct;
 
 import java.util.Map;
 
