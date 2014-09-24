@@ -10,19 +10,19 @@ import java.util.stream.Collectors;
 /**
  * Created by David Cohen on 9/4/14.
  *
- * Functions for keeping an n-best beam.
+ * Functions for managing sets of hypotheses.
  *
  */
-public class NBest {
+public class HypothesisSetManagement {
 
-    public static <T> List<Pair<T, Double>> keepBeam(Map<T, Double> asMap, int beamSize){
+    public static <T> List<Pair<T, Double>> keepNBestBeam(Map<T, Double> asMap, int beamSize){
         Set<Pair<T, Double>> ans = asMap.keySet().stream().
                 map(key -> new ImmutablePair<>(key, asMap.get(key))).
                 collect(Collectors.toSet());
-        return keepBeam(ans, beamSize);
+        return keepNBestBeam(ans, beamSize);
     }
 
-    public static <T> List<Pair<T, Double>> keepBeam(Set<Pair<T, Double>> fullSet, int beamSize){
+    public static <T> List<Pair<T, Double>> keepNBestBeam(Set<Pair<T, Double>> fullSet, int beamSize){
         List<Pair<T, Double>> ans = fullSet.stream().
                 sorted(Comparator.comparing((Function<Pair<T, Double>, Double>) Pair::getValue).reversed()).
                 collect(Collectors.toList());
@@ -32,4 +32,14 @@ public class NBest {
         }
         return ans;
     }
+
+    public static <T> Map<T, Double> putOrIncrement(Map<T, Double> destination, T obj, Double amount){
+        if (destination.containsKey(obj)){
+            destination.put(obj, destination.get(obj) + amount);
+        } else {
+            destination.put(obj, amount);
+        }
+        return destination;
+    }
+
 }

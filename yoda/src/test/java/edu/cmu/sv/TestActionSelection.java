@@ -242,7 +242,7 @@ public class TestActionSelection {
         hyp2 = new SemanticsModel();
         child2 = new SemanticsModel();
         hyp2.getSlots().put("dialogAct", "YNQuestion");
-        hyp1.getSlots().put("verb", "Exist");
+        hyp2.getSlots().put("verb", "Exist");
         hyp2.getSlots().put("Agent", "meeting1");
         hyp2.getSlots().put("fromTime", "t0");
         hyp2.getSlots().put("toTime", "t1");

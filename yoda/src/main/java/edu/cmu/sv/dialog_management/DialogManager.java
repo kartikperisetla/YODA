@@ -9,7 +9,7 @@ import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_task.DialogTask;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.utils.Combination;
-import edu.cmu.sv.utils.NBest;
+import edu.cmu.sv.utils.HypothesisSetManagement;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.lang.reflect.InvocationTargetException;
@@ -105,11 +105,12 @@ public class DialogManager {
                         Double expectedReward = RewardAndCostCalculator.
                                 executabilityRewardGain(task, 1.0/slotFillingDialogActs.size()) *
                                 DU.getHypothesisDistribution().get(hypothesisID);
-                        actionExpectedReward.put(slotFillingDialogAct, expectedReward);
+                        HypothesisSetManagement.putOrIncrement(actionExpectedReward, slotFillingDialogAct, expectedReward);
                     }
                 }
             }
         }
+
         //// Get expected rewards for executing dialog and non-dialog tasks
         for (String hypothesisID : DU.getHypotheses().keySet()) {
             SemanticsModel hypothesis = DU.getHypotheses().get(hypothesisID);
@@ -122,7 +123,7 @@ public class DialogManager {
                     DialogTask task = taskClass.getDeclaredConstructor(Database.class).newInstance(db);
                     task.setTaskSpec(hypothesis.deepCopy());
                     Double expectedReward = RewardAndCostCalculator.dialogTaskReward(DU, task);
-                    actionExpectedReward.put(task, expectedReward);
+                    HypothesisSetManagement.putOrIncrement(actionExpectedReward, task, expectedReward);
                 }
             }
             // add contribution from non dialog tasks
@@ -131,12 +132,12 @@ public class DialogManager {
                     NonDialogTask task = taskClass.getDeclaredConstructor(Database.class).newInstance(db);
                     task.setTaskSpec(hypothesis.deepCopy());
                     Double expectedReward = RewardAndCostCalculator.nonDialogTaskReward(DU, task);
-                    actionExpectedReward.put(task, expectedReward);
+                    HypothesisSetManagement.putOrIncrement(actionExpectedReward, task, expectedReward);
                 }
             }
         }
 
-        return NBest.keepBeam(actionExpectedReward, 10000);
+        return HypothesisSetManagement.keepNBestBeam(actionExpectedReward, 10000);
     }
 
 
