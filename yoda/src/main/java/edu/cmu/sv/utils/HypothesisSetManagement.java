@@ -33,6 +33,13 @@ public class HypothesisSetManagement {
         return ans;
     }
 
+    public static StringDistribution keepNBestDistribution(StringDistribution fullSet, int beamSize){
+        List<Pair<String, Double>> nBest = keepNBestBeam(fullSet.getInternalDistribution(), beamSize);
+        StringDistribution ans = new StringDistribution();
+        nBest.forEach(x -> ans.put(x.getLeft(), x.getRight()));
+        return ans;
+    }
+
     public static <T> Map<T, Double> putOrIncrement(Map<T, Double> destination, T obj, Double amount){
         if (destination.containsKey(obj)){
             destination.put(obj, destination.get(obj) + amount);

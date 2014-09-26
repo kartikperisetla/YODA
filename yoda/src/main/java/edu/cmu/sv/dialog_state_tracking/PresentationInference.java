@@ -15,13 +15,11 @@ public class PresentationInference implements DiscourseUnitUpdateInference {
     private final static double penaltyForReinterpretingFragment = .75;
 
     @Override
-    public DiscourseUnit2 applyAll(DiscourseUnit2 DU, String assumedHypothesisID, Turn turn, float timeStamp) {
+    public DiscourseUnit2 applyAll(DiscourseUnit2.DialogStateHypothesis currentState, Turn turn, float timeStamp) {
         int newDUHypothesisCounter = 0;
-        final String initialHypothesisID = "initial_hypothesis";
         DiscourseUnit2 ans = new DiscourseUnit2();
-        ans.clear();
         // if this isn't the first utterance of a DU, this turn can't be interpreted using PresentInference
-        if (!DU.hypothesisDistribution.containsKey(initialHypothesisID))
+        if (currentState.timeOfLastActByMe!=null || currentState.timeOfLastActByThem!=null)
             return ans;
 
         if (turn.speaker.equals("user")){
@@ -33,35 +31,37 @@ public class PresentationInference implements DiscourseUnitUpdateInference {
                 if (dialogAct.equals(Fragment.class.getSimpleName())){
                     for (Class<? extends DialogAct> newDAClass : DialogRegistry.discourseUnitDialogActs) {
                         String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
+                        DiscourseUnit2.DialogStateHypothesis newDUHypothesis =
+                                new DiscourseUnit2.DialogStateHypothesis();
                         SemanticsModel newSpokenByThemHypothesis = turn.hypotheses.get(sluHypothesisID).deepCopy();
                         newSpokenByThemHypothesis.getSlots().put("dialogAct", newDAClass.getSimpleName());
                         ans.getHypothesisDistribution().put(newDUHypothesisID, penaltyForReinterpretingFragment);
-                        ans.getSpokenByThem().put(newDUHypothesisID, newSpokenByThemHypothesis);
-                        ans.getUnderstoodByThem().put(newDUHypothesisID,
-                                DU.getUnderstoodByThem().get(initialHypothesisID).deepCopy());
+                        newDUHypothesis.timeOfLastActByThem = timeStamp;
+                        newDUHypothesis.spokenByThem = newSpokenByThemHypothesis;
+                        ans.hypotheses.put(newDUHypothesisID, newDUHypothesis);
                     }
                 }
                 // if the DA is one of the discourseUnitDialogActs, leave it alone
                 else if (DialogRegistry.discourseUnitDialogActs.contains(DialogRegistry.dialogActNameMap.get(dialogAct))){
                     String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
+                    DiscourseUnit2.DialogStateHypothesis newDUHypothesis = new DiscourseUnit2.DialogStateHypothesis();
                     SemanticsModel newSpokenByThemHypothesis = turn.hypotheses.get(sluHypothesisID).deepCopy();
                     ans.getHypothesisDistribution().put(newDUHypothesisID, 1.0);
-                    ans.getSpokenByThem().put(newDUHypothesisID, newSpokenByThemHypothesis);
-                    ans.getUnderstoodByThem().put(newDUHypothesisID,
-                            DU.getUnderstoodByThem().get(initialHypothesisID).deepCopy());
+                    newDUHypothesis.timeOfLastActByThem = timeStamp;
+                    newDUHypothesis.spokenByThem = newSpokenByThemHypothesis;
+                    ans.hypotheses.put(newDUHypothesisID, newDUHypothesis);
                 }
                 // otherwise, this SLU hypothesis can't be interpreted using PresentInference
                 else {}
-
             }
         } else { // if turn.speaker.equals("system")
-            String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
+            String newDUHypothesisID = "du_hyp_0";
+            DiscourseUnit2.DialogStateHypothesis newDUHypothesis =
+                    new DiscourseUnit2.DialogStateHypothesis();
             ans.getHypothesisDistribution().put(newDUHypothesisID, 1.0);
-            ans.getSpokenByThem().put(newDUHypothesisID, DU.getUnderstoodByThem().get(initialHypothesisID));
-            SemanticsModel newUnderstoodByThem = DU.getUnderstoodByThem().get(initialHypothesisID).deepCopy();
-            newUnderstoodByThem.extend(turn.systemUtterance);
-            ans.getUnderstoodByThem().put(newDUHypothesisID, newUnderstoodByThem);
-            ans.getSpokenByMe().extend(turn.systemUtterance);
+            newDUHypothesis.timeOfLastActByMe = timeStamp;
+            newDUHypothesis.spokenByMe.extend(turn.systemUtterance);
+            ans.hypotheses.put(newDUHypothesisID, newDUHypothesis);
         }
 
 

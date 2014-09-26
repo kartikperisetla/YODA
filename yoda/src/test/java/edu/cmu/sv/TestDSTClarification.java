@@ -1,6 +1,7 @@
 package edu.cmu.sv;
 
 import edu.cmu.sv.dialog_state_tracking.DSTTester;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
 import edu.cmu.sv.dialog_state_tracking.Turn;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.StringDistribution;
@@ -41,7 +42,7 @@ public class TestDSTClarification {
     DSTTester testCase1() {
         DSTTester testCase;
         Turn currentTurn;
-        DSTTester.EvaluationState correctState;
+        DiscourseUnit2.DialogStateHypothesis correctState;
         SemanticsModel sm1;
         SemanticsModel sm2;
         SemanticsModel sm3;
@@ -88,7 +89,8 @@ public class TestDSTClarification {
         sluDistribution.put("hyp2", .4);
 
         currentTurn = new Turn("user", null, sluHypotheses, sluDistribution);
-        correctState = new DSTTester.EvaluationState(sm1.deepCopy(), new SemanticsModel(), new SemanticsModel());
+        correctState = new DiscourseUnit2.DialogStateHypothesis();
+        correctState.setSpokenByThem(sm1.deepCopy());
         testCase.getTurns().put(currentTurn, (float) 0.0);
         testCase.getEvaluationStates().put(correctState, (float) 0.0);
 
@@ -112,7 +114,9 @@ public class TestDSTClarification {
         childSM.getChildren().put("Z", grandChildSM);
 
         currentTurn = new Turn("system", sm3.deepCopy(), null, null);
-        correctState = new DSTTester.EvaluationState(sm1.deepCopy(), sm3.deepCopy(), sm3.deepCopy());
+        correctState = new DiscourseUnit2.DialogStateHypothesis();
+        correctState.setSpokenByThem(sm1.deepCopy());
+        correctState.setSpokenByMe(sm3.deepCopy());
         testCase.getTurns().put(currentTurn, (float) 1.0);
         testCase.getEvaluationStates().put(correctState, (float) 1.0);
 
@@ -132,7 +136,9 @@ public class TestDSTClarification {
         sluDistribution.put("hyp1", 1.0);
 
         currentTurn = new Turn("user", null, sluHypotheses, sluDistribution);
-        correctState = new DSTTester.EvaluationState(sm2.deepCopy(), sm3.deepCopy(), sm3.deepCopy());
+        correctState = new DiscourseUnit2.DialogStateHypothesis();
+        correctState.setSpokenByThem(sm2.deepCopy());
+        correctState.setSpokenByMe(sm3.deepCopy());
         testCase.getTurns().put(currentTurn, (float) 2.0);
         testCase.getEvaluationStates().put(correctState, (float) 2.0);
 
@@ -152,7 +158,7 @@ public class TestDSTClarification {
     DSTTester testCase2() {
         DSTTester testCase;
         Turn currentTurn;
-        DSTTester.EvaluationState correctState;
+        DiscourseUnit2.DialogStateHypothesis correctState;
         SemanticsModel sm1;
         SemanticsModel sm2;
         SemanticsModel sm3;
@@ -179,7 +185,8 @@ public class TestDSTClarification {
         childSM.getSlots().put("hour", "two");
 
         currentTurn = new Turn("system", sm1.deepCopy(), null, null);
-        correctState = new DSTTester.EvaluationState(new SemanticsModel(), sm1.deepCopy(), sm1.deepCopy());
+        correctState = new DiscourseUnit2.DialogStateHypothesis();
+        correctState.setSpokenByMe(sm1.deepCopy());
         testCase.getTurns().put(currentTurn, (float) 0.0);
         testCase.getEvaluationStates().put(correctState, (float) 0.0);
 
@@ -198,14 +205,18 @@ public class TestDSTClarification {
         sluDistribution.put("hyp2", .4);
 
         currentTurn = new Turn("user", null, sluHypotheses, sluDistribution);
-        correctState = new DSTTester.EvaluationState(sm2.deepCopy(), new SemanticsModel(), sm1.deepCopy());
+        correctState = new DiscourseUnit2.DialogStateHypothesis();
+        correctState.setSpokenByMe(sm1.deepCopy());
+        correctState.setSpokenByThem(sm2.deepCopy());
         testCase.getTurns().put(currentTurn, (float) 1.0);
         testCase.getEvaluationStates().put(correctState, (float) 1.0);
 
         /// Turn 3
         // (the system repeats itself)
         currentTurn = new Turn("system", sm1.deepCopy(), null, null);
-        correctState = new DSTTester.EvaluationState(sm2.deepCopy(), sm1.deepCopy(), sm1.deepCopy());
+        correctState = new DiscourseUnit2.DialogStateHypothesis();
+        correctState.setSpokenByMe(sm1.deepCopy());
+        correctState.setSpokenByThem(sm2.deepCopy());
         testCase.getTurns().put(currentTurn, (float) 2.0);
         testCase.getEvaluationStates().put(correctState, (float) 2.0);
 
@@ -226,7 +237,7 @@ public class TestDSTClarification {
     DSTTester testCase3() {
         DSTTester testCase;
         Turn currentTurn;
-        DSTTester.EvaluationState correctState;
+        DiscourseUnit2.DialogStateHypothesis correctState;
         SemanticsModel sm1;
         SemanticsModel sm2;
         SemanticsModel sm3;
@@ -273,7 +284,7 @@ public class TestDSTClarification {
         childSM = new SemanticsModel();
         sm3.getChildren().put("X", childSM);
         childSM.getSlots().put("class", "Meeting");
-        
+
         sluHypotheses = new HashMap<>();
         sluHypotheses.put("hyp1", sm1);
         sluHypotheses.put("hyp2", sm2);
@@ -284,7 +295,8 @@ public class TestDSTClarification {
         sluDistribution.put("hyp3", .3);
 
         currentTurn = new Turn("user", null, sluHypotheses, sluDistribution);
-        correctState = new DSTTester.EvaluationState(sm1.deepCopy(), new SemanticsModel(), new SemanticsModel());
+        correctState = new DiscourseUnit2.DialogStateHypothesis();
+        correctState.setSpokenByThem(sm1.deepCopy());
         testCase.getTurns().put(currentTurn, (float) 0.0);
         testCase.getEvaluationStates().put(correctState, (float) 0.0);
 
@@ -298,7 +310,7 @@ public class TestDSTClarification {
         childSM.getSlots().put("class", "RoleDescription");
         childSM.getSlots().put("roleClass", "Time");
         // path contains whatever information was given about the path to the role being requested
-        childSM.getSlots().put("path", "Y"); 
+        childSM.getSlots().put("path", "Y");
         grandChildSM = new SemanticsModel();
         childSM.getChildren().put("Y", grandChildSM);
         grandChildSM.getSlots().put("atTime", "Z");
@@ -313,10 +325,12 @@ public class TestDSTClarification {
         sm5.getChildren().put("X", childSM);
         childSM.getSlots().put("class", "Meeting");
         sm5.getSlots().put("atTime", "<REQUESTED>");
-        
-        
+
+
         currentTurn = new Turn("system", sm4, null, null);
-        correctState = new DSTTester.EvaluationState(sm1.deepCopy(), sm5.deepCopy(), sm5.deepCopy());
+        correctState = new DiscourseUnit2.DialogStateHypothesis();
+        correctState.setSpokenByThem(sm1.deepCopy());
+        correctState.setSpokenByMe(sm5.deepCopy());
         testCase.getTurns().put(currentTurn, (float) 1.0);
         testCase.getEvaluationStates().put(correctState, (float) 1.0);
 
@@ -374,11 +388,13 @@ public class TestDSTClarification {
         childSM.getSlots().put("name", "Samsung");
 
         currentTurn = new Turn("user", null, sluHypotheses, sluDistribution);
-        correctState = new DSTTester.EvaluationState(sm1.deepCopy(), sm5.deepCopy(), sm5.deepCopy());
+        correctState = new DiscourseUnit2.DialogStateHypothesis();
+        correctState.setSpokenByMe(sm5.deepCopy());
+        correctState.setSpokenByThem(sm1.deepCopy());
         testCase.getTurns().put(currentTurn, (float) 2.0);
         testCase.getEvaluationStates().put(correctState, (float) 2.0);
-        
-        
+
+
         return testCase;
     }
 

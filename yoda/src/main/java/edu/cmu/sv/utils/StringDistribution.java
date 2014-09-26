@@ -109,6 +109,10 @@ public class StringDistribution{
             internalDistribution.put(key,value);
     }
 
+    public Map<String, Double> getInternalDistribution() {
+        return internalDistribution;
+    }
+
     @Override
     public String toString() {
         return "StringDistribution{" +

@@ -1,6 +1,6 @@
 package edu.cmu.sv.dialog_state_tracking;
 
-import edu.cmu.sv.semantics.SemanticsModel;
+import edu.cmu.sv.utils.HypothesisSetManagement;
 import edu.cmu.sv.utils.StringDistribution;
 
 import java.util.*;
@@ -24,43 +24,30 @@ public class DialogStateTracker2 {
     public void updateDialogState(Turn turn, float timeStamp) throws IllegalAccessException, InstantiationException {
         int newDUHypothesisCounter = 0;
         StringDistribution newHypothesisDistribution = new StringDistribution();
-        Map<String, SemanticsModel> newSpokenByThem = new HashMap<>();
-        Map<String, SemanticsModel> newUnderstoodByThem = new HashMap<>();
-        SemanticsModel newSpokenByMe = new SemanticsModel();
+        Map<String, DiscourseUnit2.DialogStateHypothesis> newHypotheses = new HashMap<>();
 
         for (String currentDialogStateHypothesisID : discourseUnit.getHypothesisDistribution().keySet()) {
             for (Class<? extends DiscourseUnitUpdateInference> updateInferenceClass : updateInferences) {
                 DiscourseUnit2 inferredUpdatedState = updateInferenceClass.newInstance().
-                        applyAll(discourseUnit, currentDialogStateHypothesisID, turn, timeStamp);
+                        applyAll(discourseUnit.hypotheses.get(currentDialogStateHypothesisID), turn, timeStamp);
                 for (String tmpNewDUHypothesisID : inferredUpdatedState.getHypothesisDistribution().keySet()){
                     String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
+
                     newHypothesisDistribution.put(newDUHypothesisID,
                             inferredUpdatedState.getHypothesisDistribution().get(tmpNewDUHypothesisID) *
                                     discourseUnit.getHypothesisDistribution().get(currentDialogStateHypothesisID));
-                    newSpokenByThem.put(newDUHypothesisID,
-                            inferredUpdatedState.getSpokenByThem().get(tmpNewDUHypothesisID));
-                    newUnderstoodByThem.put(newDUHypothesisID,
-                            inferredUpdatedState.getUnderstoodByThem().get(tmpNewDUHypothesisID));
-                    if (newHypothesisDistribution.getTopHypothesis().equals(newDUHypothesisID)){
-                        newSpokenByMe = inferredUpdatedState.getSpokenByMe();
-                    }
+
+                    newHypotheses.put(newDUHypothesisID, inferredUpdatedState.hypotheses.get(tmpNewDUHypothesisID));
                 }
             }
         }
-        List<String> hypothesesRemoved = newHypothesisDistribution.sortedHypotheses();
-        if (hypothesesRemoved.size() > DiscourseUnit2.BEAM_WIDTH)
-            hypothesesRemoved = hypothesesRemoved.subList(DiscourseUnit2.BEAM_WIDTH, hypothesesRemoved.size());
-        else
-            hypothesesRemoved = new LinkedList<>();
-        hypothesesRemoved.stream().forEach(newHypothesisDistribution::remove);
-        hypothesesRemoved.stream().forEach(newSpokenByThem::remove);
-        hypothesesRemoved.stream().forEach(newUnderstoodByThem::remove);
 
-        newHypothesisDistribution.normalize();
-        discourseUnit.setHypothesisDistribution(newHypothesisDistribution);
-        discourseUnit.setSpokenByThem(newSpokenByThem);
-        discourseUnit.setUnderstoodByThem(newUnderstoodByThem);
-        discourseUnit.setSpokenByMe(newSpokenByMe);
+        discourseUnit.hypothesisDistribution = HypothesisSetManagement.keepNBestDistribution(newHypothesisDistribution,
+                DiscourseUnit2.BEAM_WIDTH);
+        discourseUnit.hypotheses = new HashMap<>();
+        for (String key : discourseUnit.hypothesisDistribution.keySet()){
+            discourseUnit.hypotheses.put(key, newHypotheses.get(key));
+        }
     }
 
 }

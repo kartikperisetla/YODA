@@ -14,69 +14,7 @@ import java.util.*;
  */
 public class DSTTester {
     Map<Turn, Float> turns = new HashMap<>();
-    Map<EvaluationState, Float> evaluationStates = new HashMap<>();
-
-    /*
-    * EvaluationState Describes a single dialog state,
-    * which includes what has been spoken and understood by the user
-    * and what has been spoken by the system.
-    *
-    * The class includes a method to evaluate a DU2 according to its resemblance to a desired EvaluationState
-    * */
-    public static class EvaluationState{
-        SemanticsModel spokenByThem;
-        SemanticsModel understoodByThem;
-        SemanticsModel spokenByMe;
-
-        public Pair<Integer, Double> evaluate(DiscourseUnit2 DU){
-            int rank = -1;
-            double relativeLikelihood = 0.0;
-            double topLikelihood = DU.getHypothesisDistribution().
-                    get(DU.getHypothesisDistribution().getTopHypothesis());
-            List<String> sortedHypotheses = DU.getHypothesisDistribution().sortedHypotheses();
-            for (int i = 0; i < sortedHypotheses.size(); i++) {
-                String DUHypothesisID = sortedHypotheses.get(i);
-                if (DU.getSpokenByThem().get(DUHypothesisID).equals(spokenByThem) &&
-                        DU.getUnderstoodByThem().get(DUHypothesisID).equals(understoodByThem) &&
-                        DU.getSpokenByMe().equals(spokenByMe)) {
-                    rank = i;
-                    relativeLikelihood = DU.getHypothesisDistribution().get(DUHypothesisID) * 1.0 / topLikelihood;
-                    break;
-                }
-            }
-            return new ImmutablePair<>(rank, relativeLikelihood);
-        }
-
-        public EvaluationState(SemanticsModel spokenByThem, SemanticsModel understoodByThem, SemanticsModel spokenByMe) {
-            this.spokenByThem = spokenByThem;
-            this.understoodByThem = understoodByThem;
-            this.spokenByMe = spokenByMe;
-        }
-
-        public SemanticsModel getSpokenByThem() {
-            return spokenByThem;
-        }
-
-        public void setSpokenByThem(SemanticsModel spokenByThem) {
-            this.spokenByThem = spokenByThem;
-        }
-
-        public SemanticsModel getUnderstoodByThem() {
-            return understoodByThem;
-        }
-
-        public void setUnderstoodByThem(SemanticsModel understoodByThem) {
-            this.understoodByThem = understoodByThem;
-        }
-
-        public SemanticsModel getSpokenByMe() {
-            return spokenByMe;
-        }
-
-        public void setSpokenByMe(SemanticsModel spokenByMe) {
-            this.spokenByMe = spokenByMe;
-        }
-    }
+    Map<DiscourseUnit2.DialogStateHypothesis, Float> evaluationStates = new HashMap<>();
 
     /*
     * EvaluationResult contains the important results of an evaluation
@@ -123,7 +61,7 @@ public class DSTTester {
         List<Double> correctHypothesisRelativeLikelihoods = new LinkedList<>();
 
         Set<Turn> turnsDone = new HashSet<>();
-        Set<EvaluationState> evaluationStatesDone = new HashSet<>();
+        Set<DiscourseUnit2.DialogStateHypothesis> evaluationStatesDone = new HashSet<>();
         // .1 second increments
         for (Float t = startTime; t < endTime; t+=(float).1) {
             for (Turn turn : turns.keySet()){
@@ -136,9 +74,9 @@ public class DSTTester {
                     }
                 }
             }
-            for (EvaluationState groundTruth : evaluationStates.keySet()){
+            for (DiscourseUnit2.DialogStateHypothesis groundTruth : evaluationStates.keySet()){
                 if (evaluationStates.get(groundTruth) < t && !evaluationStatesDone.contains(groundTruth)){
-                    Pair<Integer, Double> result = groundTruth.evaluate(dst.getDiscourseUnit());
+                    Pair<Integer, Double> result = dst.getDiscourseUnit().compareHypothesis(groundTruth);
                     correctHypothesisRanks.add(result.getLeft());
                     correctHypothesisRelativeLikelihoods.add(result.getRight());
                     evaluationStatesDone.add(groundTruth);
@@ -153,7 +91,7 @@ public class DSTTester {
         return turns;
     }
 
-    public Map<EvaluationState, Float> getEvaluationStates() {
+    public Map<DiscourseUnit2.DialogStateHypothesis, Float> getEvaluationStates() {
         return evaluationStates;
     }
 }

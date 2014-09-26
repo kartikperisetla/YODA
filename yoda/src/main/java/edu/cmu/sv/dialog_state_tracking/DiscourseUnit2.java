@@ -16,120 +16,60 @@ import java.util.Map;
 public class DiscourseUnit2 {
     static final int BEAM_WIDTH = 10;
     StringDistribution hypothesisDistribution;
-    Map<String, SemanticsModel> spokenByThem;
-    Map<String, SemanticsModel> understoodByThem;
-    SemanticsModel spokenByMe;
-    Float timeOfLastActByThem;
-    Float timeOfLastActByMe;
+    Map<String, DialogStateHypothesis> hypotheses;
+
+    public static class DialogStateHypothesis{
+        SemanticsModel spokenByMe;
+        SemanticsModel spokenByThem;
+        Float timeOfLastActByThem;
+        Float timeOfLastActByMe;
+
+        public DialogStateHypothesis() {
+            spokenByMe = new SemanticsModel();
+            spokenByThem = new SemanticsModel();
+            timeOfLastActByThem = null;
+            timeOfLastActByMe = null;
+        }
+
+        public SemanticsModel getSpokenByMe() {
+            return spokenByMe;
+        }
+
+        public void setSpokenByMe(SemanticsModel spokenByMe) {
+            this.spokenByMe = spokenByMe;
+        }
+
+        public SemanticsModel getSpokenByThem() {
+            return spokenByThem;
+        }
+
+        public void setSpokenByThem(SemanticsModel spokenByThem) {
+            this.spokenByThem = spokenByThem;
+        }
+
+        public Float getTimeOfLastActByThem() {
+            return timeOfLastActByThem;
+        }
+
+        public void setTimeOfLastActByThem(Float timeOfLastActByThem) {
+            this.timeOfLastActByThem = timeOfLastActByThem;
+        }
+
+        public Float getTimeOfLastActByMe() {
+            return timeOfLastActByMe;
+        }
+
+        public void setTimeOfLastActByMe(Float timeOfLastActByMe) {
+            this.timeOfLastActByMe = timeOfLastActByMe;
+        }
+    }
 
     public DiscourseUnit2() {
         hypothesisDistribution = new StringDistribution();
         hypothesisDistribution.put("initial_hypothesis", 1.0);
-        SemanticsModel blank = new SemanticsModel();
-        spokenByMe = blank.deepCopy();
-        spokenByThem = new HashMap<>();
-        spokenByThem.put("initial_hypothesis", blank.deepCopy());
-        understoodByThem = new HashMap<>();
-        understoodByThem.put("initial_hypothesis", blank.deepCopy());
-        timeOfLastActByThem = null;
-        timeOfLastActByMe = null;
+        hypotheses = new HashMap<>();
+        hypotheses.put("initial_hypothesis", new DialogStateHypothesis());
     }
-    public void clear(){
-        hypothesisDistribution = new StringDistribution();
-        spokenByMe = new SemanticsModel();
-        spokenByThem = new HashMap<>();
-        understoodByThem = new HashMap<>();
-        timeOfLastActByThem = null;
-        timeOfLastActByMe = null;
-    }
-
-    /*
-        * Within a single discourse unit,
-        * all dialog acts are either initial presentation, clarification, or elaboration
-        *
-        * This function makes heavy use of SemanticsModel.update(SemanticsModel other)
-        *
-        * If the speaker is "system", utteranceHypotheses = null
-        * If the speaker is "user", systemUtterance = null
-        * */
-    public void updateDiscourseUnit(Map<String, SemanticsModel> utteranceHypotheses,
-                                    SemanticsModel systemUtterance,
-                                    StringDistribution weights,
-                                    String speaker,
-                                    float timeOfAct){
-        assert speaker.equals("system") || speaker.equals("user");
-        int newDUHypothesisCounter = 0;
-        Map<String, SemanticsModel> newSpokenByThem = new HashMap<>();
-        Map<String, SemanticsModel> newUnderstoodByThem = new HashMap<>();
-        StringDistribution newHypothesisDistribution = new StringDistribution();
-        if (speaker.equals("system")){
-            timeOfLastActByMe = timeOfAct;
-            spokenByMe = systemUtterance;
-            for (String DUHypothesisID : hypothesisDistribution.keySet()) {
-                String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
-                // updates to understoodByThem to account for the system utterance
-                newUnderstoodByThem.put(newDUHypothesisID,
-                        simpleSemanticsUpdate(spokenByThem.get(DUHypothesisID), spokenByMe));
-                // no change to spokenByThem
-                newSpokenByThem.put(newDUHypothesisID, spokenByThem.get(DUHypothesisID));
-                // probability is copied from the current distribution
-                newHypothesisDistribution.put(newDUHypothesisID,
-                        hypothesisDistribution.get(DUHypothesisID));
-            }
-        }
-        else {
-            timeOfLastActByThem = timeOfAct;
-            for (String DUHypothesisID : hypothesisDistribution.keySet()){
-                for (String utteranceHypothesisID : utteranceHypotheses.keySet()){
-                    String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
-                    // no change to spokenByMe
-                    // updates to the user grounding model based on context
-                    Pair<SemanticsModel, SemanticsModel> newUserModel =
-                            interpretClarificationDialog(spokenByMe, understoodByThem.get(DUHypothesisID),
-                            utteranceHypotheses.get(utteranceHypothesisID));
-                    newSpokenByThem.put(newDUHypothesisID, newUserModel.getLeft());
-                    newUnderstoodByThem.put(newDUHypothesisID, newUserModel.getRight());
-                    // probability is the product of old DU and utterance
-                    newHypothesisDistribution.put(newDUHypothesisID,
-                            hypothesisDistribution.get(DUHypothesisID) *
-                                    weights.get(utteranceHypothesisID));
-                }
-            }
-        }
-        List<String> hypothesesRemoved = newHypothesisDistribution.sortedHypotheses();
-        if (hypothesesRemoved.size() > BEAM_WIDTH)
-            hypothesesRemoved = hypothesesRemoved.subList(BEAM_WIDTH, hypothesesRemoved.size());
-        else
-            hypothesesRemoved = new LinkedList<>();
-        hypothesesRemoved.stream().forEach(newHypothesisDistribution::remove);
-        hypothesesRemoved.stream().forEach(newSpokenByThem::remove);
-        hypothesesRemoved.stream().forEach(newUnderstoodByThem::remove);
-
-        newHypothesisDistribution.normalize();
-        hypothesisDistribution = newHypothesisDistribution;
-        spokenByThem = newSpokenByThem;
-        understoodByThem = newUnderstoodByThem;
-    }
-
-    /*
-    * Return a pair of SemanticsModels <newSpokenByUser, newUnderstoodByUser>,
-    * which is an update to these models based on interpreting a new user utterance in context
-    * */
-    public Pair<SemanticsModel, SemanticsModel> interpretClarificationDialog(SemanticsModel spokenBySystem,
-                                                                             SemanticsModel understoodByUser,
-                                                                             SemanticsModel userUtterance){
-        SemanticsModel newSpokenByUser = userUtterance.deepCopy();
-        SemanticsModel newUnderstoodByUser = understoodByUser.deepCopy();
-        // todo: add clarification interpretation
-        return new ImmutablePair<>(newSpokenByUser, newUnderstoodByUser);
-    }
-
-    public SemanticsModel simpleSemanticsUpdate(SemanticsModel old, SemanticsModel delta){
-        SemanticsModel ans = old.deepCopy();
-        // todo: add changes according to delta
-        return ans;
-    }
-
 
     public StringDistribution getHypothesisDistribution() {
         return hypothesisDistribution;
@@ -139,53 +79,29 @@ public class DiscourseUnit2 {
         this.hypothesisDistribution = hypothesisDistribution;
     }
 
-    public Map<String, SemanticsModel> getSpokenByThem() {
-        return spokenByThem;
+
+    /*
+    * Compare a hypothesis to the actual content of this discourse unit
+    * */
+    public Pair<Integer, Double> compareHypothesis(DialogStateHypothesis testCase){
+
+        int rank = -1;
+        double relativeLikelihood = 0.0;
+        double topLikelihood = hypothesisDistribution.get(hypothesisDistribution.getTopHypothesis());
+        List<String> sortedHypotheses = hypothesisDistribution.sortedHypotheses();
+        for (int i = 0; i < sortedHypotheses.size(); i++) {
+            String DUHypothesisID = sortedHypotheses.get(i);
+            DialogStateHypothesis hypothesis = hypotheses.get(DUHypothesisID);
+
+            if (hypothesis.spokenByThem.equals(testCase.spokenByThem) &&
+                    hypothesis.spokenByMe.equals(testCase.spokenByMe)) {
+                rank = i;
+                relativeLikelihood = hypothesisDistribution.get(DUHypothesisID) * 1.0 / topLikelihood;
+                break;
+            }
+        }
+        return new ImmutablePair<>(rank, relativeLikelihood);
     }
 
-    public void setSpokenByThem(Map<String, SemanticsModel> spokenByThem) {
-        this.spokenByThem = spokenByThem;
-    }
 
-    public Map<String, SemanticsModel> getUnderstoodByThem() {
-        return understoodByThem;
-    }
-
-    public void setUnderstoodByThem(Map<String, SemanticsModel> understoodByThem) {
-        this.understoodByThem = understoodByThem;
-    }
-
-    public SemanticsModel getSpokenByMe() {
-        return spokenByMe;
-    }
-
-    public void setSpokenByMe(SemanticsModel spokenByMe) {
-        this.spokenByMe = spokenByMe;
-    }
-
-    public float getTimeOfLastActByThem() {
-        return timeOfLastActByThem;
-    }
-
-    public void setTimeOfLastActByThem(float timeOfLastActByThem) {
-        this.timeOfLastActByThem = timeOfLastActByThem;
-    }
-
-    public float getTimeOfLastActByMe() {
-        return timeOfLastActByMe;
-    }
-
-    public void setTimeOfLastActByMe(float timeOfLastActByMe) {
-        this.timeOfLastActByMe = timeOfLastActByMe;
-    }
-
-    @Override
-    public String toString() {
-        return "DiscourseUnit2{" +
-                "hypothesisDistribution=" + hypothesisDistribution +
-                "\nspokenByThem=" + spokenByThem +
-                "\nunderstoodByThem=" + understoodByThem +
-                "\nspokenByMe=" + spokenByMe +
-                '}';
-    }
 }
