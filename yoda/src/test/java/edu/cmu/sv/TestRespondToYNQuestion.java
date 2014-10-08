@@ -1,9 +1,7 @@
 package edu.cmu.sv;
 
-import com.google.common.collect.Iterables;
 import edu.cmu.sv.database.Database;
 import edu.cmu.sv.ontology.OntologyRegistry;
-import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_task.RespondToYNQuestionTask;
 import org.junit.Test;
@@ -28,7 +26,7 @@ public class TestRespondToYNQuestion {
         // Set up sample database
         Database db = new Database();
         Set<Class> databaseClasses = new HashSet<>(OntologyRegistry.objectClasses);
-        databaseClasses.addAll(OntologyRegistry.actionClasses);
+        databaseClasses.addAll(OntologyRegistry.verbClasses);
         Set<Class> databaseProperties = new HashSet<>(OntologyRegistry.roleClasses);
         databaseProperties.addAll(OntologyRegistry.propertyClasses);
         db.generateClassHierarchy(databaseClasses, databaseProperties);

@@ -316,7 +316,7 @@ public class TestDSTClarification {
         grandChildSM.getSlots().put("atTime", "Z");
         grandChildSM.getChildren().put("Z", new SemanticsModel());
 
-        // said by the system / understood by user
+        // said by the system
         SemanticsModel sm5 = new SemanticsModel();
         sm5.getSlots().put("dialogAct", "Offer");
         sm5.getSlots().put("action", "Create");
@@ -324,7 +324,7 @@ public class TestDSTClarification {
         childSM = new SemanticsModel();
         sm5.getChildren().put("X", childSM);
         childSM.getSlots().put("class", "Meeting");
-        sm5.getSlots().put("atTime", "<REQUESTED>");
+        sm5.getSlots().put("atTime", "Requested");
 
 
         currentTurn = new Turn("system", sm4, null, null);
