@@ -3,6 +3,7 @@ package edu.cmu.sv;
 import edu.cmu.sv.dialog_state_tracking.DSTTester;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
 import edu.cmu.sv.dialog_state_tracking.Turn;
+import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.StringDistribution;
 import org.junit.Test;
@@ -67,6 +68,9 @@ public class TestDSTClarification {
         sm1.getChildren().put("Y", childSM);
         childSM.getSlots().put("class", "Time");
         childSM.getSlots().put("hour", "one");
+
+        System.out.println("validating slu hypothesis:");
+        assert OntologyRegistry.validateSLUHypothesis(sm1);
 
         sm2 = new SemanticsModel();
         sm2.getSlots().put("dialogAct", "Command");

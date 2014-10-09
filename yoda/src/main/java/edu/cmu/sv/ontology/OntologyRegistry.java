@@ -8,14 +8,12 @@ import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.ontology.verb.Create;
 import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.ontology.object.*;
-import edu.cmu.sv.ontology.property.HasName;
-import edu.cmu.sv.ontology.property.Property;
 import edu.cmu.sv.ontology.role.Agent;
 import edu.cmu.sv.ontology.role.Patient;
 import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.ontology.role.Theme;
+import edu.cmu.sv.semantics.SemanticsModel;
 import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -27,7 +25,6 @@ public class OntologyRegistry {
     public static Set<Class <? extends Verb>> verbClasses = new HashSet<>();
     public static Set<Class <? extends edu.cmu.sv.ontology.object.Object>> objectClasses = new HashSet<>();
     public static Set<Class <? extends Role>> roleClasses = new HashSet<>();
-    public static Set<Class <? extends Property>> propertyClasses = new HashSet<>();
     public static Set<Class <? extends Thing>> miscClasses = new HashSet<>();
 
     public static Map<String, Class <? extends Thing>> thingNameMap = new HashMap<>();
@@ -49,8 +46,6 @@ public class OntologyRegistry {
         roleClasses.add(Patient.class);
         roleClasses.add(Theme.class);
 
-        propertyClasses.add(HasName.class);
-
         miscClasses.add(NonHearing.class);
         miscClasses.add(NonUnderstanding.class);
         miscClasses.add(Requested.class);
@@ -59,7 +54,6 @@ public class OntologyRegistry {
         recursivelyRegisterParents(verbClasses);
         recursivelyRegisterParents(objectClasses);
         recursivelyRegisterParents(roleClasses);
-        recursivelyRegisterParents(propertyClasses);
         recursivelyRegisterParents(miscClasses);
 
         // get name maps
@@ -68,7 +62,6 @@ public class OntologyRegistry {
         addToNameMap(thingNameMap, verbClasses);
         addToNameMap(thingNameMap, objectClasses);
         addToNameMap(thingNameMap, roleClasses);
-        addToNameMap(thingNameMap, propertyClasses);
         addToNameMap(thingNameMap, miscClasses);
     }
 
@@ -94,5 +87,67 @@ public class OntologyRegistry {
             }
         }
     }
+
+    // TODO: validate DST models
+    /*
+    * Determines whether the SLU hypothesis model is valid
+    * according to the registered ontology
+    * */
+    public static boolean validateSLUHypothesis(SemanticsModel model) {
+        // there must be a dialog act
+        if (!model.getSlots().containsKey("dialogAct"))
+            return false;
+        // there is a specific set of permitted slots in the top level
+        if (model.getSlots().keySet().stream().
+                anyMatch(x -> !x.equals("dialogAct") && !x.equals("verb") && !x.equals("topic")))
+            return false;
+
+        // check all children
+        for (SemanticsModel child : model.getChildren().values()){
+            try {
+                if (!validateThingDescription(child))
+                    return false;
+            } catch (IllegalAccessException | InstantiationException e) {
+                e.printStackTrace();
+            }
+        }
+        return true;
+    }
+
+    /*
+    * Recursively check that all the slots in a node are valid for the class of that node
+    * (does not check that the fillers are in the range for the role which corresponds to that slot)
+    * (assumes that the input is a well-formed SemanticsModel (no orphans, etc.))
+    * */
+    public static boolean validateThingDescription(SemanticsModel description) throws IllegalAccessException, InstantiationException {
+        if (!description.getSlots().containsKey("class"))
+            return false;
+        Class<? extends Thing> cls = thingNameMap.get(description.getSlots().get("class"));
+        // check that all slots correspond to roles which this node's class is in the domain of
+        for (String slot : description.getSlots().keySet()){
+            if (slot.equals("class"))
+                continue;
+            boolean inDomain = false;
+            if (!roleNameMap.containsKey(slot))
+                return false;
+            for (Class<? extends Thing> domainMember : roleNameMap.get(slot).newInstance().getDomain()){
+                if (domainMember.isAssignableFrom(cls)) {
+                    inDomain = true;
+                    break;
+                }
+            }
+            if (!inDomain)
+                return false;
+        }
+
+        // check all children
+        for (SemanticsModel child : description.getChildren().values()){
+            if (!validateThingDescription(child))
+                return false;
+        }
+
+        return true;
+    }
+
 
 }

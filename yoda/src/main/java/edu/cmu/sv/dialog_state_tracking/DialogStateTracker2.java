@@ -49,5 +49,4 @@ public class DialogStateTracker2 {
             discourseUnit.hypotheses.put(key, newHypotheses.get(key));
         }
     }
-
 }

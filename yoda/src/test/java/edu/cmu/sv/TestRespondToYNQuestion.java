@@ -28,7 +28,7 @@ public class TestRespondToYNQuestion {
         Set<Class> databaseClasses = new HashSet<>(OntologyRegistry.objectClasses);
         databaseClasses.addAll(OntologyRegistry.verbClasses);
         Set<Class> databaseProperties = new HashSet<>(OntologyRegistry.roleClasses);
-        databaseProperties.addAll(OntologyRegistry.propertyClasses);
+        databaseProperties.addAll(OntologyRegistry.roleClasses);
         db.generateClassHierarchy(databaseClasses, databaseProperties);
         addTestContent(db);
         db.outputEntireDatabase();

@@ -2,7 +2,6 @@ package edu.cmu.sv.database;
 
 
 import edu.cmu.sv.ontology.verb.Verb;
-import edu.cmu.sv.ontology.property.Property;
 import edu.cmu.sv.ontology.role.Role;
 import org.openrdf.model.Value;
 import org.openrdf.query.*;
@@ -66,7 +65,7 @@ public class Database {
         }
         for (Class prop : properties){
             insertString += generateTriple(prop, "rdf:type", "rdf:Property")+".\n";
-            if (prop != Property.class && prop != Role.class) {
+            if (prop != Role.class) {
                 insertString += generateTriple(prop, "rdfs:subPropertyOf", prop.getSuperclass()) + ".\n";
             }
         }
