@@ -3,15 +3,12 @@ package edu.cmu.sv.ontology;
 import edu.cmu.sv.ontology.misc.NonHearing;
 import edu.cmu.sv.ontology.misc.NonUnderstanding;
 import edu.cmu.sv.ontology.misc.Requested;
+import edu.cmu.sv.ontology.role.*;
 import edu.cmu.sv.ontology.verb.Exist;
 import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.ontology.verb.Create;
 import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.ontology.object.*;
-import edu.cmu.sv.ontology.role.Agent;
-import edu.cmu.sv.ontology.role.Patient;
-import edu.cmu.sv.ontology.role.Role;
-import edu.cmu.sv.ontology.role.Theme;
 import edu.cmu.sv.semantics.SemanticsModel;
 import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 
@@ -41,10 +38,14 @@ public class OntologyRegistry {
         objectClasses.add(Person.class);
         objectClasses.add(Email.class);
         objectClasses.add(Meeting.class);
+        objectClasses.add(Time.class);
 
         roleClasses.add(Agent.class);
         roleClasses.add(Patient.class);
         roleClasses.add(Theme.class);
+        roleClasses.add(HasAtTime.class);
+        roleClasses.add(HasHour.class);
+        roleClasses.add(HasName.class);
 
         miscClasses.add(NonHearing.class);
         miscClasses.add(NonUnderstanding.class);

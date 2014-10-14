@@ -1,5 +1,6 @@
 package edu.cmu.sv;
 
+import edu.cmu.sv.database.Database;
 import edu.cmu.sv.dialog_state_tracking.DSTTester;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
 import edu.cmu.sv.dialog_state_tracking.Turn;
@@ -7,6 +8,9 @@ import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.StringDistribution;
 import org.junit.Test;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.UpdateExecutionException;
+import org.openrdf.repository.RepositoryException;
 
 import java.util.*;
 
@@ -48,26 +52,56 @@ public class TestDSTClarification {
         SemanticsModel sm2;
         SemanticsModel sm3;
         SemanticsModel sm4;
-        SemanticsModel childSM;
+        SemanticsModel csm1;
+        SemanticsModel csm2;
+        SemanticsModel csm3;
+        SemanticsModel csm4;
         SemanticsModel grandChildSM;
         StringDistribution sluDistribution;
         Map<String, SemanticsModel> sluHypotheses;
 
         testCase = new DSTTester();
 
+        Database db = new Database();
+        String valueURI1 = null;
+        try {
+            valueURI1 = db.insertValue(new Integer(1));
+        } catch (MalformedQueryException | RepositoryException | UpdateExecutionException e) {
+            e.printStackTrace();
+        }
+        System.out.println("valueURI1:"+valueURI1);
+
         /// Turn 1
         sm1 = new SemanticsModel();
         sm1.getSlots().put("dialogAct", "Command");
         sm1.getSlots().put("action", "Create");
         sm1.getSlots().put("patient", "X");
-        childSM = new SemanticsModel();
-        sm1.getChildren().put("X", childSM);
-        childSM.getSlots().put("class", "Meeting");
+        csm1 = new SemanticsModel();
+        sm1.getChildren().put("X", csm1);
+        csm1.getSlots().put("class", "Meeting");
         sm1.getSlots().put("atTime", "Y");
-        childSM = new SemanticsModel();
-        sm1.getChildren().put("Y", childSM);
-        childSM.getSlots().put("class", "Time");
-        childSM.getSlots().put("hour", "one");
+        csm1 = new SemanticsModel();
+        sm1.getChildren().put("Y", csm1);
+        csm1.getSlots().put("class", "Time");
+        csm1.getSlots().put("hour", "one");
+
+        sm1 = new SemanticsModel();
+        sm1.getSlots().put("dialogAct", "Command");
+        sm1.getSlots().put("verb", "X");
+        csm1 = new SemanticsModel();
+        sm1.getChildren().put("X", csm1);
+        csm1.getSlots().put("class", "Create");
+        csm1.getSlots().put("Patient", "Y");
+        csm2 = new SemanticsModel();
+        csm1.getChildren().put("Y", csm2);
+        csm2.getSlots().put("class", "Meeting");
+        csm2.getSlots().put("HasAtTime", "Z");
+        csm3 = new SemanticsModel();
+        csm2.getChildren().put("Z", csm3);
+        csm3.getSlots().put("class", "Time");
+        csm3.getSlots().put("HasHour", valueURI1);
+
+
 
         System.out.println("validating slu hypothesis:");
         assert OntologyRegistry.validateSLUHypothesis(sm1);
@@ -76,14 +110,14 @@ public class TestDSTClarification {
         sm2.getSlots().put("dialogAct", "Command");
         sm2.getSlots().put("action", "Create");
         sm2.getSlots().put("patient", "X");
-        childSM = new SemanticsModel();
-        sm2.getChildren().put("X", childSM);
-        childSM.getSlots().put("class", "Meeting");
+        csm1 = new SemanticsModel();
+        sm2.getChildren().put("X", csm1);
+        csm1.getSlots().put("class", "Meeting");
         sm2.getSlots().put("atTime", "Y");
-        childSM = new SemanticsModel();
-        sm2.getChildren().put("Y", childSM);
-        childSM.getSlots().put("class", "Time");
-        childSM.getSlots().put("hour", "ten");
+        csm1 = new SemanticsModel();
+        sm2.getChildren().put("Y", csm1);
+        csm1.getSlots().put("class", "Time");
+        csm1.getSlots().put("hour", "ten");
 
         sluHypotheses = new HashMap<>();
         sluHypotheses.put("hyp1", sm1);
@@ -103,19 +137,19 @@ public class TestDSTClarification {
         sm3 = new SemanticsModel();
         sm3.getSlots().put("dialogAct", "RequestDisambiguateValues");
         sm3.getSlots().put("atTime", "X");
-        childSM = new SemanticsModel();
-        sm3.getChildren().put("X", childSM);
-        childSM.getSlots().put("class", "Or");
-        childSM.getSlots().put("option1", "Y");
-        childSM.getSlots().put("option2", "Z");
+        csm1 = new SemanticsModel();
+        sm3.getChildren().put("X", csm1);
+        csm1.getSlots().put("class", "Or");
+        csm1.getSlots().put("option1", "Y");
+        csm1.getSlots().put("option2", "Z");
         grandChildSM = new SemanticsModel();
         grandChildSM.getSlots().put("class", "Time");
         grandChildSM.getSlots().put("hour", "one");
-        childSM.getChildren().put("Y", grandChildSM);
+        csm1.getChildren().put("Y", grandChildSM);
         grandChildSM = new SemanticsModel();
         grandChildSM.getSlots().put("class", "Time");
         grandChildSM.getSlots().put("hour", "ten");
-        childSM.getChildren().put("Z", grandChildSM);
+        csm1.getChildren().put("Z", grandChildSM);
 
         currentTurn = new Turn("system", sm3.deepCopy(), null, null);
         correctState = new DiscourseUnit2.DialogStateHypothesis();
@@ -129,10 +163,10 @@ public class TestDSTClarification {
         sm4 = new SemanticsModel();
         sm4.getSlots().put("dialogAct", "Fragment");
         sm4.getSlots().put("atTime", "X");
-        childSM = new SemanticsModel();
-        sm4.getChildren().put("X", childSM);
-        childSM.getSlots().put("class", "Time");
-        childSM.getSlots().put("hour", "ten");
+        csm1 = new SemanticsModel();
+        sm4.getChildren().put("X", csm1);
+        csm1.getSlots().put("class", "Time");
+        csm1.getSlots().put("hour", "ten");
 
         sluHypotheses = new HashMap<>();
         sluHypotheses.put("hyp1", sm4);

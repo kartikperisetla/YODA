@@ -3,6 +3,8 @@ package edu.cmu.sv.database;
 
 import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.ontology.role.Role;
+import org.openrdf.model.Literal;
+import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.query.*;
 import org.openrdf.repository.Repository;
@@ -21,11 +23,14 @@ import java.util.Set;
  */
 public class Database {
 
-    Repository repository;
+//    Repository repository;
+    // a counter used to create new URIs
+    private static long URICounter = 0;
     RepositoryConnection connection;
     public static final String baseURI = "http://sv.cmu.edu/yoda#";
     public static final String prefixes = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
+            "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
             "PREFIX base: <"+baseURI+">\n";
 //    File ontologyFile = new File("/home/cohend/yoda/yoda_ontology.owl");
 
@@ -121,6 +126,27 @@ public class Database {
 //        System.out.println("attempting the following sparql update string:\n"+updateString);
         Update update = connection.prepareUpdate(QueryLanguage.SPARQL, updateString, baseURI);
         update.execute();
+    }
+
+    /*
+    * Insert a data value to the triple store, return the unique identifier
+    * */
+    public String insertValue(Object obj) throws MalformedQueryException, RepositoryException, UpdateExecutionException {
+        String newURI = "auto_generated_value_URI"+URICounter++;
+        if (obj instanceof String){
+            String updateString = prefixes+"INSERT DATA \n{ base:"+newURI+" rdf:value \""+obj+"\"^^xsd:string}";
+            System.out.println("Database.insertValue: updateString:"+updateString);
+            Update update = connection.prepareUpdate(QueryLanguage.SPARQL, updateString, baseURI);
+            update.execute();
+        } else if (obj instanceof Integer){
+            String updateString = prefixes+"INSERT DATA \n{ base:"+newURI+" rdf:value \""+obj+"\"^^xsd:int}";
+            System.out.println("Database.insertValue: updateString:"+updateString);
+            Update update = connection.prepareUpdate(QueryLanguage.SPARQL, updateString, baseURI);
+            update.execute();
+        } else {
+            throw new Error("Can't insertValue of that type");
+        }
+        return newURI;
     }
 
     /*

@@ -1,7 +1,6 @@
 package edu.cmu.sv.dialog_state_tracking;
 
-import edu.cmu.sv.semantics.SemanticsModel;
-import org.apache.commons.lang3.tuple.ImmutablePair;
+
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
@@ -15,6 +14,7 @@ import java.util.*;
 public class DSTTester {
     Map<Turn, Float> turns = new HashMap<>();
     Map<DiscourseUnit2.DialogStateHypothesis, Float> evaluationStates = new HashMap<>();
+    public DialogStateTracker2 dst = new DialogStateTracker2();
 
     /*
     * EvaluationResult contains the important results of an evaluation
@@ -54,7 +54,6 @@ public class DSTTester {
     }
 
     public EvaluationResult evaluate(){
-        DialogStateTracker2 dst = new DialogStateTracker2();
         Float startTime = turns.values().stream().min(Float::compare).orElse((float)0)-1;
         Float endTime = turns.values().stream().max(Float::compare).orElse((float)0)+1;
         List<Integer> correctHypothesisRanks = new LinkedList<>();
