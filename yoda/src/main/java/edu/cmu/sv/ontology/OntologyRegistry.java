@@ -1,8 +1,6 @@
 package edu.cmu.sv.ontology;
 
-import edu.cmu.sv.ontology.misc.NonHearing;
-import edu.cmu.sv.ontology.misc.NonUnderstanding;
-import edu.cmu.sv.ontology.misc.Requested;
+import edu.cmu.sv.ontology.misc.*;
 import edu.cmu.sv.ontology.role.*;
 import edu.cmu.sv.ontology.verb.Exist;
 import edu.cmu.sv.ontology.verb.Verb;
@@ -46,16 +44,33 @@ public class OntologyRegistry {
         roleClasses.add(HasAtTime.class);
         roleClasses.add(HasHour.class);
         roleClasses.add(HasName.class);
+        roleClasses.add(HasValue0.class);
+        roleClasses.add(HasValue1.class);
+        roleClasses.add(HasValue2.class);
 
         miscClasses.add(NonHearing.class);
         miscClasses.add(NonUnderstanding.class);
         miscClasses.add(Requested.class);
+        miscClasses.add(UnknownThingWithRoles.class);
+        miscClasses.add(Or.class);
+        miscClasses.add(And.class);
 
         // recursively register parents
         recursivelyRegisterParents(verbClasses);
         recursivelyRegisterParents(objectClasses);
         recursivelyRegisterParents(roleClasses);
         recursivelyRegisterParents(miscClasses);
+
+        // add ubiquitous Things to domains / ranges
+        for (Class <? extends ThingWithRoles> cls : Arrays.asList(UnknownThingWithRoles.class)){
+            for (Class <? extends Role> roleCls : roleClasses){
+                try {
+                    roleCls.newInstance().getDomain().add(cls);
+                } catch (InstantiationException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
         // get name maps
         addToNameMap(verbNameMap, verbClasses);

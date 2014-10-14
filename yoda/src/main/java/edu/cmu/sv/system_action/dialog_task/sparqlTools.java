@@ -21,7 +21,7 @@ public class sparqlTools {
     * For now, this can only be a flat reference, no nested information.
     * */
     public static StringDistribution possibleReferents(Database db, SemanticsModel description){
-        String queryString = Database.prefixes + "SELECT ?x WHERE { ";
+        String queryString = db.prefixes + "SELECT ?x WHERE { ";
         for (String slot : description.getSlots().keySet()){
             if (slot.equals("class"))
                 queryString += "?x rdf:type base:"+description.getSlots().get(slot) + " . ";

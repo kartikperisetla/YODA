@@ -45,6 +45,7 @@ public class TestDSTClarification {
         10
     */
     DSTTester testCase1() {
+        YodaEnvironment yodaEnvironment;
         DSTTester testCase;
         Turn currentTurn;
         DiscourseUnit2.DialogStateHypothesis correctState;
@@ -55,35 +56,22 @@ public class TestDSTClarification {
         SemanticsModel csm1;
         SemanticsModel csm2;
         SemanticsModel csm3;
-        SemanticsModel csm4;
         SemanticsModel grandChildSM;
         StringDistribution sluDistribution;
         Map<String, SemanticsModel> sluHypotheses;
 
-        testCase = new DSTTester();
+        yodaEnvironment = YodaEnvironment.dstTestingEnvironment();
+        testCase = new DSTTester(yodaEnvironment);
 
-        Database db = new Database();
-        String valueURI1 = null;
+        /// Turn 1
+        String uri1 = null;
+        String uri2 = null;
         try {
-            valueURI1 = db.insertValue(new Integer(1));
+            uri1 = yodaEnvironment.db.insertValue(1);
+            uri2 = yodaEnvironment.db.insertValue(10);
         } catch (MalformedQueryException | RepositoryException | UpdateExecutionException e) {
             e.printStackTrace();
         }
-        System.out.println("valueURI1:"+valueURI1);
-
-        /// Turn 1
-        sm1 = new SemanticsModel();
-        sm1.getSlots().put("dialogAct", "Command");
-        sm1.getSlots().put("action", "Create");
-        sm1.getSlots().put("patient", "X");
-        csm1 = new SemanticsModel();
-        sm1.getChildren().put("X", csm1);
-        csm1.getSlots().put("class", "Meeting");
-        sm1.getSlots().put("atTime", "Y");
-        csm1 = new SemanticsModel();
-        sm1.getChildren().put("Y", csm1);
-        csm1.getSlots().put("class", "Time");
-        csm1.getSlots().put("hour", "one");
 
         sm1 = new SemanticsModel();
         sm1.getSlots().put("dialogAct", "Command");
@@ -99,25 +87,24 @@ public class TestDSTClarification {
         csm3 = new SemanticsModel();
         csm2.getChildren().put("Z", csm3);
         csm3.getSlots().put("class", "Time");
-        csm3.getSlots().put("HasHour", valueURI1);
-
-
-
-        System.out.println("validating slu hypothesis:");
-        assert OntologyRegistry.validateSLUHypothesis(sm1);
+        csm3.getSlots().put("HasHour", uri1);
 
         sm2 = new SemanticsModel();
         sm2.getSlots().put("dialogAct", "Command");
-        sm2.getSlots().put("action", "Create");
-        sm2.getSlots().put("patient", "X");
+        sm2.getSlots().put("verb", "X");
         csm1 = new SemanticsModel();
         sm2.getChildren().put("X", csm1);
-        csm1.getSlots().put("class", "Meeting");
-        sm2.getSlots().put("atTime", "Y");
-        csm1 = new SemanticsModel();
-        sm2.getChildren().put("Y", csm1);
-        csm1.getSlots().put("class", "Time");
-        csm1.getSlots().put("hour", "ten");
+        csm1.getSlots().put("class", "Create");
+        csm1.getSlots().put("Patient", "Y");
+        csm2 = new SemanticsModel();
+        csm1.getChildren().put("Y", csm2);
+        csm2.getSlots().put("class", "Meeting");
+        csm2.getSlots().put("HasAtTime", "Z");
+        csm3 = new SemanticsModel();
+        csm2.getChildren().put("Z", csm3);
+        csm3.getSlots().put("class", "Time");
+        csm3.getSlots().put("HasHour", uri2);
+
 
         sluHypotheses = new HashMap<>();
         sluHypotheses.put("hyp1", sm1);
@@ -134,22 +121,30 @@ public class TestDSTClarification {
 
 
         /// Turn 2
+        String uri3 = null;
+        String uri4 = null;
+        try {
+            uri3 = yodaEnvironment.db.insertValue(1);
+            uri4 = yodaEnvironment.db.insertValue(10);
+        } catch (MalformedQueryException | RepositoryException | UpdateExecutionException e) {
+            e.printStackTrace();
+        }
         sm3 = new SemanticsModel();
         sm3.getSlots().put("dialogAct", "RequestDisambiguateValues");
         sm3.getSlots().put("atTime", "X");
         csm1 = new SemanticsModel();
         sm3.getChildren().put("X", csm1);
         csm1.getSlots().put("class", "Or");
-        csm1.getSlots().put("option1", "Y");
-        csm1.getSlots().put("option2", "Z");
-        grandChildSM = new SemanticsModel();
-        grandChildSM.getSlots().put("class", "Time");
-        grandChildSM.getSlots().put("hour", "one");
-        csm1.getChildren().put("Y", grandChildSM);
-        grandChildSM = new SemanticsModel();
-        grandChildSM.getSlots().put("class", "Time");
-        grandChildSM.getSlots().put("hour", "ten");
-        csm1.getChildren().put("Z", grandChildSM);
+        csm1.getSlots().put("HasValue0", "Y");
+        csm1.getSlots().put("HasValue1", "Z");
+        csm2 = new SemanticsModel();
+        csm2.getSlots().put("class", "Time");
+        csm2.getSlots().put("HasHour", uri3);
+        csm1.getChildren().put("Y", csm2);
+        csm3 = new SemanticsModel();
+        csm3.getSlots().put("class", "Time");
+        csm3.getSlots().put("HasHour", uri4);
+        csm1.getChildren().put("Z", csm3);
 
         currentTurn = new Turn("system", sm3.deepCopy(), null, null);
         correctState = new DiscourseUnit2.DialogStateHypothesis();
@@ -159,14 +154,28 @@ public class TestDSTClarification {
         testCase.getEvaluationStates().put(correctState, (float) 1.0);
 
 
+
+
+
         /// Turn 3
+        String uri5 = null;
+        try {
+            uri5 = yodaEnvironment.db.insertValue(10);
+        } catch (MalformedQueryException | RepositoryException | UpdateExecutionException e) {
+            e.printStackTrace();
+        }
+
         sm4 = new SemanticsModel();
         sm4.getSlots().put("dialogAct", "Fragment");
-        sm4.getSlots().put("atTime", "X");
+        sm4.getSlots().put("topic", "X");
         csm1 = new SemanticsModel();
         sm4.getChildren().put("X", csm1);
-        csm1.getSlots().put("class", "Time");
-        csm1.getSlots().put("hour", "ten");
+        csm1.getSlots().put("class", "UnknownThingWithRoles");
+        csm1.getSlots().put("HasAtTime", "Y");
+        csm2 = new SemanticsModel();
+        csm1.getChildren().put("Y", csm2);
+        csm2.getSlots().put("class", "Time");
+        csm2.getSlots().put("HasHour", uri5);
 
         sluHypotheses = new HashMap<>();
         sluHypotheses.put("hyp1", sm4);
@@ -194,6 +203,7 @@ public class TestDSTClarification {
     you have a meeting at 2
     */
     DSTTester testCase2() {
+        YodaEnvironment yodaEnvironment;
         DSTTester testCase;
         Turn currentTurn;
         DiscourseUnit2.DialogStateHypothesis correctState;
@@ -206,7 +216,8 @@ public class TestDSTClarification {
         StringDistribution sluDistribution;
         Map<String, SemanticsModel> sluHypotheses;
 
-        testCase = new DSTTester();
+        yodaEnvironment = YodaEnvironment.dstTestingEnvironment();
+        testCase = new DSTTester(yodaEnvironment);
 
         /// Turn 1
         sm1 = new SemanticsModel();
@@ -273,6 +284,7 @@ public class TestDSTClarification {
     At 4 at Samsung
     */
     DSTTester testCase3() {
+        YodaEnvironment yodaEnvironment;
         DSTTester testCase;
         Turn currentTurn;
         DiscourseUnit2.DialogStateHypothesis correctState;
@@ -285,7 +297,8 @@ public class TestDSTClarification {
         StringDistribution sluDistribution;
         Map<String, SemanticsModel> sluHypotheses;
 
-        testCase = new DSTTester();
+        yodaEnvironment = YodaEnvironment.dstTestingEnvironment();
+        testCase = new DSTTester(yodaEnvironment);
 
         /// Turn 1
         sm1 = new SemanticsModel();

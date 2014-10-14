@@ -1,6 +1,7 @@
 package edu.cmu.sv.dialog_state_tracking;
 
 
+import edu.cmu.sv.YodaEnvironment;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
@@ -12,13 +13,17 @@ import java.util.*;
  *
  */
 public class DSTTester {
+    YodaEnvironment yodaEnvironment;
     Map<Turn, Float> turns = new HashMap<>();
     Map<DiscourseUnit2.DialogStateHypothesis, Float> evaluationStates = new HashMap<>();
-    public DialogStateTracker2 dst = new DialogStateTracker2();
+
+    public DSTTester(YodaEnvironment yodaEnvironment) {
+        this.yodaEnvironment = yodaEnvironment;
+    }
 
     /*
-    * EvaluationResult contains the important results of an evaluation
-    * */
+        * EvaluationResult contains the important results of an evaluation
+        * */
     public class EvaluationResult{
         List<Integer> correctHypothesisRanks;
         List<Double> correctHypothesisRelativeLikelihoods;
@@ -66,7 +71,7 @@ public class DSTTester {
             for (Turn turn : turns.keySet()){
                 if (turns.get(turn) < t && !turnsDone.contains(turn)){
                     try {
-                        dst.updateDialogState(turn, t);
+                        yodaEnvironment.dst.updateDialogState(turn, t);
                         turnsDone.add(turn);
                     } catch (IllegalAccessException | InstantiationException e) {
                         e.printStackTrace();
@@ -75,7 +80,7 @@ public class DSTTester {
             }
             for (DiscourseUnit2.DialogStateHypothesis groundTruth : evaluationStates.keySet()){
                 if (evaluationStates.get(groundTruth) < t && !evaluationStatesDone.contains(groundTruth)){
-                    Pair<Integer, Double> result = dst.getDiscourseUnit().compareHypothesis(groundTruth);
+                    Pair<Integer, Double> result = yodaEnvironment.dst.getDiscourseUnit().compareHypothesis(groundTruth);
                     correctHypothesisRanks.add(result.getLeft());
                     correctHypothesisRelativeLikelihoods.add(result.getRight());
                     evaluationStatesDone.add(groundTruth);

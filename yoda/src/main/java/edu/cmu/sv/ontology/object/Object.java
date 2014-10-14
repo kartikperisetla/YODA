@@ -1,6 +1,7 @@
 package edu.cmu.sv.ontology.object;
 
 import edu.cmu.sv.ontology.Thing;
+import edu.cmu.sv.ontology.ThingWithRoles;
 import edu.cmu.sv.ontology.role.Role;
 
 import java.util.Set;
@@ -8,6 +9,5 @@ import java.util.Set;
 /**
  * Created by David Cohen on 9/20/14.
  */
-public abstract class Object extends Thing{
-    public abstract Set<Class <? extends Role>> getRequiredRoles();
+public abstract class Object extends ThingWithRoles{
 }

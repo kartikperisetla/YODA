@@ -1,19 +1,19 @@
 package edu.cmu.sv.ontology.role;
 
 import edu.cmu.sv.ontology.ThingWithRoles;
-import edu.cmu.sv.ontology.object.Person;
-import edu.cmu.sv.ontology.verb.Verb;
+import edu.cmu.sv.ontology.misc.Conjunction;
+
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by David Cohen on 9/20/14.
+ * Created by David Cohen on 10/14/14.
  */
-public class Theme extends Role {
-    static Set<Class <? extends ThingWithRoles>> domain = new HashSet<>(Arrays.asList(Verb.class));
-    static Set<Class <? extends ThingWithRoles>> range = new HashSet<>(Arrays.asList(Person.class));
+public class HasValue0 extends Role {
+    static Set<Class <? extends ThingWithRoles>> domain = new HashSet<>(Arrays.asList(Conjunction.class));
+    static Set<Class <? extends ThingWithRoles>> range = new HashSet<>(Arrays.asList(ThingWithRoles.class));
 
     @Override
     public Set<Class<? extends ThingWithRoles>> getDomain() {

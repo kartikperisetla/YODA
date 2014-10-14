@@ -25,10 +25,10 @@ public class Database {
 
 //    Repository repository;
     // a counter used to create new URIs
-    private static long URICounter = 0;
+    private long URICounter = 0;
     RepositoryConnection connection;
-    public static final String baseURI = "http://sv.cmu.edu/yoda#";
-    public static final String prefixes = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
+    public final String baseURI = "http://sv.cmu.edu/yoda#";
+    public final String prefixes = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
             "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
             "PREFIX base: <"+baseURI+">\n";
@@ -135,12 +135,12 @@ public class Database {
         String newURI = "auto_generated_value_URI"+URICounter++;
         if (obj instanceof String){
             String updateString = prefixes+"INSERT DATA \n{ base:"+newURI+" rdf:value \""+obj+"\"^^xsd:string}";
-            System.out.println("Database.insertValue: updateString:"+updateString);
+//            System.out.println("Database.insertValue: updateString:"+updateString);
             Update update = connection.prepareUpdate(QueryLanguage.SPARQL, updateString, baseURI);
             update.execute();
         } else if (obj instanceof Integer){
             String updateString = prefixes+"INSERT DATA \n{ base:"+newURI+" rdf:value \""+obj+"\"^^xsd:int}";
-            System.out.println("Database.insertValue: updateString:"+updateString);
+//            System.out.println("Database.insertValue: updateString:"+updateString);
             Update update = connection.prepareUpdate(QueryLanguage.SPARQL, updateString, baseURI);
             update.execute();
         } else {
