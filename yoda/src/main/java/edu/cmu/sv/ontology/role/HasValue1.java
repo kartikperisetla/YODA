@@ -1,5 +1,6 @@
 package edu.cmu.sv.ontology.role;
 
+import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.ThingWithRoles;
 import edu.cmu.sv.ontology.misc.Conjunction;
 
@@ -12,7 +13,7 @@ import java.util.Set;
  */
 public class HasValue1 extends Role{
     static Set<Class <? extends ThingWithRoles>> domain = new HashSet<>(Arrays.asList(Conjunction.class));
-    static Set<Class <? extends ThingWithRoles>> range = new HashSet<>(Arrays.asList(ThingWithRoles.class));
+    static Set<Class <? extends Thing>> range = new HashSet<>(Arrays.asList(ThingWithRoles.class));
 
     @Override
     public Set<Class<? extends ThingWithRoles>> getDomain() {
@@ -20,7 +21,7 @@ public class HasValue1 extends Role{
     }
 
     @Override
-    public Set<Class<? extends ThingWithRoles>> getRange() {
+    public Set<Class<? extends Thing>> getRange() {
         return range;
     }
 }

@@ -54,6 +54,7 @@ public class OntologyRegistry {
         miscClasses.add(UnknownThingWithRoles.class);
         miscClasses.add(Or.class);
         miscClasses.add(And.class);
+        miscClasses.add(URI.class);
 
         // recursively register parents
         recursivelyRegisterParents(verbClasses);

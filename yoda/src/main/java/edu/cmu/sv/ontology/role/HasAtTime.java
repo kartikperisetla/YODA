@@ -14,7 +14,7 @@ import java.util.Set;
  */
 public class HasAtTime extends Role {
     static Set<Class <? extends ThingWithRoles>> domain = new HashSet<>(Arrays.asList(Meeting.class));
-    static Set<Class <? extends ThingWithRoles>> range = new HashSet<>(Arrays.asList(Time.class));
+    static Set<Class <? extends Thing>> range = new HashSet<>(Arrays.asList(Time.class));
 
     @Override
     public Set<Class<? extends ThingWithRoles>> getDomain() {
@@ -22,7 +22,7 @@ public class HasAtTime extends Role {
     }
 
     @Override
-    public Set<Class<? extends ThingWithRoles>> getRange() {
+    public Set<Class<? extends Thing>> getRange() {
         return range;
     }
 }

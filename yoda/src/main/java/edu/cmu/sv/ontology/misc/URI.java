@@ -10,9 +10,4 @@ import java.util.Set;
 /**
  * Created by David Cohen on 10/13/14.
  */
-public class URI extends ThingWithRoles {
-    @Override
-    public Set<Class<? extends Role>> getRequiredRoles() {
-        return new HashSet<>();
-    }
-}
+public class URI extends Thing {}

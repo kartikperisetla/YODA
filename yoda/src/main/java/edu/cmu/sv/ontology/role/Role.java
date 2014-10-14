@@ -17,5 +17,5 @@ public abstract class Role extends Thing {
     *
     * */
     public abstract Set<Class <? extends ThingWithRoles>> getDomain();
-    public abstract Set<Class <? extends ThingWithRoles>> getRange();
+    public abstract Set<Class <? extends Thing>> getRange();
 }
