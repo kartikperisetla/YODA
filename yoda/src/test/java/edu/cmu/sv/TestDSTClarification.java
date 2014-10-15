@@ -210,9 +210,9 @@ public class TestDSTClarification {
         SemanticsModel sm1;
         SemanticsModel sm2;
         SemanticsModel sm3;
-        SemanticsModel sm4;
-        SemanticsModel childSM;
-        SemanticsModel grandChildSM;
+        SemanticsModel csm1;
+        SemanticsModel csm2;
+        SemanticsModel csm3;
         StringDistribution sluDistribution;
         Map<String, SemanticsModel> sluHypotheses;
 
@@ -220,18 +220,28 @@ public class TestDSTClarification {
         testCase = new DSTTester(yodaEnvironment);
 
         /// Turn 1
+        String uri1 = null;
+        try {
+            uri1 = yodaEnvironment.db.insertValue(2);
+        } catch (MalformedQueryException | RepositoryException | UpdateExecutionException e) {
+            e.printStackTrace();
+        }
+
         sm1 = new SemanticsModel();
         sm1.getSlots().put("dialogAct", "Statement");
-        sm1.getSlots().put("state", "exists");
-        sm1.getSlots().put("patient", "X");
-        childSM = new SemanticsModel();
-        sm1.getChildren().put("X", childSM);
-        childSM.getSlots().put("class", "Meeting");
-        sm1.getSlots().put("atTime", "Y");
-        childSM = new SemanticsModel();
-        sm1.getChildren().put("Y", childSM);
-        childSM.getSlots().put("class", "Time");
-        childSM.getSlots().put("hour", "two");
+        sm1.getSlots().put("verb", "X");
+        csm1 = new SemanticsModel();
+        sm1.getChildren().put("X", csm1);
+        csm1.getSlots().put("class", "Exist");
+        csm1.getSlots().put("Patient", "Y");
+        csm2 = new SemanticsModel();
+        csm1.getChildren().put("Y", csm2);
+        csm2.getSlots().put("class", "Meeting");
+        csm2.getSlots().put("HasAtTime", "Z");
+        csm3 = new SemanticsModel();
+        csm2.getChildren().put("Z", csm3);
+        csm3.getSlots().put("class", "Time");
+        csm3.getSlots().put("HasHour", uri1);
 
         currentTurn = new Turn("system", sm1.deepCopy(), null, null);
         correctState = new DiscourseUnit2.DialogStateHypothesis();
@@ -262,6 +272,29 @@ public class TestDSTClarification {
 
         /// Turn 3
         // (the system repeats itself)
+        String uri2 = null;
+        try {
+            uri2 = yodaEnvironment.db.insertValue(2);
+        } catch (MalformedQueryException | RepositoryException | UpdateExecutionException e) {
+            e.printStackTrace();
+        }
+
+        sm1 = new SemanticsModel();
+        sm1.getSlots().put("dialogAct", "Statement");
+        sm1.getSlots().put("verb", "X");
+        csm1 = new SemanticsModel();
+        sm1.getChildren().put("X", csm1);
+        csm1.getSlots().put("class", "Exist");
+        csm1.getSlots().put("Patient", "Y");
+        csm2 = new SemanticsModel();
+        csm1.getChildren().put("Y", csm2);
+        csm2.getSlots().put("class", "Meeting");
+        csm2.getSlots().put("HasAtTime", "Z");
+        csm3 = new SemanticsModel();
+        csm2.getChildren().put("Z", csm3);
+        csm3.getSlots().put("class", "Time");
+        csm3.getSlots().put("HasHour", uri2);
+
         currentTurn = new Turn("system", sm1.deepCopy(), null, null);
         correctState = new DiscourseUnit2.DialogStateHypothesis();
         correctState.setSpokenByMe(sm1.deepCopy());
@@ -292,8 +325,9 @@ public class TestDSTClarification {
         SemanticsModel sm2;
         SemanticsModel sm3;
         SemanticsModel sm4;
-        SemanticsModel childSM;
-        SemanticsModel grandChildSM;
+        SemanticsModel csm1;
+        SemanticsModel csm2;
+        SemanticsModel csm3;
         StringDistribution sluDistribution;
         Map<String, SemanticsModel> sluHypotheses;
 
@@ -305,36 +339,36 @@ public class TestDSTClarification {
         sm1.getSlots().put("dialogAct", "Command");
         sm1.getSlots().put("action", "Create");
         sm1.getSlots().put("patient", "X");
-        childSM = new SemanticsModel();
-        sm1.getChildren().put("X", childSM);
-        childSM.getSlots().put("class", "Meeting");
+        csm1 = new SemanticsModel();
+        sm1.getChildren().put("X", csm1);
+        csm1.getSlots().put("class", "Meeting");
         sm1.getSlots().put("atTime", "Y");
-        childSM = new SemanticsModel();
-        sm1.getChildren().put("Y", childSM);
-        childSM.getSlots().put("class", "Time");
-        childSM.getSlots().put("relativity", "forward");
-        childSM.getSlots().put("hour", "one");
+        csm1 = new SemanticsModel();
+        sm1.getChildren().put("Y", csm1);
+        csm1.getSlots().put("class", "Time");
+        csm1.getSlots().put("relativity", "forward");
+        csm1.getSlots().put("hour", "one");
 
         sm2 = new SemanticsModel();
         sm2.getSlots().put("dialogAct", "Command");
         sm2.getSlots().put("action", "Create");
         sm2.getSlots().put("patient", "X");
-        childSM = new SemanticsModel();
-        sm2.getChildren().put("X", childSM);
-        childSM.getSlots().put("class", "Meeting");
+        csm1 = new SemanticsModel();
+        sm2.getChildren().put("X", csm1);
+        csm1.getSlots().put("class", "Meeting");
         sm2.getSlots().put("atTime", "Y");
-        childSM = new SemanticsModel();
-        sm2.getChildren().put("Y", childSM);
-        childSM.getSlots().put("class", "Time");
-        childSM.getSlots().put("hour", "one");
+        csm1 = new SemanticsModel();
+        sm2.getChildren().put("Y", csm1);
+        csm1.getSlots().put("class", "Time");
+        csm1.getSlots().put("hour", "one");
 
         sm3 = new SemanticsModel();
         sm3.getSlots().put("dialogAct", "Command");
         sm3.getSlots().put("action", "Create");
         sm3.getSlots().put("patient", "X");
-        childSM = new SemanticsModel();
-        sm3.getChildren().put("X", childSM);
-        childSM.getSlots().put("class", "Meeting");
+        csm1 = new SemanticsModel();
+        sm3.getChildren().put("X", csm1);
+        csm1.getSlots().put("class", "Meeting");
 
         sluHypotheses = new HashMap<>();
         sluHypotheses.put("hyp1", sm1);
@@ -356,25 +390,25 @@ public class TestDSTClarification {
         sm4 = new SemanticsModel();
         sm4.getSlots().put("dialogAct", "RequestRole");
         sm4.getSlots().put("patient", "X");
-        childSM = new SemanticsModel();
-        sm4.getChildren().put("X", childSM);
-        childSM.getSlots().put("class", "RoleDescription");
-        childSM.getSlots().put("roleClass", "Time");
+        csm1 = new SemanticsModel();
+        sm4.getChildren().put("X", csm1);
+        csm1.getSlots().put("class", "RoleDescription");
+        csm1.getSlots().put("roleClass", "Time");
         // path contains whatever information was given about the path to the role being requested
-        childSM.getSlots().put("path", "Y");
-        grandChildSM = new SemanticsModel();
-        childSM.getChildren().put("Y", grandChildSM);
-        grandChildSM.getSlots().put("atTime", "Z");
-        grandChildSM.getChildren().put("Z", new SemanticsModel());
+        csm1.getSlots().put("path", "Y");
+        csm2 = new SemanticsModel();
+        csm1.getChildren().put("Y", csm2);
+        csm2.getSlots().put("atTime", "Z");
+        csm2.getChildren().put("Z", new SemanticsModel());
 
         // said by the system
         SemanticsModel sm5 = new SemanticsModel();
         sm5.getSlots().put("dialogAct", "Offer");
         sm5.getSlots().put("action", "Create");
         sm5.getSlots().put("patient", "X");
-        childSM = new SemanticsModel();
-        sm5.getChildren().put("X", childSM);
-        childSM.getSlots().put("class", "Meeting");
+        csm1 = new SemanticsModel();
+        sm5.getChildren().put("X", csm1);
+        csm1.getSlots().put("class", "Meeting");
         sm5.getSlots().put("atTime", "Requested");
 
 
@@ -389,28 +423,28 @@ public class TestDSTClarification {
         SemanticsModel sm6 = new SemanticsModel();
         sm6.getSlots().put("dialogAct", "Fragment");
         sm6.getSlots().put("atTime", "X");
-        childSM = new SemanticsModel();
-        sm6.getChildren().put("X", childSM);
-        childSM.getSlots().put("class", "Time");
-        childSM.getSlots().put("hour", "ten");
+        csm1 = new SemanticsModel();
+        sm6.getChildren().put("X", csm1);
+        csm1.getSlots().put("class", "Time");
+        csm1.getSlots().put("hour", "ten");
         sm6.getSlots().put("atPlace", "Y");
-        childSM = new SemanticsModel();
-        sm6.getChildren().put("Y", childSM);
-        childSM.getSlots().put("class", "Place");
-        childSM.getSlots().put("name", "Samsung");
+        csm1 = new SemanticsModel();
+        sm6.getChildren().put("Y", csm1);
+        csm1.getSlots().put("class", "Place");
+        csm1.getSlots().put("name", "Samsung");
 
         SemanticsModel sm7 = new SemanticsModel();
         sm7.getSlots().put("dialogAct", "Fragment");
         sm7.getSlots().put("atTime", "X");
-        childSM = new SemanticsModel();
-        sm7.getChildren().put("X", childSM);
-        childSM.getSlots().put("class", "Time");
-        childSM.getSlots().put("hour", "one");
+        csm1 = new SemanticsModel();
+        sm7.getChildren().put("X", csm1);
+        csm1.getSlots().put("class", "Time");
+        csm1.getSlots().put("hour", "one");
         sm7.getSlots().put("atPlace", "Y");
-        childSM = new SemanticsModel();
-        sm7.getChildren().put("Y", childSM);
-        childSM.getSlots().put("class", "Place");
-        childSM.getSlots().put("name", "Samsung");
+        csm1 = new SemanticsModel();
+        sm7.getChildren().put("Y", csm1);
+        csm1.getSlots().put("class", "Place");
+        csm1.getSlots().put("name", "Samsung");
 
         sluHypotheses = new HashMap<>();
         sluHypotheses.put("hyp1", sm6);
@@ -424,19 +458,19 @@ public class TestDSTClarification {
         sm1.getSlots().put("dialogAct", "Command");
         sm1.getSlots().put("action", "Create");
         sm1.getSlots().put("patient", "X");
-        childSM = new SemanticsModel();
-        sm1.getChildren().put("X", childSM);
-        childSM.getSlots().put("class", "Meeting");
+        csm1 = new SemanticsModel();
+        sm1.getChildren().put("X", csm1);
+        csm1.getSlots().put("class", "Meeting");
         sm1.getSlots().put("atTime", "Y");
-        childSM = new SemanticsModel();
-        sm1.getChildren().put("Y", childSM);
-        childSM.getSlots().put("class", "Time");
-        childSM.getSlots().put("hour", "ten");
+        csm1 = new SemanticsModel();
+        sm1.getChildren().put("Y", csm1);
+        csm1.getSlots().put("class", "Time");
+        csm1.getSlots().put("hour", "ten");
         sm1.getSlots().put("atPlace", "Y");
-        childSM = new SemanticsModel();
-        sm1.getChildren().put("Y", childSM);
-        childSM.getSlots().put("class", "Place");
-        childSM.getSlots().put("name", "Samsung");
+        csm1 = new SemanticsModel();
+        sm1.getChildren().put("Y", csm1);
+        csm1.getSlots().put("class", "Place");
+        csm1.getSlots().put("name", "Samsung");
 
         currentTurn = new Turn("user", null, sluHypotheses, sluDistribution);
         correctState = new DiscourseUnit2.DialogStateHypothesis();
