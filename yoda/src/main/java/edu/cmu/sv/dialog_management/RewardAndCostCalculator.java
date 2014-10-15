@@ -142,9 +142,9 @@ public class RewardAndCostCalculator {
         double limit = .9;
         StringDistribution ans = new StringDistribution();
         Map<String, Boolean> hasV1Map = DU.getHypotheses().keySet().stream().collect(Collectors.toMap(
-                x->x, x->DU.getHypotheses().get(x).getAllNonSpecialSlotFillerLeafPairs().values().contains(v1)));
+                x->x, x->DU.getHypotheses().get(x).getAllSlotFillerPairs().values().contains(v1)));
         Map<String, Boolean> hasV2Map = DU.getHypotheses().keySet().stream().collect(Collectors.toMap(
-                x->x, x->DU.getHypotheses().get(x).getAllNonSpecialSlotFillerLeafPairs().values().contains(v2)));
+                x->x, x->DU.getHypotheses().get(x).getAllSlotFillerPairs().values().contains(v2)));
 
         for (String key : DU.getHypotheses().keySet()) {
             if (DU.getHypothesisDistribution().get(key) >= 1.0) {
@@ -184,9 +184,9 @@ public class RewardAndCostCalculator {
         double limit = .9;
         StringDistribution ans = new StringDistribution();
         Map<String, Boolean> hasR1Map = DU.getHypotheses().keySet().stream().collect(Collectors.toMap(
-                x->x, x->DU.getHypotheses().get(x).getAllNonSpecialSlotFillerLeafPairs().keySet().contains(r1)));
+                x->x, x->DU.getHypotheses().get(x).getAllSlotFillerPairs().keySet().contains(r1)));
         Map<String, Boolean> hasR2Map = DU.getHypotheses().keySet().stream().collect(Collectors.toMap(
-                x->x, x->DU.getHypotheses().get(x).getAllNonSpecialSlotFillerLeafPairs().keySet().contains(r2)));
+                x->x, x->DU.getHypotheses().get(x).getAllSlotFillerPairs().keySet().contains(r2)));
 
         for (String key : DU.getHypotheses().keySet()) {
             if (DU.getHypothesisDistribution().get(key) >= 1.0) {
@@ -229,7 +229,7 @@ public class RewardAndCostCalculator {
         double limit = .8; // we will never predict 100% confidence gain
         StringDistribution ans = new StringDistribution();
         Map<String, Boolean> hasValueMap = DU.getHypotheses().keySet().stream().collect(Collectors.toMap(
-                x->x, x->DU.getHypotheses().get(x).getAllNonSpecialSlotFillerLeafPairs().values().contains(value)
+                x->x, x->DU.getHypotheses().get(x).getAllSlotFillerPairs().values().contains(value)
         ));
 
         for (String key : DU.getHypotheses().keySet()){
@@ -260,7 +260,7 @@ public class RewardAndCostCalculator {
         double limit = .8;
         StringDistribution ans = new StringDistribution();
         Map<String, Boolean> roleFilledMap = DU.getHypotheses().keySet().stream().collect(Collectors.toMap(
-                x->x, x->DU.getHypotheses().get(x).getAllNonSpecialSlotFillerLeafPairs().keySet().contains(role)
+                x->x, x->DU.getHypotheses().get(x).getAllSlotFillerPairs().keySet().contains(role)
         ));
         for (String key : DU.getHypotheses().keySet()){
             if (DU.getHypothesisDistribution().get(key) >= 1.0)

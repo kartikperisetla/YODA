@@ -45,7 +45,7 @@ public class DiscourseUnit {
     public Map<String, Set<String>> getAllNonSpecialSlotValueLeafPairs(){
         Map<String, Set<String>> ans = new HashMap<>();
         for (SemanticsModel semanticsModel : hypotheses.values()){
-            Map<String, String> modelSlotValues = semanticsModel.getAllNonSpecialSlotFillerLeafPairs();
+            Map<String, String> modelSlotValues = semanticsModel.getAllSlotFillerPairs();
             for (String key : modelSlotValues.keySet()){
                 if (!ans.containsKey(key))
                     ans.put(key, new HashSet<>());
