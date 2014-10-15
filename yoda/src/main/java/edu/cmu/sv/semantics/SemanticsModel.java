@@ -62,34 +62,33 @@ public class SemanticsModel {
 //        }
     }
 
-
     /*
     * Recursive helper for the public method
     * */
-    private Object getSlotPathFiller(Object startingPoint, String slotPath){
+    private Object getSlotPathFillerHelper(Object startingPoint, String slotPath){
         if (slotPath.equals(""))
             return startingPoint;
         String[] fillerPath = slotPath.split("\\.");
         String thisFiller = fillerPath[0];
-        List<String> remainingFillers = Arrays.asList(fillerPath);
+        List<String> remainingFillers = new LinkedList<>(Arrays.asList(fillerPath));
         remainingFillers.remove(0);
         String remainingSlotPath = String.join(".", remainingFillers);
         if (!(startingPoint instanceof JSONObject))
             return null;
         if (((JSONObject) startingPoint).containsKey("class") &&
-                (((JSONObject) startingPoint).get("class").equals("Or")) ||
-                ((JSONObject) startingPoint).get("class").equals("And")){
+                (((JSONObject) startingPoint).get("class").equals("Or") ||
+                ((JSONObject) startingPoint).get("class").equals("And"))){
             JSONObject ans = new JSONObject();
             JSONArray ansArray = new JSONArray();
             ans.put("class", ((JSONObject) startingPoint).get("class"));
             JSONArray nestedArray = (JSONArray) ((JSONObject) startingPoint).get("Values");
             for (Object child : nestedArray){
-                ansArray.add(getSlotPathFiller(child, remainingSlotPath));
+                ansArray.add(getSlotPathFillerHelper(child, slotPath));
             }
             ans.put("Values", ansArray);
             return ans;
         } else {
-            return getSlotPathFiller(((JSONObject) startingPoint).get(thisFiller), remainingSlotPath);
+            return getSlotPathFillerHelper(((JSONObject) startingPoint).get(thisFiller), remainingSlotPath);
         }
     }
 
@@ -103,8 +102,8 @@ public class SemanticsModel {
     * 5) null if the path is invalid
     *
     * */
-    public Object getSlotPathFiller(String slotPath){
-        return getSlotPathFiller(internalRepresentation, slotPath);
+    public String getSlotPathFiller(String slotPath){
+        return getSlotPathFillerHelper(internalRepresentation, slotPath).toString();
     }
 
 
@@ -128,6 +127,9 @@ public class SemanticsModel {
 //        return ans;
 //    }
 
+    public Map<String, String> getAllSlotFillerPairs(){
+        return null;
+    }
 
     @Override
     public int hashCode() {
@@ -140,6 +142,9 @@ public class SemanticsModel {
             return false;
         return ((SemanticsModel) obj).internalRepresentation.equals(internalRepresentation);
     }
+
+    public Map<String, String> getSlots(){return null;}
+    public Map<String, SemanticsModel> getChildren(){return null;}
 
     @Override
     public String toString() {
