@@ -36,35 +36,69 @@ public class SemanticsModel {
         return ans;
     }
 
-    public Object extendAndOverwrite(Object obj1, Object obj2){
-        if (obj1 instanceof JSONObject){}
-        if (obj1 instanceof JSONArray){}
-        return null;
-//        JSONObject ans = new JSONObject(obj1);
-//        for (Object key: obj2.keySet()){
-//            if (ans.containsKey(key)){
-//
-//            }else{
-//                ans.put(key, obj2.get(key));
-//            }
-//        }
-//        return ans;
+    public static Object extendAndOverwrite(SemanticsModel obj1, SemanticsModel obj2){
+        return extendAndOverwrite(obj1.internalRepresentation, obj2.internalRepresentation);
     }
 
     /*
-    * Extend this model with other, overwriting values as necessary
+    * (extend because original content should remain as long as it doesn't conflict with the new content)
+    * Copy the contents of other on top of what is already in initial.
+    * Overwrite slots that conflict.
+    * The class UnknownThingWithRoles does not overwrite any other class,
+    * any other class overwrites UnknownThingWithRoles without considering it to be a conflict.
+    *
+    * This calls itself on children so that current nested content isn't erased unless there is a conflict.
     * */
-    public void extendAndOverwrite(SemanticsModel other){
-//        for (Object key : other.internalRepresentation.keySet()){
-//            if (internalRepresentation.containsKey(key)){
-//
-//            }
-//        }
+    public static Object extendAndOverwrite(JSONObject initial, JSONObject other){
+        if (other.containsKey("class") && (other.get("class").equals("And") || other.get("class").equals("Or"))){
+            System.out.println("Not Yet Implemented: SemanticsModel.extendAndOverwrite with conjunctions in other JSON object");
+        }
+        if (initial.containsKey("class") && (initial.get("class").equals("And") || initial.get("class").equals("Or"))){
+            System.out.println("Not Yet Implemented: SemanticsModel.extendAndOverwrite with conjunctions in initial JSON object");
+        }
+        if (other.containsKey("class") && !other.get("class").equals("UnknownThingWithRoles")){
+            initial.put("class", other.get("class"));
+        }
+        for (Object key : other.keySet()){
+            if ("class".equals(key))
+                continue;
+            if (!initial.containsKey(key)){
+                initial.put(key, other.get(key));
+            } else {
+                if (other.get(key) instanceof String){
+                    initial.put(key, other.get(key));
+                } else if ((initial.get(key) instanceof JSONObject) &&
+                        (other.get(key) instanceof JSONObject)){
+                    extendAndOverwrite(((JSONObject)initial.get(key)), ((JSONObject)other.get(key)));
+                }
+            }
+        }
+        return initial;
     }
+
+    void insertAndOverwriteAtPointHelper(String slotPath, Object currentPoint, Object insertionContent){
+
+    }
+
+    /*
+    * insert other and overwrite what is there currently at the point specified by slotPath
+    *
+    * If slotPath filler is null, throw an error
+    *
+    * If slotPath filler is a single point, insert and overwrite at that point
+    *
+    * If slotPath filler is a conjunction, insert and overwrite at all the points
+    *
+    * */
+    public void insertAndOverwriteAtPoint(String slotPath, SemanticsModel other){
+
+    }
+
 
     /*
     * Recursive helper for the public method
     * */
+    //TODO: deal with null after conjunctions
     private Object getSlotPathFillerHelper(Object startingPoint, String slotPath){
         if (slotPath.equals(""))
             return startingPoint;
@@ -103,7 +137,8 @@ public class SemanticsModel {
     *
     * */
     public String getSlotPathFiller(String slotPath){
-        return getSlotPathFillerHelper(internalRepresentation, slotPath).toString();
+        Object ans = getSlotPathFillerHelper(internalRepresentation, slotPath);
+        return (ans==null)? null : ans.toString();
     }
 
 

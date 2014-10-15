@@ -117,12 +117,12 @@ public class TestDSTClarification {
                 "\"dialogAct\":\"RequestDisambiguateValues\",\n" +
                 "\"topic\":{\"class\":\"UnknownThingWithRoles\",\n" +
                 "         \"HasAtTime\":{\"class\": \"Or\",\n" +
-                "                      \"values\":[\n" +
+                "                      \"Values\":[\n" +
                 "                                {\"class\":\"Time\",\n" +
                 "                                 \"HasHour\":\""+uri3+"\"},\n" +
                 "                                {\"class\":\"Time\",\n" +
                 "                                 \"HasHour\":\""+uri4+"\"}\n" +
-                "                               ]}\n" +
+                "                               ]}}\n" +
                 "}";
         SemanticsModel sm3 = new SemanticsModel(jsonString);
 

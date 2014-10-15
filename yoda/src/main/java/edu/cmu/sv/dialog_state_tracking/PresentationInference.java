@@ -60,7 +60,7 @@ public class PresentationInference implements DiscourseUnitUpdateInference {
                     new DiscourseUnit2.DialogStateHypothesis();
             ans.getHypothesisDistribution().put(newDUHypothesisID, 1.0);
             newDUHypothesis.timeOfLastActByMe = timeStamp;
-            newDUHypothesis.spokenByMe.extendAndOverwrite(turn.systemUtterance);
+            SemanticsModel.extendAndOverwrite(newDUHypothesis.spokenByMe, turn.systemUtterance);
             ans.hypotheses.put(newDUHypothesisID, newDUHypothesis);
         }
 

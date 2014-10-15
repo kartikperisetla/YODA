@@ -20,12 +20,13 @@ public class TestSemanticsModel {
         YodaEnvironment yodaEnvironment;
         yodaEnvironment = YodaEnvironment.dstTestingEnvironment();
 
-        /// Turn 1
         String uri1 = null;
         String uri2 = null;
+        String uri3 = null;
         try {
             uri1 = yodaEnvironment.db.insertValue(1);
             uri2 = yodaEnvironment.db.insertValue(10);
+            uri3 = yodaEnvironment.db.insertValue(5);
         } catch (MalformedQueryException | RepositoryException | UpdateExecutionException e) {
             e.printStackTrace();
         }
@@ -56,8 +57,23 @@ public class TestSemanticsModel {
 
         System.out.println("sm2.getAllSlotFillerPairs():\n"+sm2.getSlotPathFiller("topic"));
         System.out.println("sm2.getAllSlotFillerPairs():\n"+sm2.getSlotPathFiller("topic.HasAtTime.HasHour"));
-//        System.out.println("sm2.getAllSlotFillerPairs():\n"+sm2.getSlotPathFiller("verb.Patient.HasAtTime"));
+        System.out.println("sm2.getAllSlotFillerPairs():\n"+sm2.getSlotPathFiller("verb.Patient.HasAtTime"));
 
+
+        System.out.println();
+        System.out.println("SemanticsModel.extendAndOverwrite() demonstration:");
+
+        jsonString = "{\"class\":\"Meeting\"}";
+        SemanticsModel sm3 = new SemanticsModel(jsonString);
+        jsonString = "{\"class\":\"UnknownThingWithRoles\",\n" +
+                " \"HasAtTime\":{ \"class\":\"Time\",\n" +
+                "               \"HasHour\":\""+uri3+"\" }\n" +
+                "}";
+        SemanticsModel sm4 = new SemanticsModel(jsonString);
+        System.out.println(sm3);
+        System.out.println(sm4);
+        SemanticsModel.extendAndOverwrite(sm3, sm4);
+        System.out.println(sm3);
 
     }
 
