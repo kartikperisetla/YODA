@@ -24,7 +24,7 @@ public class PresentationInference implements DiscourseUnitUpdateInference {
 
         if (turn.speaker.equals("user")){
             for (String sluHypothesisID : turn.hypothesisDistribution.keySet()){
-                String dialogAct = turn.hypotheses.get(sluHypothesisID).getSlots().get("dialogAct");
+                String dialogAct = turn.hypotheses.get(sluHypothesisID).getSlotPathFiller("dialogAct");
 
                 // if the DA is a fragment, reinterpret it as any one of the discourseUnitDialogActs
                 // with equal probability

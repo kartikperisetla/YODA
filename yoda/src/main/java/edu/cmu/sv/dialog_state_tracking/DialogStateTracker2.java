@@ -23,11 +23,9 @@ public class DialogStateTracker2 {
     public DiscourseUnit2 getDiscourseUnit(){return discourseUnit;}
 
     public void updateDialogState(Turn turn, float timeStamp) throws IllegalAccessException, InstantiationException {
-        System.out.println("DST.updateDialogState");
         // validate input
         if (turn.hypotheses!=null) {
             for (SemanticsModel sm : turn.hypotheses.values()) {
-                System.out.println(sm);
                 sm.validateSLUHypothesis();
             }
         }
