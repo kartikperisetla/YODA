@@ -44,9 +44,7 @@ public class OntologyRegistry {
         roleClasses.add(HasAtTime.class);
         roleClasses.add(HasHour.class);
         roleClasses.add(HasName.class);
-        roleClasses.add(HasValue0.class);
-        roleClasses.add(HasValue1.class);
-        roleClasses.add(HasValue2.class);
+        roleClasses.add(HasValues.class);
 
         miscClasses.add(NonHearing.class);
         miscClasses.add(NonUnderstanding.class);

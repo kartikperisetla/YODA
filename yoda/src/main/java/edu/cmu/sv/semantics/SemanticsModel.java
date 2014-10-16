@@ -36,8 +36,8 @@ public class SemanticsModel {
         return ans;
     }
 
-    public static Object extendAndOverwrite(SemanticsModel obj1, SemanticsModel obj2){
-        return extendAndOverwrite(obj1.internalRepresentation, obj2.internalRepresentation);
+    public void extendAndOverwrite(SemanticsModel other){
+        extendAndOverwriteHelper(internalRepresentation, other.internalRepresentation);
     }
 
     /*
@@ -49,12 +49,12 @@ public class SemanticsModel {
     *
     * This calls itself on children so that current nested content isn't erased unless there is a conflict.
     * */
-    public static Object extendAndOverwrite(JSONObject initial, JSONObject other){
+    void extendAndOverwriteHelper(JSONObject initial, final JSONObject other){
         if (other.containsKey("class") && (other.get("class").equals("And") || other.get("class").equals("Or"))){
-            System.out.println("Not Yet Implemented: SemanticsModel.extendAndOverwrite with conjunctions in other JSON object");
+            throw new Error("Not Yet Implemented: SemanticsModel.extendAndOverwriteHelper with conjunctions in other JSON object");
         }
         if (initial.containsKey("class") && (initial.get("class").equals("And") || initial.get("class").equals("Or"))){
-            System.out.println("Not Yet Implemented: SemanticsModel.extendAndOverwrite with conjunctions in initial JSON object");
+            throw new Error("Not Yet Implemented: SemanticsModel.extendAndOverwriteHelper with conjunctions in internal JSON object");
         }
         if (other.containsKey("class") && !other.get("class").equals("UnknownThingWithRoles")){
             initial.put("class", other.get("class"));
@@ -69,29 +69,55 @@ public class SemanticsModel {
                     initial.put(key, other.get(key));
                 } else if ((initial.get(key) instanceof JSONObject) &&
                         (other.get(key) instanceof JSONObject)){
-                    extendAndOverwrite(((JSONObject)initial.get(key)), ((JSONObject)other.get(key)));
+                    extendAndOverwriteHelper(((JSONObject) initial.get(key)), ((JSONObject) other.get(key)));
                 }
             }
         }
-        return initial;
     }
 
-    void insertAndOverwriteAtPointHelper(String slotPath, Object currentPoint, Object insertionContent){
+    void extendAndOverwriteAtPointHelper(String slotPath, Object currentPoint, JSONObject insertionContent){
+        if (currentPoint==null){
+            throw new Error("Can not extend null");
+        } else if (currentPoint instanceof String){
+            throw new Error("Can not extend a String");
+        } else if (currentPoint instanceof JSONObject){
 
+            if (slotPath.equals("")) {
+                extendAndOverwriteHelper((JSONObject)currentPoint, insertionContent);
+                return;
+            }
+            String[] fillerPath = slotPath.split("\\.");
+            String thisFiller = fillerPath[0];
+            List<String> remainingFillers = new LinkedList<>(Arrays.asList(fillerPath));
+            remainingFillers.remove(0);
+            String remainingSlotPath = String.join(".", remainingFillers);
+
+            if (((JSONObject) currentPoint).containsKey("class") &&
+                    (((JSONObject) currentPoint).get("class").equals("Or") ||
+                            ((JSONObject) currentPoint).get("class").equals("And"))){
+                JSONArray nestedArray = (JSONArray) ((JSONObject) currentPoint).get("Values");
+                for (Object child : nestedArray){
+                    extendAndOverwriteAtPointHelper(slotPath, child, insertionContent);
+                }
+            } else {
+                extendAndOverwriteAtPointHelper(remainingSlotPath, ((JSONObject) currentPoint).get(thisFiller),
+                        insertionContent);
+            }
+        } else {
+            assert false;
+        }
     }
 
     /*
-    * insert other and overwrite what is there currently at the point specified by slotPath
+    * Extend other and overwrite what is there currently at the point specified by slotPath
     *
-    * If slotPath filler is null, throw an error
-    *
+    * If slotPath filler is null or a String, throw an error
     * If slotPath filler is a single point, insert and overwrite at that point
-    *
     * If slotPath filler is a conjunction, insert and overwrite at all the points
     *
     * */
-    public void insertAndOverwriteAtPoint(String slotPath, SemanticsModel other){
-
+    public void extendAndOverwriteAtPoint(String slotPath, SemanticsModel other){
+        extendAndOverwriteAtPointHelper(slotPath, internalRepresentation, other.internalRepresentation);
     }
 
 
@@ -140,27 +166,6 @@ public class SemanticsModel {
         Object ans = getSlotPathFillerHelper(internalRepresentation, slotPath);
         return (ans==null)? null : ans.toString();
     }
-
-
-//    public Map<String, String> getAllSlotFillerPairs(){
-//        Map<String, String> ans = new HashMap<>();
-//        // collect top level slots/fillers
-//        // (exclude non-leaf pairs and special values (marked by surrounding arrow brackets))
-//        for (String slot : slots.keySet()){
-//            if (!children.containsKey(slots.get(slot)) && !slots.get(slot).matches("\\<.*\\>"))
-//                ans.put(slot, slots.get(slot));
-//        }
-//        // collect recursively
-//        for (String slot : slots.keySet()){
-//            if (!children.containsKey(slots.get(slot)))
-//                continue;
-//            Map<String, String> childSlotFillers = children.get(slots.get(slot)).getAllNonSpecialSlotFillerLeafPairs();
-//            for (String key : childSlotFillers.keySet()){
-//                ans.put(slot+"."+key, childSlotFillers.get(key));
-//            }
-//        }
-//        return ans;
-//    }
 
     public Map<String, String> getAllSlotFillerPairs(){
         return null;

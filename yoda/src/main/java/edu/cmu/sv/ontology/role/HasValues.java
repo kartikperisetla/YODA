@@ -11,8 +11,14 @@ import java.util.Set;
 
 /**
  * Created by David Cohen on 10/14/14.
+ *
+ * The role used by conjunctions to contain the set of values.
+ *
+ * {class: And,
+ *  HasValues: [{...}, {...}]}
+ *
  */
-public class HasValue0 extends Role {
+public class HasValues extends Role {
     static Set<Class <? extends ThingWithRoles>> domain = new HashSet<>(Arrays.asList(Conjunction.class));
     static Set<Class <? extends Thing>> range = new HashSet<>(Arrays.asList(ThingWithRoles.class));
 
