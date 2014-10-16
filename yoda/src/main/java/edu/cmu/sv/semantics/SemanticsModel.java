@@ -1,6 +1,8 @@
 package edu.cmu.sv.semantics;
 
 
+import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.Thing;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -25,6 +27,8 @@ public class SemanticsModel {
     public SemanticsModel(String jsonSource) throws ParseException {
         internalRepresentation = (JSONObject)parser.parse(jsonSource);
     }
+
+    public SemanticsModel(JSONObject internalRepresentation){this.internalRepresentation = internalRepresentation;}
 
     public SemanticsModel(){
         internalRepresentation = new JSONObject();
@@ -95,7 +99,7 @@ public class SemanticsModel {
             if (((JSONObject) currentPoint).containsKey("class") &&
                     (((JSONObject) currentPoint).get("class").equals("Or") ||
                             ((JSONObject) currentPoint).get("class").equals("And"))){
-                JSONArray nestedArray = (JSONArray) ((JSONObject) currentPoint).get("Values");
+                JSONArray nestedArray = (JSONArray) ((JSONObject) currentPoint).get("HasValues");
                 for (Object child : nestedArray){
                     extendAndOverwriteAtPointHelper(slotPath, child, insertionContent);
                 }
@@ -122,10 +126,17 @@ public class SemanticsModel {
 
 
     /*
-    * Recursive helper for the public method
+    * Returns:
+    *
+    * 1) A JSONObject directly copied from this if slotPath path refers to a non-ambiguous non-leaf node
+    * 2) A String if slotPath refers to a non-ambiguous leaf node
+    * 3) An OR node if the level of ambiguity closest to the root is an OR ambiguity
+    * 4) Same as above, replace OR with AND
+    * 5) null if the path is invalid
+    *
     * */
     //TODO: deal with null after conjunctions
-    private Object getSlotPathFillerHelper(Object startingPoint, String slotPath){
+    private static Object getSlotPathFillerHelper(Object startingPoint, String slotPath){
         if (slotPath.equals(""))
             return startingPoint;
         String[] fillerPath = slotPath.split("\\.");
@@ -141,11 +152,11 @@ public class SemanticsModel {
             JSONObject ans = new JSONObject();
             JSONArray ansArray = new JSONArray();
             ans.put("class", ((JSONObject) startingPoint).get("class"));
-            JSONArray nestedArray = (JSONArray) ((JSONObject) startingPoint).get("Values");
+            JSONArray nestedArray = (JSONArray) ((JSONObject) startingPoint).get("HasValues");
             for (Object child : nestedArray){
                 ansArray.add(getSlotPathFillerHelper(child, slotPath));
             }
-            ans.put("Values", ansArray);
+            ans.put("HasValues", ansArray);
             return ans;
         } else {
             return getSlotPathFillerHelper(((JSONObject) startingPoint).get(thisFiller), remainingSlotPath);
@@ -153,23 +164,98 @@ public class SemanticsModel {
     }
 
     /*
-    * Calls a helper, which returns:
-    *
-    * 1) A JSONObject directly copied from this if slotPath path refers to a non-ambiguous non-leaf node
-    * 2) A String if slotPath refers to a non-ambiguous leaf node
-    * 3) An OR node if the level of ambiguity closest to the root is an OR ambiguity
-    * 4) Same as above, replace OR with AND
-    * 5) null if the path is invalid
-    *
+    * Returns a String, null, or a JSONObject
     * */
+    public Object newGetSlotPathFiller(String slotPath){
+        Object ans = getSlotPathFillerHelper(internalRepresentation, slotPath);
+        return ans;
+    }
+
+    public Set<Object> getSlotsAtPath(String slotPath){
+        Object ans = getSlotPathFillerHelper(internalRepresentation, slotPath);
+        if (ans==null)
+            return null;
+        if (ans instanceof JSONObject)
+            return ((JSONObject) ans).keySet();
+        return null;
+    }
+
     public String getSlotPathFiller(String slotPath){
         Object ans = getSlotPathFillerHelper(internalRepresentation, slotPath);
         return (ans==null)? null : ans.toString();
     }
 
+
+    // TODO: re-implement
     public Map<String, String> getAllSlotFillerPairs(){
         return null;
     }
+
+
+    // TODO: validate DST models
+
+    /*
+    * Throws an error if the SLU hypothesis model is invalid
+    * according to the registered ontology
+    * */
+    public void validateSLUHypothesis() {
+        // there must be a dialog act
+        if (getSlotPathFiller("dialogAct")==null)
+            throw new Error("no dialog act in SLU model");
+        // there is a specific set of permitted slots in the top level
+        if (getSlotsAtPath("").stream().
+                anyMatch(x -> !x.equals("dialogAct") && !x.equals("verb") && !x.equals("topic")))
+            throw new Error("the top level contains unpermitted slots");
+
+        // check all children
+        for (Object child : internalRepresentation.values()){
+            try {
+                if (!(child instanceof JSONObject))
+                    continue;
+                validateThingDescription((JSONObject)child);
+            } catch (IllegalAccessException | InstantiationException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /*
+    * Recursively check that all the slots in a node are valid for the class of that node
+    * (does not check that the fillers are in the range for the role which corresponds to that slot)
+    * */
+    public static void validateThingDescription(JSONObject description) throws IllegalAccessException, InstantiationException {
+        String clsString = (String) getSlotPathFillerHelper(description, "class");
+        if (clsString==null)
+            throw new Error("thing description missing class slot: "+description);
+        Class<? extends Thing> cls = OntologyRegistry.thingNameMap.get(clsString);
+        // check that all slots correspond to roles which this node's class is in the domain of
+        for (Object slot : description.keySet()){
+            if (slot.equals("class"))
+                continue;
+            boolean inDomain = false;
+            if (!OntologyRegistry.roleNameMap.containsKey((String)slot))
+                throw new Error("thing description's class not in registry: "+description);
+            for (Class<? extends Thing> domainMember : OntologyRegistry.roleNameMap.get(slot).newInstance().getDomain()){
+                if (domainMember.isAssignableFrom(cls)) {
+                    inDomain = true;
+                    break;
+                }
+            }
+            if (!inDomain)
+                throw new Error("Class is not in slot's domain: "+description+", "+slot);
+        }
+
+        // check all children
+        for (Object child : description.values()){
+            if (!(child instanceof JSONObject))
+                continue;
+            validateThingDescription((JSONObject)child);
+        }
+    }
+
+
+
+
 
     @Override
     public int hashCode() {
@@ -190,4 +276,6 @@ public class SemanticsModel {
     public String toString() {
         return "SemanticsModel:\n"+internalRepresentation.toJSONString();
     }
+
+
 }

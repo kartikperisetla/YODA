@@ -48,7 +48,7 @@ public class TestSemanticsModel {
                 "\"dialogAct\":\"RequestDisambiguateValues\",\n" +
                 "\"topic\":{\"class\":\"UnknownThingWithRoles\",\n" +
                 "         \"HasAtTime\":{\"class\": \"Or\",\n" +
-                "                      \"Values\":[\n" +
+                "                      \"HasValues\":[\n" +
                 "                                {\"class\":\"Time\",\n" +
                 "                                 \"HasHour\":\""+uri1+"\"},\n" +
                 "                                {\"class\":\"Time\",\n" +

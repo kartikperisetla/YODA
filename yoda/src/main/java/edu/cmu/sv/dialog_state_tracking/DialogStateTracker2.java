@@ -1,6 +1,5 @@
 package edu.cmu.sv.dialog_state_tracking;
 
-import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.HypothesisSetManagement;
 import edu.cmu.sv.utils.StringDistribution;
@@ -24,10 +23,12 @@ public class DialogStateTracker2 {
     public DiscourseUnit2 getDiscourseUnit(){return discourseUnit;}
 
     public void updateDialogState(Turn turn, float timeStamp) throws IllegalAccessException, InstantiationException {
+        System.out.println("DST.updateDialogState");
         // validate input
         if (turn.hypotheses!=null) {
             for (SemanticsModel sm : turn.hypotheses.values()) {
-                assert OntologyRegistry.validateSLUHypothesis(sm);
+                System.out.println(sm);
+                sm.validateSLUHypothesis();
             }
         }
         int newDUHypothesisCounter = 0;
