@@ -18,11 +18,16 @@ public class DialogStateTracker2 {
 
     DiscourseUnit2 discourseUnit;
 
-    public DialogStateTracker2(){discourseUnit = new DiscourseUnit2();}
+    public DialogStateTracker2(){
+        discourseUnit = new DiscourseUnit2();
+        discourseUnit.hypothesisDistribution.put("initial_hypothesis", 1.0);
+        discourseUnit.hypotheses.put("initial_hypothesis", new DiscourseUnit2.DialogStateHypothesis());
+    }
 
     public DiscourseUnit2 getDiscourseUnit(){return discourseUnit;}
 
     public void updateDialogState(Turn turn, float timeStamp) throws IllegalAccessException, InstantiationException {
+        System.out.println("DialogStateTracker2.updateDialogStateTurn: new turn. speaker="+turn.speaker);
         // validate input
         if (turn.hypotheses!=null) {
             for (SemanticsModel sm : turn.hypotheses.values()) {
@@ -54,6 +59,11 @@ public class DialogStateTracker2 {
         discourseUnit.hypotheses = new HashMap<>();
         for (String key : discourseUnit.hypothesisDistribution.keySet()){
             discourseUnit.hypotheses.put(key, newHypotheses.get(key));
+        }
+
+        System.out.println("End of DialogStateTracker2.updateDialogStateTurn. discourseUnit.hypotheses:\n");
+        for (DiscourseUnit2.DialogStateHypothesis hyp : discourseUnit.hypotheses.values()){
+            System.out.println(hyp+"\n");
         }
     }
 }

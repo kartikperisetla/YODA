@@ -4,6 +4,7 @@ import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
 import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.semantics.SemanticsModel;
+import org.json.simple.parser.ParseException;
 
 /**
  * Created by David Cohen on 9/19/14.
@@ -34,7 +35,8 @@ public class PresentationInference implements DiscourseUnitUpdateInference {
                         DiscourseUnit2.DialogStateHypothesis newDUHypothesis =
                                 new DiscourseUnit2.DialogStateHypothesis();
                         SemanticsModel newSpokenByThemHypothesis = turn.hypotheses.get(sluHypothesisID).deepCopy();
-                        newSpokenByThemHypothesis.getSlots().put("dialogAct", newDAClass.getSimpleName());
+                        newSpokenByThemHypothesis.extendAndOverwrite(
+                                new SemanticsModel("{\"dialogAct\":\""+newDAClass.getSimpleName()+"\"}"));
                         ans.getHypothesisDistribution().put(newDUHypothesisID, penaltyForReinterpretingFragment);
                         newDUHypothesis.timeOfLastActByThem = timeStamp;
                         newDUHypothesis.spokenByThem = newSpokenByThemHypothesis;

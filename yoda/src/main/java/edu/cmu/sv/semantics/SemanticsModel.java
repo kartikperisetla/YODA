@@ -24,8 +24,13 @@ public class SemanticsModel {
     public static JSONParser parser = new JSONParser();
     JSONObject internalRepresentation;
 
-    public SemanticsModel(String jsonSource) throws ParseException {
-        internalRepresentation = (JSONObject)parser.parse(jsonSource);
+    public SemanticsModel(String jsonSource) {
+        try {
+            internalRepresentation = (JSONObject)parser.parse(jsonSource);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new Error("jsonSource is invalid");
+        }
     }
 
     public SemanticsModel(JSONObject internalRepresentation){this.internalRepresentation = internalRepresentation;}
@@ -185,6 +190,26 @@ public class SemanticsModel {
         return (ans==null)? null : ans.toString();
     }
 
+    // TODO: deal with conjunctions
+    private Set<String> getAllInternalNodePathsHelper(JSONObject currentPoint){
+        Set<String> ans = new HashSet<>();
+        for (Object key : currentPoint.keySet()) {
+            if (currentPoint.get(key) instanceof JSONObject){
+                ans.add((String) key);
+                for (String childAns : getAllInternalNodePathsHelper((JSONObject) currentPoint.get(key))){
+                    ans.add(((String)key)+"."+childAns);
+                }
+            }
+        }
+        return ans;
+    }
+
+    /*
+    * Return all the slot paths that point to JSONObjects
+    * */
+    public Set<String> getAllInternalNodePaths(){
+        return getAllInternalNodePathsHelper(internalRepresentation);
+    }
 
     // TODO: re-implement
     public Map<String, String> getAllSlotFillerPairs(){

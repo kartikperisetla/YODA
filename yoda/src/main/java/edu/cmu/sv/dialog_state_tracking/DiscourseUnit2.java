@@ -62,13 +62,21 @@ public class DiscourseUnit2 {
         public void setTimeOfLastActByMe(Float timeOfLastActByMe) {
             this.timeOfLastActByMe = timeOfLastActByMe;
         }
+
+        @Override
+        public String toString() {
+            return "DialogStateHypothesis{" +
+                    "\ntimeOfLastActByThem=" + timeOfLastActByThem +
+                    ", timeOfLastActByMe=" + timeOfLastActByMe +
+                    "\nspokenByMe=" + spokenByMe +
+                    "\nspokenByThem=" + spokenByThem +
+                    '}';
+        }
     }
 
     public DiscourseUnit2() {
         hypothesisDistribution = new StringDistribution();
-        hypothesisDistribution.put("initial_hypothesis", 1.0);
         hypotheses = new HashMap<>();
-        hypotheses.put("initial_hypothesis", new DialogStateHypothesis());
     }
 
     public StringDistribution getHypothesisDistribution() {

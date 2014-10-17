@@ -1,9 +1,5 @@
 package edu.cmu.sv.dialog_state_tracking;
 
-import org.apache.commons.lang3.tuple.Pair;
-
-import java.util.Set;
-
 /**
  * Created by David Cohen on 9/19/14.
  *

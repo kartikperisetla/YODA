@@ -1,10 +1,8 @@
 package edu.cmu.sv;
 
-import edu.cmu.sv.database.Database;
 import edu.cmu.sv.dialog_state_tracking.DSTTester;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
 import edu.cmu.sv.dialog_state_tracking.Turn;
-import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.StringDistribution;
 import org.json.simple.parser.ParseException;
@@ -30,7 +28,7 @@ public class TestDSTClarification {
         // so to reduce the chance of making variable scope mistakes,
         // I made a separate function for each one
         try {
-            for (DSTTester testDialog : Arrays.asList(testCase1(), testCase2())) {
+            for (DSTTester testDialog : Arrays.asList(testCase1())) {
                 System.out.println(testDialog.evaluate());
             }
         } catch (ParseException e) {
@@ -46,8 +44,10 @@ public class TestDSTClarification {
         Set up a meeting at 10
         S: requestDisambiguateValues
         1 or 10?
-                U: fragment
+        U: fragment
         10
+        S: Accept
+        Ok
     */
     DSTTester testCase1() throws ParseException {
         String jsonString;
@@ -118,12 +118,12 @@ public class TestDSTClarification {
                 "\"topic\":{\"class\":\"UnknownThingWithRoles\",\n" +
                 "         \"HasAtTime\":{\"class\": \"Or\",\n" +
                 "                      \"HasValues\":[\n" +
-                "                                {\"class\":\"Time\",\n" +
-                "                                 \"HasHour\":\""+uri3+"\"},\n" +
-                "                                {\"class\":\"Time\",\n" +
-                "                                 \"HasHour\":\""+uri4+"\"}\n" +
-                "                               ]}}\n" +
-                "}";
+                "                                   {\"class\":\"Time\",\n" +
+                "                                    \"HasHour\":\""+uri3+"\"},\n" +
+                "                                   {\"class\":\"Time\",\n" +
+                "                                    \"HasHour\":\""+uri4+"\"}\n" +
+                "                                  ]}}\n" +
+                "}\n";
         SemanticsModel sm3 = new SemanticsModel(jsonString);
 
         currentTurn = new Turn("system", sm3.deepCopy(), null, null);
@@ -142,12 +142,10 @@ public class TestDSTClarification {
         }
 
         jsonString = "{\n" +
-                "\"dialogAct\":\"Command\",\n" +
-                "\"verb\":{\"class\":\"Create\",\n" +
-                "        \"Patient\":{\"class\":\"Meeting\",\n" +
-                "                   \"HasAtTime\":{\"class\":\"Time\",\n" +
-                "                                \"HasHour\":\""+uri5+"\"}}}\n" +
-                "}";
+                "\"dialogAct\":\"Fragment\",\n" +
+                "\"topic\":{\"class\":\"UnknownThingWithRoles\",\n" +
+                "         \"HasHour\":\""+uri5+"\"}\n" +
+                "}\n";
         SemanticsModel sm4 = new SemanticsModel(jsonString);
 
         sluHypotheses = new HashMap<>();
