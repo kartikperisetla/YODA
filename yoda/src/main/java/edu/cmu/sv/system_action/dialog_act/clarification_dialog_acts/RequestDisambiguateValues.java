@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * Created by David Cohen on 9/15/14.
  */
-public class RequestDisambiguateValue extends DialogAct {
+public class RequestDisambiguateValues extends DialogAct {
     private Map<String, String> boundVariables = null;
     static Map<String, String> parameters = new HashMap<>();
     static {

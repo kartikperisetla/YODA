@@ -14,6 +14,7 @@ public class DialogStateTracker2 {
     static {
         updateInferences = new HashSet<>();
         updateInferences.add(PresentationInference.class);
+        updateInferences.add(SuggestedInference.class);
     }
 
     DiscourseUnit2 discourseUnit;

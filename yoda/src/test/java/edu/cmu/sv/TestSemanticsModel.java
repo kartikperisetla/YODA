@@ -1,6 +1,7 @@
 package edu.cmu.sv;
 
 import edu.cmu.sv.semantics.SemanticsModel;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.junit.Test;
 import org.openrdf.query.MalformedQueryException;
@@ -100,5 +101,14 @@ public class TestSemanticsModel {
 
         sm5.extendAndOverwriteAtPoint("verb.Patient.HasAtTime", sm6);
         System.out.println(sm5);
+
+
+        System.out.println("\nWrapping demonstration");
+        jsonString = "{\"class\":\"Time\",\"HasHour\":\"blahblah_auto_gen\"}";
+        SemanticsModel sm7 = new SemanticsModel(jsonString);
+        System.out.println(sm7);
+        SemanticsModel.wrap((JSONObject)sm7.newGetSlotPathFiller(""), "Suggested", "HasValue");
+        System.out.println(sm7);
+
     }
 }

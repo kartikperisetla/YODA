@@ -205,6 +205,24 @@ public class SemanticsModel {
     }
 
     /*
+    * turn: {class: X, ...}
+    * into
+    * {class: wrapperClass, wrappingRole: {class: X, ...}}
+    *
+    * modifies the source object in place
+    * */
+    public static void wrap(JSONObject source, String wrapperClass, String wrappingRole){
+        JSONObject tmp = new JSONObject();
+        List<Object> keyList = new LinkedList<Object>(source.keySet());
+        for (Object key: keyList){
+            tmp.put(key, source.get(key));
+            source.remove(key);
+        }
+        source.put("class", wrapperClass);
+        source.put(wrappingRole, tmp);
+    }
+
+    /*
     * Return all the slot paths that point to JSONObjects
     * */
     public Set<String> getAllInternalNodePaths(){
@@ -215,9 +233,6 @@ public class SemanticsModel {
     public Map<String, String> getAllSlotFillerPairs(){
         return null;
     }
-
-
-    // TODO: validate DST models
 
     /*
     * Throws an error if the SLU hypothesis model is invalid
