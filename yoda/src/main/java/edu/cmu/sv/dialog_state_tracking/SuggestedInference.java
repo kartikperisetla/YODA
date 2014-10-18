@@ -41,16 +41,21 @@ public class SuggestedInference implements DiscourseUnitUpdateInference {
 
                 if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(RequestConfirmValue.class)){
                     JSONObject daContent = (JSONObject) hypModel.newGetSlotPathFiller("topic");
-                    String roleOfInterest = null;
-                    for (Object key : daContent.keySet())
-                        if (!key.equals("class"))
-                            roleOfInterest=(String)key;
+//                    String roleOfInterest = null;
+//                    for (Object key : daContent.keySet())
+//                        if (!key.equals("class"))
+//                            roleOfInterest=(String)key;
 
                     Map<String, Double> attachmentPoints = Utils.findPossiblePointsOfAttachment(
                             currentState.getSpokenByThem(), daContent);
                     SemanticsModel wrapped = new SemanticsModel(daContent.toJSONString());
-                    SemanticsModel.wrap((JSONObject) wrapped.newGetSlotPathFiller(roleOfInterest),
+//                    SemanticsModel.wrap((JSONObject) wrapped.newGetSlotPathFiller(roleOfInterest),
+//                            Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
+
+                    SemanticsModel.wrap((JSONObject) wrapped.newGetSlotPathFiller(""),
                             Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
+
+
 
                     for (String attachmentPoint : attachmentPoints.keySet()){
                         String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
@@ -72,22 +77,31 @@ public class SuggestedInference implements DiscourseUnitUpdateInference {
 
             if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(RequestConfirmValue.class)){
                 JSONObject daContent = (JSONObject) turn.systemUtterance.newGetSlotPathFiller("topic");
-                String roleOfInterest = null;
-                for (Object key : daContent.keySet())
-                    if (!key.equals("class"))
-                        roleOfInterest=(String)key;
+//                String roleOfInterest = null;
+//                for (Object key : daContent.keySet())
+//                    if (!key.equals("class"))
+//                        roleOfInterest=(String)key;
 
                 Map<String, Double> attachmentPoints = Utils.findPossiblePointsOfAttachment(
                         currentState.getSpokenByThem(), daContent);
                 SemanticsModel wrapped = new SemanticsModel(daContent.toJSONString());
-                SemanticsModel.wrap((JSONObject) wrapped.newGetSlotPathFiller(roleOfInterest),
+//                SemanticsModel.wrap((JSONObject) wrapped.newGetSlotPathFiller(roleOfInterest),
+//                        Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
+                SemanticsModel.wrap((JSONObject) wrapped.newGetSlotPathFiller(""),
                         Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
+
+                System.out.println("Wrapped:\n"+wrapped);
+
+                System.out.println("Attachment Points:");
+                System.out.println(attachmentPoints.keySet());
 
                 for (String attachmentPoint : attachmentPoints.keySet()){
                     String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
                     DiscourseUnit2.DialogStateHypothesis newDUHypothesis =
                             new DiscourseUnit2.DialogStateHypothesis();
                     SemanticsModel newSpokenByMeHypothesis = currentState.getSpokenByThem().deepCopy();
+                    SemanticsModel.wrap((JSONObject)newSpokenByMeHypothesis.newGetSlotPathFiller(attachmentPoint),
+                            Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
                     newSpokenByMeHypothesis.extendAndOverwriteAtPoint(attachmentPoint, wrapped);
                     ans.getHypothesisDistribution().put(newDUHypothesisID, attachmentPoints.get(attachmentPoint));
                     newDUHypothesis.timeOfLastActByMe = timeStamp;

@@ -83,6 +83,20 @@ public class OntologyRegistry {
         addToNameMap(thingNameMap, miscClasses);
     }
 
+    public static boolean existsAClassInRangeOfAll(Set<Class <? extends Role>> roles){
+        Set<Class> possibleClasses = new HashSet<>(thingNameMap.values());
+        possibleClasses.remove(UnknownThingWithRoles.class);
+        for (Class<? extends Role> roleClass : roles){
+            try {
+                possibleClasses.retainAll(roleClass.newInstance().getDomain());
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+//        System.out.println("OntologyRegistry.existsAClassInRangeOfAll: possibleClasses:"+possibleClasses);
+        return !possibleClasses.isEmpty();
+    }
+
     public static <S,T> void addToNameMap(Map<String, Class <? extends S>> nameMap, Set<Class <? extends T>> classSet){
         for (Class <? extends T> cls : classSet){
             String id = cls.getSimpleName();

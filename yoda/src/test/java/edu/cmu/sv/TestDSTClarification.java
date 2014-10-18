@@ -105,24 +105,17 @@ public class TestDSTClarification {
 
         /// Turn 2
         String uri3 = null;
-        String uri4 = null;
         try {
             uri3 = yodaEnvironment.db.insertValue(1);
-            uri4 = yodaEnvironment.db.insertValue(10);
         } catch (MalformedQueryException | RepositoryException | UpdateExecutionException e) {
             e.printStackTrace();
         }
 
         jsonString = "{\n" +
-                "\"dialogAct\":\"RequestDisambiguateValues\",\n" +
+                "\"dialogAct\":\"RequestConfirmValue\",\n" +
                 "\"topic\":{\"class\":\"UnknownThingWithRoles\",\n" +
-                "         \"HasAtTime\":{\"class\": \"Or\",\n" +
-                "                      \"HasValues\":[\n" +
-                "                                   {\"class\":\"Time\",\n" +
-                "                                    \"HasHour\":\""+uri3+"\"},\n" +
-                "                                   {\"class\":\"Time\",\n" +
-                "                                    \"HasHour\":\""+uri4+"\"}\n" +
-                "                                  ]}}\n" +
+                "         \"HasAtTime\":{\"class\":\"Time\",\n" +
+                "                      \"HasHour\":\""+uri3+"\"}}\n" +
                 "}\n";
         SemanticsModel sm3 = new SemanticsModel(jsonString);
 

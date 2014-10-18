@@ -1,13 +1,17 @@
 package edu.cmu.sv.dialog_state_tracking;
 
+import com.google.common.collect.Iterables;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
+import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.semantics.SemanticsModel;
 import org.json.simple.JSONObject;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by David Cohen on 10/17/14.
@@ -29,6 +33,8 @@ public class Utils {
         Class <? extends Thing> insertionClass = OntologyRegistry.thingNameMap.
                 get((String) insertionContent.get("class"));
 
+//        System.out.println("Utils.findPossiblePointsOfAttachment: insertionContent:"+insertionContent);
+
         for (String slotPath : dialogStateSM.getAllInternalNodePaths()){
             // if this node isn't a Thing description node, ignore it
             if (!dialogStateSM.getSlotsAtPath(slotPath).contains("class"))
@@ -36,6 +42,15 @@ public class Utils {
             //
             Class <? extends Thing> attachmentPointClass = OntologyRegistry.thingNameMap.
                     get((String) dialogStateSM.newGetSlotPathFiller(slotPath + ".class"));
+
+            Set<Class <? extends Role>> rolesAtPoint = new HashSet<>();
+            for (Object key : Iterables.concat(dialogStateSM.getSlotsAtPath(slotPath), insertionContent.keySet())){
+                if (!key.equals("class"))
+                    rolesAtPoint.add(OntologyRegistry.roleNameMap.get((String)key));
+            }
+
+            if (!OntologyRegistry.existsAClassInRangeOfAll(rolesAtPoint))
+                continue;
 
             // allow attachment if there is class compatibility
             if (insertionClass.isAssignableFrom(attachmentPointClass)){
@@ -50,5 +65,7 @@ public class Utils {
         }
         return ans;
     }
+
+
 
 }
