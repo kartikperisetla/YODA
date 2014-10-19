@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables;
 import edu.cmu.sv.system_action.dialog_act.*;
 import edu.cmu.sv.system_action.dialog_act.clarification_dialog_acts.*;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Command;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.WHQuestion;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.YNQuestion;
 import edu.cmu.sv.system_action.dialog_task.DialogTask;
@@ -13,10 +14,7 @@ import edu.cmu.sv.system_action.non_dialog_task.CreateMeetingTask;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.system_action.non_dialog_task.SendEmailTask;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by David Cohen on 9/8/14.
@@ -64,7 +62,7 @@ public class DialogRegistry {
         nonDialogTaskRegistry.get(Command.class).add(SendEmailTask.class);
 
         for (Class<? extends DialogAct> cls : Iterables.concat(discourseUnitDialogActs,
-                clarificationDialogActs)) {
+                clarificationDialogActs, Arrays.asList(Fragment.class))) {
             dialogActNameMap.put(cls.getSimpleName(), cls);
         }
 

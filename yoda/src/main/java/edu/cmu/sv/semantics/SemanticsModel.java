@@ -11,6 +11,7 @@ import org.json.simple.parser.ParseException;
 
 import java.lang.Object;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by David Cohen on 8/27/14.
@@ -220,6 +221,35 @@ public class SemanticsModel {
         }
         source.put("class", wrapperClass);
         source.put(wrappingRole, tmp);
+    }
+
+    /*
+    * turn: {class: X, wrappingRole: {ABC}}
+    * into
+    * {ABC}
+    *
+    * does not matter what the wrapping class is
+    * modifies the source object in place
+    * does not delete the nested JSONObject or remove its contents, just copies them to the new object
+    * */
+    public static void unwrap(JSONObject source, String wrappingRole){
+        Object nested = source.get(wrappingRole);
+        List<Object> keyList = new LinkedList<Object>(source.keySet());
+        for (Object key: keyList){
+            source.remove(key);
+        }
+        for (Object key: ((JSONObject)nested).keySet()){
+            source.put(key, ((JSONObject) nested).get(key));
+        }
+    }
+
+    /*
+    * Find all the slot paths who are filled by an entity description of class clsName
+    * */
+    public Set<String> findAllPathsToClass(String clsName){
+        return getAllInternalNodePaths().stream().
+                filter(x -> clsName.equals(newGetSlotPathFiller(x+".class"))).
+                collect(Collectors.toSet());
     }
 
     /*
