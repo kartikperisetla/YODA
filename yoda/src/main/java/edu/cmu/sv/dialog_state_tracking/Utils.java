@@ -66,6 +66,39 @@ public class Utils {
         return ans;
     }
 
+    /*
+    * Detect weather there will be any conflicts while extending source with insertionContent
+    * */
+    public static boolean anyConflicts(JSONObject source, JSONObject insertionContent){
+        // check for class compatibility
+        Class sourceClass = OntologyRegistry.thingNameMap.get(source.get("class"));
+        Class insertionClass = OntologyRegistry.thingNameMap.get(insertionContent.get("class"));
+        if (!(sourceClass.isAssignableFrom(insertionClass) ||
+                insertionClass.isAssignableFrom(sourceClass) ||
+                sourceClass.equals(UnknownThingWithRoles.class) ||
+                insertionClass.equals(UnknownThingWithRoles.class)))
+            return false;
+
+        // check recursively for other role compatibility
+        for (Object key : insertionContent.keySet()){
+            if (key.equals("class")){
+                continue;
+            } else {
+                if (source.containsKey(key)){
+                    if (source.get(key) instanceof String &&
+                            !(source.get(key).equals(insertionContent.get(key)))) {
+                        return false;
+                    } else if (insertionContent.get(key) instanceof String &&
+                            !(insertionContent.get(key).equals(source.get(key)))) {
+                        return false;
+                    } else if (anyConflicts((JSONObject) source.get(key), (JSONObject) insertionContent.get(key))){
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
 
 
 }

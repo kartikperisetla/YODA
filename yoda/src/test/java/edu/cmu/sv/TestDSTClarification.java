@@ -115,7 +115,7 @@ public class TestDSTClarification {
                 "\"dialogAct\":\"RequestConfirmValue\",\n" +
                 "\"topic\":{\"class\":\"UnknownThingWithRoles\",\n" +
                 "         \"HasAtTime\":{\"class\":\"Time\",\n" +
-                "                      \"HasHour\":\""+uri3+"\"}}\n" +
+                "                      \"HasHour\":\""+uri1+"\"}}\n" +
                 "}\n";
         SemanticsModel sm3 = new SemanticsModel(jsonString);
 
@@ -137,7 +137,7 @@ public class TestDSTClarification {
         jsonString = "{\n" +
                 "\"dialogAct\":\"Fragment\",\n" +
                 "\"topic\":{\"class\":\"UnknownThingWithRoles\",\n" +
-                "         \"HasHour\":\""+uri5+"\"}\n" +
+                "         \"HasHour\":\""+uri1+"\"}\n" +
                 "}\n";
         SemanticsModel sm4 = new SemanticsModel(jsonString);
 
