@@ -25,8 +25,8 @@ public class DiscourseUnit2 {
         Float timeOfLastActByMe;
 
         public DialogStateHypothesis() {
-            spokenByMe = new SemanticsModel();
-            spokenByThem = new SemanticsModel();
+            spokenByMe = new SemanticsModel("{\"dialogAct\":null, \"verb\":{}}");
+            spokenByThem = new SemanticsModel("{\"dialogAct\":null, \"verb\":{}}");
             timeOfLastActByThem = null;
             timeOfLastActByMe = null;
         }

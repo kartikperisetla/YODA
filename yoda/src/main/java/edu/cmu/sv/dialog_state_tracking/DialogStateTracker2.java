@@ -29,6 +29,7 @@ public class DialogStateTracker2 {
     public DiscourseUnit2 getDiscourseUnit(){return discourseUnit;}
 
     public void updateDialogState(Turn turn, float timeStamp) throws IllegalAccessException, InstantiationException {
+        System.out.println("\n====== Turn ======");
         // validate input
         if (turn.hypotheses!=null) {
             for (SemanticsModel sm : turn.hypotheses.values()) {
@@ -64,7 +65,6 @@ public class DialogStateTracker2 {
         discourseUnit.hypothesisDistribution.normalize();
 
         String topHyp = discourseUnit.hypothesisDistribution.getTopHypothesis();
-        System.out.println("\n====== End of turn ======");
         System.out.println("top dialog state hypothesis: (p="+discourseUnit.hypothesisDistribution.get(topHyp)+ ")");
         System.out.println(discourseUnit.hypotheses.get(topHyp));
 

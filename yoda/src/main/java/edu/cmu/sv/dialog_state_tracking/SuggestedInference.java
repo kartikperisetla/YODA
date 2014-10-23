@@ -61,7 +61,10 @@ public class SuggestedInference implements DiscourseUnitUpdateInference {
                         String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
                         DiscourseUnit2.DialogStateHypothesis newDUHypothesis =
                                 new DiscourseUnit2.DialogStateHypothesis();
-                        SemanticsModel newSpokenByThemHypothesis = currentState.getSpokenByMe().deepCopy();
+                        SemanticsModel newSpokenByThemHypothesis = currentState.getSpokenByThem().deepCopy();
+                        newSpokenByThemHypothesis.placeAtPoint("verb",
+                                new SemanticsModel(((JSONObject)currentState.getSpokenByMe().
+                                        newGetSlotPathFiller("verb"))).deepCopy());
                         newSpokenByThemHypothesis.extendAndOverwriteAtPoint(attachmentPoint, wrapped);
                         SemanticsModel.wrap((JSONObject) newSpokenByThemHypothesis.newGetSlotPathFiller(attachmentPoint),
                                 Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
@@ -90,7 +93,12 @@ public class SuggestedInference implements DiscourseUnitUpdateInference {
                     String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
                     DiscourseUnit2.DialogStateHypothesis newDUHypothesis =
                             new DiscourseUnit2.DialogStateHypothesis();
-                    SemanticsModel newSpokenByMeHypothesis = currentState.getSpokenByThem().deepCopy();
+
+                    SemanticsModel newSpokenByMeHypothesis = currentState.getSpokenByMe().deepCopy();
+                    newSpokenByMeHypothesis.placeAtPoint("verb",
+                            new SemanticsModel(((JSONObject) currentState.getSpokenByThem().
+                                    newGetSlotPathFiller("verb"))).deepCopy());
+
                     SemanticsModel.wrap((JSONObject)newSpokenByMeHypothesis.newGetSlotPathFiller(attachmentPoint),
                             Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
                     newSpokenByMeHypothesis.extendAndOverwriteAtPoint(attachmentPoint, wrapped);

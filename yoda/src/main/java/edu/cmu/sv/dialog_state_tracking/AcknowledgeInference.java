@@ -43,7 +43,11 @@ public class AcknowledgeInference implements DiscourseUnitUpdateInference {
                     String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
                     DiscourseUnit2.DialogStateHypothesis newDUHypothesis =
                             new DiscourseUnit2.DialogStateHypothesis();
-                    SemanticsModel newSpokenByThemHypothesis = currentState.getSpokenByMe().deepCopy();
+                    SemanticsModel newSpokenByThemHypothesis = currentState.getSpokenByThem().deepCopy();
+                    newSpokenByThemHypothesis.placeAtPoint("verb",
+                            new SemanticsModel(((JSONObject)currentState.getSpokenByMe().
+                                    newGetSlotPathFiller("verb"))).deepCopy());
+//                    SemanticsModel newSpokenByThemHypothesis = currentState.getSpokenByMe().deepCopy();
                     for (String acceptancePath: suggestionPaths) {
                         SemanticsModel.unwrap((JSONObject) newSpokenByThemHypothesis.newGetSlotPathFiller(acceptancePath),
                                 HasValue.class.getSimpleName());
@@ -77,8 +81,10 @@ public class AcknowledgeInference implements DiscourseUnitUpdateInference {
                     String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
                     DiscourseUnit2.DialogStateHypothesis newDUHypothesis =
                             new DiscourseUnit2.DialogStateHypothesis();
-                    SemanticsModel newSpokenByThemHypothesis = currentState.getSpokenByMe().deepCopy();
-                    // unwrap the suggestion
+                    SemanticsModel newSpokenByThemHypothesis = currentState.getSpokenByThem().deepCopy();
+                    newSpokenByThemHypothesis.placeAtPoint("verb",
+                            new SemanticsModel(((JSONObject)currentState.getSpokenByMe().
+                                    newGetSlotPathFiller("verb"))).deepCopy());                    // unwrap the suggestion
                     SemanticsModel.unwrap((JSONObject) newSpokenByThemHypothesis.newGetSlotPathFiller(suggestionPath),
                             HasValue.class.getSimpleName());
                     // deal with potential over-answering by extending the suggestion with the new content
@@ -101,7 +107,10 @@ public class AcknowledgeInference implements DiscourseUnitUpdateInference {
                 String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
                 DiscourseUnit2.DialogStateHypothesis newDUHypothesis =
                         new DiscourseUnit2.DialogStateHypothesis();
-                SemanticsModel newSpokenByMeHypothesis = currentState.getSpokenByThem().deepCopy();
+                SemanticsModel newSpokenByMeHypothesis = currentState.getSpokenByMe().deepCopy();
+                newSpokenByMeHypothesis.placeAtPoint("verb",
+                        new SemanticsModel(((JSONObject) currentState.getSpokenByThem().
+                                newGetSlotPathFiller("verb"))).deepCopy());
                 for (String acceptancePath: suggestionPaths) {
                     SemanticsModel.unwrap((JSONObject) newSpokenByMeHypothesis.newGetSlotPathFiller(acceptancePath),
                             HasValue.class.getSimpleName());
