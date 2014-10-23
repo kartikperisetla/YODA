@@ -52,7 +52,7 @@ public class SuggestedInference implements DiscourseUnitUpdateInference {
                     JSONObject daContent = (JSONObject) hypModel.newGetSlotPathFiller("topic");
 
                     Map<String, Double> attachmentPoints = Utils.findPossiblePointsOfAttachment(
-                            currentState.getSpokenByThem(), daContent);
+                            currentState.getSpokenByMe(), daContent);
                     SemanticsModel wrapped = new SemanticsModel(daContent.toJSONString());
                     SemanticsModel.wrap((JSONObject) wrapped.newGetSlotPathFiller(""),
                             Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
@@ -61,12 +61,14 @@ public class SuggestedInference implements DiscourseUnitUpdateInference {
                         String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
                         DiscourseUnit2.DialogStateHypothesis newDUHypothesis =
                                 new DiscourseUnit2.DialogStateHypothesis();
-                        SemanticsModel newSpokenByThemHypothesis = currentState.getSpokenByThem().deepCopy();
+                        SemanticsModel newSpokenByThemHypothesis = currentState.getSpokenByMe().deepCopy();
                         newSpokenByThemHypothesis.extendAndOverwriteAtPoint(attachmentPoint, wrapped);
                         SemanticsModel.wrap((JSONObject) newSpokenByThemHypothesis.newGetSlotPathFiller(attachmentPoint),
                                 Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
                         ans.getHypothesisDistribution().put(newDUHypothesisID, attachmentPoints.get(attachmentPoint) *
                                 penaltyForReinterpretingFragment);
+                        newDUHypothesis.timeOfLastActByMe = currentState.timeOfLastActByMe;
+                        newDUHypothesis.setSpokenByMe(currentState.spokenByMe.deepCopy());
                         newDUHypothesis.timeOfLastActByThem = timeStamp;
                         newDUHypothesis.spokenByThem = newSpokenByThemHypothesis;
                         ans.hypotheses.put(newDUHypothesisID, newDUHypothesis);
@@ -93,6 +95,8 @@ public class SuggestedInference implements DiscourseUnitUpdateInference {
                             Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
                     newSpokenByMeHypothesis.extendAndOverwriteAtPoint(attachmentPoint, wrapped);
                     ans.getHypothesisDistribution().put(newDUHypothesisID, attachmentPoints.get(attachmentPoint));
+                    newDUHypothesis.timeOfLastActByThem = currentState.timeOfLastActByThem;
+                    newDUHypothesis.setSpokenByThem(currentState.spokenByThem.deepCopy());
                     newDUHypothesis.timeOfLastActByMe = timeStamp;
                     newDUHypothesis.spokenByMe = newSpokenByMeHypothesis;
                     ans.hypotheses.put(newDUHypothesisID, newDUHypothesis);

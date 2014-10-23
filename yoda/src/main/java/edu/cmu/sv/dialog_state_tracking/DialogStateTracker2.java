@@ -61,10 +61,11 @@ public class DialogStateTracker2 {
         for (String key : discourseUnit.hypothesisDistribution.keySet()){
             discourseUnit.hypotheses.put(key, newHypotheses.get(key));
         }
+        discourseUnit.hypothesisDistribution.normalize();
 
         String topHyp = discourseUnit.hypothesisDistribution.getTopHypothesis();
         System.out.println("\n====== End of turn ======");
-        System.out.println("top dialog state hypothesis:");
+        System.out.println("top dialog state hypothesis: (p="+discourseUnit.hypothesisDistribution.get(topHyp)+ ")");
         System.out.println(discourseUnit.hypotheses.get(topHyp));
 
 //        System.out.println("End of DialogStateTracker2.updateDialogStateTurn. discourseUnit.hypotheses:\n");

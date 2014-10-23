@@ -3,6 +3,8 @@ package edu.cmu.sv;
 import edu.cmu.sv.dialog_state_tracking.DSTTester;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
 import edu.cmu.sv.dialog_state_tracking.Turn;
+import edu.cmu.sv.ontology.misc.WebResource;
+import edu.cmu.sv.ontology.role.HasURI;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.StringDistribution;
 import org.json.simple.parser.ParseException;
@@ -21,6 +23,12 @@ import java.util.*;
  */
 public class TestDSTClarification {
 
+
+    public String WebResourceWrap(String URI){
+        String ans = "{\"class\": \""+ WebResource.class.getSimpleName()+"\", \""+
+                HasURI.class.getSimpleName()+"\":\""+URI+"\"}";
+        return ans;
+    }
 
     @Test
     public void Test() {
@@ -76,7 +84,7 @@ public class TestDSTClarification {
                 "\"verb\":{\"class\":\"Create\",\n" +
                 "        \"Patient\":{\"class\":\"Meeting\",\n" +
                 "                   \"HasAtTime\":{\"class\":\"Time\",\n" +
-                "                                \"HasHour\":\""+uri1+"\"}}}\n" +
+                "                                \"HasHour\":"+WebResourceWrap(uri1)+"}}}\n" +
                 "}";
         SemanticsModel sm1 = new SemanticsModel(jsonString);
 
@@ -85,7 +93,7 @@ public class TestDSTClarification {
                 "\"verb\":{\"class\":\"Create\",\n" +
                 "        \"Patient\":{\"class\":\"Meeting\",\n" +
                 "                   \"HasAtTime\":{\"class\":\"Time\",\n" +
-                "                                \"HasHour\":\""+uri2+"\"}}}\n" +
+                "                                \"HasHour\":"+WebResourceWrap(uri2)+"}}}\n" +
                 "}";
         SemanticsModel sm2 = new SemanticsModel(jsonString);
 
@@ -115,7 +123,7 @@ public class TestDSTClarification {
                 "\"dialogAct\":\"RequestConfirmValue\",\n" +
                 "\"topic\":{\"class\":\"UnknownThingWithRoles\",\n" +
                 "         \"HasAtTime\":{\"class\":\"Time\",\n" +
-                "                      \"HasHour\":\""+uri1+"\"}}\n" +
+                "                      \"HasHour\":"+WebResourceWrap(uri3)+"}}\n" +
                 "}\n";
         SemanticsModel sm3 = new SemanticsModel(jsonString);
 
@@ -134,11 +142,15 @@ public class TestDSTClarification {
             e.printStackTrace();
         }
 
-        jsonString = "{\n" +
-                "\"dialogAct\":\"Fragment\",\n" +
-                "\"topic\":{\"class\":\"UnknownThingWithRoles\",\n" +
-                "         \"HasHour\":\""+uri1+"\"}\n" +
-                "}\n";
+        // Option 1, a confirmation fragment
+//        jsonString = "{\n" +
+//                "\"dialogAct\":\"Fragment\",\n" +
+//                "\"topic\":{\"class\":\"UnknownThingWithRoles\",\n" +
+//                "         \"HasHour\":"+WebResourceWrap(uri5)+"}\n" +
+//                "}\n";
+
+        // Option 2, an acknowledgement
+        jsonString = "{\"dialogAct\":\"Acknowledge\"}";
         SemanticsModel sm4 = new SemanticsModel(jsonString);
 
         sluHypotheses = new HashMap<>();
@@ -191,7 +203,7 @@ public class TestDSTClarification {
                 "\"verb\":{\"class\":\"Exist\",\n" +
                 "        \"Patient\":{\"class\":\"Meeting\",\n" +
                 "                   \"HasAtTime\":{\"class\":\"Time\",\n" +
-                "                                \"HasHour\":\""+uri1+"\"}}}\n" +
+                "                                \"HasHour\":\""+WebResourceWrap(uri1)+"\"}}}\n" +
                 "}";
         SemanticsModel sm1 = new SemanticsModel(jsonString);
 
@@ -236,7 +248,7 @@ public class TestDSTClarification {
                 "\"verb\":{\"class\":\"Exist\",\n" +
                 "        \"Patient\":{\"class\":\"Meeting\",\n" +
                 "                   \"HasAtTime\":{\"class\":\"Time\",\n" +
-                "                                \"HasHour\":\""+uri2+"\"}}}\n" +
+                "                                \"HasHour\":\""+WebResourceWrap(uri2)+"\"}}}\n" +
                 "}";
         SemanticsModel sm4 = new SemanticsModel(jsonString);
 

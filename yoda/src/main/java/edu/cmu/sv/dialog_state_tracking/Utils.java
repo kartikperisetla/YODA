@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
+import edu.cmu.sv.ontology.misc.WebResource;
 import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.semantics.SemanticsModel;
 import org.json.simple.JSONObject;
@@ -69,10 +70,14 @@ public class Utils {
     /*
     * Detect weather there will be any conflicts while extending source with insertionContent
     * */
-    public static boolean anyConflicts(JSONObject source, JSONObject insertionContent){
+    public static boolean anySenseConflicts(JSONObject source, JSONObject insertionContent){
         // check for class compatibility
         Class sourceClass = OntologyRegistry.thingNameMap.get(source.get("class"));
         Class insertionClass = OntologyRegistry.thingNameMap.get(insertionContent.get("class"));
+        // two web resources can not cause sense conflicts, only denotation conflicts
+        if (sourceClass.equals(WebResource.class) && insertionClass.equals(WebResource.class))
+            return true;
+
         if (!(sourceClass.isAssignableFrom(insertionClass) ||
                 insertionClass.isAssignableFrom(sourceClass) ||
                 sourceClass.equals(UnknownThingWithRoles.class) ||
@@ -91,7 +96,7 @@ public class Utils {
                     } else if (insertionContent.get(key) instanceof String &&
                             !(insertionContent.get(key).equals(source.get(key)))) {
                         return false;
-                    } else if (anyConflicts((JSONObject) source.get(key), (JSONObject) insertionContent.get(key))){
+                    } else if (anySenseConflicts((JSONObject) source.get(key), (JSONObject) insertionContent.get(key))){
                         return false;
                     }
                 }

@@ -47,6 +47,7 @@ public class DialogRegistry {
         clarificationDialogActs.add(RequestDisambiguateRole.class);
         clarificationDialogActs.add(RequestDisambiguateValues.class);
         clarificationDialogActs.add(RequestRephrase.class);
+        clarificationDialogActs.add(Acknowledge.class);
 
         discourseUnitDialogActs.add(WHQuestion.class);
         discourseUnitDialogActs.add(YNQuestion.class);

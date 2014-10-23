@@ -7,9 +7,7 @@ import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.ontology.verb.Create;
 import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.ontology.object.*;
-import edu.cmu.sv.semantics.SemanticsModel;
 import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
-import org.json.simple.JSONObject;
 
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -47,6 +45,7 @@ public class OntologyRegistry {
         roleClasses.add(HasName.class);
         roleClasses.add(HasValues.class);
         roleClasses.add(HasValue.class);
+        roleClasses.add(HasURI.class);
 
         miscClasses.add(NonHearing.class);
         miscClasses.add(NonUnderstanding.class);
@@ -55,7 +54,7 @@ public class OntologyRegistry {
         miscClasses.add(UnknownThingWithRoles.class);
         miscClasses.add(Or.class);
         miscClasses.add(And.class);
-        miscClasses.add(URI.class);
+        miscClasses.add(WebResource.class);
 
         // recursively register parents
         recursivelyRegisterParents(verbClasses);

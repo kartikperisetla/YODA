@@ -42,7 +42,12 @@ public class SemanticsModel {
 
     public SemanticsModel deepCopy(){
         SemanticsModel ans = new SemanticsModel();
-        ans.internalRepresentation = new JSONObject(internalRepresentation);
+        try {
+            ans.internalRepresentation = (JSONObject) parser.parse(internalRepresentation.toJSONString());
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new Error("failed to create a json object from an existing json object"+internalRepresentation);
+        }
         return ans;
     }
 

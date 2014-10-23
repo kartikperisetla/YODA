@@ -4,16 +4,11 @@ import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.ontology.misc.Suggested;
 import edu.cmu.sv.ontology.role.HasValue;
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.system_action.dialog_act.clarification_dialog_acts.Acknowledge;
-import edu.cmu.sv.system_action.dialog_act.clarification_dialog_acts.RequestConfirmValue;
-import edu.cmu.sv.system_action.dialog_act.clarification_dialog_acts.RequestDisambiguateValues;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Accept;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
 import org.json.simple.JSONObject;
 
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -38,23 +33,24 @@ public class AcknowledgeInference implements DiscourseUnitUpdateInference {
 
         if (turn.speaker.equals("user")){
             // find any suggestions, these will all be unwrapped
-            Set<String> suggestionPaths = currentState.spokenByThem.findAllPathsToClass(Suggested.class.getSimpleName());
+            Set<String> suggestionPaths = currentState.getSpokenByMe().findAllPathsToClass(Suggested.class.getSimpleName());
 
             for (String sluHypothesisID : turn.hypothesisDistribution.keySet()){
                 SemanticsModel hypModel = turn.hypotheses.get(sluHypothesisID);
                 String dialogAct = hypModel.getSlotPathFiller("dialogAct");
 
                 if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(Acknowledge.class)) {
-
                     String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
                     DiscourseUnit2.DialogStateHypothesis newDUHypothesis =
                             new DiscourseUnit2.DialogStateHypothesis();
-                    SemanticsModel newSpokenByThemHypothesis = currentState.getSpokenByThem().deepCopy();
+                    SemanticsModel newSpokenByThemHypothesis = currentState.getSpokenByMe().deepCopy();
                     for (String acceptancePath: suggestionPaths) {
                         SemanticsModel.unwrap((JSONObject) newSpokenByThemHypothesis.newGetSlotPathFiller(acceptancePath),
                                 HasValue.class.getSimpleName());
                     }
                     ans.getHypothesisDistribution().put(newDUHypothesisID, 1.0);
+                    newDUHypothesis.timeOfLastActByMe = currentState.timeOfLastActByMe;
+                    newDUHypothesis.setSpokenByMe(currentState.spokenByMe.deepCopy());
                     newDUHypothesis.timeOfLastActByThem = timeStamp;
                     newDUHypothesis.spokenByThem = newSpokenByThemHypothesis;
                     ans.hypotheses.put(newDUHypothesisID, newDUHypothesis);
@@ -73,15 +69,15 @@ public class AcknowledgeInference implements DiscourseUnitUpdateInference {
                     JSONObject daContent = (JSONObject) hypModel.newGetSlotPathFiller("topic");
 
                     // what is being confirmed must not conflict with what has been suggested
-                    if (Utils.anyConflicts(
-                            (JSONObject) hypModel.newGetSlotPathFiller(suggestionPath+"."+HasValue.class.getSimpleName()),daContent))
+                    if (Utils.anySenseConflicts(
+                            (JSONObject) hypModel.newGetSlotPathFiller(suggestionPath + "." + HasValue.class.getSimpleName()), daContent))
                         continue;
 
 
                     String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
                     DiscourseUnit2.DialogStateHypothesis newDUHypothesis =
                             new DiscourseUnit2.DialogStateHypothesis();
-                    SemanticsModel newSpokenByThemHypothesis = currentState.getSpokenByThem().deepCopy();
+                    SemanticsModel newSpokenByThemHypothesis = currentState.getSpokenByMe().deepCopy();
                     // unwrap the suggestion
                     SemanticsModel.unwrap((JSONObject) newSpokenByThemHypothesis.newGetSlotPathFiller(suggestionPath),
                             HasValue.class.getSimpleName());
@@ -90,6 +86,8 @@ public class AcknowledgeInference implements DiscourseUnitUpdateInference {
                             new SemanticsModel(daContent.toJSONString()));
 
                     ans.getHypothesisDistribution().put(newDUHypothesisID, penaltyForReinterpretingFragment);
+                    newDUHypothesis.timeOfLastActByMe = currentState.timeOfLastActByMe;
+                    newDUHypothesis.setSpokenByMe(currentState.spokenByMe.deepCopy());
                     newDUHypothesis.timeOfLastActByThem = timeStamp;
                     newDUHypothesis.spokenByThem = newSpokenByThemHypothesis;
                     ans.hypotheses.put(newDUHypothesisID, newDUHypothesis);
@@ -109,10 +107,13 @@ public class AcknowledgeInference implements DiscourseUnitUpdateInference {
                             HasValue.class.getSimpleName());
                 }
                 ans.getHypothesisDistribution().put(newDUHypothesisID, 1.0);
+                newDUHypothesis.timeOfLastActByThem = currentState.timeOfLastActByThem;
+                newDUHypothesis.setSpokenByThem(currentState.spokenByThem.deepCopy());
                 newDUHypothesis.timeOfLastActByMe = timeStamp;
                 newDUHypothesis.spokenByMe = newSpokenByMeHypothesis;
                 ans.hypotheses.put(newDUHypothesisID, newDUHypothesis);
             }
         }
-        return ans;    }
+        return ans;
+    }
 }
