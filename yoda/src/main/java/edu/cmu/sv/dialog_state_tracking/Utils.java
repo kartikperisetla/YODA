@@ -72,6 +72,8 @@ public class Utils {
     * */
     public static boolean anySenseConflicts(JSONObject source, JSONObject insertionContent){
         // check for class compatibility
+        if (source.get("class")==null || insertionContent.get("class")==null)
+            throw new Error("one of these does not have a class!");
         Class sourceClass = OntologyRegistry.thingNameMap.get(source.get("class"));
         Class insertionClass = OntologyRegistry.thingNameMap.get(insertionContent.get("class"));
         // two web resources can not cause sense conflicts, only denotation conflicts

@@ -3,7 +3,9 @@ package edu.cmu.sv;
 import edu.cmu.sv.dialog_state_tracking.DSTTester;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
 import edu.cmu.sv.dialog_state_tracking.Turn;
+import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.ontology.misc.WebResource;
+import edu.cmu.sv.ontology.object.Time;
 import edu.cmu.sv.ontology.role.HasURI;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.StringDistribution;
@@ -119,6 +121,7 @@ public class TestDSTClarification {
             e.printStackTrace();
         }
 
+        // A confirmation request: "At 3?"
         jsonString = "{\n" +
                 "\"dialogAct\":\"RequestConfirmValue\",\n" +
                 "\"topic\":{\"class\":\"UnknownThingWithRoles\",\n" +
@@ -142,15 +145,21 @@ public class TestDSTClarification {
             e.printStackTrace();
         }
 
-        // Option 1, a confirmation fragment
-//        jsonString = "{\n" +
-//                "\"dialogAct\":\"Fragment\",\n" +
-//                "\"topic\":{\"class\":\"UnknownThingWithRoles\",\n" +
-//                "         \"HasHour\":"+WebResourceWrap(uri5)+"}\n" +
-//                "}\n";
+        // Option 0, a confirmation fragment: "At 3"
+        jsonString = "{\"dialogAct\":\"Fragment\",\n" +
+                " \"topic\":{\"class\":\""+UnknownThingWithRoles.class.getSimpleName()+"\",\n" +
+                "          \"HasAtTime\":{\"class\":\"Time\",\n" +
+                "                       \"HasHour\":"+WebResourceWrap(uri5)+"}}}";
+
+        // Option 1, a confirmation fragment "3 o'clock"
+        jsonString = "{\n" +
+                "\"dialogAct\":\"Fragment\",\n" +
+                "\"topic\":{\"class\":\""+Time.class.getSimpleName()+"\",\n" +
+                "         \"HasHour\":"+WebResourceWrap(uri5)+"}\n" +
+                "}\n";
 
         // Option 2, an acknowledgement
-        jsonString = "{\"dialogAct\":\"Acknowledge\"}";
+//        jsonString = "{\"dialogAct\":\"Acknowledge\"}";
         SemanticsModel sm4 = new SemanticsModel(jsonString);
 
         sluHypotheses = new HashMap<>();
