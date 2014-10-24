@@ -31,6 +31,19 @@ public class DiscourseUnit2 {
             timeOfLastActByMe = null;
         }
 
+        public SemanticsModel getMostRecent() {
+            if (timeOfLastActByMe==null && timeOfLastActByThem==null)
+                return null;
+            if (timeOfLastActByMe==null)
+                return spokenByThem;
+            if (timeOfLastActByThem==null)
+                return spokenByMe;
+            if (timeOfLastActByThem <= timeOfLastActByMe){
+                return spokenByMe;
+            }
+            return spokenByThem;
+        }
+
         public SemanticsModel getSpokenByMe() {
             return spokenByMe;
         }

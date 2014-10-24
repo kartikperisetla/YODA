@@ -317,6 +317,31 @@ public class SemanticsModel {
     }
 
     /*
+    * Throws an error if the dialog state hypothesis model is invalid
+    * according to the registered ontology
+    * */
+    public void validateDSTHypothesis(){
+        // there is a specific set of permitted slots in the top level
+        if (getSlotsAtPath("").stream().
+                anyMatch(x -> !x.equals("dialogAct") && !x.equals("verb")))
+            throw new Error("the top level contains unpermitted slots");
+
+        // check all children
+        for (Object child : internalRepresentation.values()){
+            try {
+                if (!(child instanceof JSONObject))
+                    continue;
+                if (((JSONObject)child).keySet().isEmpty())
+                    continue;
+                validateThingDescription((JSONObject)child);
+            } catch (IllegalAccessException | InstantiationException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    /*
     * Recursively check that all the slots in a node are valid for the class of that node
     * (does not check that the fillers are in the range for the role which corresponds to that slot)
     * */

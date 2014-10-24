@@ -70,14 +70,12 @@ public class AcknowledgeInference implements DiscourseUnitUpdateInference {
                     if (suggestionPaths.size() != 1)
                         continue;
                     String suggestionPath = new LinkedList<>(suggestionPaths).get(0);
-                    System.out.println("suggestionPath:"+suggestionPath);
                     JSONObject daContent = (JSONObject) hypModel.newGetSlotPathFiller("topic");
 
                     // what is being confirmed must not conflict with what has been suggested
                     if (Utils.anySenseConflicts(
                             (JSONObject) currentState.getSpokenByMe().newGetSlotPathFiller(suggestionPath + "." + HasValue.class.getSimpleName()), daContent))
                         continue;
-
 
                     String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
                     DiscourseUnit2.DialogStateHypothesis newDUHypothesis =
@@ -89,8 +87,6 @@ public class AcknowledgeInference implements DiscourseUnitUpdateInference {
                     // unwrap the suggestion
                     SemanticsModel.unwrap((JSONObject) newSpokenByThemHypothesis.newGetSlotPathFiller(suggestionPath),
                             HasValue.class.getSimpleName());
-                    System.out.println("newSpokenByThemHyp after unwrap:"+newSpokenByThemHypothesis);
-                    System.out.println("daContent:"+daContent);
                     // deal with potential over-answering by extending the suggestion with the new content
                     newSpokenByThemHypothesis.extendAndOverwriteAtPoint(suggestionPath,
                             new SemanticsModel(daContent.toJSONString()));

@@ -121,13 +121,20 @@ public class TestDSTClarification {
             e.printStackTrace();
         }
 
-        // A confirmation request: "At 3?"
+        // Option 0: Confirmation request fragment: "3 o'clock?"
         jsonString = "{\n" +
                 "\"dialogAct\":\"RequestConfirmValue\",\n" +
-                "\"topic\":{\"class\":\"UnknownThingWithRoles\",\n" +
-                "         \"HasAtTime\":{\"class\":\"Time\",\n" +
-                "                      \"HasHour\":"+WebResourceWrap(uri3)+"}}\n" +
+                "\"topic\":{\"class\":\""+Time.class.getSimpleName()+"\",\n" +
+                "         \"HasHour\":"+WebResourceWrap(uri3)+"}\n" +
                 "}\n";
+
+        // Option 1: Confirmation request fragment: "At 3?"
+//        jsonString = "{\n" +
+//                "\"dialogAct\":\"RequestConfirmValue\",\n" +
+//                "\"topic\":{\"class\":\"UnknownThingWithRoles\",\n" +
+//                "         \"HasAtTime\":{\"class\":\"Time\",\n" +
+//                "                      \"HasHour\":"+WebResourceWrap(uri3)+"}}\n" +
+//                "}\n";
         SemanticsModel sm3 = new SemanticsModel(jsonString);
 
         currentTurn = new Turn("system", sm3.deepCopy(), null, null);
@@ -146,10 +153,10 @@ public class TestDSTClarification {
         }
 
         // Option 0, a confirmation fragment: "At 3"
-        jsonString = "{\"dialogAct\":\"Fragment\",\n" +
-                " \"topic\":{\"class\":\""+UnknownThingWithRoles.class.getSimpleName()+"\",\n" +
-                "          \"HasAtTime\":{\"class\":\"Time\",\n" +
-                "                       \"HasHour\":"+WebResourceWrap(uri5)+"}}}";
+//        jsonString = "{\"dialogAct\":\"Fragment\",\n" +
+//                " \"topic\":{\"class\":\""+UnknownThingWithRoles.class.getSimpleName()+"\",\n" +
+//                "          \"HasAtTime\":{\"class\":\"Time\",\n" +
+//                "                       \"HasHour\":"+WebResourceWrap(uri5)+"}}}";
 
         // Option 1, a confirmation fragment "3 o'clock"
         jsonString = "{\n" +
@@ -158,7 +165,7 @@ public class TestDSTClarification {
                 "         \"HasHour\":"+WebResourceWrap(uri5)+"}\n" +
                 "}\n";
 
-        // Option 2, an acknowledgement
+        // Option 3, an acknowledgement
 //        jsonString = "{\"dialogAct\":\"Acknowledge\"}";
         SemanticsModel sm4 = new SemanticsModel(jsonString);
 

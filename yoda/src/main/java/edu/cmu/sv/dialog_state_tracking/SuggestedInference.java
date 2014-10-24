@@ -38,6 +38,12 @@ public class SuggestedInference implements DiscourseUnitUpdateInference {
             return ans;
 
         if (turn.speaker.equals("user")){
+
+            // we can't add a suggestion if there's already a suggestion
+            Set<String> suggestionPaths = currentState.getSpokenByMe().findAllPathsToClass(Suggested.class.getSimpleName());
+            if (suggestionPaths.size() > 0)
+                return ans;
+
             for (String sluHypothesisID : turn.hypothesisDistribution.keySet()){
                 SemanticsModel hypModel = turn.hypotheses.get(sluHypothesisID);
                 String dialogAct = hypModel.getSlotPathFiller("dialogAct");
@@ -48,6 +54,8 @@ public class SuggestedInference implements DiscourseUnitUpdateInference {
                     if ("Or".equals(hypModel.newGetSlotPathFiller("topic.class")) ||
                             "And".equals(hypModel.newGetSlotPathFiller("topic.class")))
                         continue;
+
+
 
                     JSONObject daContent = (JSONObject) hypModel.newGetSlotPathFiller("topic");
 
@@ -80,6 +88,11 @@ public class SuggestedInference implements DiscourseUnitUpdateInference {
             }
         } else { // if turn.speaker.equals("system")
             String dialogAct = turn.systemUtterance.getSlotPathFiller("dialogAct");
+
+            // we can't add a suggestion if there's already a suggestion
+            Set<String> suggestionPaths = currentState.getSpokenByThem().findAllPathsToClass(Suggested.class.getSimpleName());
+            if (suggestionPaths.size() > 0)
+                return ans;
 
             if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(RequestConfirmValue.class)){
                 JSONObject daContent = (JSONObject) turn.systemUtterance.newGetSlotPathFiller("topic");

@@ -67,8 +67,11 @@ public class Utils {
         return ans;
     }
 
+
+
     /*
     * Detect weather there will be any conflicts while extending source with insertionContent
+    * Does NOT check that the resulting object will be valid
     * */
     public static boolean anySenseConflicts(JSONObject source, JSONObject insertionContent){
         // check for class compatibility
@@ -76,15 +79,16 @@ public class Utils {
             throw new Error("one of these does not have a class!");
         Class sourceClass = OntologyRegistry.thingNameMap.get(source.get("class"));
         Class insertionClass = OntologyRegistry.thingNameMap.get(insertionContent.get("class"));
+
         // two web resources can not cause sense conflicts, only denotation conflicts
         if (sourceClass.equals(WebResource.class) && insertionClass.equals(WebResource.class))
-            return true;
+            return false;
 
         if (!(sourceClass.isAssignableFrom(insertionClass) ||
                 insertionClass.isAssignableFrom(sourceClass) ||
                 sourceClass.equals(UnknownThingWithRoles.class) ||
                 insertionClass.equals(UnknownThingWithRoles.class)))
-            return false;
+            return true;
 
         // check recursively for other role compatibility
         for (Object key : insertionContent.keySet()){
@@ -94,17 +98,17 @@ public class Utils {
                 if (source.containsKey(key)){
                     if (source.get(key) instanceof String &&
                             !(source.get(key).equals(insertionContent.get(key)))) {
-                        return false;
+                        return true;
                     } else if (insertionContent.get(key) instanceof String &&
                             !(insertionContent.get(key).equals(source.get(key)))) {
-                        return false;
+                        return true;
                     } else if (anySenseConflicts((JSONObject) source.get(key), (JSONObject) insertionContent.get(key))){
-                        return false;
+                        return true;
                     }
                 }
             }
         }
-        return true;
+        return false;
     }
 
 

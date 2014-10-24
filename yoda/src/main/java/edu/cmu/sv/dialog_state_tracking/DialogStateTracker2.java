@@ -45,6 +45,16 @@ public class DialogStateTracker2 {
                 DiscourseUnit2 inferredUpdatedState = updateInferenceClass.newInstance().
                         applyAll(discourseUnit.hypotheses.get(currentDialogStateHypothesisID), turn, timeStamp);
                 for (String tmpNewDUHypothesisID : inferredUpdatedState.getHypothesisDistribution().keySet()){
+
+                    // discard invalid DST hypotheses
+                    try {
+                        inferredUpdatedState.hypotheses.get(tmpNewDUHypothesisID).getSpokenByMe().validateDSTHypothesis();
+                        inferredUpdatedState.hypotheses.get(tmpNewDUHypothesisID).getSpokenByThem().validateDSTHypothesis();
+                    } catch (Error error){
+                        System.out.println(error);
+                        continue;
+                    }
+
                     String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
 
                     newHypothesisDistribution.put(newDUHypothesisID,
