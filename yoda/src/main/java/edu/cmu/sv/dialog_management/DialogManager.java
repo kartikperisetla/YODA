@@ -1,24 +1,18 @@
 package edu.cmu.sv.dialog_management;
 
 import edu.cmu.sv.YodaEnvironment;
-import edu.cmu.sv.database.Database;
-import edu.cmu.sv.dialog_state_tracking.DialogStateTracker2;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.system_action.SystemAction;
 import edu.cmu.sv.system_action.dialog_act.*;
-import edu.cmu.sv.dialog_state_tracking.DialogStateTracker;
-import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
+
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.system_action.dialog_task.DialogTask;
-import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.utils.Combination;
 import edu.cmu.sv.utils.HypothesisSetManagement;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by David Cohen on 9/2/14.
@@ -30,6 +24,14 @@ import java.util.stream.Collectors;
  */
 public class DialogManager {
     YodaEnvironment yodaEnvironment;
+
+    public YodaEnvironment getYodaEnvironment() {
+        return yodaEnvironment;
+    }
+
+    public void setYodaEnvironment(YodaEnvironment yodaEnvironment) {
+        this.yodaEnvironment = yodaEnvironment;
+    }
 
     public DialogManager(YodaEnvironment yodaEnvironment) {
         this.yodaEnvironment = yodaEnvironment;
@@ -45,6 +47,7 @@ public class DialogManager {
 
         //// Enumerate and evaluate sense clarification acts
         for (Class <? extends DialogAct> daClass : DialogRegistry.senseClarificationDialogActs){
+            System.out.println("Enumerating and evaluating actions of class: "+daClass.getSimpleName());
             Map<String, Set<Object>> possibleBindingsPerVariable = new HashMap<>();
             Map<String, Class<? extends Thing>> parameters = daClass.newInstance().getParameters();
             Map<String, DiscourseUnit2.DialogStateHypothesis> dialogStateHypothesisMap = DU.getHypotheses();
@@ -61,10 +64,12 @@ public class DialogManager {
                 }
             }
 
+            System.out.println("possibleBindingsPerVariable: "+possibleBindingsPerVariable);
+
             // create an action and evaluate reward for each possible binding
             for (Map<String, Object> binding : Combination.possibleBindings(possibleBindingsPerVariable)) {
                 DialogAct dialogAct = daClass.newInstance();
-                dialogAct = dialogAct.bindVariables(binding);
+                dialogAct.bindVariables(binding);
                 Double expectedReward = dialogAct.reward(DU);
                 Double expectedCost = dialogAct.cost(DU);
                 actionExpectedReward.put(dialogAct, expectedReward - expectedCost);

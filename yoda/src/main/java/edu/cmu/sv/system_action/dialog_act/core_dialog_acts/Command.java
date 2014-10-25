@@ -1,6 +1,7 @@
 package edu.cmu.sv.system_action.dialog_act.core_dialog_acts;
 
-import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
+import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 
 import java.util.Map;
@@ -9,27 +10,28 @@ import java.util.Map;
  * Created by David Cohen on 9/8/14.
  */
 public class Command extends DialogAct {
-
-    // command is not executable by the system
     @Override
-    public Double reward(DiscourseUnit DU) {return null;}
-    @Override
-    public Double cost(DiscourseUnit DU) {
+    public Double reward(DiscourseUnit2 DU) {
         return null;
     }
 
     @Override
-    public Map<String, String> getParameters() {
+    public Double cost(DiscourseUnit2 DU) {
         return null;
     }
 
     @Override
-    public Map<String, String> getBindings() {
+    public Map<String, Class<? extends Thing>> getParameters() {
         return null;
     }
 
     @Override
-    public DialogAct bindVariables(Map<String, String> bindings) {
+    public Map<String, Object> getBindings() {
         return null;
+    }
+
+    @Override
+    public void bindVariables(Map<String, Object> bindings) {
+
     }
 }

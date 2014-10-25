@@ -1,6 +1,7 @@
 package edu.cmu.sv.ontology;
 
 import edu.cmu.sv.ontology.misc.*;
+import edu.cmu.sv.ontology.object.Object;
 import edu.cmu.sv.ontology.role.*;
 import edu.cmu.sv.ontology.verb.Exist;
 import edu.cmu.sv.ontology.verb.Verb;
@@ -28,15 +29,18 @@ public class OntologyRegistry {
     static{
         // register leaf classes
 
+        verbClasses.add(Verb.class);
         verbClasses.add(Create.class);
         verbClasses.add(HasProperty.class);
         verbClasses.add(Exist.class);
 
+        objectClasses.add(Object.class);
         objectClasses.add(Person.class);
         objectClasses.add(Email.class);
         objectClasses.add(Meeting.class);
         objectClasses.add(Time.class);
 
+        roleClasses.add(Role.class);
         roleClasses.add(Agent.class);
         roleClasses.add(Patient.class);
         roleClasses.add(Theme.class);
@@ -65,6 +69,8 @@ public class OntologyRegistry {
         // add ubiquitous Things to domains / ranges
         for (Class <? extends ThingWithRoles> cls : Arrays.asList(UnknownThingWithRoles.class)){
             for (Class <? extends Role> roleCls : roleClasses){
+                if (roleCls==Role.class)
+                    continue;
                 try {
                     roleCls.newInstance().getDomain().add(cls);
                 } catch (InstantiationException | IllegalAccessException e) {

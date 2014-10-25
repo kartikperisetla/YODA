@@ -57,9 +57,11 @@ public abstract class DialogTask extends SystemAction {
         if (parameterValue==null && verb==null)
             return null;
         if (verb==null) {
-            Map<String, String> bindings = new HashMap<>();
+            Map<String, Object> bindings = new HashMap<>();
             bindings.put("v1", parameterValue);
-            return new RequestVerb().bindVariables(bindings);
+            DialogAct ans = new RequestVerb();
+            ans.bindVariables(bindings);
+            return ans;
         }
         return null;
     }
@@ -85,10 +87,12 @@ public abstract class DialogTask extends SystemAction {
                     collect(Collectors.toSet());
 
             for (Class<? extends Role> roleCls : missingRoles){
-                Map<String, String> bindings = new HashMap<>();
+                Map<String, Object> bindings = new HashMap<>();
                 bindings.put("r1", roleCls.getSimpleName());
                 bindings.put("v1", verb);
-                ans.add(new RequestVerbRole().bindVariables(bindings));
+                DialogAct tmp = new RequestVerbRole();
+                tmp.bindVariables(bindings);
+                ans.add(tmp);
             }
 
         } catch (InstantiationException | IllegalAccessException e) {

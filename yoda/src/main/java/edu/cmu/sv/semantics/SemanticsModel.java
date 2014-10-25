@@ -42,16 +42,23 @@ public class SemanticsModel {
         internalRepresentation = new JSONObject();
     }
 
+    public JSONObject getInternalRepresentation() {
+        return internalRepresentation;
+    }
+
     /*
-        * Detect weather there will be any conflicts while extending source with insertionContent
-        * Does NOT check that the resulting object will be valid
-        * */
+            * Detect weather there will be any conflicts while extending source with insertionContent
+            * Does NOT check that the resulting object will be valid
+            * */
     public static boolean anySenseConflicts(JSONObject source, JSONObject insertionContent){
         // check for class compatibility
         if (source.get("class")==null || insertionContent.get("class")==null)
             throw new Error("one of these does not have a class!");
         Class sourceClass = OntologyRegistry.thingNameMap.get(source.get("class"));
         Class insertionClass = OntologyRegistry.thingNameMap.get(insertionContent.get("class"));
+        if (sourceClass==null || insertionClass==null){
+            System.out.println("one of these classes is missing from thingNameMap: "+source.get("class")+", "+insertionContent.get("class"));
+        }
 
         // two web resources can not cause sense conflicts, only denotation conflicts
         if (sourceClass.equals(WebResource.class) && insertionClass.equals(WebResource.class))
@@ -318,9 +325,13 @@ public class SemanticsModel {
     * Find all the slot paths who are filled by an entity description of class clsName
     * */
     public Set<String> findAllPathsToClass(String clsName){
-        return getAllInternalNodePaths().stream().
-                filter(x -> clsName.equals(newGetSlotPathFiller(x+".class"))).
-                collect(Collectors.toSet());
+        try {
+            JSONObject filter = (JSONObject) parser.parse("{\"class\":\""+clsName+"\"}");
+            return findAllPathsToNonConflict(filter);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 

@@ -2,7 +2,6 @@ package edu.cmu.sv;
 
 import edu.cmu.sv.database.Database;
 import edu.cmu.sv.dialog_management.DialogManager;
-import edu.cmu.sv.dialog_management.DialogManager2;
 import edu.cmu.sv.dialog_state_tracking.DialogStateTracker2;
 
 /**

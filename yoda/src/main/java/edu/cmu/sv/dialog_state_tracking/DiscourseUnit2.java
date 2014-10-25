@@ -100,9 +100,17 @@ public class DiscourseUnit2 {
         return hypotheses;
     }
 
+    public void setHypothesisDistribution(StringDistribution hypothesisDistribution) {
+        this.hypothesisDistribution = hypothesisDistribution;
+    }
+
+    public void setHypotheses(Map<String, DialogStateHypothesis> hypotheses) {
+        this.hypotheses = hypotheses;
+    }
+
     /*
-    * Compare a hypothesis to the actual content of this discourse unit
-    * */
+        * Compare a hypothesis to the actual content of this discourse unit
+        * */
     public Pair<Integer, Double> compareHypothesis(DialogStateHypothesis testCase){
 
         int rank = -1;

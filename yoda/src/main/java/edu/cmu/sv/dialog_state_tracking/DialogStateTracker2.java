@@ -31,6 +31,10 @@ public class DialogStateTracker2 {
 
     public DiscourseUnit2 getDiscourseUnit(){return discourseUnit;}
 
+    public void setDiscourseUnit(DiscourseUnit2 discourseUnit) {
+        this.discourseUnit = discourseUnit;
+    }
+
     public void updateDialogState(Turn turn, float timeStamp) throws IllegalAccessException, InstantiationException {
         System.out.println("\n====== Turn ======");
         // validate input

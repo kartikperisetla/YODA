@@ -1,6 +1,5 @@
 package edu.cmu.sv.system_action.dialog_act.clarification_dialog_acts;
 
-import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
 import edu.cmu.sv.ontology.Thing;
@@ -46,8 +45,7 @@ public class RequestRephrase extends DialogAct {
     }
 
     @Override
-    public DialogAct bindVariables(Map<String, Object> bindings) {
+    public void bindVariables(Map<String, Object> bindings) {
         boundVariables = bindings;
-        return this;
     }
 }

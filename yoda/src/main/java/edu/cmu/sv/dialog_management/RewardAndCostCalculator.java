@@ -3,7 +3,6 @@ package edu.cmu.sv.dialog_management;
 import edu.cmu.sv.database.Database;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
-import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_task.DialogTask;
 import edu.cmu.sv.system_action.dialog_task.DialogTaskPreferences;

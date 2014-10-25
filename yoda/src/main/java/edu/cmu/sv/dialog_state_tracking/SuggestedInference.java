@@ -115,10 +115,7 @@ public class SuggestedInference implements DiscourseUnitUpdateInference {
                     newDUHypothesis.spokenByMe = newSpokenByMeHypothesis;
                     ans.hypotheses.put(newDUHypothesisID, newDUHypothesis);
                 }
-            } else if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(RequestDisambiguateValues.class)) {
-                throw new Error("Not yet implemented: SuggestedInference for RequestDisambiguateValues dialogAct");
             }
-
         }
         return ans;
     }

@@ -1,7 +1,7 @@
 package edu.cmu.sv.system_action.dialog_act.core_dialog_acts;
 
-import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
-import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
+import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 
 import java.util.Map;
@@ -12,28 +12,29 @@ import java.util.Map;
 public class Rejection extends DialogAct {
     // template "No."
 
-    @Override
-    public Double reward(DiscourseUnit DU) {
-        return 0.0;
-    }
 
     @Override
-    public Double cost(DiscourseUnit DU) {
-       return RewardAndCostCalculator.penaltyForContradictingUser;
-    }
-
-    @Override
-    public Map<String, String> getParameters() {
+    public Double reward(DiscourseUnit2 DU) {
         return null;
     }
 
     @Override
-    public Map<String, String> getBindings() {
+    public Double cost(DiscourseUnit2 DU) {
         return null;
     }
 
     @Override
-    public DialogAct bindVariables(Map<String, String> bindings) {
+    public Map<String, Class<? extends Thing>> getParameters() {
         return null;
+    }
+
+    @Override
+    public Map<String, Object> getBindings() {
+        return null;
+    }
+
+    @Override
+    public void bindVariables(Map<String, Object> bindings) {
+
     }
 }

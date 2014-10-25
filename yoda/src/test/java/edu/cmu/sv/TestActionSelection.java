@@ -1,7 +1,9 @@
 package edu.cmu.sv;
 
 import edu.cmu.sv.database.Database;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
 import edu.cmu.sv.system_action.SystemAction;
+import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.system_action.dialog_act.clarification_dialog_acts.*;
 import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestVerbRole;
 import edu.cmu.sv.system_action.dialog_task.DialogTask;
@@ -48,10 +50,6 @@ public class TestActionSelection {
             return correctIsTopAction;
         }
 
-        public boolean isCorrectInTopNActions() {
-            return correctInTopNActions;
-        }
-
         public int getCorrectActionRank() {
             return correctActionRank;
         }
@@ -78,14 +76,14 @@ public class TestActionSelection {
     }
 
     private class TestCase{
-        Map<String, SemanticsModel> hypotheses;
-        StringDistribution hypothesisDistribution;
+        DiscourseUnit2 du;
         SystemAction bestActionDescriptor;
+        YodaEnvironment yodaEnvironment;
 
-        private TestCase(Map<String, SemanticsModel> hypotheses, StringDistribution hypothesisDistribution, SystemAction bestActionDescriptor) {
-            this.hypotheses = hypotheses;
-            this.hypothesisDistribution = hypothesisDistribution;
+        private TestCase(DiscourseUnit2 du, SystemAction bestActionDescriptor, YodaEnvironment yodaEnvironment) {
+            this.du = du;
             this.bestActionDescriptor = bestActionDescriptor;
+            this.yodaEnvironment = yodaEnvironment;
         }
 
         private EvaluationResult evaluate(List<Pair<SystemAction, Double>> nBestActions){
@@ -125,14 +123,13 @@ public class TestActionSelection {
 
     @Test
     public void Test() throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        Database db = new Database();
-        List<TestCase> testCases = basicClarificationTestSet(db);
+        List<TestCase> testCases = basicClarificationTestSet();
         List<EvaluationResult> evaluationResults = new LinkedList<>();
         SummaryStatistics rewardStatistics = new SummaryStatistics();
         for (TestCase testCase : testCases) {
-            DialogManager dialogManager = new DialogManager();
-            dialogManager.getTracker().updateDialogState(testCase.hypotheses, testCase.hypothesisDistribution, (float) 0);
-            List<Pair<SystemAction, Double>> topActions = dialogManager.selectAction();
+            YodaEnvironment environment = YodaEnvironment.dialogTestingEnvironment();
+            environment.dst.setDiscourseUnit(testCase.du);
+            List<Pair<SystemAction, Double>> topActions = environment.dm.selectAction();
             topActions.stream().map(Pair::getRight).forEach(rewardStatistics::addValue);
             System.out.println("Test case evaluation:");
             EvaluationResult result = testCase.evaluate(topActions);
@@ -172,22 +169,49 @@ public class TestActionSelection {
 
     }
 
-    private List<TestCase> basicClarificationTestSet(Database db){
+    private List<TestCase> basicClarificationTestSet(){
         List<TestCase> ans = new LinkedList<>();
-        Map<String, SemanticsModel> utterances;
-        StringDistribution weights;
-        TestCase testCase;
-        Map<String, String> bestDialogActionParameters;
-        SystemAction bestDialogAction;
 
-        SemanticsModel hyp1;
-        SemanticsModel hyp2;
-        SemanticsModel hyp3;
-        SemanticsModel hyp4;
-        SemanticsModel child1;
-        SemanticsModel child2;
-        SemanticsModel child3;
-        SemanticsModel child4;
+
+
+        // test case 0: request confirm value
+        {
+            YodaEnvironment yodaEnvironment = YodaEnvironment.dialogTestingEnvironment();
+            DiscourseUnit2 du = new DiscourseUnit2();
+
+            DiscourseUnit2.DialogStateHypothesis hyp1 = new DiscourseUnit2.DialogStateHypothesis();
+            String jsonString1 = "{\"dialogAct\":\"Command\",\n" +
+                    " \"verb\":{\"class\":\"Create\",\n" +
+                    "         \"Patient\":{\"class\":\"Meeting\"}}}";
+            SemanticsModel spokenByThemHyp1 = new SemanticsModel(jsonString1);
+            hyp1.setSpokenByThem(spokenByThemHyp1);
+
+            DiscourseUnit2.DialogStateHypothesis hyp2 = new DiscourseUnit2.DialogStateHypothesis();
+            String jsonString2 = "{\"dialogAct\":\"Command\",\n" +
+                    " \"verb\":{\"class\":\"Create\",\n" +
+                    "         \"Patient\":{\"class\":\"Email\"}}}";
+            SemanticsModel spokenByThemHyp2 = new SemanticsModel(jsonString2);
+            hyp2.setSpokenByThem(spokenByThemHyp2);
+
+            du.getHypotheses().put("hyp1", hyp1);
+            du.getHypotheses().put("hyp2", hyp2);
+            StringDistribution weights = new StringDistribution();
+            weights.put("hyp1", .6);
+            weights.put("hyp2", .4);
+            du.setHypothesisDistribution(weights);
+
+            Map<String, Object> bestDialogActionParameters = new HashMap<>();
+            bestDialogActionParameters.put("v1", new SemanticsModel("{\"class\":\"Meeting\"}").getInternalRepresentation());
+            DialogAct bestAction = new RequestConfirmValue();
+            bestAction.bindVariables(bestDialogActionParameters);
+            TestCase testCase = new TestCase(du, bestAction, yodaEnvironment);
+            ans.add(testCase);
+
+        }
+
+
+
+
 
 //        // test case 0: role ambiguity with different depths
 //        utterances = new HashMap<>();
@@ -220,38 +244,38 @@ public class TestActionSelection {
 //        testCase = new TestCase(utterances, weights, bestDialogAction);
 //        ans.add(testCase);
 
-        // test case 1: request patient
-        utterances = new HashMap<>();
-        weights = new StringDistribution();
-        bestDialogActionParameters = new HashMap<>();
-        bestDialogActionParameters.put("r1", "Patient");
-        bestDialogActionParameters.put("v1", "Exist");
-        bestDialogAction = new RequestVerbRole().bindVariables(bestDialogActionParameters);
-
-        hyp1 = new SemanticsModel();
-        child1 = new SemanticsModel();
-        hyp1.getSlots().put("dialogAct", "YNQuestion");
-        hyp1.getSlots().put("verb", "Exist");
-        hyp1.getSlots().put("Agent", "meeting0");
-        hyp1.getSlots().put("fromTime", "t0");
-        hyp1.getChildren().put("meeting0", child1);
-        child1.getSlots().put("endTime", "t1");
-        utterances.put("hyp1", hyp1);
-        weights.put("hyp1", .9);
-
-        hyp2 = new SemanticsModel();
-        child2 = new SemanticsModel();
-        hyp2.getSlots().put("dialogAct", "YNQuestion");
-        hyp2.getSlots().put("verb", "Exist");
-        hyp2.getSlots().put("Agent", "meeting1");
-        hyp2.getSlots().put("fromTime", "t0");
-        hyp2.getSlots().put("toTime", "t1");
-        hyp2.getChildren().put("meeting1", child2);
-        utterances.put("hyp2", hyp2);
-        weights.put("hyp2", .1);
-
-        testCase = new TestCase(utterances, weights, bestDialogAction);
-        ans.add(testCase);
+//        // test case 1: request patient
+//        utterances = new HashMap<>();
+//        weights = new StringDistribution();
+//        bestDialogActionParameters = new HashMap<>();
+//        bestDialogActionParameters.put("r1", "Patient");
+//        bestDialogActionParameters.put("v1", "Exist");
+//        bestDialogAction = new RequestVerbRole().bindVariables(bestDialogActionParameters);
+//
+//        hyp1 = new SemanticsModel();
+//        child1 = new SemanticsModel();
+//        hyp1.getSlots().put("dialogAct", "YNQuestion");
+//        hyp1.getSlots().put("verb", "Exist");
+//        hyp1.getSlots().put("Agent", "meeting0");
+//        hyp1.getSlots().put("fromTime", "t0");
+//        hyp1.getChildren().put("meeting0", child1);
+//        child1.getSlots().put("endTime", "t1");
+//        utterances.put("hyp1", hyp1);
+//        weights.put("hyp1", .9);
+//
+//        hyp2 = new SemanticsModel();
+//        child2 = new SemanticsModel();
+//        hyp2.getSlots().put("dialogAct", "YNQuestion");
+//        hyp2.getSlots().put("verb", "Exist");
+//        hyp2.getSlots().put("Agent", "meeting1");
+//        hyp2.getSlots().put("fromTime", "t0");
+//        hyp2.getSlots().put("toTime", "t1");
+//        hyp2.getChildren().put("meeting1", child2);
+//        utterances.put("hyp2", hyp2);
+//        weights.put("hyp2", .1);
+//
+//        testCase = new TestCase(utterances, weights, bestDialogAction);
+//        ans.add(testCase);
 //
 //
 //        // test case 2: ask for a rephrase

@@ -33,9 +33,8 @@ public class RequestConfirmValue extends DialogAct {
     }
 
     @Override
-    public DialogAct bindVariables(Map<String, Object> bindings) {
+    public void bindVariables(Map<String, Object> bindings) {
         boundVariables = bindings;
-        return this;
     }
 
     @Override
