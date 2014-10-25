@@ -3,6 +3,8 @@ package edu.cmu.sv.semantics;
 
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
+import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
+import edu.cmu.sv.ontology.misc.WebResource;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -38,6 +40,48 @@ public class SemanticsModel {
 
     public SemanticsModel(){
         internalRepresentation = new JSONObject();
+    }
+
+    /*
+        * Detect weather there will be any conflicts while extending source with insertionContent
+        * Does NOT check that the resulting object will be valid
+        * */
+    public static boolean anySenseConflicts(JSONObject source, JSONObject insertionContent){
+        // check for class compatibility
+        if (source.get("class")==null || insertionContent.get("class")==null)
+            throw new Error("one of these does not have a class!");
+        Class sourceClass = OntologyRegistry.thingNameMap.get(source.get("class"));
+        Class insertionClass = OntologyRegistry.thingNameMap.get(insertionContent.get("class"));
+
+        // two web resources can not cause sense conflicts, only denotation conflicts
+        if (sourceClass.equals(WebResource.class) && insertionClass.equals(WebResource.class))
+            return false;
+
+        if (!(sourceClass.isAssignableFrom(insertionClass) ||
+                insertionClass.isAssignableFrom(sourceClass) ||
+                sourceClass.equals(UnknownThingWithRoles.class) ||
+                insertionClass.equals(UnknownThingWithRoles.class)))
+            return true;
+
+        // check recursively for other role compatibility
+        for (Object key : insertionContent.keySet()){
+            if (key.equals("class")){
+                continue;
+            } else {
+                if (source.containsKey(key)){
+                    if (source.get(key) instanceof String &&
+                            !(source.get(key).equals(insertionContent.get(key)))) {
+                        return true;
+                    } else if (insertionContent.get(key) instanceof String &&
+                            !(insertionContent.get(key).equals(source.get(key)))) {
+                        return true;
+                    } else if (anySenseConflicts((JSONObject) source.get(key), (JSONObject) insertionContent.get(key))){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public SemanticsModel deepCopy(){
@@ -278,6 +322,17 @@ public class SemanticsModel {
                 filter(x -> clsName.equals(newGetSlotPathFiller(x+".class"))).
                 collect(Collectors.toSet());
     }
+
+
+    /*
+    * return the set of paths pointing to nodes that don't conflict with the filler
+    * */
+    public Set<String> findAllPathsToNonConflict(JSONObject filter){
+        return getAllInternalNodePaths().stream().
+                filter(x -> !anySenseConflicts((JSONObject) newGetSlotPathFiller(x), filter)).
+                collect(Collectors.toSet());
+    }
+
 
     /*
     * Return all the slot paths that point to JSONObjects

@@ -96,10 +96,9 @@ public class DiscourseUnit2 {
         return hypothesisDistribution;
     }
 
-    public void setHypothesisDistribution(StringDistribution hypothesisDistribution) {
-        this.hypothesisDistribution = hypothesisDistribution;
+    public Map<String, DialogStateHypothesis> getHypotheses() {
+        return hypotheses;
     }
-
 
     /*
     * Compare a hypothesis to the actual content of this discourse unit

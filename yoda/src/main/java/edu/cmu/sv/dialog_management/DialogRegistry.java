@@ -27,8 +27,8 @@ public class DialogRegistry {
     // map from string identifier to dialog act
     public static Map<String, Class <? extends DialogAct>> dialogActNameMap = new HashMap<>();
 
-    // the set of clarification dialog acts available to the system
-    public static Set<Class <? extends DialogAct>> clarificationDialogActs = new HashSet<>();
+    // the set of sense clarification dialog acts available to the system
+    public static Set<Class <? extends DialogAct>> senseClarificationDialogActs = new HashSet<>();
 
     // the full set of discourse unit dialog act types handled by the system
     public static Set<Class <? extends DialogAct>> discourseUnitDialogActs = new HashSet<>();
@@ -42,12 +42,9 @@ public class DialogRegistry {
             nonDialogTaskRegistry = new HashMap<>();
 
     static{
-        clarificationDialogActs.add(RequestConfirmRole.class);
-        clarificationDialogActs.add(RequestConfirmValue.class);
-        clarificationDialogActs.add(RequestDisambiguateRole.class);
-        clarificationDialogActs.add(RequestDisambiguateValues.class);
-        clarificationDialogActs.add(RequestRephrase.class);
-        clarificationDialogActs.add(Acknowledge.class);
+        senseClarificationDialogActs.add(RequestConfirmValue.class);
+//        senseClarificationDialogActs.add(RequestRephrase.class);
+        senseClarificationDialogActs.add(Acknowledge.class);
 
         discourseUnitDialogActs.add(WHQuestion.class);
         discourseUnitDialogActs.add(YNQuestion.class);
@@ -63,7 +60,7 @@ public class DialogRegistry {
         nonDialogTaskRegistry.get(Command.class).add(SendEmailTask.class);
 
         for (Class<? extends DialogAct> cls : Iterables.concat(discourseUnitDialogActs,
-                clarificationDialogActs, Arrays.asList(Fragment.class))) {
+                senseClarificationDialogActs, Arrays.asList(Fragment.class))) {
             dialogActNameMap.put(cls.getSimpleName(), cls);
         }
 

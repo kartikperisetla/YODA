@@ -2,7 +2,9 @@ package edu.cmu.sv.dialog_management;
 
 import edu.cmu.sv.YodaEnvironment;
 import edu.cmu.sv.database.Database;
+import edu.cmu.sv.dialog_state_tracking.DialogStateTracker2;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
+import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.system_action.SystemAction;
 import edu.cmu.sv.system_action.dialog_act.*;
 import edu.cmu.sv.dialog_state_tracking.DialogStateTracker;
@@ -41,13 +43,35 @@ public class DialogManager {
         DiscourseUnit2 DU = yodaEnvironment.dst.getDiscourseUnit();
         Map<SystemAction, Double> actionExpectedReward = new HashMap<>();
 
-        //// Enumerate and evaluate sense clarification actions
+        //// Enumerate and evaluate sense clarification acts
+        for (Class <? extends DialogAct> daClass : DialogRegistry.senseClarificationDialogActs){
+            Map<String, Set<Object>> possibleBindingsPerVariable = new HashMap<>();
+            Map<String, Class<? extends Thing>> parameters = daClass.newInstance().getParameters();
+            Map<String, DiscourseUnit2.DialogStateHypothesis> dialogStateHypothesisMap = DU.getHypotheses();
 
-        //// Enumerate and evaluate denotation clarification actions
+            // Collect matches
+            for (String dialogStateHypothesisID : dialogStateHypothesisMap.keySet()){
+                for (String parameter : parameters.keySet()){
+                    if (!possibleBindingsPerVariable.containsKey(parameter))
+                        possibleBindingsPerVariable.put(parameter, new HashSet<>());
+                    SemanticsModel spokenByThem = dialogStateHypothesisMap.get(dialogStateHypothesisID).getSpokenByThem();
+                    for (String path: spokenByThem.findAllPathsToClass(parameters.get(parameter).getSimpleName())){
+                        possibleBindingsPerVariable.get(parameter).add(spokenByThem.newGetSlotPathFiller(path));
+                    }
+                }
+            }
 
-        //// Enumerate and evaluate slot-filling dialog acts,
+            // create an action and evaluate reward for each possible binding
+            for (Map<String, Object> binding : Combination.possibleBindings(possibleBindingsPerVariable)) {
+                DialogAct dialogAct = daClass.newInstance();
+                dialogAct = dialogAct.bindVariables(binding);
+                Double expectedReward = dialogAct.reward(DU);
+                Double expectedCost = dialogAct.cost(DU);
+                actionExpectedReward.put(dialogAct, expectedReward - expectedCost);
+            }
 
-        //// Enumerate and evaluate dialog and non-dialog tasks
+        }
+
 
         return HypothesisSetManagement.keepNBestBeam(actionExpectedReward, 10000);
     }

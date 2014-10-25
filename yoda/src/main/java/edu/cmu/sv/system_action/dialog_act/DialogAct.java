@@ -1,8 +1,8 @@
 package edu.cmu.sv.system_action.dialog_act;
 
-import edu.cmu.sv.database.Database;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
+import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.system_action.SystemAction;
-import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 
 import java.util.*;
 
@@ -18,11 +18,11 @@ import java.util.*;
  *
  */
 public abstract class DialogAct extends SystemAction {
-    public abstract Double reward(DiscourseUnit DU);
-    public abstract Double cost(DiscourseUnit DU);
-    public abstract Map<String, String> getParameters();
-    public abstract Map<String, String> getBindings();
-    public abstract DialogAct bindVariables(Map<String, String> bindings);
+    public abstract Double reward(DiscourseUnit2 DU);
+    public abstract Double cost(DiscourseUnit2 DU);
+    public abstract Map<String, Class<? extends Thing>> getParameters();
+    public abstract Map<String, Object> getBindings();
+    public abstract DialogAct bindVariables(Map<String, Object> bindings);
 
     @Override
     public String toString() {

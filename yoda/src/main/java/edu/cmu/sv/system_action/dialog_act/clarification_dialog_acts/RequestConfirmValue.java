@@ -1,9 +1,11 @@
 package edu.cmu.sv.system_action.dialog_act.clarification_dialog_acts;
 
-import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
+import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 
+import java.lang.Object;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,32 +14,32 @@ import java.util.Map;
  * Created by David Cohen on 9/8/14.
  */
 public class RequestConfirmValue extends DialogAct {
-    private Map<String, String> boundVariables = null;
-    static Map<String, String> parameters = new HashMap<>();
+    private Map<String, Object> boundVariables = null;
+    static Map<String, Class<? extends Thing>> parameters = new HashMap<>();
     static {
-        parameters.put("v1", "value");
+        parameters.put("v1", edu.cmu.sv.ontology.object.Object.class);
     }
 
     // template "<v1> ?"
 
     @Override
-    public Map<String, String> getParameters() {
+    public Map<String, Class<? extends Thing>> getParameters() {
         return parameters;
     }
 
     @Override
-    public Map<String, String> getBindings() {
+    public Map<String, Object> getBindings() {
         return boundVariables;
     }
 
     @Override
-    public DialogAct bindVariables(Map<String, String> bindings) {
+    public DialogAct bindVariables(Map<String, Object> bindings) {
         boundVariables = bindings;
         return this;
     }
 
     @Override
-    public Double reward(DiscourseUnit DU) {
+    public Double reward(DiscourseUnit2 DU) {
         try {
             return RewardAndCostCalculator.clarificationDialogActReward(db, DU,
                     RewardAndCostCalculator.predictConfidenceGainFromValueConfirmation(DU,
@@ -49,7 +51,7 @@ public class RequestConfirmValue extends DialogAct {
     }
 
     @Override
-    public Double cost(DiscourseUnit DU) {
+    public Double cost(DiscourseUnit2 DU) {
         // we oblige the user to a simple yes/no, which is < one phrase
         return RewardAndCostCalculator.penaltyForObligingUserPhrase*.75 +
                 RewardAndCostCalculator.penaltyForSpeakingPhrase *1;

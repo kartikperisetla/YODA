@@ -1,6 +1,7 @@
 package edu.cmu.sv.dialog_management;
 
 import edu.cmu.sv.database.Database;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.semantics.SemanticsModel;
@@ -9,6 +10,7 @@ import edu.cmu.sv.system_action.dialog_task.DialogTaskPreferences;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTaskPreferences;
 import edu.cmu.sv.utils.StringDistribution;
+import org.json.simple.JSONObject;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
@@ -40,11 +42,11 @@ public class RewardAndCostCalculator {
                 (dialogTask.getPreferences().rewardForCorrectExecution * executability);
     }
 
-    public static Double nonDialogTaskReward(DiscourseUnit DU, NonDialogTask nonDialogTask){
+    public static Double nonDialogTaskReward(DiscourseUnit2 DU, NonDialogTask nonDialogTask){
         Double totalReward = 0.0;
         Double probabilityCorrect = 0.0;
         for (String key : DU.getHypotheses().keySet()){
-            if (nonDialogTask.meetsTaskSpec(DU.getHypotheses().get(key)))
+            if (nonDialogTask.meetsTaskSpec(DU.getHypotheses().get(key).getSpokenByThem()))
                 probabilityCorrect += DU.getHypothesisDistribution().get(key);
         }
         // multiply probability correct by probability that the task is executable
@@ -59,11 +61,11 @@ public class RewardAndCostCalculator {
         return totalReward;
     }
 
-    public static Double dialogTaskReward(DiscourseUnit DU, DialogTask dialogTask){
+    public static Double dialogTaskReward(DiscourseUnit2 DU, DialogTask dialogTask){
         Double totalReward = 0.0;
         Double probabilityCorrect = 0.0;
         for (String key : DU.getHypotheses().keySet()){
-            if (dialogTask.meetsTaskSpec(DU.getHypotheses().get(key)))
+            if (dialogTask.meetsTaskSpec(DU.getHypotheses().get(key).getSpokenByThem()))
                 probabilityCorrect += DU.getHypothesisDistribution().get(key);
         }
         // multiply probability correct by probability that the task is executable
@@ -83,7 +85,7 @@ public class RewardAndCostCalculator {
     * estimate the improvement in reward to all possible dialog and non-dialog tasks
     * that relate to all the available DU hypotheses.
     * */
-    public static Double clarificationDialogActReward(Database db, DiscourseUnit DU,
+    public static Double clarificationDialogActReward(Database db, DiscourseUnit2 DU,
                                                       StringDistribution predictedRelativeConfidenceGain)
             throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
         Double totalReward = 0.0;
@@ -91,7 +93,8 @@ public class RewardAndCostCalculator {
         // sum up the predicted rewards supposing that each current hypothesis is true,
         // weighting the predicted reward by the current belief that the hypothesis is true.
         for (String hypothesisID : DU.getHypotheses().keySet()){
-            SemanticsModel hypothesis = DU.getHypotheses().get(hypothesisID);
+            DiscourseUnit2.DialogStateHypothesis hypothesis = DU.getHypotheses().get(hypothesisID);
+            SemanticsModel spokenByThem = hypothesis.getSpokenByThem();
             Double currentConfidence = DU.getHypothesisDistribution().get(hypothesisID);
             Double predictedConfidence = currentConfidence + (1-currentConfidence)*
                     predictedRelativeConfidenceGain.get(hypothesisID);
@@ -99,7 +102,7 @@ public class RewardAndCostCalculator {
             // predict the difference in expected reward after clarification
             Double predictedRewardDifference = 0.0;
             Class<? extends DialogAct> daClass = DialogRegistry.dialogActNameMap.
-                    get(hypothesis.getSlotPathFiller("dialogAct"));
+                    get((String)spokenByThem.newGetSlotPathFiller("dialogAct"));
             // add contribution from dialog tasks
             if (DialogRegistry.dialogTaskRegistry.containsKey(daClass)) {
                 for (Class<? extends DialogTask> taskClass : DialogRegistry.dialogTaskRegistry.get(daClass)) {
@@ -128,7 +131,7 @@ public class RewardAndCostCalculator {
         return totalReward;
     }
 
-    public static StringDistribution predictedConfidenceGainFromJointClarification(DiscourseUnit DU){
+    public static StringDistribution predictedConfidenceGainFromJointClarification(DiscourseUnit2 DU){
         double relativeImprovement = .5; // every hypothesis is expected to improve by 50% relative if it is correct
         StringDistribution ans = new StringDistribution();
         for (String key : DU.getHypotheses().keySet()){
@@ -137,99 +140,19 @@ public class RewardAndCostCalculator {
         return ans;
     }
 
-    public static StringDistribution predictConfidenceGainFromValueDisambiguation(DiscourseUnit DU, String v1,
-                                                                                  String v2){
-        double limit = .9;
-        StringDistribution ans = new StringDistribution();
-        Map<String, Boolean> hasV1Map = DU.getHypotheses().keySet().stream().collect(Collectors.toMap(
-                x->x, x->DU.getHypotheses().get(x).getAllSlotFillerPairs().values().contains(v1)));
-        Map<String, Boolean> hasV2Map = DU.getHypotheses().keySet().stream().collect(Collectors.toMap(
-                x->x, x->DU.getHypotheses().get(x).getAllSlotFillerPairs().values().contains(v2)));
-
-        for (String key : DU.getHypotheses().keySet()) {
-            if (DU.getHypothesisDistribution().get(key) >= 1.0) {
-                ans.put(key, 0.0);
-            }
-            else if ((hasV1Map.get(key) && hasV2Map.get(key)) || (!hasV1Map.get(key) && !hasV2Map.get(key)))
-                ans.put(key, 0.0);
-            else if (hasV1Map.get(key)){ // !hasV2Map.get(key) is necessarily true
-                ans.put(key, limit *
-                        DU.getHypothesisDistribution().keySet().stream().
-                                filter(x -> !hasV1Map.get(x)).
-                                map(x -> DU.getHypothesisDistribution().get(x)).
-                                reduce(0.0, (x, y) -> x + y) * 1.0 /
-                        (1.0 - DU.getHypothesisDistribution().get(key)) /
-                        DU.getHypothesisDistribution().keySet().stream().
-                                filter(x -> hasV1Map.get(x) && !hasV2Map.get(x)).
-                                count());
-            }
-            else if (hasV2Map.get(key)){
-                ans.put(key, limit *
-                        DU.getHypothesisDistribution().keySet().stream().
-                                filter(x -> !hasV2Map.get(x)).
-                                map(x -> DU.getHypothesisDistribution().get(x)).
-                                reduce(0.0, (x, y) -> x + y) * 1.0 /
-                        (1.0 - DU.getHypothesisDistribution().get(key)) /
-                        DU.getHypothesisDistribution().keySet().stream().
-                                filter(x -> hasV2Map.get(x) && !hasV1Map.get(x)).
-                                count());
-            }
-        }
-
-            return ans;
-    }
-
-    public static StringDistribution predictConfidenceGainFromRoleDisambiguation(DiscourseUnit DU, String r1,
-                                                                                  String r2){
-        double limit = .9;
-        StringDistribution ans = new StringDistribution();
-        Map<String, Boolean> hasR1Map = DU.getHypotheses().keySet().stream().collect(Collectors.toMap(
-                x->x, x->DU.getHypotheses().get(x).getAllSlotFillerPairs().keySet().contains(r1)));
-        Map<String, Boolean> hasR2Map = DU.getHypotheses().keySet().stream().collect(Collectors.toMap(
-                x->x, x->DU.getHypotheses().get(x).getAllSlotFillerPairs().keySet().contains(r2)));
-
-        for (String key : DU.getHypotheses().keySet()) {
-            if (DU.getHypothesisDistribution().get(key) >= 1.0) {
-                ans.put(key, 0.0);
-            }
-            else if ((hasR1Map.get(key) && hasR2Map.get(key)) || (!hasR1Map.get(key) && !hasR2Map.get(key)))
-                ans.put(key, 0.0);
-            else if (hasR1Map.get(key)){ // !hasR2Map.get(key) is necessarily true
-                ans.put(key, limit *
-                        DU.getHypothesisDistribution().keySet().stream().
-                                filter(x -> !hasR1Map.get(x)).
-                                map(x -> DU.getHypothesisDistribution().get(x)).
-                                reduce(0.0, (x, y) -> x + y) * 1.0 /
-                        (1.0 - DU.getHypothesisDistribution().get(key)) /
-                        DU.getHypothesisDistribution().keySet().stream().
-                                filter(x -> hasR1Map.get(x) && !hasR2Map.get(x)).
-                                count());
-            }
-            else if (hasR2Map.get(key)){
-                ans.put(key, limit *
-                        DU.getHypothesisDistribution().keySet().stream().
-                                filter(x -> !hasR2Map.get(x)).
-                                map(x -> DU.getHypothesisDistribution().get(x)).
-                                reduce(0.0, (x, y) -> x + y) * 1.0 /
-                        (1.0 - DU.getHypothesisDistribution().get(key)) /
-                        DU.getHypothesisDistribution().keySet().stream().
-                                filter(x -> hasR2Map.get(x) && !hasR1Map.get(x)).
-                                count());
-            }
-        }
-
-        return ans;
-    }
-
     /*
     * Confirming a value is confirming that some role is filled by it,
     * it does not confirm anything about which role it fills
     * */
-    public static StringDistribution predictConfidenceGainFromValueConfirmation(DiscourseUnit DU, String value){
+    public static StringDistribution predictConfidenceGainFromValueConfirmation(DiscourseUnit2 DU, Object value){
         double limit = .8; // we will never predict 100% confidence gain
         StringDistribution ans = new StringDistribution();
+        if (!(value instanceof JSONObject))
+            return null;
         Map<String, Boolean> hasValueMap = DU.getHypotheses().keySet().stream().collect(Collectors.toMap(
-                x->x, x->DU.getHypotheses().get(x).getAllSlotFillerPairs().values().contains(value)
+                x->x,
+                x->!DU.getHypotheses().get(x).getSpokenByThem().
+                        findAllPathsToNonConflict((JSONObject)value).isEmpty()
         ));
 
         for (String key : DU.getHypotheses().keySet()){
@@ -249,34 +172,6 @@ public class RewardAndCostCalculator {
             }
         }
 //        System.out.println("RewardAndCostCalculator.predictConfidenceGainFromValueConfirmation: ans:\n"+ans);
-        return ans;
-    }
-
-    /*
-    * Confirming a role is confirming that the role is filled,
-    * it does not confirm anything about the value that fills it
-    * */
-    public static StringDistribution predictConfidenceGainFromRoleConfirmation(DiscourseUnit DU, String role){
-        double limit = .8;
-        StringDistribution ans = new StringDistribution();
-        Map<String, Boolean> roleFilledMap = DU.getHypotheses().keySet().stream().collect(Collectors.toMap(
-                x->x, x->DU.getHypotheses().get(x).getAllSlotFillerPairs().keySet().contains(role)
-        ));
-        for (String key : DU.getHypotheses().keySet()){
-            if (DU.getHypothesisDistribution().get(key) >= 1.0)
-                ans.put(key, 0.0);
-            else if (roleFilledMap.get(key)) {
-                ans.put(key, limit *
-                        DU.getHypotheses().keySet().stream().
-                                filter(x -> !roleFilledMap.get(x)).
-                                map(x -> DU.getHypothesisDistribution().get(x)).
-                                reduce(0.0, (x, y) -> x + y) * 1.0 /
-                        (1.0 - DU.getHypothesisDistribution().get(key)) /
-                        roleFilledMap.values().stream().filter(x -> x).count());
-            } else {
-                ans.put(key, 0.0);
-            }
-        }
         return ans;
     }
 

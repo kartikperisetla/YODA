@@ -73,7 +73,7 @@ public class AcknowledgeInference implements DiscourseUnitUpdateInference {
                     JSONObject daContent = (JSONObject) hypModel.newGetSlotPathFiller("topic");
 
                     // what is being confirmed must not conflict with what has been suggested
-                    if (Utils.anySenseConflicts(
+                    if (SemanticsModel.anySenseConflicts(
                             (JSONObject) currentState.getSpokenByMe().newGetSlotPathFiller(suggestionPath + "." + HasValue.class.getSimpleName()), daContent))
                         continue;
 
