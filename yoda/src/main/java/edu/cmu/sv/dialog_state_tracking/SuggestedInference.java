@@ -71,7 +71,7 @@ public class SuggestedInference implements DiscourseUnitUpdateInference {
                                 new DiscourseUnit2.DialogStateHypothesis();
                         SemanticsModel newSpokenByThemHypothesis = currentState.getSpokenByThem().deepCopy();
                         newSpokenByThemHypothesis.placeAtPoint("verb",
-                                new SemanticsModel(((JSONObject)currentState.getSpokenByMe().
+                                new SemanticsModel(((JSONObject)currentState.getMostRecent().
                                         newGetSlotPathFiller("verb"))).deepCopy());
                         newSpokenByThemHypothesis.extendAndOverwriteAtPoint(attachmentPoint, wrapped);
                         SemanticsModel.wrap((JSONObject) newSpokenByThemHypothesis.newGetSlotPathFiller(attachmentPoint),
@@ -90,14 +90,14 @@ public class SuggestedInference implements DiscourseUnitUpdateInference {
             String dialogAct = turn.systemUtterance.getSlotPathFiller("dialogAct");
 
             // we can't add a suggestion if there's already a suggestion
-            Set<String> suggestionPaths = currentState.getSpokenByThem().findAllPathsToClass(Suggested.class.getSimpleName());
+            Set<String> suggestionPaths = currentState.getMostRecent().findAllPathsToClass(Suggested.class.getSimpleName());
             if (suggestionPaths.size() > 0)
                 return ans;
 
             if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(RequestConfirmValue.class)){
                 JSONObject daContent = (JSONObject) turn.systemUtterance.newGetSlotPathFiller("topic");
                 Map<String, Double> attachmentPoints = Utils.findPossiblePointsOfAttachment(
-                        currentState.getSpokenByThem(), daContent);
+                        currentState.getMostRecent(), daContent);
                 SemanticsModel wrapped = new SemanticsModel(daContent.toJSONString());
                 SemanticsModel.wrap((JSONObject) wrapped.newGetSlotPathFiller(""),
                         Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
@@ -109,7 +109,7 @@ public class SuggestedInference implements DiscourseUnitUpdateInference {
 
                     SemanticsModel newSpokenByMeHypothesis = currentState.getSpokenByMe().deepCopy();
                     newSpokenByMeHypothesis.placeAtPoint("verb",
-                            new SemanticsModel(((JSONObject) currentState.getSpokenByThem().
+                            new SemanticsModel(((JSONObject) currentState.getMostRecent().
                                     newGetSlotPathFiller("verb"))).deepCopy());
 
                     SemanticsModel.wrap((JSONObject)newSpokenByMeHypothesis.newGetSlotPathFiller(attachmentPoint),

@@ -45,7 +45,7 @@ public class AcknowledgeInference implements DiscourseUnitUpdateInference {
                             new DiscourseUnit2.DialogStateHypothesis();
                     SemanticsModel newSpokenByThemHypothesis = currentState.getSpokenByThem().deepCopy();
                     newSpokenByThemHypothesis.placeAtPoint("verb",
-                            new SemanticsModel(((JSONObject)currentState.getSpokenByMe().
+                            new SemanticsModel(((JSONObject)currentState.getMostRecent().
                                     newGetSlotPathFiller("verb"))).deepCopy());
 //                    SemanticsModel newSpokenByThemHypothesis = currentState.getSpokenByMe().deepCopy();
                     for (String acceptancePath: suggestionPaths) {
@@ -82,7 +82,7 @@ public class AcknowledgeInference implements DiscourseUnitUpdateInference {
                             new DiscourseUnit2.DialogStateHypothesis();
                     SemanticsModel newSpokenByThemHypothesis = currentState.getSpokenByThem().deepCopy();
                     newSpokenByThemHypothesis.placeAtPoint("verb",
-                            new SemanticsModel(((JSONObject)currentState.getSpokenByMe().
+                            new SemanticsModel(((JSONObject)currentState.getMostRecent().
                                     newGetSlotPathFiller("verb"))).deepCopy());
                     // unwrap the suggestion
                     SemanticsModel.unwrap((JSONObject) newSpokenByThemHypothesis.newGetSlotPathFiller(suggestionPath),
@@ -109,7 +109,7 @@ public class AcknowledgeInference implements DiscourseUnitUpdateInference {
                         new DiscourseUnit2.DialogStateHypothesis();
                 SemanticsModel newSpokenByMeHypothesis = currentState.getSpokenByMe().deepCopy();
                 newSpokenByMeHypothesis.placeAtPoint("verb",
-                        new SemanticsModel(((JSONObject) currentState.getSpokenByThem().
+                        new SemanticsModel(((JSONObject) currentState.getMostRecent().
                                 newGetSlotPathFiller("verb"))).deepCopy());
                 for (String acceptancePath: suggestionPaths) {
                     SemanticsModel.unwrap((JSONObject) newSpokenByMeHypothesis.newGetSlotPathFiller(acceptancePath),
