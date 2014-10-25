@@ -1,5 +1,6 @@
 package edu.cmu.sv.dialog_state_tracking;
 
+import edu.cmu.sv.YodaEnvironment;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.HypothesisSetManagement;
 import edu.cmu.sv.utils.StringDistribution;
@@ -18,9 +19,11 @@ public class DialogStateTracker2 {
         updateInferences.add(AcknowledgeInference.class);
     }
 
+    YodaEnvironment yodaEnvironment;
     DiscourseUnit2 discourseUnit;
 
-    public DialogStateTracker2(){
+    public DialogStateTracker2(YodaEnvironment yodaEnvironment){
+        this.yodaEnvironment = yodaEnvironment;
         discourseUnit = new DiscourseUnit2();
         discourseUnit.hypothesisDistribution.put("initial_hypothesis", 1.0);
         discourseUnit.hypotheses.put("initial_hypothesis", new DiscourseUnit2.DialogStateHypothesis());

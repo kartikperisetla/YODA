@@ -2,6 +2,7 @@ package edu.cmu.sv;
 
 import edu.cmu.sv.database.Database;
 import edu.cmu.sv.dialog_management.DialogManager;
+import edu.cmu.sv.dialog_management.DialogManager2;
 import edu.cmu.sv.dialog_state_tracking.DialogStateTracker2;
 
 /**
@@ -21,8 +22,16 @@ public class YodaEnvironment {
 
     public static YodaEnvironment dstTestingEnvironment(){
         YodaEnvironment ans = new YodaEnvironment();
-        ans.dst = new DialogStateTracker2();
+        ans.dst = new DialogStateTracker2(ans);
         ans.db = new Database();
+        return ans;
+    }
+
+    public static YodaEnvironment dialogTestingEnvironment(){
+        YodaEnvironment ans = new YodaEnvironment();
+        ans.dst = new DialogStateTracker2(ans);
+        ans.db = new Database();
+        ans.dm = new DialogManager(ans);
         return ans;
     }
 }

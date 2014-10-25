@@ -55,8 +55,6 @@ public class SuggestedInference implements DiscourseUnitUpdateInference {
                             "And".equals(hypModel.newGetSlotPathFiller("topic.class")))
                         continue;
 
-
-
                     JSONObject daContent = (JSONObject) hypModel.newGetSlotPathFiller("topic");
 
                     Map<String, Double> attachmentPoints = Utils.findPossiblePointsOfAttachment(
