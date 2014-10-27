@@ -4,7 +4,7 @@ import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.ontology.misc.Suggested;
 import edu.cmu.sv.ontology.role.HasValue;
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.system_action.dialog_act.clarification_dialog_acts.Acknowledge;
+import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ConfirmSenseSuggestion;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
 import org.json.simple.JSONObject;
 
@@ -39,7 +39,7 @@ public class AcknowledgeInference implements DiscourseUnitUpdateInference {
                 SemanticsModel hypModel = turn.hypotheses.get(sluHypothesisID);
                 String dialogAct = hypModel.getSlotPathFiller("dialogAct");
 
-                if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(Acknowledge.class)) {
+                if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(ConfirmSenseSuggestion.class)) {
                     String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
                     DiscourseUnit2.DialogStateHypothesis newDUHypothesis =
                             new DiscourseUnit2.DialogStateHypothesis();
@@ -103,7 +103,7 @@ public class AcknowledgeInference implements DiscourseUnitUpdateInference {
             String dialogAct = turn.systemUtterance.getSlotPathFiller("dialogAct");
             Set<String> suggestionPaths = currentState.spokenByMe.findAllPathsToClass(Suggested.class.getSimpleName());
 
-            if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(Acknowledge.class)) {
+            if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(ConfirmSenseSuggestion.class)) {
                 String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
                 DiscourseUnit2.DialogStateHypothesis newDUHypothesis =
                         new DiscourseUnit2.DialogStateHypothesis();

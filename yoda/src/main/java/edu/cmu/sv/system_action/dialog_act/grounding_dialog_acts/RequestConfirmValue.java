@@ -1,4 +1,4 @@
-package edu.cmu.sv.system_action.dialog_act.clarification_dialog_acts;
+package edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts;
 
 import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;

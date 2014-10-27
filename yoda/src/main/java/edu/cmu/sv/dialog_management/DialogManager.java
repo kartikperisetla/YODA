@@ -10,6 +10,7 @@ import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.Combination;
 import edu.cmu.sv.utils.HypothesisSetManagement;
 import org.apache.commons.lang3.tuple.Pair;
+import org.json.simple.JSONObject;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -47,7 +48,7 @@ public class DialogManager {
 
         //// Enumerate and evaluate sense clarification acts
         for (Class <? extends DialogAct> daClass : DialogRegistry.senseClarificationDialogActs){
-            System.out.println("Enumerating and evaluating actions of class: "+daClass.getSimpleName());
+//            System.out.println("Enumerating and evaluating actions of class: "+daClass.getSimpleName());
             Map<String, Set<Object>> possibleBindingsPerVariable = new HashMap<>();
             Map<String, Class<? extends Thing>> parameters = daClass.newInstance().getParameters();
             Map<String, DiscourseUnit2.DialogStateHypothesis> dialogStateHypothesisMap = DU.getHypotheses();
@@ -64,7 +65,7 @@ public class DialogManager {
                 }
             }
 
-            System.out.println("possibleBindingsPerVariable: "+possibleBindingsPerVariable);
+//            System.out.println("DialogManager: possibleBindingsPerVariable: "+possibleBindingsPerVariable);
 
             // create an action and evaluate reward for each possible binding
             for (Map<String, Object> binding : Combination.possibleBindings(possibleBindingsPerVariable)) {
@@ -76,7 +77,6 @@ public class DialogManager {
             }
 
         }
-
 
         return HypothesisSetManagement.keepNBestBeam(actionExpectedReward, 10000);
     }

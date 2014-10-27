@@ -1,18 +1,9 @@
 package edu.cmu.sv;
 
-import edu.cmu.sv.database.Database;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
 import edu.cmu.sv.system_action.SystemAction;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
-import edu.cmu.sv.system_action.dialog_act.clarification_dialog_acts.*;
-import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestVerbRole;
-import edu.cmu.sv.system_action.dialog_task.DialogTask;
-import edu.cmu.sv.system_action.dialog_task.RespondToWHQuestionTask;
-import edu.cmu.sv.system_action.dialog_task.RespondToYNQuestionTask;
-import edu.cmu.sv.system_action.non_dialog_task.CreateMeetingTask;
-import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
-import edu.cmu.sv.system_action.non_dialog_task.SendEmailTask;
-import edu.cmu.sv.dialog_management.DialogManager;
+import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.*;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.EvaluationTools;
 import edu.cmu.sv.utils.StringDistribution;
@@ -131,7 +122,7 @@ public class TestActionSelection {
             environment.dst.setDiscourseUnit(testCase.du);
             List<Pair<SystemAction, Double>> topActions = environment.dm.selectAction();
             topActions.stream().map(Pair::getRight).forEach(rewardStatistics::addValue);
-            System.out.println("Test case evaluation:");
+            System.out.println("\nTest case evaluation:");
             EvaluationResult result = testCase.evaluate(topActions);
             evaluationResults.add(result);
             result.printSummary();
@@ -207,6 +198,40 @@ public class TestActionSelection {
             TestCase testCase = new TestCase(du, bestAction, yodaEnvironment);
             ans.add(testCase);
 
+        }
+
+
+
+        // test case 1: confirm sense suggestion
+        {
+            YodaEnvironment yodaEnvironment = YodaEnvironment.dialogTestingEnvironment();
+            DiscourseUnit2 du = new DiscourseUnit2();
+
+            DiscourseUnit2.DialogStateHypothesis hyp1 = new DiscourseUnit2.DialogStateHypothesis();
+            String jsonString1 = "{\"dialogAct\":null,\n" +
+                    " \"verb\":{\"class\":\"Create\",\n" +
+                    "         \"Patient\":{\"class\":\"Suggested\",\n" +
+                    "\"HasValue\":{\"class\":\"Email\"}}}}";
+            SemanticsModel spokenByThemHyp1 = new SemanticsModel(jsonString1);
+            hyp1.setSpokenByThem(spokenByThemHyp1);
+
+            String jsonString2 = "{\"dialogAct\":\"Command\",\n" +
+                    " \"verb\":{\"class\":\"Create\",\n" +
+                    "         \"Patient\":{\"class\":\"Email\"}}}";
+            SemanticsModel spokenByMeHyp1 = new SemanticsModel(jsonString2);
+            hyp1.setSpokenByMe(spokenByMeHyp1);
+
+            du.getHypotheses().put("hyp1", hyp1);
+            du.getHypotheses().put("hyp2", new DiscourseUnit2.DialogStateHypothesis());
+            StringDistribution weights = new StringDistribution();
+            weights.put("hyp1", .8);
+            weights.put("hyp2", .2);
+            du.setHypothesisDistribution(weights);
+
+            DialogAct bestAction = new ConfirmSenseSuggestion();
+            bestAction.bindVariables(new HashMap<>());
+            TestCase testCase = new TestCase(du, bestAction, yodaEnvironment);
+            ans.add(testCase);
         }
 
 

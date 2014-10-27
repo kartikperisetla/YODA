@@ -4,7 +4,7 @@ import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.ontology.misc.Suggested;
 import edu.cmu.sv.ontology.role.HasValue;
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.system_action.dialog_act.clarification_dialog_acts.RequestConfirmValue;
+import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestConfirmValue;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
 import org.json.simple.JSONObject;
 

@@ -2,7 +2,7 @@ package edu.cmu.sv.dialog_management;
 
 import com.google.common.collect.Iterables;
 import edu.cmu.sv.system_action.dialog_act.*;
-import edu.cmu.sv.system_action.dialog_act.clarification_dialog_acts.*;
+import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.*;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Command;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.WHQuestion;
@@ -44,7 +44,7 @@ public class DialogRegistry {
     static{
         senseClarificationDialogActs.add(RequestConfirmValue.class);
 //        senseClarificationDialogActs.add(RequestRephrase.class);
-        senseClarificationDialogActs.add(Acknowledge.class);
+        senseClarificationDialogActs.add(ConfirmSenseSuggestion.class);
 
         discourseUnitDialogActs.add(WHQuestion.class);
         discourseUnitDialogActs.add(YNQuestion.class);

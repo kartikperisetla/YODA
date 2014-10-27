@@ -46,14 +46,68 @@ public class SemanticsModel {
         return internalRepresentation;
     }
 
+
     /*
-            * Detect weather there will be any conflicts while extending source with insertionContent
-            * Does NOT check that the resulting object will be valid
-            * */
-    public static boolean anySenseConflicts(JSONObject source, JSONObject insertionContent){
+    * Detect whether there will be any new content added while extending source with insertionContent
+    * */
+    public static boolean anyNewSenseInformation(JSONObject source, JSONObject insertionContent){
+        if (source.keySet().isEmpty())
+            return true;
+        if (insertionContent.keySet().isEmpty())
+            return false;
         // check for class compatibility
         if (source.get("class")==null || insertionContent.get("class")==null)
-            throw new Error("one of these does not have a class!");
+            throw new Error("one of these does not have a class!"+source + insertionContent);
+        Class sourceClass = OntologyRegistry.thingNameMap.get(source.get("class"));
+        Class insertionClass = OntologyRegistry.thingNameMap.get(insertionContent.get("class"));
+        if (sourceClass==null || insertionClass==null){
+            System.out.println("one of these classes is missing from thingNameMap: "+source.get("class")+", "+insertionContent.get("class"));
+        }
+
+        // two web resources always add new content, but not sense content
+        if (sourceClass.equals(WebResource.class) && insertionClass.equals(WebResource.class))
+            return false;
+
+        // the insertionContent may not be more specific that the source content
+        if (!(insertionClass.isAssignableFrom(sourceClass) ||
+                insertionClass.equals(UnknownThingWithRoles.class)))
+            return true;
+
+        // check recursively for other role compatibility
+        for (Object key : insertionContent.keySet()){
+            if (key.equals("class")){
+                continue;
+            } else {
+                if (source.containsKey(key)){
+                    if (source.get(key) instanceof String &&
+                            !(source.get(key).equals(insertionContent.get(key)))) {
+                        return true;
+                    } else if (insertionContent.get(key) instanceof String &&
+                            !(insertionContent.get(key).equals(source.get(key)))) {
+                        return true;
+                    } else if (anyNewSenseInformation((JSONObject) source.get(key), (JSONObject) insertionContent.get(key))){
+                        return true;
+                    }
+                } else {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /*
+    * Detect whether there will be any conflicts while extending source with insertionContent
+    * Does NOT check that the resulting object will be valid
+    * */
+    public static boolean anySenseConflicts(JSONObject source, JSONObject insertionContent){
+        if (source.keySet().isEmpty())
+            return true;
+        if (insertionContent.keySet().isEmpty())
+            return false;
+        // check for class compatibility
+        if (source.get("class")==null || insertionContent.get("class")==null)
+            throw new Error("one of these does not have a class!" + source + insertionContent);
         Class sourceClass = OntologyRegistry.thingNameMap.get(source.get("class"));
         Class insertionClass = OntologyRegistry.thingNameMap.get(insertionContent.get("class"));
         if (sourceClass==null || insertionClass==null){

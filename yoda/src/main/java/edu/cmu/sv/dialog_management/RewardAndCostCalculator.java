@@ -30,6 +30,7 @@ public class RewardAndCostCalculator {
     public static double penaltyForObligingUserAction = 2;
     public static double penaltyForObligingUserPhrase = .1;
     public static double penaltyForSpeakingPhrase = .1;
+    public static double penaltyForIgnoringUserRequest = 2;
 
     /*
     * Calculate the expected reward improvement for performing a slot-filling task
