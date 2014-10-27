@@ -17,16 +17,17 @@ import java.util.Set;
 /**
  * Created by David Cohen on 10/18/14.
  *
- * A repair-type clarification Dialog act to confirm some content which was suggested
- * by the other speaker as a request-repair.
+ * A repair-type clarification Dialog act to correct some content which was suggested
+ * by the other speaker as a request-repair, but was incorrect.
  *
  * Ex:
+ * Present: "4"
  * Req. Conf. : "3?"
- * Confirm: "Yes"
+ * Correct: "No"
  *
  * This does not confirm cases where the user has suggested additional information.
  */
-public class ConfirmSenseSuggestion extends DialogAct {
+public class DenyIncorrectSenseSuggestion extends DialogAct {
     private Map<String, Object> boundVariables = null;
     static Map<String, Class<? extends Thing>> parameters = new HashMap<>();
     static {
@@ -61,7 +62,7 @@ public class ConfirmSenseSuggestion extends DialogAct {
                 continue;
             if (correspondingPresentedContent instanceof String)
                 continue;
-            if (SemanticsModel.anyNewSenseInformation((JSONObject) correspondingPresentedContent,
+            if (!SemanticsModel.anyNewSenseInformation((JSONObject) correspondingPresentedContent,
                     suggestedContent))
                 continue;
             // collect probability

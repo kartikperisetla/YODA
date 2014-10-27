@@ -236,6 +236,39 @@ public class TestActionSelection {
 
 
 
+        // test case 1: confirm sense suggestion
+        {
+            YodaEnvironment yodaEnvironment = YodaEnvironment.dialogTestingEnvironment();
+            DiscourseUnit2 du = new DiscourseUnit2();
+
+            DiscourseUnit2.DialogStateHypothesis hyp1 = new DiscourseUnit2.DialogStateHypothesis();
+            String jsonString1 = "{\"dialogAct\":null,\n" +
+                    " \"verb\":{\"class\":\"Create\",\n" +
+                    "         \"Patient\":{\"class\":\"Suggested\",\n" +
+                    "\"HasValue\":{\"class\":\"Email\"}}}}";
+            SemanticsModel spokenByThemHyp1 = new SemanticsModel(jsonString1);
+            hyp1.setSpokenByThem(spokenByThemHyp1);
+
+            String jsonString2 = "{\"dialogAct\":\"Command\",\n" +
+                    " \"verb\":{\"class\":\"Create\",\n" +
+                    "         \"Patient\":{\"class\":\"Meeting\"}}}";
+            SemanticsModel spokenByMeHyp1 = new SemanticsModel(jsonString2);
+            hyp1.setSpokenByMe(spokenByMeHyp1);
+
+            du.getHypotheses().put("hyp1", hyp1);
+            du.getHypotheses().put("hyp2", new DiscourseUnit2.DialogStateHypothesis());
+            StringDistribution weights = new StringDistribution();
+            weights.put("hyp1", .8);
+            weights.put("hyp2", .2);
+            du.setHypothesisDistribution(weights);
+
+            DialogAct bestAction = new DenyIncorrectSenseSuggestion();
+            bestAction.bindVariables(new HashMap<>());
+            TestCase testCase = new TestCase(du, bestAction, yodaEnvironment);
+            ans.add(testCase);
+        }
+
+
 
 
 //        // test case 0: role ambiguity with different depths

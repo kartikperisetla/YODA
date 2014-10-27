@@ -45,6 +45,7 @@ public class DialogRegistry {
         senseClarificationDialogActs.add(RequestConfirmValue.class);
 //        senseClarificationDialogActs.add(RequestRephrase.class);
         senseClarificationDialogActs.add(ConfirmSenseSuggestion.class);
+        senseClarificationDialogActs.add(DenyIncorrectSenseSuggestion.class);
 
         discourseUnitDialogActs.add(WHQuestion.class);
         discourseUnitDialogActs.add(YNQuestion.class);
