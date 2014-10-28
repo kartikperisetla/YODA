@@ -39,6 +39,7 @@ public class OntologyRegistry {
         objectClasses.add(Email.class);
         objectClasses.add(Meeting.class);
         objectClasses.add(Time.class);
+        objectClasses.add(PointOfInterest.class);
 
         roleClasses.add(Role.class);
         roleClasses.add(Agent.class);
