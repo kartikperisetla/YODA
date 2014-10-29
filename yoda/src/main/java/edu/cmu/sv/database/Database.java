@@ -19,7 +19,9 @@ import org.openrdf.sail.inferencer.fc.ForwardChainingRDFSInferencer;
 import org.openrdf.sail.memory.MemoryStore;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.Object;
 import java.util.HashSet;
 import java.util.Set;
@@ -59,8 +61,8 @@ public class Database {
 
             // load the registered databases
             for (String filename : DatabaseRegistry.turtleDatabaseSources){
-                File ontologyFile = new File(filename);
-                connection.add(ontologyFile, baseURI, RDFFormat.TURTLE);
+                connection.add(new InputStreamReader(new FileInputStream(filename), "UTF-8"),
+                        baseURI, RDFFormat.TURTLE);
             }
 
         } catch (RepositoryException | RDFParseException | IOException | MalformedQueryException | UpdateExecutionException e) {

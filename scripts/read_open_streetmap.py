@@ -241,10 +241,14 @@ if __name__ == '__main__':
 
     converted_amenities = set()
     for amenity in set(nav_map.amenities.values()):
+        if amenity.id in converted_amenities:
+            continue
+        if '"' in amenity.name:
+            print "this name contains a quote character!", amenity.name
         if amenity.amenity_type in amenity_tag_yoda_class_map.keys():
             f.write("base:POI_"+amenity.id+" rdf:type base:"+amenity_tag_yoda_class_map[amenity.amenity_type]+" . \n")
             f.write("base:POI_"+amenity.id+" rdfs:label "+'"'+amenity.name+'"^^xsd:string'+" . \n")
-            converted_amenities.add(amenity)
+            converted_amenities.add(amenity.id)
 
     f.close()
 

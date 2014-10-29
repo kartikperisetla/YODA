@@ -12,12 +12,20 @@ public class TestLoadDatabase {
     public void Test() {
         YodaEnvironment yodaEnvironment = YodaEnvironment.dialogTestingEnvironment();
 
-
         String queryString = yodaEnvironment.db.prefixes +
                 "SELECT ?x WHERE { ?x rdfs:subClassOf base:PointOfInterest . \n }";
 
         System.out.println("Number of classes that inherit from POI:" +
                 yodaEnvironment.db.runQuerySelectX(queryString).size());
+
+
+        queryString = yodaEnvironment.db.prefixes +
+                "SELECT ?x WHERE { ?x rdfs:subClassOf base:PointOfInterest . \n FILTER (!sameTerm(?x, base:PointOfInterest))}";
+
+        System.out.println("Number of classes that inherit from POI, but aren't the same term as POI:" +
+                yodaEnvironment.db.runQuerySelectX(queryString).size());
+
+
 
         queryString = yodaEnvironment.db.prefixes +
                 "SELECT ?x WHERE { ?x rdf:type base:PointOfInterest . \n }";
