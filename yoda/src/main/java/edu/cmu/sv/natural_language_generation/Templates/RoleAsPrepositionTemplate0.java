@@ -18,7 +18,5 @@ import java.util.Map;
  *
  */
 public class RoleAsPrepositionTemplate0 {
-
-    public Map<String, JSONObject> generateAll()
-
+//    public Map<String, JSONObject> generateAll()
 }

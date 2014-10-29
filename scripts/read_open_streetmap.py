@@ -240,7 +240,7 @@ if __name__ == '__main__':
     poi_cls = "base:PointOfInterest"
 
     converted_amenities = set()
-    for amenity in nav_map.amenities.values():
+    for amenity in set(nav_map.amenities.values()):
         if amenity.amenity_type in amenity_tag_yoda_class_map.keys():
             f.write("base:POI_"+amenity.id+" rdf:type base:"+amenity_tag_yoda_class_map[amenity.amenity_type]+" . \n")
             f.write("base:POI_"+amenity.id+" rdfs:label "+'"'+amenity.name+'"^^xsd:string'+" . \n")

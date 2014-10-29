@@ -22,14 +22,14 @@ public class YodaEnvironment {
     public static YodaEnvironment dstTestingEnvironment(){
         YodaEnvironment ans = new YodaEnvironment();
         ans.dst = new DialogStateTracker2(ans);
-        ans.db = new Database();
+        ans.db = new Database(ans);
         return ans;
     }
 
     public static YodaEnvironment dialogTestingEnvironment(){
         YodaEnvironment ans = new YodaEnvironment();
         ans.dst = new DialogStateTracker2(ans);
-        ans.db = new Database();
+        ans.db = new Database(ans);
         ans.dm = new DialogManager(ans);
         return ans;
     }

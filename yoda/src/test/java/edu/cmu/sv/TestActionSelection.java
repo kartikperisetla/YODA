@@ -118,9 +118,8 @@ public class TestActionSelection {
         List<EvaluationResult> evaluationResults = new LinkedList<>();
         SummaryStatistics rewardStatistics = new SummaryStatistics();
         for (TestCase testCase : testCases) {
-            YodaEnvironment environment = YodaEnvironment.dialogTestingEnvironment();
-            environment.dst.setDiscourseUnit(testCase.du);
-            List<Pair<SystemAction, Double>> topActions = environment.dm.selectAction();
+            testCase.yodaEnvironment.dst.setDiscourseUnit(testCase.du);
+            List<Pair<SystemAction, Double>> topActions = testCase.yodaEnvironment.dm.selectAction();
             topActions.stream().map(Pair::getRight).forEach(rewardStatistics::addValue);
             System.out.println("\nTest case evaluation:");
             EvaluationResult result = testCase.evaluate(topActions);

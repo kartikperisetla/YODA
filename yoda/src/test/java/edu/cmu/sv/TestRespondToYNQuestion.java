@@ -24,12 +24,8 @@ public class TestRespondToYNQuestion {
     @Test
     public void test() throws RepositoryException, MalformedQueryException, UpdateExecutionException {
         // Set up sample database
-        Database db = new Database();
-        Set<Class> databaseClasses = new HashSet<>(OntologyRegistry.objectClasses);
-        databaseClasses.addAll(OntologyRegistry.verbClasses);
-        Set<Class> databaseProperties = new HashSet<>(OntologyRegistry.roleClasses);
-        databaseProperties.addAll(OntologyRegistry.roleClasses);
-        db.generateClassHierarchy(databaseClasses, databaseProperties);
+        YodaEnvironment yodaEnvironment = YodaEnvironment.dialogTestingEnvironment();
+        Database db = yodaEnvironment.db;
         addTestContent(db);
         db.outputEntireDatabase();
 

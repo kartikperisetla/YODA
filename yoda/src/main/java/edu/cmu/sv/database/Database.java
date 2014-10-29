@@ -1,6 +1,8 @@
 package edu.cmu.sv.database;
 
 
+import edu.cmu.sv.YodaEnvironment;
+import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.ontology.role.Role;
 import org.openrdf.model.Literal;
@@ -11,9 +13,13 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFParseException;
 import org.openrdf.sail.inferencer.fc.ForwardChainingRDFSInferencer;
 import org.openrdf.sail.memory.MemoryStore;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.Object;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,6 +29,7 @@ import java.util.Set;
  */
 public class Database {
 
+    public YodaEnvironment yodaEnvironment;
 //    Repository repository;
     // a counter used to create new URIs
     private long URICounter = 0;
@@ -32,9 +39,9 @@ public class Database {
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
             "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
             "PREFIX base: <"+baseURI+">\n";
-//    File ontologyFile = new File("/home/cohend/yoda/yoda_ontology.owl");
 
-    public Database() {
+    public Database(YodaEnvironment yodaEnvironment) {
+        this.yodaEnvironment = yodaEnvironment;
 //        // non-inferencing triple store
 //        repository = new SailRepository(new MemoryStore());
         // inferencing rdf database
@@ -42,14 +49,23 @@ public class Database {
         try {
             repository.initialize();
             connection = repository.getConnection();
-//            connection.add(ontologyFile, baseURI, RDFFormat.TURTLE); //load up some turtle file
-        } catch (RepositoryException e) {
+
+            // generate the ontology
+            Set<Class> databaseClasses = new HashSet<>(OntologyRegistry.objectClasses);
+            databaseClasses.addAll(OntologyRegistry.verbClasses);
+            Set<Class> databaseProperties = new HashSet<>(OntologyRegistry.roleClasses);
+            databaseProperties.addAll(OntologyRegistry.roleClasses);
+            generateClassHierarchy(databaseClasses, databaseProperties);
+
+            // load the registered databases
+            for (String filename : DatabaseRegistry.turtleDatabaseSources){
+                File ontologyFile = new File(filename);
+                connection.add(ontologyFile, baseURI, RDFFormat.TURTLE);
+            }
+
+        } catch (RepositoryException | RDFParseException | IOException | MalformedQueryException | UpdateExecutionException e) {
             e.printStackTrace();
-        } /*catch (RDFParseException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
+        }
 
     }
 
@@ -75,7 +91,7 @@ public class Database {
             }
         }
         insertString += "}";
-        System.out.println("Creating ontology, insert string:\n" + insertString);
+//        System.out.println("Creating ontology, insert string:\n" + insertString);
         Update update = connection.prepareUpdate(QueryLanguage.SPARQL, insertString);
         update.execute();
     }

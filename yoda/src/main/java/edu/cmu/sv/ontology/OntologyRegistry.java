@@ -2,6 +2,7 @@ package edu.cmu.sv.ontology;
 
 import edu.cmu.sv.ontology.misc.*;
 import edu.cmu.sv.ontology.object.Object;
+import edu.cmu.sv.ontology.object.poi_types.*;
 import edu.cmu.sv.ontology.role.*;
 import edu.cmu.sv.ontology.verb.Exist;
 import edu.cmu.sv.ontology.verb.Verb;
@@ -40,6 +41,28 @@ public class OntologyRegistry {
         objectClasses.add(Meeting.class);
         objectClasses.add(Time.class);
         objectClasses.add(PointOfInterest.class);
+        objectClasses.add(Parking.class);
+        objectClasses.add(PlaceOfWorship.class);
+        objectClasses.add(School.class);
+        objectClasses.add(Bench.class);
+        objectClasses.add(Restaurant.class);
+        objectClasses.add(GasStation.class);
+        objectClasses.add(MailBox.class);
+        objectClasses.add(Bank.class);
+        objectClasses.add(GraveYard.class);
+        objectClasses.add(Cafe.class);
+        objectClasses.add(Recycling.class);
+        objectClasses.add(Kindergarten.class);
+        objectClasses.add(Pharmacy.class);
+        objectClasses.add(Hospital.class);
+        objectClasses.add(PostOffice.class);
+        objectClasses.add(PublicBuilding.class);
+        objectClasses.add(BicycleParking.class);
+        objectClasses.add(Bar.class);
+        objectClasses.add(Restroom.class);
+        objectClasses.add(GarbageCan.class);
+        objectClasses.add(Shelter.class);
+        objectClasses.add(PublicTelephone.class);
 
         roleClasses.add(Role.class);
         roleClasses.add(Agent.class);
