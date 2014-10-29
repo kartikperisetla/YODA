@@ -8,6 +8,7 @@ import pickle
 import sys
 
 osm_source = sys.argv[1]
+database_file = sys.argv[2]
 
 class observation:
     def __init__(self, lat, lon, time):
@@ -226,21 +227,26 @@ amenity_tag_yoda_class_map['telephone'] = "PublicTelephone"
 if __name__ == '__main__':
     nav_map = Map(osm_source)
 
+    import codecs
+    f = codecs.open(database_file, encoding='utf-8', mode='w')
     prefixes = """\
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix base: <http://sv.cmu.edu/yoda#> .
 """
+    f.write(prefixes)
+
     poi_cls = "base:PointOfInterest"
 
     converted_amenities = set()
     for amenity in nav_map.amenities.values():
         if amenity.amenity_type in amenity_tag_yoda_class_map.keys():
-            print "base:POI_"+amenity.id, "rdf:type", "base:"+amenity_tag_yoda_class_map[amenity.amenity_type]
-            print "base:POI_"+amenity.id, "rdfs:label", '"'+amenity.name+'"^^xsd:string'
+            f.write("base:POI_"+amenity.id+" rdf:type base:"+amenity_tag_yoda_class_map[amenity.amenity_type]+" . \n")
+            f.write("base:POI_"+amenity.id+" rdfs:label "+'"'+amenity.name+'"^^xsd:string'+" . \n")
             converted_amenities.add(amenity)
 
+    f.close()
 
     print "Number of converted amenities:", len(converted_amenities)
     print "Total number of amenities:", len(nav_map.amenities)
