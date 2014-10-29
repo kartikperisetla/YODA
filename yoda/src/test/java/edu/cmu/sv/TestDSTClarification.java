@@ -26,7 +26,7 @@ import java.util.*;
 public class TestDSTClarification {
 
 
-    public String WebResourceWrap(String URI){
+    public static String WebResourceWrap(String URI){
         String ans = "{\"class\": \""+ WebResource.class.getSimpleName()+"\", \""+
                 HasURI.class.getSimpleName()+"\":\""+URI+"\"}";
         return ans;

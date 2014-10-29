@@ -145,6 +145,36 @@ public class SemanticsModel {
         return false;
     }
 
+    public static boolean anySLUTopLevelConflicts(SemanticsModel filter, SemanticsModel testCase){
+        try {
+            filter.validateSLUHypothesis();
+            testCase.validateSLUHypothesis();
+        } catch (Error e){
+            System.out.println("SM.anySLUTopLevelConflicts: invalid filter or test case");
+            return true;
+        }
+        if (!testCase.newGetSlotPathFiller("dialogAct").equals(filter.newGetSlotPathFiller("dialogAct")))
+            return true;
+
+        if (filter.newGetSlotPathFiller("topic")!=null){
+            if (testCase.newGetSlotPathFiller("topic")==null)
+                return true;
+            if (anySenseConflicts((JSONObject) testCase.newGetSlotPathFiller("topic"),
+                    (JSONObject) filter.newGetSlotPathFiller("topic")))
+                return true;
+        }
+
+        if (filter.newGetSlotPathFiller("verb")!=null){
+            if (testCase.newGetSlotPathFiller("verb")==null)
+                return true;
+            if (anySenseConflicts((JSONObject) testCase.newGetSlotPathFiller("verb"),
+                    (JSONObject) filter.newGetSlotPathFiller("verb")))
+                return true;
+        }
+
+        return false;
+    }
+
     public SemanticsModel deepCopy(){
         SemanticsModel ans = new SemanticsModel();
         try {

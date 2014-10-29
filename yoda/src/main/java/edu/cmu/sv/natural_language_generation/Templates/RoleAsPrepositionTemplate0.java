@@ -1,5 +1,7 @@
 package edu.cmu.sv.natural_language_generation.Templates;
 
+import edu.cmu.sv.YodaEnvironment;
+import edu.cmu.sv.natural_language_generation.Template;
 import org.json.simple.JSONObject;
 
 import java.util.Map;
@@ -17,6 +19,9 @@ import java.util.Map;
  * the meeting at Red Rock
  *
  */
-public class RoleAsPrepositionTemplate0 {
-//    public Map<String, JSONObject> generateAll()
+public class RoleAsPrepositionTemplate0 implements Template{
+    @Override
+    public Map<String, JSONObject> generateAll(JSONObject constraints, YodaEnvironment yodaEnvironment) {
+        return null;
+    }
 }

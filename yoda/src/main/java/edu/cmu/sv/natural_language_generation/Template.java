@@ -1,6 +1,11 @@
 package edu.cmu.sv.natural_language_generation;
 
+import edu.cmu.sv.YodaEnvironment;
+import edu.cmu.sv.semantics.SemanticsModel;
+import org.json.simple.JSONObject;
+
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -10,7 +15,11 @@ import java.util.Set;
  *
  */
 public interface Template {
-
-    public Set<List<Object>> generateAll();
+    /*
+    * Constraints are passed from above,
+    * and the template generates strings /
+    * elaborated constraints to pass back up to the parent template
+    * */
+    public Map<String, JSONObject> generateAll(JSONObject constraints, YodaEnvironment yodaEnvironment);
 
 }
