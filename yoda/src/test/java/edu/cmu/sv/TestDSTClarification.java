@@ -3,10 +3,8 @@ package edu.cmu.sv;
 import edu.cmu.sv.dialog_state_tracking.DSTTester;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
 import edu.cmu.sv.dialog_state_tracking.Turn;
-import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
-import edu.cmu.sv.ontology.misc.WebResource;
+import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.object.Time;
-import edu.cmu.sv.ontology.role.HasURI;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.StringDistribution;
 import org.json.simple.parser.ParseException;
@@ -24,13 +22,6 @@ import java.util.*;
  *
  */
 public class TestDSTClarification {
-
-
-    public static String WebResourceWrap(String URI){
-        String ans = "{\"class\": \""+ WebResource.class.getSimpleName()+"\", \""+
-                HasURI.class.getSimpleName()+"\":\""+URI+"\"}";
-        return ans;
-    }
 
     @Test
     public void Test() {
@@ -86,7 +77,7 @@ public class TestDSTClarification {
                 "\"verb\":{\"class\":\"Create\",\n" +
                 "        \"Patient\":{\"class\":\"Meeting\",\n" +
                 "                   \"HasAtTime\":{\"class\":\"Time\",\n" +
-                "                                \"HasHour\":"+WebResourceWrap(uri1)+"}}}\n" +
+                "                                \"HasHour\":"+ OntologyRegistry.WebResourceWrap(uri1)+"}}}\n" +
                 "}";
         SemanticsModel sm1 = new SemanticsModel(jsonString);
 
@@ -95,7 +86,7 @@ public class TestDSTClarification {
                 "\"verb\":{\"class\":\"Create\",\n" +
                 "        \"Patient\":{\"class\":\"Meeting\",\n" +
                 "                   \"HasAtTime\":{\"class\":\"Time\",\n" +
-                "                                \"HasHour\":"+WebResourceWrap(uri2)+"}}}\n" +
+                "                                \"HasHour\":"+ OntologyRegistry.WebResourceWrap(uri2)+"}}}\n" +
                 "}";
         SemanticsModel sm2 = new SemanticsModel(jsonString);
 
@@ -125,7 +116,7 @@ public class TestDSTClarification {
         jsonString = "{\n" +
                 "\"dialogAct\":\"RequestConfirmValue\",\n" +
                 "\"topic\":{\"class\":\""+Time.class.getSimpleName()+"\",\n" +
-                "         \"HasHour\":"+WebResourceWrap(uri3)+"}\n" +
+                "         \"HasHour\":"+ OntologyRegistry.WebResourceWrap(uri3)+"}\n" +
                 "}\n";
 
         // Option 1: Confirmation request fragment: "At 3?"
@@ -162,7 +153,7 @@ public class TestDSTClarification {
         jsonString = "{\n" +
                 "\"dialogAct\":\"Fragment\",\n" +
                 "\"topic\":{\"class\":\""+Time.class.getSimpleName()+"\",\n" +
-                "         \"HasHour\":"+WebResourceWrap(uri5)+"}\n" +
+                "         \"HasHour\":"+ OntologyRegistry.WebResourceWrap(uri5)+"}\n" +
                 "}\n";
 
         // Option 3, an acknowledgement
@@ -219,7 +210,7 @@ public class TestDSTClarification {
                 "\"verb\":{\"class\":\"Exist\",\n" +
                 "        \"Patient\":{\"class\":\"Meeting\",\n" +
                 "                   \"HasAtTime\":{\"class\":\"Time\",\n" +
-                "                                \"HasHour\":\""+WebResourceWrap(uri1)+"\"}}}\n" +
+                "                                \"HasHour\":\""+ OntologyRegistry.WebResourceWrap(uri1)+"\"}}}\n" +
                 "}";
         SemanticsModel sm1 = new SemanticsModel(jsonString);
 
@@ -264,7 +255,7 @@ public class TestDSTClarification {
                 "\"verb\":{\"class\":\"Exist\",\n" +
                 "        \"Patient\":{\"class\":\"Meeting\",\n" +
                 "                   \"HasAtTime\":{\"class\":\"Time\",\n" +
-                "                                \"HasHour\":\""+WebResourceWrap(uri2)+"\"}}}\n" +
+                "                                \"HasHour\":\""+ OntologyRegistry.WebResourceWrap(uri2)+"\"}}}\n" +
                 "}";
         SemanticsModel sm4 = new SemanticsModel(jsonString);
 

@@ -24,18 +24,18 @@ public class Combination {
         return ans;
     }
 
-    public static <T> Set<Map<String, T>> possibleBindings(Map<String, Set<T>> keysAndValues){
-        Set<Map<String, T>> ans = new HashSet<>();
+    public static <S, T> Set<Map<S, T>> possibleBindings(Map<S, Set<T>> keysAndValues){
+        Set<Map<S, T>> ans = new HashSet<>();
         if (keysAndValues.size()==0){
-            ans.add(new HashMap<String, T>());
+            ans.add(new HashMap<S, T>());
             return ans;
         }
-        String key = new LinkedList<>(keysAndValues.keySet()).get(0);
+        S key = new LinkedList<>(keysAndValues.keySet()).get(0);
         Set<T> values = keysAndValues.get(key);
         keysAndValues.remove(key);
-        for (Map<String, T> partialBinding : possibleBindings(keysAndValues)){
+        for (Map<S, T> partialBinding : possibleBindings(keysAndValues)){
             for (T value : values){
-                Map<String, T> extendedBinding = new HashMap<>(partialBinding);
+                Map<S, T> extendedBinding = new HashMap<>(partialBinding);
                 extendedBinding.put(key, value);
                 ans.add(extendedBinding);
             }

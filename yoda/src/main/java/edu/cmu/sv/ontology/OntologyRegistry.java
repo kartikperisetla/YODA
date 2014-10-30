@@ -76,6 +76,7 @@ public class OntologyRegistry {
         roleClasses.add(HasValues.class);
         roleClasses.add(HasValue.class);
         roleClasses.add(HasURI.class);
+        roleClasses.add(IsCloseTo.class);
 
         miscClasses.add(NonHearing.class);
         miscClasses.add(NonUnderstanding.class);
@@ -152,4 +153,9 @@ public class OntologyRegistry {
     }
 
 
+    public static String WebResourceWrap(String URI){
+        String ans = "{\"class\": \""+ WebResource.class.getSimpleName()+"\", \""+
+                HasURI.class.getSimpleName()+"\":\""+URI+"\"}";
+        return ans;
+    }
 }

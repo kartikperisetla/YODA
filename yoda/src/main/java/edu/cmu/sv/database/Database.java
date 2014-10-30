@@ -5,6 +5,8 @@ import edu.cmu.sv.YodaEnvironment;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.ontology.role.Role;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
@@ -146,6 +148,17 @@ public class Database {
         update.execute();
     }
 
+    public void insertStatement(String updateString) {
+        Update update = null;
+        try {
+            update = connection.prepareUpdate(QueryLanguage.SPARQL, updateString, baseURI);
+            update.execute();
+        } catch (RepositoryException | MalformedQueryException | UpdateExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     /*
     * Insert a data value to the triple store, return the unique identifier
     * */
@@ -185,6 +198,33 @@ public class Database {
             e.printStackTrace();
         }
         return ans;
+    }
+
+    /*
+    * Run a sparql query on the database and return all value pairs for the variables x and y
+    * */
+    public Set<Pair<String, String>> runQuerySelectXAndY(String queryString){
+        Set<Pair<String, String>> ans = new HashSet<>();
+        try {
+            TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+            TupleQueryResult result = query.evaluate();
+
+            while (result.hasNext()){
+                BindingSet bindings = result.next();
+                ans.add(new ImmutablePair<>(bindings.getValue("x").stringValue(),
+                        bindings.getValue("y").stringValue()));
+            }
+
+        } catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {
+            e.printStackTrace();
+        }
+        return ans;
+    }
+
+
+
+    public static String getLocalName(String fullName){
+        return fullName.split("#")[1];
     }
 
     public void outputEntireDatabase(){

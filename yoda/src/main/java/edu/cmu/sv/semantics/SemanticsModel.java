@@ -525,9 +525,14 @@ public class SemanticsModel {
         }
     }
 
-
-
-
+    public static JSONObject parseJSON(String jsonString){
+        try {
+            return (JSONObject) parser.parse(jsonString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new Error("failed to parse json sttring:"+jsonString);
+        }
+    }
 
     @Override
     public int hashCode() {

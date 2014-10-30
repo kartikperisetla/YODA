@@ -25,6 +25,7 @@ public class LexicalEntry {
     // adjectives
     public Set<String> adjectives = new HashSet<>();
 
-
+    // prepositional phrases
+    public Set<String> relationalPrepositionalPhrases = new HashSet<>();
 
 }
