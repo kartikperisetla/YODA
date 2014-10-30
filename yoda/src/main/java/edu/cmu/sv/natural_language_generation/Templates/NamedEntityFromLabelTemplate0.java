@@ -38,10 +38,7 @@ public class NamedEntityFromLabelTemplate0 implements Template {
                 "SELECT ?x WHERE { <"+entityURI+"> rdfs:label ?x .}";
 
         Set<String> labels = yodaEnvironment.db.runQuerySelectX(queryString);
-        System.out.println("Label(s) from database:" + labels);
-
-//        System.exit(0);
-
+//        System.out.println("Label(s) from database:" + labels);
 
         for (String label : labels){
             try {

@@ -18,7 +18,7 @@ public class TestGenerateCorpus {
         for (String uri : yodaEnvironment.db.runQuerySelectX(queryString)) {
             SemanticsModel ex = new SemanticsModel("{\"dialogAct\": \"Fragment\", \"topic\": " +
                     TestDSTClarification.WebResourceWrap(uri) + "}");
-            yodaEnvironment.nlg.generateAll(ex, yodaEnvironment);
+            yodaEnvironment.nlg.generateAll(ex, yodaEnvironment).keySet().forEach(System.out::println);
         }
     }
 
