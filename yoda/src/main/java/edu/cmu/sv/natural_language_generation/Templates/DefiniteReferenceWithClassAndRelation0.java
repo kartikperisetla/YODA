@@ -12,6 +12,7 @@ import edu.cmu.sv.ontology.misc.WebResource;
 import edu.cmu.sv.ontology.role.HasURI;
 import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.semantics.SemanticsModel;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
@@ -59,9 +60,9 @@ public class DefiniteReferenceWithClassAndRelation0 implements Template {
         // define the chunks that this template composes
         Map<String, JSONObject> detChunks = new HashMap<>();
         Map<String, JSONObject> clsChunks = new HashMap<>();
-        Map<String, JSONObject> ppChunks = new HashMap<>();
-        Map<String, JSONObject> childChunks = new HashMap<>();
-
+        // We have to use different composition rules depending on the pp, so these maps are defined later
+//        Map<String, JSONObject> ppChunks = new HashMap<>();
+//        Map<String, JSONObject> childChunks = new HashMap<>();
 
         try {
             // compose det chunks
@@ -85,6 +86,9 @@ public class DefiniteReferenceWithClassAndRelation0 implements Template {
 
             // collect role / filler chunks
             for (Pair<String, String> roleFillerPair : roleFillerPairs) {
+                Map<String, JSONObject> ppChunks = new HashMap<>();
+                Map<String, JSONObject> childChunks = new HashMap<>();
+
                 String roleName = Database.getLocalName(roleFillerPair.getKey());
 
                 if (!OntologyRegistry.thingNameMap.containsKey(roleName))
@@ -104,16 +108,17 @@ public class DefiniteReferenceWithClassAndRelation0 implements Template {
                         OntologyRegistry.WebResourceWrap(roleFillerPair.getValue()));
                 yodaEnvironment.nlg.generateAll(childContent, yodaEnvironment).
                         entrySet().forEach(y -> childChunks.put(y.getKey(), y.getValue()));
-            }
 
+                List<Map<String, JSONObject>> chunks = Arrays.asList(detChunks, clsChunks, ppChunks, childChunks);
+                Map<String, Pair<Integer, Integer>> childNodeChunks = new HashMap<>();
+                childNodeChunks.put(roleName, new ImmutablePair<>(3,3));
+                ans = TemplateCombiner.simpleOrderedCombinations(chunks,
+                        DefiniteReferenceWithClassAndRelation0::compositionFunction, childNodeChunks);
+            }
 
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
-
-        List<Map<String, JSONObject>> chunks = Arrays.asList(detChunks, clsChunks, ppChunks, childChunks);
-        ans = TemplateCombiner.simpleOrderedCombinations(chunks,
-                DefiniteReferenceWithClassAndRelation0::compositionFunction);
         return ans;
     }
 

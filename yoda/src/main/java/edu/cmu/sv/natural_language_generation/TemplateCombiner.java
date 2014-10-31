@@ -1,6 +1,7 @@
 package edu.cmu.sv.natural_language_generation;
 
 import edu.cmu.sv.utils.Combination;
+import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
 import java.util.*;
@@ -21,7 +22,8 @@ public class TemplateCombiner {
     * */
     public static Map<String, JSONObject> simpleOrderedCombinations(
             List<Map<String, JSONObject>> chunks,
-            Function<List<JSONObject>, JSONObject> compositionFunction){
+            Function<List<JSONObject>, JSONObject> compositionFunction,
+            Map<String, Pair<Integer, Integer>> childNodeChunks){
         Map<String, JSONObject> ans = new HashMap<>();
 
         Map<Integer, Set<Map.Entry<String, JSONObject>>> possibleBindingsInput = new HashMap<>();
@@ -36,9 +38,38 @@ public class TemplateCombiner {
             }
             String combinedString = String.join(" ", subStrings);
             JSONObject combinedMeaning = compositionFunction.apply(subContents);
+            for (String childRole : childNodeChunks.keySet()){
+                addChunkIndices(combinedMeaning, subStrings, childNodeChunks.get(childRole), childRole);
+            }
+
             ans.put(combinedString, combinedMeaning);
         }
         return ans;
     }
+
+    /*
+    * A convenience function used for corpus generation
+    * It sets up chunk indices in the child inside childSlot at the appropriate indices
+    * given the particular ordered list of chunks and the indices of the chunks contributing to that child
+    *
+    * The chunk start is the index of the start, the chunk end is the index at the end
+    *
+    * */
+    public static void addChunkIndices(JSONObject composedContent,
+                                             List<String> stringChunks,
+                                             Pair<Integer, Integer> selectedChunks,
+                                             String childSlot){
+        Integer startingIndex = 0;
+        for (int i = 0; i < selectedChunks.getKey(); i++) {
+            startingIndex += stringChunks.get(i).split(" ").length;
+        }
+        Integer endingIndex = startingIndex - 1;
+        for (int i = selectedChunks.getKey(); i <= selectedChunks.getValue(); i++) {
+            endingIndex += stringChunks.get(i).split(" ").length;
+        }
+        ((JSONObject)composedContent.get(childSlot)).put("chunk-start",startingIndex);
+        ((JSONObject)composedContent.get(childSlot)).put("chunk-end",endingIndex);
+    }
+
 
 }

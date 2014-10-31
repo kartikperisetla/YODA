@@ -27,6 +27,7 @@ import java.io.InputStreamReader;
 import java.lang.Object;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by David Cohen on 6/21/14.
@@ -246,6 +247,29 @@ public class Database {
         } catch (RepositoryException | MalformedQueryException | QueryEvaluationException e) {
             e.printStackTrace();
         }
+    }
+
+    public String mostSpecificClass(String entityName){
+        String queryString = prefixes + "SELECT ?x WHERE { <"+entityName+"> rdf:type ?x . }";
+        Set<Class> classes = runQuerySelectX(queryString).stream().
+                map(Database::getLocalName).
+                filter(x -> OntologyRegistry.thingNameMap.containsKey(x)).
+                map(OntologyRegistry.thingNameMap::get).
+                collect(Collectors.toSet());
+        for (Class cls : classes){
+            boolean anyChildren = false;
+            for (Class cls2 : classes){
+                if (cls==cls2)
+                    continue;
+                if (cls.isAssignableFrom(cls2)){
+                    anyChildren = true;
+                    break;
+                }
+            }
+            if (!anyChildren)
+                return cls.getSimpleName();
+        }
+        return null;
     }
 
 }

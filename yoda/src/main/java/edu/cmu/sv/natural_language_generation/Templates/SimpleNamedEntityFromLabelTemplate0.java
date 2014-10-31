@@ -1,21 +1,24 @@
 package edu.cmu.sv.natural_language_generation.Templates;
 
 import edu.cmu.sv.YodaEnvironment;
+import edu.cmu.sv.database.Database;
 import edu.cmu.sv.natural_language_generation.Template;
+import edu.cmu.sv.natural_language_generation.TemplateCombiner;
 import edu.cmu.sv.ontology.misc.WebResource;
+import edu.cmu.sv.ontology.role.HasName;
 import edu.cmu.sv.ontology.role.HasURI;
 import edu.cmu.sv.semantics.SemanticsModel;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by David Cohen on 10/29/14.
  */
-public class NamedEntityFromLabelTemplate0 implements Template {
+public class SimpleNamedEntityFromLabelTemplate0 implements Template {
     static JSONObject applicabilityConstraint;
     static {
         try {
@@ -41,11 +44,15 @@ public class NamedEntityFromLabelTemplate0 implements Template {
 //        System.out.println("Label(s) from database:" + labels);
 
         for (String label : labels){
-            try {
-                ans.put(label, (JSONObject) SemanticsModel.parser.parse(constraints.toJSONString()));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+            JSONObject content = SemanticsModel.parseJSON(constraints.toJSONString());
+            SemanticsModel.wrap(content, yodaEnvironment.db.mostSpecificClass(entityURI),
+                    HasName.class.getSimpleName());
+            Map<String, JSONObject> tmp = new HashMap<>();
+            tmp.put(label, content);
+            Map<String, Pair<Integer, Integer>> tmp2 = new HashMap<>();
+            tmp2.put(HasName.class.getSimpleName(), new ImmutablePair<>(0,0));
+            ans.put(label,TemplateCombiner.simpleOrderedCombinations(Arrays.asList(tmp),
+                    x -> x.get(0), tmp2).get(label));
         }
 
         return ans;
