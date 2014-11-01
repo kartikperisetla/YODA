@@ -3,6 +3,7 @@ package edu.cmu.sv.database;
 
 import edu.cmu.sv.YodaEnvironment;
 import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.ontology.role.Role;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.Object;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -55,12 +57,17 @@ public class Database {
             repository.initialize();
             connection = repository.getConnection();
 
-            // generate the ontology
+            // generate the class hierarchy
             Set<Class> databaseClasses = new HashSet<>(OntologyRegistry.objectClasses);
             databaseClasses.addAll(OntologyRegistry.verbClasses);
+            databaseClasses.addAll(OntologyRegistry.qualityClasses);
+            databaseClasses.addAll(OntologyRegistry.modifierClasses);
             Set<Class> databaseProperties = new HashSet<>(OntologyRegistry.roleClasses);
             databaseProperties.addAll(OntologyRegistry.roleClasses);
             generateClassHierarchy(databaseClasses, databaseProperties);
+
+            // generate the special individuals
+            addIndividuals(OntologyRegistry.individualNameMap);
 
             // load the registered databases
             for (String filename : DatabaseRegistry.turtleDatabaseSources){
@@ -72,6 +79,18 @@ public class Database {
             e.printStackTrace();
         }
 
+    }
+
+    public void addIndividuals(Map<String, Thing> individuals)
+            throws UpdateExecutionException, MalformedQueryException, RepositoryException {
+        String insertString = prefixes+"INSERT DATA\n{\n";
+        for (String key : individuals.keySet()){
+            Class<? extends Thing> cls = individuals.get(key).getClass();
+            insertString += "base:"+key+" rdf:type base:"+cls.getSimpleName()+" .\n";
+        }
+        insertString+="}";
+        Update update = connection.prepareUpdate(QueryLanguage.SPARQL, insertString);
+        update.execute();
     }
 
     /*

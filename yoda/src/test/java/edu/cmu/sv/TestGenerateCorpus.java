@@ -1,6 +1,7 @@
 package edu.cmu.sv;
 
 import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.role.HasExpensiveness;
 import edu.cmu.sv.ontology.role.IsCloseTo;
 import edu.cmu.sv.semantics.SemanticsModel;
 import org.junit.Test;
@@ -24,11 +25,19 @@ public class TestGenerateCorpus {
 
         // randomly insert the IsCloseTo relation between two POIs
         List<String> poiURIList = new LinkedList<>(yodaEnvironment.db.runQuerySelectX(queryString));
-
         String insertString = yodaEnvironment.db.prefixes +
                 "INSERT DATA \n{<"+poiURIList.get(0)+"> base:IsCloseTo <"+poiURIList.get(1)+">}";
         yodaEnvironment.db.insertStatement(insertString);
 
+        // randomly insert IsExpensive at a restaurant
+        String queryString2 = yodaEnvironment.db.prefixes +
+                "SELECT ?x WHERE { ?x rdf:type base:Restaurant . \n }";
+        List<String> restaurantURIList = new LinkedList<>(yodaEnvironment.db.runQuerySelectX(queryString2));
+
+        String insertString2 = yodaEnvironment.db.prefixes +
+                "INSERT DATA \n{<"+restaurantURIList.get(0)+"> base:"+
+                HasExpensiveness.class.getSimpleName()+" base:expensive}";
+        yodaEnvironment.db.insertStatement(insertString2);
 
         Map<String, SemanticsModel> corpus = new HashMap<>();
 

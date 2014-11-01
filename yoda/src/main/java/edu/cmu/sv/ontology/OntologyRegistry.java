@@ -1,8 +1,13 @@
 package edu.cmu.sv.ontology;
 
 import edu.cmu.sv.ontology.misc.*;
+import edu.cmu.sv.ontology.modifier.Slightly;
+import edu.cmu.sv.ontology.modifier.Very;
 import edu.cmu.sv.ontology.object.Object;
 import edu.cmu.sv.ontology.object.poi_types.*;
+import edu.cmu.sv.ontology.quality.Expensiveness;
+import edu.cmu.sv.ontology.quality.Quality;
+import edu.cmu.sv.ontology.quality.QualityRegistry;
 import edu.cmu.sv.ontology.role.*;
 import edu.cmu.sv.ontology.verb.Exist;
 import edu.cmu.sv.ontology.verb.Verb;
@@ -21,15 +26,17 @@ public class OntologyRegistry {
     public static Set<Class <? extends Verb>> verbClasses = new HashSet<>();
     public static Set<Class <? extends edu.cmu.sv.ontology.object.Object>> objectClasses = new HashSet<>();
     public static Set<Class <? extends Role>> roleClasses = new HashSet<>();
+    public static Set<Class <? extends Quality>> qualityClasses = new HashSet<>();
+    public static Set<Class <? extends edu.cmu.sv.ontology.modifier.Modifier>> modifierClasses = new HashSet<>();
     public static Set<Class <? extends Thing>> miscClasses = new HashSet<>();
 
     public static Map<String, Class <? extends Thing>> thingNameMap = new HashMap<>();
     public static Map<String, Class <? extends Verb>> verbNameMap = new HashMap<>();
     public static Map<String, Class <? extends Role>> roleNameMap = new HashMap<>();
+    public static Map<String, Thing> individualNameMap = new HashMap<>();
 
     static{
-        // register leaf classes
-
+        // register classes
         verbClasses.add(Verb.class);
         verbClasses.add(Create.class);
         verbClasses.add(HasProperty.class);
@@ -71,12 +78,20 @@ public class OntologyRegistry {
         roleClasses.add(Patient.class);
         roleClasses.add(Theme.class);
         roleClasses.add(HasAtTime.class);
+        roleClasses.add(HasExpensiveness.class);
         roleClasses.add(HasHour.class);
         roleClasses.add(HasName.class);
         roleClasses.add(HasValues.class);
         roleClasses.add(HasValue.class);
         roleClasses.add(HasURI.class);
         roleClasses.add(IsCloseTo.class);
+
+        qualityClasses.add(Quality.class);
+        qualityClasses.add(Expensiveness.class);
+
+        modifierClasses.add(edu.cmu.sv.ontology.modifier.Modifier.class);
+        modifierClasses.add(Slightly.class);
+        modifierClasses.add(Very.class);
 
         miscClasses.add(NonHearing.class);
         miscClasses.add(NonUnderstanding.class);
@@ -91,7 +106,13 @@ public class OntologyRegistry {
         recursivelyRegisterParents(verbClasses);
         recursivelyRegisterParents(objectClasses);
         recursivelyRegisterParents(roleClasses);
+        recursivelyRegisterParents(qualityClasses);
+        recursivelyRegisterParents(modifierClasses);
         recursivelyRegisterParents(miscClasses);
+
+        // register individuals
+        individualNameMap.putAll(QualityRegistry.qualityInstances);
+
 
         // add ubiquitous Things to domains / ranges
         for (Class <? extends ThingWithRoles> cls : Arrays.asList(UnknownThingWithRoles.class)){
@@ -112,6 +133,8 @@ public class OntologyRegistry {
         addToNameMap(thingNameMap, verbClasses);
         addToNameMap(thingNameMap, objectClasses);
         addToNameMap(thingNameMap, roleClasses);
+        addToNameMap(thingNameMap, qualityClasses);
+        addToNameMap(thingNameMap, modifierClasses);
         addToNameMap(thingNameMap, miscClasses);
     }
 

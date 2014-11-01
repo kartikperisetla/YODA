@@ -1,10 +1,7 @@
 package edu.cmu.sv.natural_language_generation;
 
 
-import edu.cmu.sv.natural_language_generation.Templates.DefiniteReferenceWithClass0;
-import edu.cmu.sv.natural_language_generation.Templates.DefiniteReferenceWithClassAndRelation0;
-import edu.cmu.sv.natural_language_generation.Templates.FragmentTemplate0;
-import edu.cmu.sv.natural_language_generation.Templates.SimpleNamedEntityFromLabelTemplate0;
+import edu.cmu.sv.natural_language_generation.Templates.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -20,6 +17,7 @@ public class GrammarRegistry {
         grammar1.add(SimpleNamedEntityFromLabelTemplate0.class);
         grammar1.add(DefiniteReferenceWithClass0.class);
         grammar1.add(DefiniteReferenceWithClassAndRelation0.class);
+        grammar1.add(QualityAdjectiveTemplate0.class);
         grammar1_roots.add(FragmentTemplate0.class);
     }
 }
