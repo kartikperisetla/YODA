@@ -7,8 +7,10 @@ import edu.cmu.sv.natural_language_generation.Template;
 import edu.cmu.sv.natural_language_generation.TemplateCombiner;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
+import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.ontology.misc.WebResource;
 import edu.cmu.sv.ontology.quality.Quality;
+import edu.cmu.sv.ontology.role.HasIndividual;
 import edu.cmu.sv.ontology.role.HasURI;
 import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.semantics.SemanticsModel;
@@ -53,15 +55,18 @@ public class QualityAdjectiveTemplate0 implements Template {
                 "SELECT ?x ?y WHERE { ?y rdf:type base:" + Quality.class.getSimpleName() + " . \n" +
                 "<" + entityURI + "> ?x ?y . \n" +
                 "?x rdfs:subPropertyOf base:" + Role.class.getSimpleName() + " .}";
-        Set<Pair<String, String>> roleFillerPairs = yodaEnvironment.db.runQuerySelectXAndY(queryString2);
+        Set<Pair<String, String>> roleQualityPairs = yodaEnvironment.db.runQuerySelectXAndY(queryString2);
 
-        if (roleFillerPairs.size()>0)
-            System.out.println("roles and qualities:" + roleFillerPairs);
+        if (roleQualityPairs.size()>0)
+            System.out.println("roles and qualities:" + roleQualityPairs);
 
+
+        Map<String, JSONObject> detChunks = new HashMap<>();
         Map<String, JSONObject> clsChunks = new HashMap<>();
 
-
         try {
+            detChunks.put("the", new SemanticsModel("{}").getInternalRepresentation());
+
             // collect class name chunks
             for (String clsName : classNames.stream().map(Database::getLocalName).
                     collect(Collectors.toList())) {
@@ -79,35 +84,37 @@ public class QualityAdjectiveTemplate0 implements Template {
             }
 
             // collect role / filler chunks
-            for (Pair<String, String> roleFillerPair : roleFillerPairs) {
-                Map<String, JSONObject> ppChunks = new HashMap<>();
-                Map<String, JSONObject> childChunks = new HashMap<>();
+            for (Pair<String, String> roleQualityPair : roleQualityPairs) {
+                Map<String, JSONObject> adjChunks = new HashMap<>();
 
-                String roleName = Database.getLocalName(roleFillerPair.getKey());
+                String roleName = Database.getLocalName(roleQualityPair.getKey());
+                String qualityName = Database.getLocalName(roleQualityPair.getValue());
+                String qualityClassName = yodaEnvironment.db.mostSpecificClass(roleQualityPair.getValue());
 
                 if (!OntologyRegistry.thingNameMap.containsKey(roleName))
                     continue;
-                Class<? extends Thing> cls = OntologyRegistry.thingNameMap.get(roleName);
-                if (Modifier.isAbstract(cls.getModifiers()))
+                Class<? extends Thing> roleCls = OntologyRegistry.thingNameMap.get(roleName);
+                if (Modifier.isAbstract(roleCls.getModifiers()))
                     continue;
 
-                for (LexicalEntry lexicalEntry : cls.newInstance().getLexicalEntries()) {
-                    for (String ppForms : lexicalEntry.relationalPrepositionalPhrases) {
-                        ppChunks.put(ppForms,
-                                SemanticsModel.parseJSON("{\"HasRole\":\"" + roleName + "\"}"));
+                Thing qualityIndividual = OntologyRegistry.individualNameMap.get(qualityName);
+
+
+                for (LexicalEntry lexicalEntry : qualityIndividual.getLexicalEntries()) {
+                    for (String adjectiveForm : lexicalEntry.adjectives) {
+                        String contentString = OntologyRegistry.
+                                WebResourceWrap(roleQualityPair.getValue());
+                        JSONObject content = SemanticsModel.parseJSON(contentString);
+                        SemanticsModel.wrap(content, qualityClassName, HasIndividual.class.getSimpleName());
+                        SemanticsModel.wrap(content, UnknownThingWithRoles.class.getSimpleName(), roleCls.getSimpleName());
+                        adjChunks.put(adjectiveForm, content);
                     }
                 }
 
-                JSONObject childContent = SemanticsModel.parseJSON(
-                        OntologyRegistry.WebResourceWrap(roleFillerPair.getValue()));
-                yodaEnvironment.nlg.generateAll(childContent, yodaEnvironment).
-                        entrySet().forEach(y -> childChunks.put(y.getKey(), y.getValue()));
 
-                List<Map<String, JSONObject>> chunks = Arrays.asList(clsChunks, ppChunks, childChunks);
-                Map<String, Pair<Integer, Integer>> childNodeChunks = new HashMap<>();
-                childNodeChunks.put(roleName, new ImmutablePair<>(3, 3));
+                List<Map<String, JSONObject>> chunks = Arrays.asList(detChunks, adjChunks, clsChunks);
                 ans = TemplateCombiner.simpleOrderedCombinations(chunks,
-                        QualityAdjectiveTemplate0::compositionFunction, childNodeChunks);
+                        QualityAdjectiveTemplate0::compositionFunction, new HashMap<>());
             }
 
         } catch (InstantiationException | IllegalAccessException e) {
@@ -117,6 +124,11 @@ public class QualityAdjectiveTemplate0 implements Template {
     }
 
     private static JSONObject compositionFunction(List<JSONObject> children) {
-        return null;
+        JSONObject det = children.get(0);
+        JSONObject adj = children.get(1);
+        JSONObject cls = children.get(2);
+        SemanticsModel ans = new SemanticsModel(cls.toJSONString());
+        ans.extendAndOverwrite(new SemanticsModel(adj.toJSONString()));
+        return ans.getInternalRepresentation();
     }
 }
