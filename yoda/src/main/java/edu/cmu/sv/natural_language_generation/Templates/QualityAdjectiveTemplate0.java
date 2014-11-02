@@ -57,8 +57,8 @@ public class QualityAdjectiveTemplate0 implements Template {
                 "?x rdfs:subPropertyOf base:" + Role.class.getSimpleName() + " .}";
         Set<Pair<String, String>> roleQualityPairs = yodaEnvironment.db.runQuerySelectXAndY(queryString2);
 
-        if (roleQualityPairs.size()>0)
-            System.out.println("roles and qualities:" + roleQualityPairs);
+//        if (roleQualityPairs.size()>0)
+//            System.out.println("roles and qualities:" + roleQualityPairs);
 
 
         Map<String, JSONObject> detChunks = new HashMap<>();

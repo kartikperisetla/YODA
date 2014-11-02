@@ -243,6 +243,8 @@ if __name__ == '__main__':
     for amenity in set(nav_map.amenities.values()):
         if amenity.id in converted_amenities:
             continue
+        if len(amenity.name.strip())==0:
+            continue
         if '"' in amenity.name:
             print "this name contains a quote character!", amenity.name
         if amenity.amenity_type in amenity_tag_yoda_class_map.keys():

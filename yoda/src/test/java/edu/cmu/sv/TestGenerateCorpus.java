@@ -6,6 +6,9 @@ import edu.cmu.sv.ontology.role.IsCloseTo;
 import edu.cmu.sv.semantics.SemanticsModel;
 import org.junit.Test;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,44 +20,62 @@ import java.util.Map;
 public class TestGenerateCorpus {
 
     @Test
-    public void Test() {
+    public void Test() throws FileNotFoundException, UnsupportedEncodingException {
+        String outputFileName = "/home/cohend/YODA_corpus.txt";
+        PrintWriter writer = new PrintWriter(outputFileName, "UTF-8");
+
         YodaEnvironment yodaEnvironment = YodaEnvironment.dialogTestingEnvironment();
 
-        String queryString = yodaEnvironment.db.prefixes +
+        String poiSelectionQuery = yodaEnvironment.db.prefixes +
                 "SELECT ?x WHERE { ?x rdf:type base:PointOfInterest . \n }";
+        String restaurantSelectionQuery = yodaEnvironment.db.prefixes +
+                "SELECT ?x WHERE { ?x rdf:type base:Restaurant . \n }";
+        List<String> poiURIList = new LinkedList<>(yodaEnvironment.db.runQuerySelectX(poiSelectionQuery));
+        List<String> restaurantURIList = new LinkedList<>(yodaEnvironment.db.runQuerySelectX(restaurantSelectionQuery));
 
         // randomly insert the IsCloseTo relation between two POIs
-        List<String> poiURIList = new LinkedList<>(yodaEnvironment.db.runQuerySelectX(queryString));
-        String insertString = yodaEnvironment.db.prefixes +
-                "INSERT DATA \n{<"+poiURIList.get(0)+"> base:IsCloseTo <"+poiURIList.get(1)+">}";
-        yodaEnvironment.db.insertStatement(insertString);
+        for (int i = 0; i < 100; i++) {
+            String isCloseToInsertString = yodaEnvironment.db.prefixes +
+                    "INSERT DATA \n{<"+poiURIList.get(2*i)+"> base:IsCloseTo <"+poiURIList.get(2*i+1)+">}";
+            yodaEnvironment.db.insertStatement(isCloseToInsertString);
 
-        // randomly insert IsExpensive at a restaurant
-        String queryString2 = yodaEnvironment.db.prefixes +
-                "SELECT ?x WHERE { ?x rdf:type base:Restaurant . \n }";
-        List<String> restaurantURIList = new LinkedList<>(yodaEnvironment.db.runQuerySelectX(queryString2));
+            // randomly insert IsExpensive at a restaurant
+            String isExpensiveInsertString = yodaEnvironment.db.prefixes +
+                    "INSERT DATA \n{<"+restaurantURIList.get(i)+"> base:"+
+                    HasExpensiveness.class.getSimpleName()+" base:expensive}";
+            yodaEnvironment.db.insertStatement(isExpensiveInsertString);
+        }
 
-        String insertString2 = yodaEnvironment.db.prefixes +
-                "INSERT DATA \n{<"+restaurantURIList.get(0)+"> base:"+
-                HasExpensiveness.class.getSimpleName()+" base:expensive}";
-        yodaEnvironment.db.insertStatement(insertString2);
 
         Map<String, SemanticsModel> corpus = new HashMap<>();
 
-        for (String uri : yodaEnvironment.db.runQuerySelectX(queryString)) {
+        for (String uri : yodaEnvironment.db.runQuerySelectX(poiSelectionQuery)) {
             SemanticsModel ex = new SemanticsModel("{\"dialogAct\": \"Fragment\", \"topic\": " +
                     OntologyRegistry.WebResourceWrap(uri) + "}");
             Map<String, SemanticsModel> tmp = yodaEnvironment.nlg.generateAll(ex, yodaEnvironment);
             for (String key : tmp.keySet()){
                 corpus.put(key, tmp.get(key));
             }
+
+            // usually, the command won't have a topic,
+            // but this is a quick way to generate a more interesting corpus for Bing
+            SemanticsModel ex2 = new SemanticsModel("{\"dialogAct\": \"Command\", \"topic\": " +
+                    OntologyRegistry.WebResourceWrap(uri) + "}");
+            Map<String, SemanticsModel> tmp2 = yodaEnvironment.nlg.generateAll(ex2, yodaEnvironment);
+            for (String key : tmp2.keySet()){
+                corpus.put(key, tmp2.get(key));
+            }
+
         }
 
         for (String key : corpus.keySet()){
-            System.out.println(key);
-            System.out.println(corpus.get(key));
+//            System.out.println(key);
+//            System.out.println(corpus.get(key));
+            writer.write("---\n");
+            writer.write(key+"\n");
+            writer.write(corpus.get(key).getInternalRepresentation().toJSONString()+"\n");
         }
-
+        writer.close();
 
     }
 

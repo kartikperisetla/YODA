@@ -19,5 +19,6 @@ public class GrammarRegistry {
         grammar1.add(DefiniteReferenceWithClassAndRelation0.class);
         grammar1.add(QualityAdjectiveTemplate0.class);
         grammar1_roots.add(FragmentTemplate0.class);
+        grammar1_roots.add(CommandTemplate0.class);
     }
 }

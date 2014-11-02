@@ -1,5 +1,6 @@
 package edu.cmu.sv.natural_language_generation;
 
+import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.Combination;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
@@ -49,7 +50,7 @@ public class TemplateCombiner {
 
     /*
     * A convenience function used for corpus generation
-    * It sets up chunk indices in the child inside childSlot at the appropriate indices
+    * It sets up chunk indices in the child inside pathToChild at the appropriate indices
     * given the particular ordered list of chunks and the indices of the chunks contributing to that child
     *
     * The chunk start is the index of the start, the chunk end is the index at the end
@@ -58,7 +59,7 @@ public class TemplateCombiner {
     public static void addChunkIndices(JSONObject composedContent,
                                              List<String> stringChunks,
                                              Pair<Integer, Integer> selectedChunks,
-                                             String childSlot){
+                                             String pathToChild){
         Integer startingIndex = 0;
         for (int i = 0; i < selectedChunks.getKey(); i++) {
             startingIndex += stringChunks.get(i).split(" ").length;
@@ -67,8 +68,9 @@ public class TemplateCombiner {
         for (int i = selectedChunks.getKey(); i <= selectedChunks.getValue(); i++) {
             endingIndex += stringChunks.get(i).split(" ").length;
         }
-        ((JSONObject)composedContent.get(childSlot)).put("chunk-start",startingIndex);
-        ((JSONObject)composedContent.get(childSlot)).put("chunk-end",endingIndex);
+        JSONObject tmp = (JSONObject) new SemanticsModel(composedContent).newGetSlotPathFiller(pathToChild);
+        tmp.put("chunk-start", startingIndex);
+        tmp.put("chunk-end", endingIndex);
     }
 
 

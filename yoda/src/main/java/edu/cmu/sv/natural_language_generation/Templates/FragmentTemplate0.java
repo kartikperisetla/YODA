@@ -35,9 +35,17 @@ public class FragmentTemplate0 implements Template {
         JSONObject topicWebResource = (JSONObject) new SemanticsModel(constraints).
                 newGetSlotPathFiller("topic");
 
-        // we just generate the noun phrase, no extra content
-        yodaEnvironment.nlg.generateAll(topicWebResource, yodaEnvironment).
-                entrySet().forEach(y -> ans.put(y.getKey(), y.getValue()));
+        // generate the noun phrase chunks
+        Map<String, JSONObject> nounPhraseChunks = yodaEnvironment.nlg.
+                generateAll(topicWebResource, yodaEnvironment);
+
+        for (String key : nounPhraseChunks.keySet()){
+            JSONObject content = nounPhraseChunks.get(key);
+            JSONObject newContent = SemanticsModel.
+                    parseJSON("{\"dialogAct\":\"Fragment\",\"topic\":"+content.toJSONString()+"}");
+            ans.put(key, newContent);
+        }
+
         return ans;
     }
 }
