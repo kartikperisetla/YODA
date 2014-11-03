@@ -1,8 +1,7 @@
 package edu.cmu.sv;
 
 import edu.cmu.sv.ontology.OntologyRegistry;
-import edu.cmu.sv.ontology.role.HasExpensiveness;
-import edu.cmu.sv.ontology.role.IsCloseTo;
+import edu.cmu.sv.ontology.role.HasAbsoluteQualityDegree;
 import edu.cmu.sv.semantics.SemanticsModel;
 import org.junit.Test;
 
@@ -42,7 +41,7 @@ public class TestGenerateCorpus {
             // randomly insert IsExpensive at a restaurant
             String isExpensiveInsertString = yodaEnvironment.db.prefixes +
                     "INSERT DATA \n{<"+restaurantURIList.get(i)+"> base:"+
-                    HasExpensiveness.class.getSimpleName()+" base:expensive}";
+                    HasAbsoluteQualityDegree.class.getSimpleName()+" base:expensive}";
             yodaEnvironment.db.insertStatement(isExpensiveInsertString);
         }
 

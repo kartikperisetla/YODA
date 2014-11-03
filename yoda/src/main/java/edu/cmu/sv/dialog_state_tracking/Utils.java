@@ -4,7 +4,6 @@ import com.google.common.collect.Iterables;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
-import edu.cmu.sv.ontology.misc.WebResource;
 import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.semantics.SemanticsModel;
 import org.json.simple.JSONObject;
@@ -50,7 +49,7 @@ public class Utils {
                     rolesAtPoint.add(OntologyRegistry.roleNameMap.get((String)key));
             }
 
-            if (!OntologyRegistry.existsAClassInRangeOfAll(rolesAtPoint))
+            if (!OntologyRegistry.existsAClassInDomainOfAll(rolesAtPoint))
                 continue;
 
             // allow attachment if there is class compatibility

@@ -7,7 +7,6 @@ import edu.cmu.sv.ontology.object.Object;
 import edu.cmu.sv.ontology.object.poi_types.*;
 import edu.cmu.sv.ontology.quality.Expensiveness;
 import edu.cmu.sv.ontology.quality.Quality;
-import edu.cmu.sv.ontology.quality.QualityRegistry;
 import edu.cmu.sv.ontology.role.*;
 import edu.cmu.sv.ontology.verb.Exist;
 import edu.cmu.sv.ontology.verb.Verb;
@@ -18,6 +17,7 @@ import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by David Cohen on 9/22/14.
@@ -78,7 +78,7 @@ public class OntologyRegistry {
         roleClasses.add(Patient.class);
         roleClasses.add(Theme.class);
         roleClasses.add(HasAtTime.class);
-        roleClasses.add(HasExpensiveness.class);
+        roleClasses.add(HasAbsoluteQualityDegree.class);
         roleClasses.add(HasHour.class);
         roleClasses.add(HasName.class);
         roleClasses.add(HasValues.class);
@@ -111,8 +111,6 @@ public class OntologyRegistry {
         recursivelyRegisterParents(miscClasses);
 
         // register individuals
-        individualNameMap.putAll(QualityRegistry.qualityInstances);
-
 
         // add ubiquitous Things to domains / ranges
         for (Class <? extends ThingWithRoles> cls : Arrays.asList(UnknownThingWithRoles.class)){
@@ -138,17 +136,25 @@ public class OntologyRegistry {
         addToNameMap(thingNameMap, miscClasses);
     }
 
-    public static boolean existsAClassInRangeOfAll(Set<Class <? extends Role>> roles){
+    public static boolean inDomain(Class<? extends Role> roleClass, Class<? extends ThingWithRoles> subjectClass){
+        try {
+            return roleClass.newInstance().getDomain().stream().anyMatch(x -> x.isAssignableFrom(subjectClass));
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+            System.exit(0);
+        }
+        return false;
+    }
+
+    public static boolean existsAClassInDomainOfAll(Set<Class<? extends Role>> roles){
         Set<Class> possibleClasses = new HashSet<>(thingNameMap.values());
         possibleClasses.remove(UnknownThingWithRoles.class);
         for (Class<? extends Role> roleClass : roles){
-            try {
-                possibleClasses.retainAll(roleClass.newInstance().getDomain());
-            } catch (InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
+            possibleClasses.retainAll(
+                    possibleClasses.stream().
+                    filter(x -> inDomain(roleClass, x)).
+                    collect(Collectors.toSet()));
         }
-//        System.out.println("OntologyRegistry.existsAClassInRangeOfAll: possibleClasses:"+possibleClasses);
         return !possibleClasses.isEmpty();
     }
 
@@ -175,10 +181,10 @@ public class OntologyRegistry {
         }
     }
 
-
     public static String WebResourceWrap(String URI){
         String ans = "{\"class\": \""+ WebResource.class.getSimpleName()+"\", \""+
                 HasURI.class.getSimpleName()+"\":\""+URI+"\"}";
         return ans;
     }
+
 }

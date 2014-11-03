@@ -4,6 +4,7 @@ package edu.cmu.sv.database;
 import edu.cmu.sv.YodaEnvironment;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
+import edu.cmu.sv.ontology.absolute_quality_degree.AbsoluteQualityDegree;
 import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.ontology.role.Role;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -26,9 +27,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.Object;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -41,7 +40,7 @@ public class Database {
     // a counter used to create new URIs
     private long URICounter = 0;
     RepositoryConnection connection;
-    public final String baseURI = "http://sv.cmu.edu/yoda#";
+    public final static String baseURI = "http://sv.cmu.edu/yoda#";
     public final String prefixes = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
             "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
@@ -289,6 +288,30 @@ public class Database {
                 return cls.getSimpleName();
         }
         return null;
+    }
+
+    public double evaluateAbsoluteQualityDegree(String entityURI, Class<? extends Role> hasQualityRoleClass,
+                                                Class<? extends AbsoluteQualityDegree> degreeCls){
+        assert OntologyRegistry.inDomain(hasQualityRoleClass, degreeCls);
+        List<Double> ans = new LinkedList<>();
+        try {
+            AbsoluteQualityDegree tmp = degreeCls.newInstance();
+            String queryString = prefixes +
+                    "SELECT ?x WHERE {<"+entityURI+"> base:"+hasQualityRoleClass.getSimpleName()+" ?y . "+
+                    "?y base:quantifiedAs ?actual . " +
+                    "BIND(base:LinearFuzzyMap("+tmp.getCenter()+" "+tmp.getSlope()+"?actual) AS ?x)}";
+            TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+            TupleQueryResult result = query.evaluate();
+
+            while (result.hasNext()){
+                BindingSet bindings = result.next();
+                ans.add(Double.parseDouble(bindings.getValue("x").stringValue()));
+            }
+
+        } catch (InstantiationException | IllegalAccessException | MalformedQueryException | RepositoryException | QueryEvaluationException e) {
+            e.printStackTrace();
+        }
+        return ans.get(0);
     }
 
 }
