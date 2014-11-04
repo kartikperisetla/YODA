@@ -10,6 +10,7 @@ import edu.cmu.sv.ontology.role.*;
 import edu.cmu.sv.ontology.role.has_quality_subroles.HasAbsoluteQualityDegree;
 import edu.cmu.sv.ontology.role.has_quality_subroles.HasExpensiveness;
 import edu.cmu.sv.ontology.role.has_quality_subroles.HasHeight;
+import edu.cmu.sv.ontology.transient_pairwise_role.IsCloseTo;
 import edu.cmu.sv.ontology.verb.Exist;
 import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.ontology.verb.Create;

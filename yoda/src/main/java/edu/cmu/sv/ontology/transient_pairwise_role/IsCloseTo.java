@@ -1,9 +1,12 @@
-package edu.cmu.sv.ontology.role;
+package edu.cmu.sv.ontology.transient_pairwise_role;
 
 import edu.cmu.sv.natural_language_generation.LexicalEntry;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.ThingWithRoles;
 import edu.cmu.sv.ontology.object.PointOfInterest;
+import edu.cmu.sv.ontology.role.Role;
+import edu.cmu.sv.ontology.transient_pairwise_quality.HasDistance;
+import edu.cmu.sv.ontology.transient_pairwise_quality.TransientPairwiseQuality;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -14,7 +17,11 @@ import java.util.Set;
  *
  * Relates two POI's that are geographically close to each other.
  */
-public class IsCloseTo extends Role {
+public class IsCloseTo extends TransientPairwiseRole {
+    @Override
+    public Class<? extends TransientPairwiseQuality> getTransientPairwiseQuality() {
+        return HasDistance.class;
+    }
 
     static Set<LexicalEntry> lexicalEntries = new HashSet<>();
     static {
@@ -28,18 +35,5 @@ public class IsCloseTo extends Role {
     @Override
     public Set<LexicalEntry> getLexicalEntries() {
         return lexicalEntries;
-    }
-
-    static Set<Class <? extends ThingWithRoles>> domain = new HashSet<>(Arrays.asList(PointOfInterest.class));
-    static Set<Class <? extends Thing>> range = new HashSet<>(Arrays.asList(PointOfInterest.class));
-
-    @Override
-    public Set<Class<? extends ThingWithRoles>> getDomain() {
-        return domain;
-    }
-
-    @Override
-    public Set<Class<? extends Thing>> getRange() {
-        return range;
     }
 }
