@@ -2,8 +2,8 @@ package edu.cmu.sv.ontology.role.has_quality_subroles;
 
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.ThingWithRoles;
-import edu.cmu.sv.ontology.absolute_quality_degree.AbsoluteExpensivenessDegree;
-import edu.cmu.sv.ontology.object.poi_types.Restaurant;
+import edu.cmu.sv.ontology.adjective.AbsoluteExpensivenessDegree;
+import edu.cmu.sv.ontology.noun.poi_types.Restaurant;
 
 import java.util.Arrays;
 import java.util.HashSet;

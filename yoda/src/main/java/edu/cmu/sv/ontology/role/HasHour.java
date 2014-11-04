@@ -3,7 +3,7 @@ package edu.cmu.sv.ontology.role;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.ThingWithRoles;
 import edu.cmu.sv.ontology.misc.WebResource;
-import edu.cmu.sv.ontology.object.Time;
+import edu.cmu.sv.ontology.noun.Time;
 
 import java.util.Arrays;
 import java.util.HashSet;

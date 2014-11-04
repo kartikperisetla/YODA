@@ -1,5 +1,6 @@
 package edu.cmu.sv.database;
 
+import com.google.common.primitives.Doubles;
 import org.kohsuke.MetaInfServices;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Value;
@@ -19,9 +20,6 @@ public class LinearFuzzyMap implements Function{
 
     @Override
     public Value evaluate(ValueFactory valueFactory, Value... values) throws ValueExprEvaluationException {
-        // our palindrome function expects only a single argument,
-        // so throw an error if there’s more than one
-
         if (values.length != 3) {
             throw new ValueExprEvaluationException(getURI()+" requires" +
                     "exactly 3 arguments, got " + values.length);
@@ -31,7 +29,7 @@ public class LinearFuzzyMap implements Function{
         double slope = ((Literal)values[1]).doubleValue();
         double actual = ((Literal)values[2]).doubleValue();
 
-        double ans = 1.0 - slope * (Math.abs(center - actual));
+        double ans = Doubles.max(1.0 - slope * (Math.abs(center - actual)), 0.0);
         return valueFactory.createLiteral(ans);
     }
 }

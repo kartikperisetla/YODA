@@ -17,7 +17,7 @@ public class RequestConfirmValue extends DialogAct {
     private Map<String, Object> boundVariables = null;
     static Map<String, Class<? extends Thing>> parameters = new HashMap<>();
     static {
-        parameters.put("v1", edu.cmu.sv.ontology.object.Object.class);
+        parameters.put("v1", edu.cmu.sv.ontology.noun.Object.class);
     }
 
     // template "<v1> ?"

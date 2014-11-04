@@ -9,11 +9,12 @@ import org.openrdf.query.algebra.evaluation.function.Function;
 
 /**
  * Created by David Cohen on 11/2/14.
- * TODO: IMPLEMENT
- * Function to compute the transient distance between two physical objects
+ * Function to compute the transient distance between two physical objects.
+ * NOTE: this uses 1- exp(dist) to normalize values between 0 and 1
  */
 @MetaInfServices
 public class DistanceFunction implements Function{
+    static int R = 6371;
     @Override
     public String getURI() {
         return Database.baseURI+this.getClass().getSimpleName();
@@ -21,19 +22,19 @@ public class DistanceFunction implements Function{
 
     @Override
     public Value evaluate(ValueFactory valueFactory, Value... values) throws ValueExprEvaluationException {
-        // our palindrome function expects only a single argument,
-        // so throw an error if there’s more than one
-
-        if (values.length != 3) {
+        if (values.length != 4) {
             throw new ValueExprEvaluationException(getURI()+" requires" +
-                    "exactly 3 arguments, got " + values.length);
+                    "exactly 4 arguments, got " + values.length);
         }
 
-        double center = ((Literal)values[0]).doubleValue();
-        double slope = ((Literal)values[1]).doubleValue();
-        double actual = ((Literal)values[2]).doubleValue();
-
-        double ans = 1.0 - slope * (Math.abs(center - actual));
-        return valueFactory.createLiteral(ans);
+        double lat1 = ((Literal)values[0]).doubleValue();
+        double lon1 = ((Literal)values[1]).doubleValue();
+        double lat2 = ((Literal)values[2]).doubleValue();
+        double lon2 = ((Literal)values[3]).doubleValue();
+        double unscaledDistanceSq = 0.5 - Math.cos((lat2 - lat1) * Math.PI / 180)/2 +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                (1 - Math.cos((lon2 - lon1) * Math.PI / 180))/2;
+        double distanceInKilometers = R * 2 * Math.asin(Math.sqrt(unscaledDistanceSq));
+        return valueFactory.createLiteral(1.0 - Math.exp(-1*distanceInKilometers));
     }
 }

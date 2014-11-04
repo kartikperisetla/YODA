@@ -2,7 +2,7 @@ package edu.cmu.sv.ontology.role;
 
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.ThingWithRoles;
-import edu.cmu.sv.ontology.object.Person;
+import edu.cmu.sv.ontology.noun.Person;
 import edu.cmu.sv.ontology.verb.Verb;
 
 import java.util.Arrays;

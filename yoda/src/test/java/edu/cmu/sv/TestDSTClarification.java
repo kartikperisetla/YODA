@@ -4,7 +4,7 @@ import edu.cmu.sv.dialog_state_tracking.DSTTester;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
 import edu.cmu.sv.dialog_state_tracking.Turn;
 import edu.cmu.sv.ontology.OntologyRegistry;
-import edu.cmu.sv.ontology.object.Time;
+import edu.cmu.sv.ontology.noun.Time;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.StringDistribution;
 import org.json.simple.parser.ParseException;

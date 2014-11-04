@@ -250,6 +250,8 @@ if __name__ == '__main__':
         if amenity.amenity_type in amenity_tag_yoda_class_map.keys():
             f.write("base:POI_"+amenity.id+" rdf:type base:"+amenity_tag_yoda_class_map[amenity.amenity_type]+" . \n")
             f.write("base:POI_"+amenity.id+" rdfs:label "+'"'+amenity.name+'"^^xsd:string'+" . \n")
+            f.write("base:POI_"+amenity.id+" base:gps_lat "+str(amenity.lat)+" . \n")
+            f.write("base:POI_"+amenity.id+" base:gps_lon "+str(amenity.lon)+" . \n")
             converted_amenities.add(amenity.id)
 
     f.close()

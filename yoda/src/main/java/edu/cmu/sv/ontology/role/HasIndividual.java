@@ -12,7 +12,7 @@ import java.util.Set;
  * Created by David Cohen on 11/1/14.
  */
 public class HasIndividual extends Role {
-    static Set<Class<? extends ThingWithRoles>> domain = new HashSet<>(Arrays.asList(edu.cmu.sv.ontology.object.Object.class));
+    static Set<Class<? extends ThingWithRoles>> domain = new HashSet<>(Arrays.asList(edu.cmu.sv.ontology.noun.Object.class));
     static Set<Class<? extends Thing>> range = new HashSet<>(Arrays.asList(WebResource.class));
 
     @Override

@@ -16,7 +16,7 @@ public class RequestVerbRole extends DialogAct{
     private Map<String, Object> boundVariables = null;
     static Map<String, Class<? extends Thing>> parameters = new HashMap<>(); // parameters are empty for this DA
     static{
-        parameters.put("r1", edu.cmu.sv.ontology.object.Object.class);
+        parameters.put("r1", edu.cmu.sv.ontology.noun.Object.class);
         parameters.put("v1", Verb.class); // this is the action whose role is being requested
     }
 

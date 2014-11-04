@@ -1,8 +1,7 @@
 package edu.cmu.sv;
 
 import edu.cmu.sv.ontology.OntologyRegistry;
-import edu.cmu.sv.ontology.quality.Expensiveness;
-import edu.cmu.sv.ontology.role.has_quality_subroles.HasAbsoluteQualityDegree;
+import edu.cmu.sv.ontology.quality.unary_quality.Expensiveness;
 import edu.cmu.sv.ontology.role.has_quality_subroles.HasExpensiveness;
 import edu.cmu.sv.semantics.SemanticsModel;
 import org.junit.Test;

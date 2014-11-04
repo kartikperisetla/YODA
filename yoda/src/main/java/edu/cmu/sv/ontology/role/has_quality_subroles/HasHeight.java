@@ -2,8 +2,8 @@ package edu.cmu.sv.ontology.role.has_quality_subroles;
 
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.ThingWithRoles;
-import edu.cmu.sv.ontology.absolute_quality_degree.AbsoluteHeightDegree;
-import edu.cmu.sv.ontology.object.Person;
+import edu.cmu.sv.ontology.adjective.AbsoluteHeightDegree;
+import edu.cmu.sv.ontology.noun.Person;
 
 import java.util.Arrays;
 import java.util.HashSet;

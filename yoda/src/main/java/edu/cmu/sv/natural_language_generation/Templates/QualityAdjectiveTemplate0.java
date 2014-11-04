@@ -9,7 +9,7 @@ import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.ontology.misc.WebResource;
-import edu.cmu.sv.ontology.quality.Quality;
+import edu.cmu.sv.ontology.quality.TransientQuality;
 import edu.cmu.sv.ontology.role.HasIndividual;
 import edu.cmu.sv.ontology.role.HasURI;
 import edu.cmu.sv.ontology.role.Role;
@@ -51,7 +51,7 @@ public class QualityAdjectiveTemplate0 implements Template {
         Set<String> classNames = yodaEnvironment.db.runQuerySelectX(queryString);
 
         String queryString2 = yodaEnvironment.db.prefixes +
-                "SELECT ?x ?y WHERE { ?y rdf:type base:" + Quality.class.getSimpleName() + " . \n" +
+                "SELECT ?x ?y WHERE { ?y rdf:type base:" + TransientQuality.class.getSimpleName() + " . \n" +
                 "<" + entityURI + "> ?x ?y . \n" +
                 "?x rdfs:subPropertyOf base:" + Role.class.getSimpleName() + " .}";
         Set<Pair<String, String>> roleQualityPairs = yodaEnvironment.db.runQuerySelectXAndY(queryString2);

@@ -1,21 +1,21 @@
 package edu.cmu.sv.ontology;
 
-import edu.cmu.sv.ontology.absolute_quality_degree.*;
+import edu.cmu.sv.ontology.adjective.*;
 import edu.cmu.sv.ontology.misc.*;
-import edu.cmu.sv.ontology.object.Object;
-import edu.cmu.sv.ontology.object.poi_types.*;
-import edu.cmu.sv.ontology.quality.Expensiveness;
-import edu.cmu.sv.ontology.quality.Quality;
+import edu.cmu.sv.ontology.noun.Object;
+import edu.cmu.sv.ontology.noun.poi_types.*;
+import edu.cmu.sv.ontology.quality.unary_quality.Expensiveness;
+import edu.cmu.sv.ontology.quality.TransientQuality;
 import edu.cmu.sv.ontology.role.*;
 import edu.cmu.sv.ontology.role.has_quality_subroles.HasAbsoluteQualityDegree;
 import edu.cmu.sv.ontology.role.has_quality_subroles.HasExpensiveness;
 import edu.cmu.sv.ontology.role.has_quality_subroles.HasHeight;
-import edu.cmu.sv.ontology.transient_pairwise_role.IsCloseTo;
+import edu.cmu.sv.ontology.preposition.IsCloseTo;
 import edu.cmu.sv.ontology.verb.Exist;
 import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.ontology.verb.Create;
 import edu.cmu.sv.ontology.verb.HasProperty;
-import edu.cmu.sv.ontology.object.*;
+import edu.cmu.sv.ontology.noun.*;
 import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 
 import java.lang.reflect.Modifier;
@@ -27,10 +27,10 @@ import java.util.stream.Collectors;
  */
 public class OntologyRegistry {
     public static Set<Class <? extends Verb>> verbClasses = new HashSet<>();
-    public static Set<Class <? extends edu.cmu.sv.ontology.object.Object>> objectClasses = new HashSet<>();
+    public static Set<Class <? extends edu.cmu.sv.ontology.noun.Object>> objectClasses = new HashSet<>();
     public static Set<Class <? extends Role>> roleClasses = new HashSet<>();
-    public static Set<Class <? extends Quality>> qualityClasses = new HashSet<>();
-    public static Set<Class <? extends AbsoluteQualityDegree>> absoluteQualityDegreeClasses = new HashSet<>();
+    public static Set<Class <? extends TransientQuality>> qualityClasses = new HashSet<>();
+    public static Set<Class <? extends AbsoluteQualityDegree>> absoluteTransientQualityDegreeClasses = new HashSet<>();
     public static Set<Class <? extends HasAbsoluteQualityDegree>> qualityRoleClasses = new HashSet<>();
     public static Set<Class <? extends Thing>> miscClasses = new HashSet<>();
 
@@ -88,15 +88,16 @@ public class OntologyRegistry {
         roleClasses.add(HasValues.class);
         roleClasses.add(HasValue.class);
         roleClasses.add(HasURI.class);
+        // transient roles
         roleClasses.add(IsCloseTo.class);
 
-        qualityClasses.add(Quality.class);
+        qualityClasses.add(TransientQuality.class);
         qualityClasses.add(Expensiveness.class);
 
-        absoluteQualityDegreeClasses.add(Expensive.class);
-        absoluteQualityDegreeClasses.add(Cheap.class);
-        absoluteQualityDegreeClasses.add(Tall.class);
-        absoluteQualityDegreeClasses.add(edu.cmu.sv.ontology.absolute_quality_degree.Short.class);
+        absoluteTransientQualityDegreeClasses.add(Expensive.class);
+        absoluteTransientQualityDegreeClasses.add(Cheap.class);
+        absoluteTransientQualityDegreeClasses.add(Tall.class);
+        absoluteTransientQualityDegreeClasses.add(edu.cmu.sv.ontology.adjective.Short.class);
 
         qualityRoleClasses.add(HasExpensiveness.class);
         qualityRoleClasses.add(HasHeight.class);
@@ -154,9 +155,9 @@ public class OntologyRegistry {
         return false;
     }
 
-    public static boolean inRange(Class<? extends Role> roleClass, Class<? extends ThingWithRoles> subjectClass){
+    public static boolean inRange(Class<? extends Role> roleClass , Class<? extends ThingWithRoles> objectClass){
         try {
-            return roleClass.newInstance().getRange().stream().anyMatch(x -> x.isAssignableFrom(subjectClass));
+            return roleClass.newInstance().getRange().stream().anyMatch(x -> x.isAssignableFrom(objectClass));
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         } catch (NullPointerException e) {
