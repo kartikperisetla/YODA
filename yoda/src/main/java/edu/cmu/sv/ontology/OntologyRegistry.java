@@ -1,13 +1,15 @@
 package edu.cmu.sv.ontology;
 
+import edu.cmu.sv.ontology.absolute_quality_degree.*;
 import edu.cmu.sv.ontology.misc.*;
-import edu.cmu.sv.ontology.modifier.Slightly;
-import edu.cmu.sv.ontology.modifier.Very;
 import edu.cmu.sv.ontology.object.Object;
 import edu.cmu.sv.ontology.object.poi_types.*;
 import edu.cmu.sv.ontology.quality.Expensiveness;
 import edu.cmu.sv.ontology.quality.Quality;
 import edu.cmu.sv.ontology.role.*;
+import edu.cmu.sv.ontology.role.has_quality_subroles.HasAbsoluteQualityDegree;
+import edu.cmu.sv.ontology.role.has_quality_subroles.HasExpensiveness;
+import edu.cmu.sv.ontology.role.has_quality_subroles.HasHeight;
 import edu.cmu.sv.ontology.verb.Exist;
 import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.ontology.verb.Create;
@@ -27,7 +29,8 @@ public class OntologyRegistry {
     public static Set<Class <? extends edu.cmu.sv.ontology.object.Object>> objectClasses = new HashSet<>();
     public static Set<Class <? extends Role>> roleClasses = new HashSet<>();
     public static Set<Class <? extends Quality>> qualityClasses = new HashSet<>();
-    public static Set<Class <? extends edu.cmu.sv.ontology.modifier.Modifier>> modifierClasses = new HashSet<>();
+    public static Set<Class <? extends AbsoluteQualityDegree>> absoluteQualityDegreeClasses = new HashSet<>();
+    public static Set<Class <? extends HasAbsoluteQualityDegree>> qualityRoleClasses = new HashSet<>();
     public static Set<Class <? extends Thing>> miscClasses = new HashSet<>();
 
     public static Map<String, Class <? extends Thing>> thingNameMap = new HashMap<>();
@@ -78,7 +81,7 @@ public class OntologyRegistry {
         roleClasses.add(Patient.class);
         roleClasses.add(Theme.class);
         roleClasses.add(HasAtTime.class);
-        roleClasses.add(HasAbsoluteQualityDegree.class);
+//        roleClasses.add(HasAbsoluteQualityDegree.class);
         roleClasses.add(HasHour.class);
         roleClasses.add(HasName.class);
         roleClasses.add(HasValues.class);
@@ -89,9 +92,13 @@ public class OntologyRegistry {
         qualityClasses.add(Quality.class);
         qualityClasses.add(Expensiveness.class);
 
-        modifierClasses.add(edu.cmu.sv.ontology.modifier.Modifier.class);
-        modifierClasses.add(Slightly.class);
-        modifierClasses.add(Very.class);
+        absoluteQualityDegreeClasses.add(Expensive.class);
+        absoluteQualityDegreeClasses.add(Cheap.class);
+        absoluteQualityDegreeClasses.add(Tall.class);
+        absoluteQualityDegreeClasses.add(edu.cmu.sv.ontology.absolute_quality_degree.Short.class);
+
+        qualityRoleClasses.add(HasExpensiveness.class);
+        qualityRoleClasses.add(HasHeight.class);
 
         miscClasses.add(NonHearing.class);
         miscClasses.add(NonUnderstanding.class);
@@ -107,7 +114,6 @@ public class OntologyRegistry {
         recursivelyRegisterParents(objectClasses);
         recursivelyRegisterParents(roleClasses);
         recursivelyRegisterParents(qualityClasses);
-        recursivelyRegisterParents(modifierClasses);
         recursivelyRegisterParents(miscClasses);
 
         // register individuals
@@ -132,7 +138,6 @@ public class OntologyRegistry {
         addToNameMap(thingNameMap, objectClasses);
         addToNameMap(thingNameMap, roleClasses);
         addToNameMap(thingNameMap, qualityClasses);
-        addToNameMap(thingNameMap, modifierClasses);
         addToNameMap(thingNameMap, miscClasses);
     }
 
@@ -141,16 +146,31 @@ public class OntologyRegistry {
             return roleClass.newInstance().getDomain().stream().anyMatch(x -> x.isAssignableFrom(subjectClass));
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
-            System.exit(0);
+        } catch (NullPointerException e) {
+            return false;
+//            System.exit(0);
         }
         return false;
     }
+
+    public static boolean inRange(Class<? extends Role> roleClass, Class<? extends ThingWithRoles> subjectClass){
+        try {
+            return roleClass.newInstance().getRange().stream().anyMatch(x -> x.isAssignableFrom(subjectClass));
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NullPointerException e) {
+            return false;
+//            System.exit(0);
+        }
+        return false;
+    }
+
 
     public static boolean existsAClassInDomainOfAll(Set<Class<? extends Role>> roles){
         Set<Class> possibleClasses = new HashSet<>(thingNameMap.values());
         possibleClasses.remove(UnknownThingWithRoles.class);
         for (Class<? extends Role> roleClass : roles){
-            possibleClasses.retainAll(
+            possibleClasses.retainAll((Set)
                     possibleClasses.stream().
                     filter(x -> inDomain(roleClass, x)).
                     collect(Collectors.toSet()));

@@ -5,6 +5,8 @@ import edu.cmu.sv.YodaEnvironment;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.absolute_quality_degree.AbsoluteQualityDegree;
+import edu.cmu.sv.ontology.quality.Quality;
+import edu.cmu.sv.ontology.role.has_quality_subroles.HasAbsoluteQualityDegree;
 import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.ontology.role.Role;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -60,7 +62,6 @@ public class Database {
             Set<Class> databaseClasses = new HashSet<>(OntologyRegistry.objectClasses);
             databaseClasses.addAll(OntologyRegistry.verbClasses);
             databaseClasses.addAll(OntologyRegistry.qualityClasses);
-            databaseClasses.addAll(OntologyRegistry.modifierClasses);
             Set<Class> databaseProperties = new HashSet<>(OntologyRegistry.roleClasses);
             databaseProperties.addAll(OntologyRegistry.roleClasses);
             generateClassHierarchy(databaseClasses, databaseProperties);
@@ -292,14 +293,16 @@ public class Database {
 
     public double evaluateAbsoluteQualityDegree(String entityURI, Class<? extends Role> hasQualityRoleClass,
                                                 Class<? extends AbsoluteQualityDegree> degreeCls){
-        assert OntologyRegistry.inDomain(hasQualityRoleClass, degreeCls);
+//        System.out.println(hasQualityRoleClass.getSimpleName() + ", " + degreeCls.getSimpleName());
+        assert OntologyRegistry.inRange(hasQualityRoleClass, degreeCls);
         List<Double> ans = new LinkedList<>();
         try {
             AbsoluteQualityDegree tmp = degreeCls.newInstance();
             String queryString = prefixes +
                     "SELECT ?x WHERE {<"+entityURI+"> base:"+hasQualityRoleClass.getSimpleName()+" ?y . "+
                     "?y base:quantifiedAs ?actual . " +
-                    "BIND(base:LinearFuzzyMap("+tmp.getCenter()+" "+tmp.getSlope()+"?actual) AS ?x)}";
+                    "BIND(base:LinearFuzzyMap("+tmp.getCenter()+", "+tmp.getSlope()+", ?actual) AS ?x)}";
+//            System.out.println(queryString);
             TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
             TupleQueryResult result = query.evaluate();
 
@@ -312,6 +315,22 @@ public class Database {
             e.printStackTrace();
         }
         return ans.get(0);
+    }
+
+
+    //TODO: overwrite if the quality is already assigned
+    public void assignQuantityToEntityQuality(String entityURI, Class<? extends Role> hasQualityRoleClass,
+                                              Class<? extends Quality> qualityClass, double value){
+        try {
+            String newQualityURI = "auto_generated_quality_URI" + URICounter++;
+            String updateString = prefixes + "INSERT DATA\n{<" + entityURI + "> base:" + hasQualityRoleClass.getSimpleName() +
+                    " base:" + newQualityURI + " . base:" + newQualityURI + " rdf:type base:" + qualityClass.getSimpleName() + " ; base:quantifiedAs " + value + " .}";
+//            System.out.println(updateString);
+            Update update = connection.prepareUpdate(QueryLanguage.SPARQL, updateString, baseURI);
+            update.execute();
+        } catch (UpdateExecutionException | RepositoryException | MalformedQueryException e) {
+            e.printStackTrace();
+        }
     }
 
 }

@@ -4,7 +4,7 @@ import edu.cmu.sv.YodaEnvironment;
 import edu.cmu.sv.database.Database;
 import edu.cmu.sv.natural_language_generation.LexicalEntry;
 import edu.cmu.sv.natural_language_generation.Template;
-import edu.cmu.sv.natural_language_generation.TemplateCombiner;
+import edu.cmu.sv.natural_language_generation.GenerationUtils;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
@@ -14,7 +14,6 @@ import edu.cmu.sv.ontology.role.HasIndividual;
 import edu.cmu.sv.ontology.role.HasURI;
 import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.semantics.SemanticsModel;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
@@ -99,7 +98,6 @@ public class QualityAdjectiveTemplate0 implements Template {
 
                 Thing qualityIndividual = OntologyRegistry.individualNameMap.get(qualityName);
 
-
                 for (LexicalEntry lexicalEntry : qualityIndividual.getLexicalEntries()) {
                     for (String adjectiveForm : lexicalEntry.adjectives) {
                         String contentString = OntologyRegistry.
@@ -113,7 +111,7 @@ public class QualityAdjectiveTemplate0 implements Template {
 
 
                 List<Map<String, JSONObject>> chunks = Arrays.asList(detChunks, adjChunks, clsChunks);
-                ans = TemplateCombiner.simpleOrderedCombinations(chunks,
+                ans = GenerationUtils.simpleOrderedCombinations(chunks,
                         QualityAdjectiveTemplate0::compositionFunction, new HashMap<>());
             }
 

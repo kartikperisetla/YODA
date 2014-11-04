@@ -1,8 +1,11 @@
 package edu.cmu.sv.ontology.absolute_quality_degree;
 
 import edu.cmu.sv.natural_language_generation.LexicalEntry;
+import edu.cmu.sv.ontology.quality.Height;
+import edu.cmu.sv.ontology.quality.Quality;
 import edu.cmu.sv.ontology.role.Role;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,7 +20,7 @@ public class Tall extends AbsoluteHeightDegree {
 
     @Override
     public Set<LexicalEntry> getLexicalEntries() {
-        return super.getLexicalEntries();
+        return new HashSet<>(Arrays.asList(lexicalEntry));
     }
 
     @Override

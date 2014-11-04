@@ -14,12 +14,6 @@ import java.util.Set;
  *
  */
 public class Expensiveness extends Quality {
-    public Expensiveness() {
-        lexicalEntry = new LexicalEntry();
-        // add information about the quality itself
-        // each individual will add individual-specific information to its lexical entry
-    }
-
     @Override
     public Set<Class<? extends Role>> getRequiredRoles() {
         return new HashSet<>();

@@ -4,8 +4,6 @@ import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.ThingWithRoles;
 import edu.cmu.sv.ontology.absolute_quality_degree.AbsoluteQualityDegree;
 import edu.cmu.sv.ontology.modifier.PolarityModifier;
-import edu.cmu.sv.ontology.modifier.RelativeDegreeModifier;
-import edu.cmu.sv.ontology.role.HasModifier;
 
 import java.util.Arrays;
 import java.util.HashSet;

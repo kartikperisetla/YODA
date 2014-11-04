@@ -15,9 +15,10 @@ public class GrammarRegistry {
 
     static {
         grammar1.add(SimpleNamedEntityFromLabelTemplate0.class);
-        grammar1.add(DefiniteReferenceWithClass0.class);
+//        grammar1.add(DefiniteReferenceWithClass0.class);
         grammar1.add(DefiniteReferenceWithClassAndRelation0.class);
-        grammar1.add(QualityAdjectiveTemplate0.class);
+//        grammar1.add(QualityAdjectiveTemplate0.class);
+        grammar1.add(DefiniteReferenceWithAdjectiveAndClassTemplate0.class);
         grammar1_roots.add(FragmentTemplate0.class);
         grammar1_roots.add(CommandTemplate0.class);
     }

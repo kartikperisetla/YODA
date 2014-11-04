@@ -14,11 +14,6 @@ import java.util.Set;
  *
  */
 public class Height extends Quality {
-    public Height() {
-        lexicalEntry = new LexicalEntry();
-        // add information about the quality itself
-        // each individual will add individual-specific information to its lexical entry
-    }
 
     @Override
     public Set<Class<? extends Role>> getRequiredRoles() {

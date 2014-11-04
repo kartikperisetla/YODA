@@ -1,17 +1,16 @@
 package edu.cmu.sv;
 
 import edu.cmu.sv.ontology.OntologyRegistry;
-import edu.cmu.sv.ontology.role.HasAbsoluteQualityDegree;
+import edu.cmu.sv.ontology.quality.Expensiveness;
+import edu.cmu.sv.ontology.role.has_quality_subroles.HasAbsoluteQualityDegree;
+import edu.cmu.sv.ontology.role.has_quality_subroles.HasExpensiveness;
 import edu.cmu.sv.semantics.SemanticsModel;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by David Cohen on 10/29/14.
@@ -37,13 +36,15 @@ public class TestGenerateCorpus {
             String isCloseToInsertString = yodaEnvironment.db.prefixes +
                     "INSERT DATA \n{<"+poiURIList.get(2*i)+"> base:IsCloseTo <"+poiURIList.get(2*i+1)+">}";
             yodaEnvironment.db.insertStatement(isCloseToInsertString);
-
-            // randomly insert IsExpensive at a restaurant
-            String isExpensiveInsertString = yodaEnvironment.db.prefixes +
-                    "INSERT DATA \n{<"+restaurantURIList.get(i)+"> base:"+
-                    HasAbsoluteQualityDegree.class.getSimpleName()+" base:expensive}";
-            yodaEnvironment.db.insertStatement(isExpensiveInsertString);
         }
+
+        Random r = new Random();
+        for (String restaurantURI : restaurantURIList){
+            // randomly insert Expensiveness
+            yodaEnvironment.db.assignQuantityToEntityQuality(restaurantURI, HasExpensiveness.class, Expensiveness.class, r.nextDouble());
+        }
+
+
 
 
         Map<String, SemanticsModel> corpus = new HashMap<>();

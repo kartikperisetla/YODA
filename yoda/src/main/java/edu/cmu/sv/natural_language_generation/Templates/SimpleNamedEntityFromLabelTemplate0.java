@@ -1,9 +1,8 @@
 package edu.cmu.sv.natural_language_generation.Templates;
 
 import edu.cmu.sv.YodaEnvironment;
-import edu.cmu.sv.database.Database;
 import edu.cmu.sv.natural_language_generation.Template;
-import edu.cmu.sv.natural_language_generation.TemplateCombiner;
+import edu.cmu.sv.natural_language_generation.GenerationUtils;
 import edu.cmu.sv.ontology.misc.WebResource;
 import edu.cmu.sv.ontology.role.HasName;
 import edu.cmu.sv.ontology.role.HasURI;
@@ -51,7 +50,7 @@ public class SimpleNamedEntityFromLabelTemplate0 implements Template {
             tmp.put(label, content);
             Map<String, Pair<Integer, Integer>> tmp2 = new HashMap<>();
             tmp2.put(HasName.class.getSimpleName(), new ImmutablePair<>(0,0));
-            ans.put(label,TemplateCombiner.simpleOrderedCombinations(Arrays.asList(tmp),
+            ans.put(label, GenerationUtils.simpleOrderedCombinations(Arrays.asList(tmp),
                     x -> x.get(0), tmp2).get(label));
         }
 

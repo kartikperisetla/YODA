@@ -1,21 +1,64 @@
 package edu.cmu.sv.natural_language_generation;
 
+import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.Thing;
+import edu.cmu.sv.ontology.ThingWithRoles;
+import edu.cmu.sv.ontology.absolute_quality_degree.AbsoluteQualityDegree;
+import edu.cmu.sv.ontology.role.Role;
+import edu.cmu.sv.ontology.role.has_quality_subroles.HasAbsoluteQualityDegree;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.Combination;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
 /**
  * Created by David Cohen on 10/30/14.
- *
- * TemplateCombiner contains convenience functions for creating combinations of templates
- *
  */
-public class TemplateCombiner {
+public class GenerationUtils {
+
+    public static Set<String> getPOSForClass(Class<? extends Thing> cls, String partOfSpeech){
+        Set<String> ans = new HashSet<>();
+        if (Modifier.isAbstract(cls.getModifiers()))
+            return ans;
+        try {
+            Thing tmp = cls.newInstance();
+            for (LexicalEntry lexicalEntry : tmp.getLexicalEntries()){
+                boolean posFound = false;
+                for (Field field : lexicalEntry.getClass().getDeclaredFields()){
+                    if (field.getName().equals(partOfSpeech)) {
+                        ans.addAll((Collection) field.get(lexicalEntry));
+                        posFound = true;
+                        break;
+                    }
+                }
+                if (!(posFound))
+                    throw new Error("requested part of speech is not a member of the LexicalEntry class:"+partOfSpeech);
+            }
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return ans;
+    }
+
+    public static Set<Pair<Class<? extends HasAbsoluteQualityDegree>, Class<? extends AbsoluteQualityDegree>>> applicableAdjectives
+            (Class<? extends ThingWithRoles> individualClass){
+        Set<Pair<Class<? extends HasAbsoluteQualityDegree>, Class<? extends AbsoluteQualityDegree>>> ans = new HashSet<>();
+        for (Class <? extends AbsoluteQualityDegree> aqdClass : OntologyRegistry.absoluteQualityDegreeClasses){
+            for (Class <? extends HasAbsoluteQualityDegree> roleCls : OntologyRegistry.qualityRoleClasses){
+                if (OntologyRegistry.inDomain(roleCls, individualClass) && OntologyRegistry.inRange(roleCls, aqdClass))
+                    ans.add(new ImmutablePair<>(roleCls, aqdClass));
+            }
+        }
+        return ans;
+    }
+
 
     /*
     * Return all combinations of strings and composed semantics objects,
@@ -34,7 +77,8 @@ public class TemplateCombiner {
             List<String> subStrings = new LinkedList<>();
             List<JSONObject> subContents = new LinkedList<>();
             for (int i = 0; i < chunks.size(); i++) {
-                subStrings.add(binding.get(i).getKey());
+                if (!(binding.get(i).getKey().trim().equals("")))
+                    subStrings.add(binding.get(i).getKey());
                 subContents.add(binding.get(i).getValue());
             }
             String combinedString = String.join(" ", subStrings);
@@ -62,11 +106,13 @@ public class TemplateCombiner {
                                              String pathToChild){
         Integer startingIndex = 0;
         for (int i = 0; i < selectedChunks.getKey(); i++) {
-            startingIndex += stringChunks.get(i).split(" ").length;
+            if (!(stringChunks.get(i).trim().equals("")))
+                startingIndex += stringChunks.get(i).split(" ").length;
         }
         Integer endingIndex = startingIndex - 1;
         for (int i = selectedChunks.getKey(); i <= selectedChunks.getValue(); i++) {
-            endingIndex += stringChunks.get(i).split(" ").length;
+            if (!(stringChunks.get(i).trim().equals("")))
+                endingIndex += stringChunks.get(i).split(" ").length;
         }
         JSONObject tmp = (JSONObject) new SemanticsModel(composedContent).newGetSlotPathFiller(pathToChild);
         tmp.put("chunk-start", startingIndex);

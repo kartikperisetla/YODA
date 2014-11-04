@@ -1,0 +1,14 @@
+edu/cmu/sv/ontology/role/HasAtTime.class
+edu/cmu/sv/natural_language_generation/GrammarRegistry.class
+edu/cmu/sv/ontology/role/has_modifier_subroles/HasRelativeDegreeModifier.class
+edu/cmu/sv/ontology/role/has_quality_subroles/HasExpensiveness.class
+edu/cmu/sv/system_action/dialog_act/core_dialog_acts/Rejection.class
+edu/cmu/sv/ontology/role/has_modifier_subroles/HasPolarityModifier.class
+edu/cmu/sv/ontology/verb/Exist.class
+edu/cmu/sv/ontology/object/poi_types/FastFood.class
+edu/cmu/sv/ontology/misc/WebResource.class
+edu/cmu/sv/utils/CollectionComparison.class
+edu/cmu/sv/ontology/misc/Or.class
+edu/cmu/sv/database/LinearFuzzyMap.class
+edu/cmu/sv/ontology/object/poi_types/GarbageCan.class
+edu/cmu/sv/system_action/dialog_task/RespondToWHQuestionTask.class

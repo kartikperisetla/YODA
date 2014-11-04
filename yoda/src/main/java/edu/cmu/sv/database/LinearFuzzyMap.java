@@ -1,5 +1,6 @@
 package edu.cmu.sv.database;
 
+import org.kohsuke.MetaInfServices;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
@@ -9,7 +10,7 @@ import org.openrdf.query.algebra.evaluation.function.Function;
 /**
  * Created by David Cohen on 11/2/14.
  */
-
+@MetaInfServices
 public class LinearFuzzyMap implements Function{
     @Override
     public String getURI() {

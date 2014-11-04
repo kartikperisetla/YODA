@@ -4,7 +4,6 @@ import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.ThingWithRoles;
 import edu.cmu.sv.ontology.absolute_quality_degree.AbsoluteExpensivenessDegree;
 import edu.cmu.sv.ontology.object.poi_types.Restaurant;
-import edu.cmu.sv.ontology.role.HasAbsoluteQualityDegree;
 
 import java.util.Arrays;
 import java.util.HashSet;
