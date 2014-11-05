@@ -79,8 +79,11 @@ public class GenerationUtils {
             List<String> subStrings = new LinkedList<>();
             List<JSONObject> subContents = new LinkedList<>();
             for (int i = 0; i < chunks.size(); i++) {
-                if (!(binding.get(i).getKey().trim().equals("")))
-                    combinedString += " "+binding.get(i).getKey().trim();
+                if (!(binding.get(i).getKey().trim().equals(""))) {
+                    if (i!=0)
+                        combinedString += " ";
+                    combinedString += binding.get(i).getKey().trim();
+                }
                 subStrings.add(binding.get(i).getKey());
                 subContents.add(binding.get(i).getValue());
             }

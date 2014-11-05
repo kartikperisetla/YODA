@@ -65,6 +65,7 @@ public class TestGenerateCorpus {
             Map<String, SemanticsModel> tmp = yodaEnvironment.nlg.generateAll(ex, yodaEnvironment);
             for (String key : tmp.keySet()){
                 System.out.println(key);
+                System.out.println(tmp.get(key).getInternalRepresentation().toJSONString() + "\n");
                 writer.write("---\n");
                 writer.write(key+"\n");
                 writer.write(tmp.get(key).getInternalRepresentation().toJSONString() + "\n");
@@ -77,6 +78,7 @@ public class TestGenerateCorpus {
             Map<String, SemanticsModel> tmp2 = yodaEnvironment.nlg.generateAll(ex2, yodaEnvironment);
             for (String key : tmp2.keySet()){
                 System.out.println(key);
+                System.out.println(tmp2.get(key).getInternalRepresentation().toJSONString() + "\n");
                 writer.write("---\n");
                 writer.write(key+"\n");
                 writer.write(tmp2.get(key).getInternalRepresentation().toJSONString() + "\n");
