@@ -5,6 +5,6 @@ import edu.cmu.sv.ontology.role.Role;
 /**
  * Created by David Cohen on 10/31/14.
  */
-public abstract class HasAbsoluteQualityDegree extends Role {
+public abstract class HasQualityRole extends Role {
 
 }

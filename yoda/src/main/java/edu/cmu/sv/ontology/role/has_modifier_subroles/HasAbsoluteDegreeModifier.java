@@ -2,7 +2,7 @@ package edu.cmu.sv.ontology.role.has_modifier_subroles;
 
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.ThingWithRoles;
-import edu.cmu.sv.ontology.adjective.AbsoluteQualityDegree;
+import edu.cmu.sv.ontology.adjective.Adjective;
 import edu.cmu.sv.ontology.modifier.AbsoluteDegreeModifier;
 
 import java.util.Arrays;
@@ -13,7 +13,7 @@ import java.util.Set;
  * Created by David Cohen on 11/2/14.
  */
 public class HasAbsoluteDegreeModifier extends HasModifier {
-    static Set<Class <? extends ThingWithRoles>> domain = new HashSet<>(Arrays.asList(AbsoluteQualityDegree.class));
+    static Set<Class <? extends ThingWithRoles>> domain = new HashSet<>(Arrays.asList(Adjective.class));
     static Set<Class <? extends Thing>> range = new HashSet<>(Arrays.asList(AbsoluteDegreeModifier.class));
 
     @Override

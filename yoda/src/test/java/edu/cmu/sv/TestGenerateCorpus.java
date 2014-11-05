@@ -5,6 +5,11 @@ import edu.cmu.sv.ontology.quality.unary_quality.Expensiveness;
 import edu.cmu.sv.ontology.role.has_quality_subroles.HasExpensiveness;
 import edu.cmu.sv.semantics.SemanticsModel;
 import org.junit.Test;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.Update;
+import org.openrdf.query.UpdateExecutionException;
+import org.openrdf.repository.RepositoryException;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -40,7 +45,14 @@ public class TestGenerateCorpus {
         Random r = new Random();
         for (String restaurantURI : restaurantURIList){
             // randomly insert Expensiveness
-            yodaEnvironment.db.assignQuantityToEntityQuality(restaurantURI, HasExpensiveness.class, Expensiveness.class, r.nextDouble());
+            String expensivenessInsertString = yodaEnvironment.db.prefixes +
+                    "INSERT DATA {<"+restaurantURI+"> base:expensiveness "+r.nextDouble()+"}";
+            try {
+                Update update = yodaEnvironment.db.connection.prepareUpdate(QueryLanguage.SPARQL, expensivenessInsertString, yodaEnvironment.db.baseURI);
+                update.execute();
+            } catch (RepositoryException | UpdateExecutionException | MalformedQueryException e) {
+                e.printStackTrace();
+            }
         }
 
 

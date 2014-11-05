@@ -6,7 +6,7 @@ import edu.cmu.sv.ontology.quality.TransientQuality;
 /**
  * Created by David Cohen on 11/2/14.
  */
-public abstract class AbsoluteExpensivenessDegree extends AbsoluteQualityDegree{
+public abstract class ExpensivenessAdjective extends Adjective {
 
     @Override
     public Class<? extends TransientQuality> getQuality() {

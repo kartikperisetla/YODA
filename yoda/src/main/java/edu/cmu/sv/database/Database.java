@@ -5,15 +5,14 @@ import edu.cmu.sv.YodaEnvironment;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.ThingWithRoles;
-import edu.cmu.sv.ontology.adjective.AbsoluteQualityDegree;
+import edu.cmu.sv.ontology.adjective.Adjective;
+import edu.cmu.sv.ontology.noun.Noun;
 import edu.cmu.sv.ontology.quality.TransientQuality;
-import edu.cmu.sv.ontology.preposition.TransientPairwiseRole;
-import edu.cmu.sv.ontology.quality.binary_quality.TransientPairwiseQuality;
+import edu.cmu.sv.ontology.preposition.Preposition;
 import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.ontology.role.Role;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.json.simple.JSONObject;
 import org.openrdf.model.Value;
 import org.openrdf.query.*;
 import org.openrdf.repository.Repository;
@@ -41,7 +40,7 @@ public class Database {
 //    Repository repository;
     // a counter used to create new URIs
     private long URICounter = 0;
-    RepositoryConnection connection;
+    public RepositoryConnection connection;
     public final static String baseURI = "http://sv.cmu.edu/yoda#";
     public final static String prefixes = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
@@ -59,7 +58,7 @@ public class Database {
             connection = repository.getConnection();
 
             // generate the class hierarchy
-            Set<Class> databaseClasses = new HashSet<>(OntologyRegistry.objectClasses);
+            Set<Class> databaseClasses = new HashSet<>(OntologyRegistry.nounClasses);
             databaseClasses.addAll(OntologyRegistry.verbClasses);
             databaseClasses.addAll(OntologyRegistry.qualityClasses);
             Set<Class> databaseProperties = new HashSet<>(OntologyRegistry.roleClasses);
@@ -104,7 +103,7 @@ public class Database {
         String insertString = prefixes+"INSERT DATA\n{\n";
         for (Class cls : classes){
             insertString += generateTriple(cls, "rdf:type", "rdfs:Class")+".\n";
-            if (cls != edu.cmu.sv.ontology.noun.Object.class && cls != Verb.class) {
+            if (cls != Noun.class && cls != Verb.class) {
                 insertString += generateTriple(cls, "rdfs:subClassOf", cls.getSuperclass()) + ".\n";
             }
         }
@@ -292,82 +291,46 @@ public class Database {
     }
 
     public double evaluateQualityDegree(List<String> entityURIs, Class<? extends Role> hasQualityRoleClass,
-                                        JSONObject qualityDescription, Class<? extends ThingWithRoles> degreeClass){
-        // use the quality description to decide on which modifiers to apply to the fuzzy map / query
-        //todo: extend the: run the getQualitySparql query with the apply fuzzy map query
-    }
-
-    // todo: replace with evaluateQualityDegree
-    public double evaluateAbsoluteQualityDegree(String entityURI, Class<? extends Role> hasQualityRoleClass,
-                                                Class<? extends AbsoluteQualityDegree> degreeCls){
-//        System.out.println(hasQualityRoleClass.getSimpleName() + ", " + degreeCls.getSimpleName());
-        assert OntologyRegistry.inRange(hasQualityRoleClass, degreeCls);
-        List<Double> ans = new LinkedList<>();
+                                        Class<? extends ThingWithRoles> degreeClass){
+//        System.out.println("evaluating quality degree:"+entityURIs + hasQualityRoleClass + degreeClass);
         try {
-            AbsoluteQualityDegree tmp = degreeCls.newInstance();
-            String queryString = prefixes +
-                    "SELECT ?x WHERE {<"+entityURI+"> base:"+hasQualityRoleClass.getSimpleName()+" ?y . "+
-                    "?y base:quantifiedAs ?actual . " +
-                    "BIND(base:LinearFuzzyMap("+tmp.getCenter()+", "+tmp.getSlope()+", ?actual) AS ?x)}";
-//            System.out.println(queryString);
+            double center;
+            double slope;
+            Class<? extends TransientQuality> q;
+            if (Preposition.class.isAssignableFrom(degreeClass)) {
+                Preposition preposition = (Preposition) degreeClass.newInstance();
+                center = preposition.getCenter();
+                slope = preposition.getSlope();
+                q = preposition.getQuality();
+            } else if (Adjective.class.isAssignableFrom(degreeClass)) {
+                Adjective adjective = (Adjective) degreeClass.newInstance();
+                center = adjective.getCenter();
+                slope = adjective.getSlope();
+                q = adjective.getQuality();
+            } else {
+                throw new Error("degreeClass is neither an Adjective nor a Preposition class");
+            }
+
+            String queryString = prefixes + "SELECT ?fuzzy_mapped_quality WHERE {" +
+                    q.newInstance().getQualityCalculatorSPARQLQuery().apply(entityURIs) +
+                    "BIND(base:LinearFuzzyMap("+center+", "+slope+", ?transient_quality) AS ?fuzzy_mapped_quality)}";
+
+//            System.out.println("query string:\n"+queryString);
+
             TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
             TupleQueryResult result = query.evaluate();
 
-            while (result.hasNext()){
+            if (result.hasNext()){
                 BindingSet bindings = result.next();
-                ans.add(Double.parseDouble(bindings.getValue("x").stringValue()));
+                return (Double.parseDouble(bindings.getValue("fuzzy_mapped_quality").stringValue()));
             }
 
         } catch (InstantiationException | IllegalAccessException | MalformedQueryException | RepositoryException | QueryEvaluationException e) {
             e.printStackTrace();
+            throw new Error(e);
         }
-        return ans.get(0);
+        throw new Error("no value could be determined");
     }
 
-
-    //TODO: overwrite if the quality is already assigned
-    public void assignQuantityToEntityQuality(String entityURI, Class<? extends Role> hasQualityRoleClass,
-                                              Class<? extends TransientQuality> qualityClass, double value){
-        try {
-            String newQualityURI = "auto_generated_quality_URI" + URICounter++;
-            String updateString = prefixes + "INSERT DATA\n{<" + entityURI + "> base:" + hasQualityRoleClass.getSimpleName() +
-                    " base:" + newQualityURI + " . base:" + newQualityURI + " rdf:type base:" + qualityClass.getSimpleName() +
-                    " ; base:quantifiedAs " + value + " .}";
-//            System.out.println(updateString);
-            Update update = connection.prepareUpdate(QueryLanguage.SPARQL, updateString, baseURI);
-            update.execute();
-        } catch (UpdateExecutionException | RepositoryException | MalformedQueryException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // todo: replace with evaluateQualityDegree
-    public double evaluateTransientPairwiseRoleDegree(String entity1URI, String entity2URI,
-                                                      Class<? extends TransientPairwiseRole> roleCls,
-                                                      Class<? extends TransientPairwiseQuality> qualityCls){
-
-        assert OntologyRegistry.inRange(qualityCls, roleCls);
-        // determine the quality degree
-        double transientPairwiseQualityDegree = -1.0;
-        try {
-            TransientPairwiseQuality tmp = qualityCls.newInstance();
-            TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL,
-                    tmp.getQualityCalculatorSPARQLQuery().apply(new ImmutablePair<>(entity1URI, entity2URI)));
-            TupleQueryResult result = query.evaluate();
-
-            while (result.hasNext()){
-                BindingSet bindings = result.next();
-                transientPairwiseQualityDegree = Double.parseDouble(bindings.getValue("x").stringValue());
-                break;
-            }
-
-        } catch (InstantiationException | IllegalAccessException | MalformedQueryException | RepositoryException | QueryEvaluationException e) {
-            e.printStackTrace();
-        }
-
-        for ()
-
-
-    }
 
 }

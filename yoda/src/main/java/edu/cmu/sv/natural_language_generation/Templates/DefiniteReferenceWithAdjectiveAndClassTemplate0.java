@@ -6,11 +6,13 @@ import edu.cmu.sv.natural_language_generation.GenerationUtils;
 import edu.cmu.sv.natural_language_generation.Template;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.ThingWithRoles;
-import edu.cmu.sv.ontology.adjective.AbsoluteQualityDegree;
+import edu.cmu.sv.ontology.adjective.Adjective;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.ontology.misc.WebResource;
+import edu.cmu.sv.ontology.quality.TransientQuality;
 import edu.cmu.sv.ontology.role.HasURI;
-import edu.cmu.sv.ontology.role.has_quality_subroles.HasAbsoluteQualityDegree;
+import edu.cmu.sv.ontology.role.Role;
+import edu.cmu.sv.ontology.role.has_quality_subroles.HasQualityRole;
 import edu.cmu.sv.semantics.SemanticsModel;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
@@ -57,20 +59,31 @@ public class DefiniteReferenceWithAdjectiveAndClassTemplate0 implements Template
         // compose det chunks
         detChunks.put("the", new SemanticsModel("{}").getInternalRepresentation());
 
-        // collect adj chunks
-        for (String clsName : classNames.stream().map(Database::getLocalName).collect(Collectors.toSet())) {
-            for (Pair<Class<? extends HasAbsoluteQualityDegree>, Class<? extends AbsoluteQualityDegree>> adjPair : GenerationUtils.
-                    applicableAdjectives((Class <? extends ThingWithRoles>) OntologyRegistry.thingNameMap.get(clsName))){
-                double degreeOfMatch = yodaEnvironment.db.
-                        evaluateAbsoluteQualityDegree(entityURI, adjPair.getLeft(), adjPair.getRight());
-                if (degreeOfMatch > 0.5){
-                    Set<String> adjStrings = GenerationUtils.getPOSForClass(adjPair.getRight(), "adjectives");
-                    for (String adjString : adjStrings){
-                        JSONObject tmp = SemanticsModel.parseJSON("{\"class\":\"" + adjPair.getRight().getSimpleName() + "\"}");
-                        SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(), adjPair.getLeft().getSimpleName());
-                        adjChunks.put(adjString, tmp);
-                    }
 
+        // collect applicable qualities
+        String mostSpecificClass = yodaEnvironment.db.mostSpecificClass(entityURI);
+        if (OntologyRegistry.thingNameMap.containsKey(mostSpecificClass) &&
+                ThingWithRoles.class.isAssignableFrom(OntologyRegistry.thingNameMap.get(mostSpecificClass))) {
+            for (Class<? extends TransientQuality> qualityClass : OntologyRegistry.qualitiesForClass.get(
+                    OntologyRegistry.thingNameMap.get(mostSpecificClass))) {
+                // adjectives
+                if (OntologyRegistry.qualityArguments(qualityClass).size()==0){
+                    Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> descriptor =
+                            OntologyRegistry.qualityDescriptors(qualityClass);
+                    for (Class<? extends ThingWithRoles> adjectiveClass : descriptor.getRight()){
+                        double degreeOfMatch = yodaEnvironment.db.
+                                evaluateQualityDegree(Arrays.asList(entityURI),
+                                        descriptor.getLeft(), adjectiveClass);
+                        if (degreeOfMatch > 0.5){
+                            Set<String> adjStrings = GenerationUtils.getPOSForClass(adjectiveClass, "adjectives");
+                            for (String adjString : adjStrings){
+                                JSONObject tmp = SemanticsModel.parseJSON("{\"class\":\"" + adjectiveClass.getSimpleName() + "\"}");
+                                SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(),
+                                        descriptor.getLeft().getSimpleName());
+                                adjChunks.put(adjString, tmp);
+                            }
+                        }
+                    }
                 }
             }
         }

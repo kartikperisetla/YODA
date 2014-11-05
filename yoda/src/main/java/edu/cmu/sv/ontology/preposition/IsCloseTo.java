@@ -1,8 +1,8 @@
 package edu.cmu.sv.ontology.preposition;
 
 import edu.cmu.sv.natural_language_generation.LexicalEntry;
-import edu.cmu.sv.ontology.quality.binary_quality.HasDistance;
-import edu.cmu.sv.ontology.quality.binary_quality.TransientPairwiseQuality;
+import edu.cmu.sv.ontology.quality.TransientQuality;
+import edu.cmu.sv.ontology.quality.binary_quality.Distance;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -12,7 +12,7 @@ import java.util.Set;
  *
  * Relates two POI's that are geographically close to each other.
  */
-public class IsCloseTo extends TransientPairwiseRole{
+public class IsCloseTo extends DistancePreposition {
     @Override
     public double getCenter() {
         return 0;
@@ -21,13 +21,6 @@ public class IsCloseTo extends TransientPairwiseRole{
     @Override
     public double getSlope() {
         return 10;
-    }
-
-    static TransientPairwiseQuality myTransientQuality = new HasDistance();
-
-    @Override
-    public TransientPairwiseQuality getTransientPairwiseQuality() {
-        return myTransientQuality;
     }
 
     static Set<LexicalEntry> lexicalEntries = new HashSet<>();

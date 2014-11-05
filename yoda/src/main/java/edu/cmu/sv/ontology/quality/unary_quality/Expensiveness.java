@@ -1,12 +1,15 @@
 package edu.cmu.sv.ontology.quality.unary_quality;
 
 
+import edu.cmu.sv.database.Database;
+import edu.cmu.sv.database.DistanceFunction;
+import edu.cmu.sv.ontology.Thing;
+import edu.cmu.sv.ontology.noun.PointOfInterest;
 import edu.cmu.sv.ontology.quality.TransientQuality;
 import edu.cmu.sv.ontology.role.Role;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -16,5 +19,18 @@ import java.util.function.Function;
  *
  */
 public class Expensiveness extends TransientQuality {
+    static List<Class <? extends Thing>> arguments = new LinkedList<>();
 
+    @Override
+    public List<Class<? extends Thing>> getArguments() {
+        return arguments;
+    }
+
+
+    @Override
+    public Function<List<String>, String> getQualityCalculatorSPARQLQuery() {
+        java.util.function.Function<List<String>, String> queryGen = (List<String> entityURIs) ->
+                "<"+entityURIs.get(0)+"> base:expensiveness ?transient_quality . ";
+        return queryGen;
+    }
 }

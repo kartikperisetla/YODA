@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * Created by David Cohen on 11/2/14.
  */
-public class Expensive extends AbsoluteExpensivenessDegree {
+public class Expensive extends ExpensivenessAdjective {
     private static LexicalEntry lexicalEntry = new LexicalEntry();
     static {
         lexicalEntry.adjectives.add("expensive");
@@ -19,11 +19,6 @@ public class Expensive extends AbsoluteExpensivenessDegree {
     @Override
     public Set<LexicalEntry> getLexicalEntries() {
         return new HashSet<>(Arrays.asList(lexicalEntry));
-    }
-
-    @Override
-    public Set<Class<? extends Role>> getRequiredRoles() {
-        return new HashSet<>();
     }
 
     @Override

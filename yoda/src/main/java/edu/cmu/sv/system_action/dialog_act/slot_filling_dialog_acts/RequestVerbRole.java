@@ -2,6 +2,7 @@ package edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts;
 
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
 import edu.cmu.sv.ontology.Thing;
+import edu.cmu.sv.ontology.noun.Noun;
 import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 
@@ -16,7 +17,7 @@ public class RequestVerbRole extends DialogAct{
     private Map<String, Object> boundVariables = null;
     static Map<String, Class<? extends Thing>> parameters = new HashMap<>(); // parameters are empty for this DA
     static{
-        parameters.put("r1", edu.cmu.sv.ontology.noun.Object.class);
+        parameters.put("r1", Noun.class);
         parameters.put("v1", Verb.class); // this is the action whose role is being requested
     }
 

@@ -3,8 +3,9 @@ package edu.cmu.sv.natural_language_generation;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.ThingWithRoles;
-import edu.cmu.sv.ontology.adjective.AbsoluteQualityDegree;
-import edu.cmu.sv.ontology.role.has_quality_subroles.HasAbsoluteQualityDegree;
+import edu.cmu.sv.ontology.adjective.Adjective;
+import edu.cmu.sv.ontology.quality.TransientQuality;
+import edu.cmu.sv.ontology.role.has_quality_subroles.HasQualityRole;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.Combination;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -46,17 +47,18 @@ public class GenerationUtils {
         return ans;
     }
 
-    public static Set<Pair<Class<? extends HasAbsoluteQualityDegree>, Class<? extends AbsoluteQualityDegree>>> applicableAdjectives
-            (Class<? extends ThingWithRoles> individualClass){
-        Set<Pair<Class<? extends HasAbsoluteQualityDegree>, Class<? extends AbsoluteQualityDegree>>> ans = new HashSet<>();
-        for (Class <? extends AbsoluteQualityDegree> aqdClass : OntologyRegistry.absoluteTransientQualityDegreeClasses){
-            for (Class <? extends HasAbsoluteQualityDegree> roleCls : OntologyRegistry.qualityRoleClasses){
-                if (OntologyRegistry.inDomain(roleCls, individualClass) && OntologyRegistry.inRange(roleCls, aqdClass))
-                    ans.add(new ImmutablePair<>(roleCls, aqdClass));
-            }
-        }
-        return ans;
-    }
+
+//    public static Set<Pair<Class<? extends HasQualityRole>, Class<? extends Adjective>>> applicableAdjectives
+//            (Class<? extends ThingWithRoles> individualClass){
+//        Set<Pair<Class<? extends HasQualityRole>, Class<? extends Adjective>>> ans = new HashSet<>();
+//        for (Class <? extends Adjective> aqdClass : OntologyRegistry.absoluteTransientQualityDegreeClasses){
+//            for (Class <? extends HasQualityRole> roleCls : OntologyRegistry.qualityRoleClasses){
+//                if (OntologyRegistry.inDomain(roleCls, individualClass) && OntologyRegistry.inRange(roleCls, aqdClass))
+//                    ans.add(new ImmutablePair<>(roleCls, aqdClass));
+//            }
+//        }
+//        return ans;
+//    }
 
 
     /*

@@ -8,7 +8,7 @@ import java.util.Set;
 /**
  * Created by David Cohen on 9/20/14.
  */
-public class NonPhysicalObject extends Object {
+public class NonPhysicalNoun extends Noun {
     @Override
     public Set<Class<? extends Role>> getRequiredRoles() {
         return new HashSet<>();

@@ -3,6 +3,7 @@ package edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts;
 import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
 import edu.cmu.sv.ontology.Thing;
+import edu.cmu.sv.ontology.noun.Noun;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 
 import java.lang.Object;
@@ -17,7 +18,7 @@ public class RequestConfirmValue extends DialogAct {
     private Map<String, Object> boundVariables = null;
     static Map<String, Class<? extends Thing>> parameters = new HashMap<>();
     static {
-        parameters.put("v1", edu.cmu.sv.ontology.noun.Object.class);
+        parameters.put("v1", Noun.class);
     }
 
     // template "<v1> ?"

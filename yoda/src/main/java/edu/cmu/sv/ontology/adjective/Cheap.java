@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * Created by David Cohen on 11/2/14.
  */
-public class Cheap extends AbsoluteExpensivenessDegree {
+public class Cheap extends ExpensivenessAdjective {
     private static LexicalEntry lexicalEntry = new LexicalEntry();
     static {
         lexicalEntry.adjectives.add("cheap");
