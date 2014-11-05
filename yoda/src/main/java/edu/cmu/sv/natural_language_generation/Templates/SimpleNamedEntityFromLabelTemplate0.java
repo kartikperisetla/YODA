@@ -29,7 +29,7 @@ public class SimpleNamedEntityFromLabelTemplate0 implements Template {
     }
 
     @Override
-    public Map<String, JSONObject> generateAll(JSONObject constraints, YodaEnvironment yodaEnvironment) {
+    public Map<String, JSONObject> generateAll(JSONObject constraints, YodaEnvironment yodaEnvironment, int remainingDepth) {
         Map<String, JSONObject> ans = new HashMap<>();
         if (SemanticsModel.anySenseConflicts(applicabilityConstraint, constraints))
             return ans;

@@ -27,7 +27,6 @@ public class TestRespondToYNQuestion {
         YodaEnvironment yodaEnvironment = YodaEnvironment.dialogTestingEnvironment();
         Database db = yodaEnvironment.db;
         addTestContent(db);
-        db.outputEntireDatabase();
 
         // example 0
         SemanticsModel taskSpec = new SemanticsModel();

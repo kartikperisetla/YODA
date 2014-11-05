@@ -80,7 +80,7 @@ public class TestGenerateCorpus {
         }
 
         for (String key : corpus.keySet()){
-//            System.out.println(key);
+            System.out.println(key);
 //            System.out.println(corpus.get(key));
             writer.write("---\n");
             writer.write(key+"\n");

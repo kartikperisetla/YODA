@@ -1,8 +1,6 @@
 package edu.cmu.sv.ontology.preposition;
 
 import edu.cmu.sv.natural_language_generation.LexicalEntry;
-import edu.cmu.sv.ontology.quality.TransientQuality;
-import edu.cmu.sv.ontology.quality.binary_quality.Distance;
 
 import java.util.HashSet;
 import java.util.Set;

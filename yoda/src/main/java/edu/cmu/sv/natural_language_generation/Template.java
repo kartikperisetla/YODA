@@ -20,6 +20,6 @@ public interface Template {
     * and the template generates strings /
     * elaborated constraints to pass back up to the parent template
     * */
-    public Map<String, JSONObject> generateAll(JSONObject constraints, YodaEnvironment yodaEnvironment);
+    public Map<String, JSONObject> generateAll(JSONObject constraints, YodaEnvironment yodaEnvironment, int remainingDepth);
 
 }

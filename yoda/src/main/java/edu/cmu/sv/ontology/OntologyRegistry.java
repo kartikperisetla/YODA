@@ -95,6 +95,7 @@ public class OntologyRegistry {
         roleClasses.add(HasURI.class);
         roleClasses.add(HasDistance.class);
         roleClasses.add(HasExpensiveness.class);
+        roleClasses.add(InRelationTo.class);
 
         adjectiveClasses.add(Cheap.class);
         adjectiveClasses.add(Expensive.class);
@@ -191,21 +192,22 @@ public class OntologyRegistry {
         if (Modifier.isAbstract(qualityClass.getModifiers()))
             return null;
         try {
-            Set<Class<? extends ThingWithRoles>> qualityDescriptors = new HashSet<>();
+            Set<Class<? extends ThingWithRoles>> adjectiveAndPrepositionClasses = new HashSet<>();
             for (Class<? extends Adjective> cls : adjectiveClasses){
                 if (cls.newInstance().getQuality().equals(qualityClass)) {
-                    qualityDescriptors.add(cls);
+                    adjectiveAndPrepositionClasses.add(cls);
                 }
             }
             for (Class<? extends Preposition> cls : prepositionClasses){
                 if (cls.newInstance().getQuality().equals(qualityClass)){
-                    qualityDescriptors.add(cls);
+                    adjectiveAndPrepositionClasses.add(cls);
                 }
             }
             Class<? extends Role> roleClass = roleClasses.stream().
-                    filter(x -> inRange(x, new LinkedList<>(qualityDescriptors).get(0))).
+                    filter(HasQualityRole.class::isAssignableFrom).
+                    filter(x -> inRange(x, new LinkedList<>(adjectiveAndPrepositionClasses).get(0))).
                     collect(Collectors.toList()).get(0);
-            return new ImmutablePair<>(roleClass, qualityDescriptors);
+            return new ImmutablePair<>(roleClass, adjectiveAndPrepositionClasses);
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
             throw new Error("OntologyRegistry.qualityDescriptors: instantiation or access exception:" + qualityClass);

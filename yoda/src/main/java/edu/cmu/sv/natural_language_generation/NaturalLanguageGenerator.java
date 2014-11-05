@@ -33,7 +33,7 @@ public class NaturalLanguageGenerator {
         Map<String, SemanticsModel> ans = new HashMap<>();
         for (Class<? extends Template> templateCls : GrammarRegistry.grammar1_roots){
             try {
-                templateCls.newInstance().generateAll(model.getInternalRepresentation(), yodaEnvironment).
+                templateCls.newInstance().generateAll(model.getInternalRepresentation(), yodaEnvironment, GrammarRegistry.MAX_UTT_DEPTH).
                         entrySet().forEach(x -> ans.put(x.getKey(), new SemanticsModel(x.getValue())));
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
@@ -45,11 +45,13 @@ public class NaturalLanguageGenerator {
 
     // currently, this will overwrite semantic interpretations of identical strings,
     // i.e. ambiguity is ignored at all levels of generation
-    public Map<String, JSONObject> generateAll(JSONObject constraints, YodaEnvironment yodaEnvironment){
+    public Map<String, JSONObject> generateAll(JSONObject constraints, YodaEnvironment yodaEnvironment, int remainingDepth){
         Map<String, JSONObject> ans = new HashMap<>();
+        if (remainingDepth==0)
+            return ans;
         for (Class<? extends Template> templateCls : GrammarRegistry.grammar1){
             try {
-                templateCls.newInstance().generateAll(constraints, yodaEnvironment).
+                templateCls.newInstance().generateAll(constraints, yodaEnvironment, remainingDepth).
                         entrySet().forEach(x -> ans.put(x.getKey(), x.getValue()));
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();

@@ -240,31 +240,8 @@ public class Database {
         return ans;
     }
 
-
-
     public static String getLocalName(String fullName){
         return fullName.split("#")[1];
-    }
-
-    public void outputEntireDatabase(){
-        System.out.println("Outputting Entire Database");
-        String queryString = "SELECT ?x ?y ?z WHERE {?x ?y ?z} ";
-        try {
-            TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
-            TupleQueryResult result = query.evaluate();
-
-
-            while (result.hasNext()){
-                BindingSet bindings = result.next();
-                Value valueOfX = bindings.getValue("x");
-                Value valueOfY = bindings.getValue("y");
-                Value valueOfZ = bindings.getValue("z");
-                System.out.println(valueOfX.stringValue() + " " + valueOfY.stringValue() + " " + valueOfZ.stringValue());
-            }
-
-        } catch (RepositoryException | MalformedQueryException | QueryEvaluationException e) {
-            e.printStackTrace();
-        }
     }
 
     public String mostSpecificClass(String entityName){
@@ -290,9 +267,35 @@ public class Database {
         return null;
     }
 
+    public Set<List<String>> possibleBindings(List<Class<? extends Thing>> classConstraints){
+        Set<List<String>> ans = new HashSet<>();
+        List<String> variables = new LinkedList<>();
+        try {
+            String graph = "";
+            for (int i = 0; i < classConstraints.size(); i++) {
+                variables.add("binding" + i);
+                graph += "?binding" + i + " rdf:type base:" + classConstraints.get(i).getSimpleName() + " . ";
+            }
+            String queryString = prefixes + "SELECT " +String.join(" ", variables.stream().map(x -> "?"+x).collect(Collectors.toList()))
+                    + " WHERE { " + graph + "}";
+//            System.out.println("Database.possibleBindings. qQuerystring:\n"+queryString);
+            TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+            TupleQueryResult result = query.evaluate();
+
+            while (result.hasNext()) {
+                BindingSet bindings = result.next();
+                ans.add(variables.stream().map(bindings::getValue).map(Value::stringValue).collect(Collectors.toList()));
+            }
+        } catch (MalformedQueryException | RepositoryException | QueryEvaluationException e) {
+            e.printStackTrace();
+            throw new Error(e);
+        }
+        return ans;
+
+    }
+
     public double evaluateQualityDegree(List<String> entityURIs, Class<? extends Role> hasQualityRoleClass,
                                         Class<? extends ThingWithRoles> degreeClass){
-//        System.out.println("evaluating quality degree:"+entityURIs + hasQualityRoleClass + degreeClass);
         try {
             double center;
             double slope;
@@ -314,8 +317,6 @@ public class Database {
             String queryString = prefixes + "SELECT ?fuzzy_mapped_quality WHERE {" +
                     q.newInstance().getQualityCalculatorSPARQLQuery().apply(entityURIs) +
                     "BIND(base:LinearFuzzyMap("+center+", "+slope+", ?transient_quality) AS ?fuzzy_mapped_quality)}";
-
-//            System.out.println("query string:\n"+queryString);
 
             TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
             TupleQueryResult result = query.evaluate();
