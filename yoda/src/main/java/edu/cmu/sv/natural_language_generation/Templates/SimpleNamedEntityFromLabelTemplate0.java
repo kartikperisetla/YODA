@@ -46,14 +46,13 @@ public class SimpleNamedEntityFromLabelTemplate0 implements Template {
             JSONObject content = SemanticsModel.parseJSON(constraints.toJSONString());
             SemanticsModel.wrap(content, yodaEnvironment.db.mostSpecificClass(entityURI),
                     HasName.class.getSimpleName());
-            Map<String, JSONObject> tmp = new HashMap<>();
-            tmp.put(label, content);
+            Map<String, JSONObject> nameChunk = new HashMap<>();
+            nameChunk.put(label, content);
             Map<String, Pair<Integer, Integer>> tmp2 = new HashMap<>();
             tmp2.put(HasName.class.getSimpleName(), new ImmutablePair<>(0,0));
-            ans.put(label, GenerationUtils.simpleOrderedCombinations(Arrays.asList(tmp),
-                    x -> x.get(0), tmp2).get(label));
+            GenerationUtils.simpleOrderedCombinations(Arrays.asList(nameChunk),
+                    x -> x.get(0), tmp2).entrySet().forEach(x -> ans.put(x.getKey(), x.getValue()));
         }
-
         return ans;
     }
 }

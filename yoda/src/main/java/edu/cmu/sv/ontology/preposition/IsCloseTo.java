@@ -18,7 +18,7 @@ public class IsCloseTo extends DistancePreposition {
 
     @Override
     public double getSlope() {
-        return 10;
+        return 2;
     }
 
     static Set<LexicalEntry> lexicalEntries = new HashSet<>();

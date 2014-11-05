@@ -75,14 +75,15 @@ public class GenerationUtils {
         IntStream.range(0, chunks.size()).forEach(x -> possibleBindingsInput.put(x, chunks.get(x).entrySet()));
 
         for (Map<Integer, Map.Entry<String, JSONObject>> binding : Combination.possibleBindings(possibleBindingsInput)){
+            String combinedString = "";
             List<String> subStrings = new LinkedList<>();
             List<JSONObject> subContents = new LinkedList<>();
             for (int i = 0; i < chunks.size(); i++) {
                 if (!(binding.get(i).getKey().trim().equals("")))
-                    subStrings.add(binding.get(i).getKey());
+                    combinedString += " "+binding.get(i).getKey().trim();
+                subStrings.add(binding.get(i).getKey());
                 subContents.add(binding.get(i).getValue());
             }
-            String combinedString = String.join(" ", subStrings);
             JSONObject combinedMeaning = compositionFunction.apply(subContents);
             for (String childRole : childNodeChunks.keySet()){
                 addChunkIndices(combinedMeaning, subStrings, childNodeChunks.get(childRole), childRole);
@@ -105,6 +106,10 @@ public class GenerationUtils {
                                              List<String> stringChunks,
                                              Pair<Integer, Integer> selectedChunks,
                                              String pathToChild){
+
+//        System.out.println("GenerationUtils.addChunkIndices stringChunks:"+stringChunks + ", selectedChunks:"+selectedChunks);
+//        System.out.println(composedContent);
+//        System.out.println(pathToChild);
         Integer startingIndex = 0;
         for (int i = 0; i < selectedChunks.getKey(); i++) {
             if (!(stringChunks.get(i).trim().equals("")))

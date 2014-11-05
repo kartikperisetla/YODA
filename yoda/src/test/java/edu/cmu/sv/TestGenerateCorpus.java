@@ -58,14 +58,16 @@ public class TestGenerateCorpus {
 
 
 
-        Map<String, SemanticsModel> corpus = new HashMap<>();
 
         for (String uri : yodaEnvironment.db.runQuerySelectX(poiSelectionQuery)) {
             SemanticsModel ex = new SemanticsModel("{\"dialogAct\": \"Fragment\", \"topic\": " +
                     OntologyRegistry.WebResourceWrap(uri) + "}");
             Map<String, SemanticsModel> tmp = yodaEnvironment.nlg.generateAll(ex, yodaEnvironment);
             for (String key : tmp.keySet()){
-                corpus.put(key, tmp.get(key));
+                System.out.println(key);
+                writer.write("---\n");
+                writer.write(key+"\n");
+                writer.write(tmp.get(key).getInternalRepresentation().toJSONString() + "\n");
             }
 
             // usually, the command won't have a topic,
@@ -74,18 +76,14 @@ public class TestGenerateCorpus {
                     OntologyRegistry.WebResourceWrap(uri) + "}");
             Map<String, SemanticsModel> tmp2 = yodaEnvironment.nlg.generateAll(ex2, yodaEnvironment);
             for (String key : tmp2.keySet()){
-                corpus.put(key, tmp2.get(key));
+                System.out.println(key);
+                writer.write("---\n");
+                writer.write(key+"\n");
+                writer.write(tmp2.get(key).getInternalRepresentation().toJSONString() + "\n");
             }
 
         }
 
-        for (String key : corpus.keySet()){
-            System.out.println(key);
-//            System.out.println(corpus.get(key));
-            writer.write("---\n");
-            writer.write(key+"\n");
-            writer.write(corpus.get(key).getInternalRepresentation().toJSONString()+"\n");
-        }
         writer.close();
 
     }

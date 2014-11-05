@@ -81,7 +81,7 @@ public class DefiniteReferenceWithAdjectiveAndClassTemplate0 implements Template
                 ThingWithRoles.class.isAssignableFrom(OntologyRegistry.thingNameMap.get(mostSpecificClass))) {
 
             // collect adjectives
-            System.out.println("most specific class:"+mostSpecificClass);
+//            System.out.println("most specific class:"+mostSpecificClass);
             for (Class<? extends TransientQuality> qualityClass : OntologyRegistry.qualitiesForClass.get(
                     OntologyRegistry.thingNameMap.get(mostSpecificClass))) {
                 List<Class<? extends Thing>> qualityArguments = OntologyRegistry.qualityArguments(qualityClass);
@@ -120,7 +120,9 @@ public class DefiniteReferenceWithAdjectiveAndClassTemplate0 implements Template
                     if (qualityArguments.size() == 1) {
                         Set<List<String>> bindings = yodaEnvironment.db.possibleBindings(qualityArguments);
                         for (List<String> binding : bindings) {
-                            System.out.println("binding:"+binding);
+                            if (binding.get(0).equals(entityURI)) {
+                                continue;
+                            }
                             List<String> fullArgumentList = new LinkedList<>(Arrays.asList(entityURI));
                             fullArgumentList.addAll(binding);
 
@@ -131,9 +133,9 @@ public class DefiniteReferenceWithAdjectiveAndClassTemplate0 implements Template
                             yodaEnvironment.nlg.generateAll(childContent, yodaEnvironment, remainingDepth-1).
                                     entrySet().forEach(y -> childChunks.put(y.getKey(), y.getValue()));
 
-
                             Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> descriptor =
                                     OntologyRegistry.qualityDescriptors(qualityClass);
+
                             for (Class<? extends ThingWithRoles> prepositionClass : descriptor.getRight()) {
                                 Map<String, JSONObject> ppChunks = new HashMap<>();
                                 double degreeOfMatch = yodaEnvironment.db.
@@ -189,12 +191,12 @@ public class DefiniteReferenceWithAdjectiveAndClassTemplate0 implements Template
         JSONObject child = children.get(4);
 
         // insert the child inside the preposition
-//        System.out.println("PP keyset:"+pp.keySet());
-//        System.out.println("PP:"+pp.toJSONString());
-        List<Object> ppKeys = new LinkedList<>(pp.keySet());
+        List<Object> ppKeys = new LinkedList<Object>(pp.keySet());
         ppKeys.remove("class");
         String hasPPQualityRole = (String) ppKeys.get(0);
         ((JSONObject)pp.get(hasPPQualityRole)).put(InRelationTo.class.getSimpleName(), child);
+//        System.out.println("compositionFunctionWithPP: pp after adding child:");
+//        System.out.println(pp.toJSONString());
 
         SemanticsModel ans = new SemanticsModel(cls.toJSONString());
         ans.extendAndOverwrite(new SemanticsModel(adj.toJSONString()));

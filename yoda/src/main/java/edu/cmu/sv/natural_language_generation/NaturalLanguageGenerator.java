@@ -2,17 +2,17 @@ package edu.cmu.sv.natural_language_generation;
 
 import edu.cmu.sv.YodaEnvironment;
 import edu.cmu.sv.semantics.SemanticsModel;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * YODA's built-in NLG module
  */
 public class NaturalLanguageGenerator {
+
     YodaEnvironment yodaEnvironment;
 
     public NaturalLanguageGenerator(YodaEnvironment yodaEnvironment) {
@@ -29,7 +29,6 @@ public class NaturalLanguageGenerator {
     }
 
     public Map<String, SemanticsModel> generateAll(SemanticsModel model, YodaEnvironment yodaEnvironment){
-
         Map<String, SemanticsModel> ans = new HashMap<>();
         for (Class<? extends Template> templateCls : GrammarRegistry.grammar1_roots){
             try {
