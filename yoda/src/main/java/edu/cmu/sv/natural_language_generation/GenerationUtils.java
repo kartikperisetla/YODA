@@ -16,12 +16,16 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
  * Created by David Cohen on 10/30/14.
  */
 public class GenerationUtils {
+
+    public static int limitPerPreposition = 3;
+//    static int maxCombinations = 5;
 
     public static Set<String> getPOSForClass(Class<? extends Thing> cls, String partOfSpeech){
         Set<String> ans = new HashSet<>();
@@ -46,20 +50,6 @@ public class GenerationUtils {
         }
         return ans;
     }
-
-
-//    public static Set<Pair<Class<? extends HasQualityRole>, Class<? extends Adjective>>> applicableAdjectives
-//            (Class<? extends ThingWithRoles> individualClass){
-//        Set<Pair<Class<? extends HasQualityRole>, Class<? extends Adjective>>> ans = new HashSet<>();
-//        for (Class <? extends Adjective> aqdClass : OntologyRegistry.absoluteTransientQualityDegreeClasses){
-//            for (Class <? extends HasQualityRole> roleCls : OntologyRegistry.qualityRoleClasses){
-//                if (OntologyRegistry.inDomain(roleCls, individualClass) && OntologyRegistry.inRange(roleCls, aqdClass))
-//                    ans.add(new ImmutablePair<>(roleCls, aqdClass));
-//            }
-//        }
-//        return ans;
-//    }
-
 
     /*
     * Return all combinations of strings and composed semantics objects,

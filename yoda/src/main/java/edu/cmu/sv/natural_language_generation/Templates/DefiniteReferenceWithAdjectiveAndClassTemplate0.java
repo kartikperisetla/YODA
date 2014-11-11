@@ -10,6 +10,7 @@ import edu.cmu.sv.ontology.ThingWithRoles;
 import edu.cmu.sv.ontology.adjective.Adjective;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.ontology.misc.WebResource;
+import edu.cmu.sv.ontology.preposition.Preposition;
 import edu.cmu.sv.ontology.quality.TransientQuality;
 import edu.cmu.sv.ontology.role.HasURI;
 import edu.cmu.sv.ontology.role.InRelationTo;
@@ -118,6 +119,13 @@ public class DefiniteReferenceWithAdjectiveAndClassTemplate0 implements Template
                     List<Class<? extends Thing>> qualityArguments = OntologyRegistry.qualityArguments(qualityClass);
                     // iterate through every possible binding for the quality arguments
                     if (qualityArguments.size() == 1) {
+                        Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> descriptor =
+                                OntologyRegistry.qualityDescriptors(qualityClass);
+                        // init preposition counter
+                        Map<Class<? extends ThingWithRoles>, Integer> prepositionUsageCounter = new HashMap<>();
+                        for (Class<? extends ThingWithRoles> prepositionClass : descriptor.getRight())
+                            prepositionUsageCounter.put(prepositionClass, 0);
+
                         Set<List<String>> bindings = yodaEnvironment.db.possibleBindings(qualityArguments);
                         for (List<String> binding : bindings) {
                             if (binding.get(0).equals(entityURI)) {
@@ -126,22 +134,27 @@ public class DefiniteReferenceWithAdjectiveAndClassTemplate0 implements Template
                             List<String> fullArgumentList = new LinkedList<>(Arrays.asList(entityURI));
                             fullArgumentList.addAll(binding);
 
-                            // prepositions
+                            // nested noun phrases
                             Map<String, JSONObject> childChunks = new HashMap<>();
-                            JSONObject childContent = SemanticsModel.parseJSON(
-                                    OntologyRegistry.WebResourceWrap(binding.get(0)));
-                            yodaEnvironment.nlg.generateAll(childContent, yodaEnvironment, remainingDepth-1).
-                                    entrySet().forEach(y -> childChunks.put(y.getKey(), y.getValue()));
+                            JSONObject childContent = null;
 
-                            Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> descriptor =
-                                    OntologyRegistry.qualityDescriptors(qualityClass);
-
+                            // prepositions
                             for (Class<? extends ThingWithRoles> prepositionClass : descriptor.getRight()) {
+                                if (prepositionUsageCounter.get(prepositionClass) == GenerationUtils.limitPerPreposition)
+                                    continue;
                                 Map<String, JSONObject> ppChunks = new HashMap<>();
                                 double degreeOfMatch = yodaEnvironment.db.
                                         evaluateQualityDegree(fullArgumentList,
                                                 descriptor.getLeft(), prepositionClass);
                                 if (degreeOfMatch > 0.5) {
+
+                                    if (childContent==null){
+                                        childContent = SemanticsModel.parseJSON(
+                                                OntologyRegistry.WebResourceWrap(binding.get(0)));
+                                        yodaEnvironment.nlg.generateAll(childContent, yodaEnvironment, remainingDepth-1).
+                                                entrySet().forEach(y -> childChunks.put(y.getKey(), y.getValue()));
+                                    }
+
                                     Set<String> ppStrings = GenerationUtils.getPOSForClass(prepositionClass, "relationalPrepositionalPhrases");
                                     for (String ppString : ppStrings) {
                                         JSONObject tmp = SemanticsModel.parseJSON("{\"class\":\"" + prepositionClass.getSimpleName() + "\"}");
@@ -149,6 +162,8 @@ public class DefiniteReferenceWithAdjectiveAndClassTemplate0 implements Template
                                                 descriptor.getLeft().getSimpleName());
                                         ppChunks.put(ppString, tmp);
                                     }
+
+                                    prepositionUsageCounter.put(prepositionClass, prepositionUsageCounter.get(prepositionClass)+1);
                                 }
 
                                 // collect the referent strings that contain this PP

@@ -55,10 +55,6 @@ public class TestGenerateCorpus {
             }
         }
 
-
-
-
-
         for (String uri : yodaEnvironment.db.runQuerySelectX(poiSelectionQuery)) {
             SemanticsModel ex = new SemanticsModel("{\"dialogAct\": \"Fragment\", \"topic\": " +
                     OntologyRegistry.WebResourceWrap(uri) + "}");
@@ -83,7 +79,6 @@ public class TestGenerateCorpus {
                 writer.write(key+"\n");
                 writer.write(tmp2.get(key).getInternalRepresentation().toJSONString() + "\n");
             }
-
         }
 
         writer.close();
