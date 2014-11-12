@@ -341,6 +341,7 @@ public class Database {
                 if (result.hasNext()){
                     BindingSet bindings = result.next();
                 }
+                result.close();
             } catch (MalformedQueryException | RepositoryException | QueryEvaluationException e) {
                 e.printStackTrace();
                 throw new Error(e);
