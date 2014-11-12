@@ -7,6 +7,8 @@ import org.openrdf.model.ValueFactory;
 import org.openrdf.query.algebra.evaluation.ValueExprEvaluationException;
 import org.openrdf.query.algebra.evaluation.function.Function;
 
+import java.util.LinkedList;
+
 /**
  * Created by David Cohen on 11/2/14.
  * Function to compute the transient distance between two physical objects.
@@ -14,7 +16,6 @@ import org.openrdf.query.algebra.evaluation.function.Function;
  */
 @MetaInfServices
 public class DistanceFunction implements Function{
-    static int R = 6371;
     @Override
     public String getURI() {
         return Database.baseURI+this.getClass().getSimpleName();
@@ -31,10 +32,14 @@ public class DistanceFunction implements Function{
         double lon1 = ((Literal)values[1]).doubleValue();
         double lat2 = ((Literal)values[2]).doubleValue();
         double lon2 = ((Literal)values[3]).doubleValue();
+//        System.out.println("DistanceFunction: lat2:"+lat2+", lon2:"+lon2+", lat1:"+lat1+", lon1:"+lon1);
         double unscaledDistanceSq = 0.5 - Math.cos((lat2 - lat1) * Math.PI / 180)/2 +
                 Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
                 (1 - Math.cos((lon2 - lon1) * Math.PI / 180))/2;
-        double distanceInKilometers = R * 2 * Math.asin(Math.sqrt(unscaledDistanceSq));
-        return valueFactory.createLiteral(1.0 - Math.exp(-1*distanceInKilometers));
+        double distanceInKilometers = 6371 * 2 * Math.asin(Math.sqrt(unscaledDistanceSq));
+//        System.out.println("DistanceFunction: distance in km computed:"+distanceInKilometers);
+        double ans = 1.0 - Math.exp(-1 * distanceInKilometers);
+//        System.out.println("ans computed:"+ ans);
+        return valueFactory.createLiteral(ans);
     }
 }

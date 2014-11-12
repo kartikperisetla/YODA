@@ -21,6 +21,7 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
+import org.openrdf.rio.Rio;
 import org.openrdf.sail.inferencer.fc.ForwardChainingRDFSInferencer;
 import org.openrdf.sail.memory.MemoryStore;
 
@@ -46,6 +47,14 @@ public class Database {
             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
             "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
             "PREFIX base: <"+baseURI+">\n";
+
+
+    /*
+    * log interactions with the database
+    * */
+    public void log(String interaction){
+//        System.out.println(interaction);
+    }
 
     public Database(YodaEnvironment yodaEnvironment) {
         this.yodaEnvironment = yodaEnvironment;
@@ -74,8 +83,22 @@ public class Database {
                         baseURI, RDFFormat.TURTLE);
             }
 
+            // load the non-ontology relations
+            addNonOntologyProperties(DatabaseRegistry.nonOntologyRelations);
+
+
+            String sampleCrashQuery = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
+                    "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
+                    "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
+                    "PREFIX base: <http://sv.cmu.edu/yoda#>\n" +
+                    "SELECT ?fuzzy_mapped_quality WHERE {<http://sv.cmu.edu/yoda#POI_1016459001> base:gps_lat ?i ; base:gps_lon ?j . <http://sv.cmu.edu/yoda#POI_1312454947> base:gps_lat ?k ; base:gps_lon ?l . BIND(base:DistanceFunction(?i, ?j, ?k, ?l) AS ?transient_quality) BIND(base:LinearFuzzyMap(0.0, 2.0, ?transient_quality) AS ?fuzzy_mapped_quality)}\n";
+            runQueryForever(sampleCrashQuery);
+
+//            System.exit(0);
+
         } catch (RepositoryException | RDFParseException | IOException | MalformedQueryException | UpdateExecutionException e) {
             e.printStackTrace();
+            System.exit(0);
         }
 
     }
@@ -88,9 +111,25 @@ public class Database {
             insertString += "base:"+key+" rdf:type base:"+cls.getSimpleName()+" .\n";
         }
         insertString+="}";
+        log(insertString);
         Update update = connection.prepareUpdate(QueryLanguage.SPARQL, insertString);
         update.execute();
     }
+
+    public void addNonOntologyProperties(Set<String> properties)
+            throws MalformedQueryException, RepositoryException, UpdateExecutionException {
+
+        String insertString = prefixes+"INSERT DATA\n{\n";
+        for (String prop : properties){
+            insertString += "base:"+prop+" rdf:type rdf:Property . \n";
+        }
+        insertString += "}";
+        log(insertString);
+        Update update = connection.prepareUpdate(QueryLanguage.SPARQL, insertString);
+        update.execute();
+
+    }
+
 
     /*
     * Insert all the classes and properties of an ontology into the database.
@@ -100,7 +139,7 @@ public class Database {
     public void generateClassHierarchy(Set<Class> classes, Set<Class> properties)
             throws MalformedQueryException, RepositoryException, UpdateExecutionException {
 
-        String insertString = prefixes+"INSERT DATA\n{\n";
+        String insertString = prefixes+"INSERT DATA {\n";
         for (Class cls : classes){
             insertString += generateTriple(cls, "rdf:type", "rdfs:Class")+".\n";
             if (cls != Noun.class && cls != Verb.class) {
@@ -115,6 +154,7 @@ public class Database {
         }
         insertString += "}";
 //        System.out.println("Creating ontology, insert string:\n" + insertString);
+        log(insertString);
         Update update = connection.prepareUpdate(QueryLanguage.SPARQL, insertString);
         update.execute();
     }
@@ -163,20 +203,10 @@ public class Database {
 
         String updateString = prefixes+"INSERT DATA \n{ base:"+subject+" "+predicate+" base:"+object+" }";
 //        System.out.println("attempting the following sparql update string:\n"+updateString);
+        log(updateString);
         Update update = connection.prepareUpdate(QueryLanguage.SPARQL, updateString, baseURI);
         update.execute();
     }
-
-    public void insertStatement(String updateString) {
-        Update update = null;
-        try {
-            update = connection.prepareUpdate(QueryLanguage.SPARQL, updateString, baseURI);
-            update.execute();
-        } catch (RepositoryException | MalformedQueryException | UpdateExecutionException e) {
-            e.printStackTrace();
-        }
-    }
-
 
     /*
     * Insert a data value to the triple store, return the unique identifier
@@ -186,11 +216,13 @@ public class Database {
         if (obj instanceof String){
             String updateString = prefixes+"INSERT DATA \n{ base:"+newURI+" rdf:value \""+obj+"\"^^xsd:string}";
 //            System.out.println("Database.insertValue: updateString:"+updateString);
+            log(updateString);
             Update update = connection.prepareUpdate(QueryLanguage.SPARQL, updateString, baseURI);
             update.execute();
         } else if (obj instanceof Integer){
             String updateString = prefixes+"INSERT DATA \n{ base:"+newURI+" rdf:value \""+obj+"\"^^xsd:int}";
 //            System.out.println("Database.insertValue: updateString:"+updateString);
+            log(updateString);
             Update update = connection.prepareUpdate(QueryLanguage.SPARQL, updateString, baseURI);
             update.execute();
         } else {
@@ -203,6 +235,7 @@ public class Database {
     * Run a sparql query on the database and return all values for the variable x
     * */
     public Set<String> runQuerySelectX(String queryString){
+        log(queryString);
         Set<String> ans = new HashSet<>();
         try {
             TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
@@ -223,6 +256,7 @@ public class Database {
     * Run a sparql query on the database and return all value pairs for the variables x and y
     * */
     public Set<Pair<String, String>> runQuerySelectXAndY(String queryString){
+        log(queryString);
         Set<Pair<String, String>> ans = new HashSet<>();
         try {
             TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
@@ -279,6 +313,7 @@ public class Database {
             String queryString = prefixes + "SELECT " +String.join(" ", variables.stream().map(x -> "?"+x).collect(Collectors.toList()))
                     + " WHERE { " + graph + "}";
 //            System.out.println("Database.possibleBindings. qQuerystring:\n"+queryString);
+            log(queryString);
             TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
             TupleQueryResult result = query.evaluate();
 
@@ -294,37 +329,65 @@ public class Database {
 
     }
 
+    public void runQueryForever(String queryString){
+        long numSuccessfulRuns = 0;
+        while (true){
+            numSuccessfulRuns++;
+            if (numSuccessfulRuns%100==0)
+                System.out.println(numSuccessfulRuns);
+            try{
+                TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+                TupleQueryResult result = query.evaluate();
+                if (result.hasNext()){
+                    BindingSet bindings = result.next();
+                }
+            } catch (MalformedQueryException | RepositoryException | QueryEvaluationException e) {
+                e.printStackTrace();
+                throw new Error(e);
+            }
+        }
+    }
+
+
     public double evaluateQualityDegree(List<String> entityURIs, Class<? extends Role> hasQualityRoleClass,
                                         Class<? extends ThingWithRoles> degreeClass){
+        System.out.println("database.evaluateQualityDegree: entityURI's.size():"+entityURIs.size()+", ");
         try {
             double center;
             double slope;
-            Class<? extends TransientQuality> q;
+            Class<? extends TransientQuality> qualityClass;
             if (Preposition.class.isAssignableFrom(degreeClass)) {
                 Preposition preposition = (Preposition) degreeClass.newInstance();
                 center = preposition.getCenter();
                 slope = preposition.getSlope();
-                q = preposition.getQuality();
+                qualityClass = preposition.getQuality();
             } else if (Adjective.class.isAssignableFrom(degreeClass)) {
                 Adjective adjective = (Adjective) degreeClass.newInstance();
                 center = adjective.getCenter();
                 slope = adjective.getSlope();
-                q = adjective.getQuality();
+                qualityClass = adjective.getQuality();
             } else {
                 throw new Error("degreeClass is neither an Adjective nor a Preposition class");
             }
+            System.out.println("Database.evaluateQualityDegree: degreeClass:"+degreeClass.getSimpleName()+", center:"+center+", slope:"+slope+", qualityClass:"+qualityClass.getSimpleName());
+
 
             String queryString = prefixes + "SELECT ?fuzzy_mapped_quality WHERE {" +
-                    q.newInstance().getQualityCalculatorSPARQLQuery().apply(entityURIs) +
+                    qualityClass.newInstance().getQualityCalculatorSPARQLQuery().apply(entityURIs) +
                     "BIND(base:LinearFuzzyMap("+center+", "+slope+", ?transient_quality) AS ?fuzzy_mapped_quality)}";
-
+            log(queryString);
+            System.out.println(queryString);
+            System.out.println("preparing tuple query");
             TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+            System.out.println("evaluating query");
             TupleQueryResult result = query.evaluate();
-
+            System.out.println("done evaluating query");
             if (result.hasNext()){
                 BindingSet bindings = result.next();
+                System.out.println("Database.evaluateQualityDegree: result:"+bindings.getValue("fuzzy_mapped_quality").stringValue());
                 return (Double.parseDouble(bindings.getValue("fuzzy_mapped_quality").stringValue()));
             }
+            System.out.println("!!! Database.evaluateQualityDegree: no result was returned from the query");
 
         } catch (InstantiationException | IllegalAccessException | MalformedQueryException | RepositoryException | QueryEvaluationException e) {
             e.printStackTrace();

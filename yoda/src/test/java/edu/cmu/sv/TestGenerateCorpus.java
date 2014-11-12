@@ -23,6 +23,7 @@ public class TestGenerateCorpus {
 
     @Test
     public void Test() throws FileNotFoundException, UnsupportedEncodingException {
+
         String outputFileName = "/home/cohend/YODA_corpus.txt";
         PrintWriter writer = new PrintWriter(outputFileName, "UTF-8");
 
@@ -32,15 +33,7 @@ public class TestGenerateCorpus {
                 "SELECT ?x WHERE { ?x rdf:type base:PointOfInterest . \n }";
         String restaurantSelectionQuery = yodaEnvironment.db.prefixes +
                 "SELECT ?x WHERE { ?x rdf:type base:Restaurant . \n }";
-        List<String> poiURIList = new LinkedList<>(yodaEnvironment.db.runQuerySelectX(poiSelectionQuery));
         List<String> restaurantURIList = new LinkedList<>(yodaEnvironment.db.runQuerySelectX(restaurantSelectionQuery));
-
-        // randomly insert the IsCloseTo relation between two POIs
-        for (int i = 0; i < 100; i++) {
-            String isCloseToInsertString = yodaEnvironment.db.prefixes +
-                    "INSERT DATA \n{<"+poiURIList.get(2*i)+"> base:IsCloseTo <"+poiURIList.get(2*i+1)+">}";
-            yodaEnvironment.db.insertStatement(isCloseToInsertString);
-        }
 
         Random r = new Random();
         for (String restaurantURI : restaurantURIList){
@@ -60,8 +53,8 @@ public class TestGenerateCorpus {
                     OntologyRegistry.WebResourceWrap(uri) + "}");
             Map<String, SemanticsModel> tmp = yodaEnvironment.nlg.generateAll(ex, yodaEnvironment);
             for (String key : tmp.keySet()){
-                System.out.println(key);
-                System.out.println(tmp.get(key).getInternalRepresentation().toJSONString() + "\n");
+//                System.out.println(key);
+//                System.out.println(tmp.get(key).getInternalRepresentation().toJSONString() + "\n");
                 writer.write("---\n");
                 writer.write(key+"\n");
                 writer.write(tmp.get(key).getInternalRepresentation().toJSONString() + "\n");
@@ -73,12 +66,18 @@ public class TestGenerateCorpus {
                     OntologyRegistry.WebResourceWrap(uri) + "}");
             Map<String, SemanticsModel> tmp2 = yodaEnvironment.nlg.generateAll(ex2, yodaEnvironment);
             for (String key : tmp2.keySet()){
-                System.out.println(key);
-                System.out.println(tmp2.get(key).getInternalRepresentation().toJSONString() + "\n");
+//                System.out.println(key);
+//                System.out.println(tmp2.get(key).getInternalRepresentation().toJSONString() + "\n");
                 writer.write("---\n");
                 writer.write(key+"\n");
                 writer.write(tmp2.get(key).getInternalRepresentation().toJSONString() + "\n");
             }
+
+            String queryString = yodaEnvironment.db.prefixes +
+                    "SELECT ?x WHERE { FILTER ( dataType(?x) = xsd:decimal ) }";
+
+            System.out.println("number of floats in the database:" + yodaEnvironment.db.runQuerySelectX(queryString).size());
+
         }
 
         writer.close();

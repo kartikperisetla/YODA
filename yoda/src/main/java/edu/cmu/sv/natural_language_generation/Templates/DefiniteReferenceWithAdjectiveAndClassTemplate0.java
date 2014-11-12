@@ -21,6 +21,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
+import org.openrdf.query.algebra.Str;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -126,7 +127,9 @@ public class DefiniteReferenceWithAdjectiveAndClassTemplate0 implements Template
                         for (Class<? extends ThingWithRoles> prepositionClass : descriptor.getRight())
                             prepositionUsageCounter.put(prepositionClass, 0);
 
+                        System.out.println("DefRefWithAdjAndClass(AndPP): about to collect bindings for preposition quality arguments. Args:"+qualityArguments);
                         Set<List<String>> bindings = yodaEnvironment.db.possibleBindings(qualityArguments);
+                        System.out.println("DefRefWithAdjAndClass(AndPP): done collecting bindings for quality arguments, about to iterate through them");
                         for (List<String> binding : bindings) {
                             if (binding.get(0).equals(entityURI)) {
                                 continue;
@@ -143,16 +146,25 @@ public class DefiniteReferenceWithAdjectiveAndClassTemplate0 implements Template
                                 if (prepositionUsageCounter.get(prepositionClass) == GenerationUtils.limitPerPreposition)
                                     continue;
                                 Map<String, JSONObject> ppChunks = new HashMap<>();
+//                                System.out.println("DefRefWithAdjAndClass(AndPP): about to calculate degree of match"+ descriptor.getLeft() + ", "+prepositionClass);
                                 double degreeOfMatch = yodaEnvironment.db.
                                         evaluateQualityDegree(fullArgumentList,
                                                 descriptor.getLeft(), prepositionClass);
+//                                System.out.println("DefRefWithAdjAndClass(AndPP): done calculating degree of match");
+
                                 if (degreeOfMatch > 0.5) {
 
                                     if (childContent==null){
                                         childContent = SemanticsModel.parseJSON(
                                                 OntologyRegistry.WebResourceWrap(binding.get(0)));
-                                        yodaEnvironment.nlg.generateAll(childContent, yodaEnvironment, remainingDepth-1).
-                                                entrySet().forEach(y -> childChunks.put(y.getKey(), y.getValue()));
+                                        System.out.println("DefRefWithAdjAndClass(AndPP): about to generate nested NPs. remainingDepth="+remainingDepth);
+                                        for (Map.Entry<String, JSONObject> entry : yodaEnvironment.nlg.
+                                                generateAll(childContent, yodaEnvironment, remainingDepth-1).entrySet()){
+                                            childChunks.put(entry.getKey(), entry.getValue());
+                                        }
+                                        System.out.println("DefRefWithAdjAndClass(AndPP): finished generating nested NPs");
+//                                        yodaEnvironment.nlg.generateAll(childContent, yodaEnvironment, remainingDepth-1).
+//                                                entrySet().forEach(y -> childChunks.put(y.getKey(), y.getValue()));
                                     }
 
                                     Set<String> ppStrings = GenerationUtils.getPOSForClass(prepositionClass, "relationalPrepositionalPhrases");
