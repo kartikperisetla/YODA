@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * Generates {cls:UnknownThingWithRoles, X:HasAQD: {cls: Y:aqd}}
  *
  */
-public class DefiniteReference0 implements Template {
+public class DefiniteReferenceTemplate0 implements Template {
     static JSONObject applicabilityConstraint;
     static {
         try {
@@ -190,7 +190,7 @@ public class DefiniteReference0 implements Template {
                                 Map<String, Pair<Integer, Integer>> childChunkingIndexMap = new HashMap<>();
                                 childChunkingIndexMap.put(descriptor.getLeft().getSimpleName() + "." + InRelationTo.class.getSimpleName(), new ImmutablePair<>(4, 4));
                                 for (Map.Entry<String, JSONObject> entry : GenerationUtils.simpleOrderedCombinations(chunks,
-                                        DefiniteReference0::compositionFunctionWithPrepositionPhrase, childChunkingIndexMap, yodaEnvironment).entrySet()) {
+                                        DefiniteReferenceTemplate0::compositionFunctionWithPrepositionPhrase, childChunkingIndexMap, yodaEnvironment).entrySet()) {
                                     ans.put(entry.getKey(), entry.getValue());
                                 }
                             }
@@ -203,7 +203,7 @@ public class DefiniteReference0 implements Template {
         // compose without PP
         List<Map<String, JSONObject>> chunks = Arrays.asList(detChunks, adjChunks, clsChunks);
         for (Map.Entry<String, JSONObject> entry : GenerationUtils.simpleOrderedCombinations(chunks,
-                DefiniteReference0::compositionFunction, new HashMap<>(), yodaEnvironment).entrySet()){
+                DefiniteReferenceTemplate0::compositionFunction, new HashMap<>(), yodaEnvironment).entrySet()){
             ans.put(entry.getKey(), entry.getValue());
         }
         return ans;

@@ -18,7 +18,6 @@ public class Grammar {
         public int maxUtteranceDepth;
         public int maxNounPhraseDepth;
         public int maxPhrasesPerPreposition;
-        //todo: include maxCombinations and maxWordForms to prevent over-generation of lexical items and word combinations
         public int maxCombinations;
         public int maxWordForms;
         Map<Class<? extends Template>, Double> templateProbability;
@@ -40,8 +39,10 @@ public class Grammar {
 
     static {
         grammar1.add(SimpleNamedEntity0.class);
-        grammar1.add(DefiniteReference0.class);
+        grammar1.add(DefiniteReferenceTemplate0.class);
+        grammar1.add(PPTemplate0.class);
         grammar1_roots.add(FragmentTemplate0.class);
         grammar1_roots.add(CommandTemplate0.class);
+        grammar1_roots.add(HasPropertyYNQTemplate0.class);
     }
 }

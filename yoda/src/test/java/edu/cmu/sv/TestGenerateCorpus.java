@@ -2,9 +2,16 @@ package edu.cmu.sv;
 
 import edu.cmu.sv.natural_language_generation.Grammar;
 import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
+import edu.cmu.sv.ontology.preposition.Preposition;
+import edu.cmu.sv.ontology.quality.TransientQuality;
 import edu.cmu.sv.ontology.quality.unary_quality.Expensiveness;
+import edu.cmu.sv.ontology.role.Agent;
+import edu.cmu.sv.ontology.role.Patient;
 import edu.cmu.sv.ontology.role.has_quality_subroles.HasExpensiveness;
+import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.semantics.SemanticsModel;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.YNQuestion;
 import org.junit.Test;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryLanguage;
@@ -24,6 +31,7 @@ public class TestGenerateCorpus {
 
     @Test
     public void Test() throws FileNotFoundException, UnsupportedEncodingException {
+        String empty = "{\"class\":\""+UnknownThingWithRoles.class.getSimpleName()+"\"}";
 
         String outputFileName = "/home/cohend/YODA_corpus.txt";
         PrintWriter writer = new PrintWriter(outputFileName, "UTF-8");
@@ -52,9 +60,23 @@ public class TestGenerateCorpus {
         Grammar.GrammarPreferences corpusPreferences = new Grammar.GrammarPreferences(.01, .2, 5, 2, 5, 5, 2, new HashMap<>());
 
         for (String uri : yodaEnvironment.db.runQuerySelectX(poiSelectionQuery)) {
-            SemanticsModel ex = new SemanticsModel("{\"dialogAct\": \"Fragment\", \"topic\": " +
+
+            SemanticsModel ex0 = new SemanticsModel("{\"dialogAct\":\'"+YNQuestion.class.getSimpleName()+
+                    "\", \"verb\": {\"class\":\""+
+                    HasProperty.class.getSimpleName()+"\", \""+
+                    Agent.class.getSimpleName()+"\":"+empty+", \""+
+                    Patient.class.getSimpleName()+"\":"+empty+"}}");
+
+            for (Class<? extends Preposition> prepositionClass : OntologyRegistry.prepositionClasses){
+                //todo: generate YNQ's with PP's acting as the requested property
+            }
+
+
+
+
+            SemanticsModel ex1 = new SemanticsModel("{\"dialogAct\": \"Fragment\", \"topic\": " +
                     OntologyRegistry.WebResourceWrap(uri) + "}");
-            Map<String, SemanticsModel> tmp = yodaEnvironment.nlg.generateAll(ex, yodaEnvironment, corpusPreferences);
+            Map<String, SemanticsModel> tmp = yodaEnvironment.nlg.generateAll(ex1, yodaEnvironment, corpusPreferences);
             for (String key : tmp.keySet()){
                 System.out.println(key);
 //                System.out.println(tmp.get(key).getInternalRepresentation().toJSONString() + "\n");
