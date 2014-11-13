@@ -1,9 +1,8 @@
 package edu.cmu.sv.natural_language_generation.Templates;
 
 import edu.cmu.sv.YodaEnvironment;
-import edu.cmu.sv.natural_language_generation.GrammarRegistry;
+import edu.cmu.sv.natural_language_generation.Grammar;
 import edu.cmu.sv.natural_language_generation.Template;
-import edu.cmu.sv.ontology.misc.WebResource;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
 import org.json.simple.JSONObject;
@@ -38,7 +37,7 @@ public class FragmentTemplate0 implements Template {
 
         // generate the noun phrase chunks
         Map<String, JSONObject> nounPhraseChunks = yodaEnvironment.nlg.
-                generateAll(topicWebResource, yodaEnvironment, GrammarRegistry.MAX_NP_DEPTH);
+                generateAll(topicWebResource, yodaEnvironment, yodaEnvironment.nlg.grammarPreferences.maxNounPhraseDepth);
 
         for (String key : nounPhraseChunks.keySet()){
             JSONObject content = nounPhraseChunks.get(key);

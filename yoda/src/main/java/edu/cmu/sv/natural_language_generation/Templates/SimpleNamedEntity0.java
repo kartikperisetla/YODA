@@ -17,7 +17,7 @@ import java.util.*;
 /**
  * Created by David Cohen on 10/29/14.
  */
-public class SimpleNamedEntityFromLabelTemplate0 implements Template {
+public class SimpleNamedEntity0 implements Template {
     static JSONObject applicabilityConstraint;
     static {
         try {
@@ -51,7 +51,7 @@ public class SimpleNamedEntityFromLabelTemplate0 implements Template {
             Map<String, Pair<Integer, Integer>> tmp2 = new HashMap<>();
             tmp2.put(HasName.class.getSimpleName(), new ImmutablePair<>(0,0));
             GenerationUtils.simpleOrderedCombinations(Arrays.asList(nameChunk),
-                    x -> x.get(0), tmp2).entrySet().forEach(x -> ans.put(x.getKey(), x.getValue()));
+                    x -> x.get(0), tmp2, yodaEnvironment).entrySet().forEach(x -> ans.put(x.getKey(), x.getValue()));
         }
         return ans;
     }

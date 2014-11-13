@@ -87,12 +87,12 @@ public class Database {
             addNonOntologyProperties(DatabaseRegistry.nonOntologyRelations);
 
 
-            String sampleCrashQuery = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
-                    "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
-                    "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
-                    "PREFIX base: <http://sv.cmu.edu/yoda#>\n" +
-                    "SELECT ?fuzzy_mapped_quality WHERE {<http://sv.cmu.edu/yoda#POI_1016459001> base:gps_lat ?i ; base:gps_lon ?j . <http://sv.cmu.edu/yoda#POI_1312454947> base:gps_lat ?k ; base:gps_lon ?l . BIND(base:DistanceFunction(?i, ?j, ?k, ?l) AS ?transient_quality) BIND(base:LinearFuzzyMap(0.0, 2.0, ?transient_quality) AS ?fuzzy_mapped_quality)}\n";
-            runQueryForever(sampleCrashQuery);
+//            String sampleCrashQuery = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
+//                    "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
+//                    "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
+//                    "PREFIX base: <http://sv.cmu.edu/yoda#>\n" +
+//                    "SELECT ?fuzzy_mapped_quality WHERE {<http://sv.cmu.edu/yoda#POI_1016459001> base:gps_lat ?i ; base:gps_lon ?j . <http://sv.cmu.edu/yoda#POI_1312454947> base:gps_lat ?k ; base:gps_lon ?l . BIND(base:DistanceFunction(?i, ?j, ?k, ?l) AS ?transient_quality) BIND(base:LinearFuzzyMap(0.0, 2.0, ?transient_quality) AS ?fuzzy_mapped_quality)}\n";
+//            runQueryForever(sampleCrashQuery);
 
 //            System.exit(0);
 
@@ -245,6 +245,7 @@ public class Database {
                 BindingSet bindings = result.next();
                 ans.add(bindings.getValue("x").stringValue());
             }
+            result.close();
 
         } catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {
             e.printStackTrace();
@@ -267,6 +268,7 @@ public class Database {
                 ans.add(new ImmutablePair<>(bindings.getValue("x").stringValue(),
                         bindings.getValue("y").stringValue()));
             }
+            result.close();
 
         } catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {
             e.printStackTrace();
@@ -321,6 +323,7 @@ public class Database {
                 BindingSet bindings = result.next();
                 ans.add(variables.stream().map(bindings::getValue).map(Value::stringValue).collect(Collectors.toList()));
             }
+            result.close();
         } catch (MalformedQueryException | RepositoryException | QueryEvaluationException e) {
             e.printStackTrace();
             throw new Error(e);
@@ -352,7 +355,6 @@ public class Database {
 
     public double evaluateQualityDegree(List<String> entityURIs, Class<? extends Role> hasQualityRoleClass,
                                         Class<? extends ThingWithRoles> degreeClass){
-        System.out.println("database.evaluateQualityDegree: entityURI's.size():"+entityURIs.size()+", ");
         try {
             double center;
             double slope;
@@ -370,31 +372,26 @@ public class Database {
             } else {
                 throw new Error("degreeClass is neither an Adjective nor a Preposition class");
             }
-            System.out.println("Database.evaluateQualityDegree: degreeClass:"+degreeClass.getSimpleName()+", center:"+center+", slope:"+slope+", qualityClass:"+qualityClass.getSimpleName());
 
 
             String queryString = prefixes + "SELECT ?fuzzy_mapped_quality WHERE {" +
                     qualityClass.newInstance().getQualityCalculatorSPARQLQuery().apply(entityURIs) +
                     "BIND(base:LinearFuzzyMap("+center+", "+slope+", ?transient_quality) AS ?fuzzy_mapped_quality)}";
             log(queryString);
-            System.out.println(queryString);
-            System.out.println("preparing tuple query");
             TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
-            System.out.println("evaluating query");
             TupleQueryResult result = query.evaluate();
-            System.out.println("done evaluating query");
+            Double ans = null;
             if (result.hasNext()){
                 BindingSet bindings = result.next();
-                System.out.println("Database.evaluateQualityDegree: result:"+bindings.getValue("fuzzy_mapped_quality").stringValue());
-                return (Double.parseDouble(bindings.getValue("fuzzy_mapped_quality").stringValue()));
+                ans = Double.parseDouble(bindings.getValue("fuzzy_mapped_quality").stringValue());
             }
-            System.out.println("!!! Database.evaluateQualityDegree: no result was returned from the query");
+            result.close();
+            return ans;
 
         } catch (InstantiationException | IllegalAccessException | MalformedQueryException | RepositoryException | QueryEvaluationException e) {
             e.printStackTrace();
             throw new Error(e);
         }
-        throw new Error("no value could be determined");
     }
 
 

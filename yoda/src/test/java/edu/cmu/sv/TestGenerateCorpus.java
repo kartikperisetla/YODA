@@ -1,5 +1,6 @@
 package edu.cmu.sv;
 
+import edu.cmu.sv.natural_language_generation.Grammar;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.quality.unary_quality.Expensiveness;
 import edu.cmu.sv.ontology.role.has_quality_subroles.HasExpensiveness;
@@ -48,14 +49,16 @@ public class TestGenerateCorpus {
             }
         }
 
+        Grammar.GrammarPreferences corpusPreferences = new Grammar.GrammarPreferences(.01, .2, 5, 2, 5, 5, 2, new HashMap<>());
+
         for (String uri : yodaEnvironment.db.runQuerySelectX(poiSelectionQuery)) {
             SemanticsModel ex = new SemanticsModel("{\"dialogAct\": \"Fragment\", \"topic\": " +
                     OntologyRegistry.WebResourceWrap(uri) + "}");
-            Map<String, SemanticsModel> tmp = yodaEnvironment.nlg.generateAll(ex, yodaEnvironment);
+            Map<String, SemanticsModel> tmp = yodaEnvironment.nlg.generateAll(ex, yodaEnvironment, corpusPreferences);
             for (String key : tmp.keySet()){
-//                System.out.println(key);
+                System.out.println(key);
 //                System.out.println(tmp.get(key).getInternalRepresentation().toJSONString() + "\n");
-                writer.write("---\n");
+//                writer.write("---\n");
                 writer.write(key+"\n");
                 writer.write(tmp.get(key).getInternalRepresentation().toJSONString() + "\n");
             }
@@ -64,20 +67,14 @@ public class TestGenerateCorpus {
             // but this is a quick way to generate a more interesting corpus for Bing
             SemanticsModel ex2 = new SemanticsModel("{\"dialogAct\": \"Command\", \"topic\": " +
                     OntologyRegistry.WebResourceWrap(uri) + "}");
-            Map<String, SemanticsModel> tmp2 = yodaEnvironment.nlg.generateAll(ex2, yodaEnvironment);
+            Map<String, SemanticsModel> tmp2 = yodaEnvironment.nlg.generateAll(ex2, yodaEnvironment, corpusPreferences);
             for (String key : tmp2.keySet()){
-//                System.out.println(key);
+                System.out.println(key);
 //                System.out.println(tmp2.get(key).getInternalRepresentation().toJSONString() + "\n");
-                writer.write("---\n");
+//                writer.write("---\n");
                 writer.write(key+"\n");
                 writer.write(tmp2.get(key).getInternalRepresentation().toJSONString() + "\n");
             }
-
-            String queryString = yodaEnvironment.db.prefixes +
-                    "SELECT ?x WHERE { FILTER ( dataType(?x) = xsd:decimal ) }";
-
-            System.out.println("number of floats in the database:" + yodaEnvironment.db.runQuerySelectX(queryString).size());
-
         }
 
         writer.close();

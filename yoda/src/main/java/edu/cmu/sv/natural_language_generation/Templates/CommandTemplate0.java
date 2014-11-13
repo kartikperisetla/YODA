@@ -1,7 +1,7 @@
 package edu.cmu.sv.natural_language_generation.Templates;
 
 import edu.cmu.sv.YodaEnvironment;
-import edu.cmu.sv.natural_language_generation.GrammarRegistry;
+import edu.cmu.sv.natural_language_generation.Grammar;
 import edu.cmu.sv.natural_language_generation.Template;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
 import edu.cmu.sv.semantics.SemanticsModel;
@@ -50,13 +50,13 @@ public class CommandTemplate0 implements Template {
 
         // generate the noun phrase chunks
         Map<String, JSONObject> nounPhraseChunks = yodaEnvironment.nlg.
-                generateAll(topicWebResource, yodaEnvironment, GrammarRegistry.MAX_NP_DEPTH);
+                generateAll(topicWebResource, yodaEnvironment, yodaEnvironment.nlg.grammarPreferences.maxNounPhraseDepth);
 
         Map<String, Pair<Integer, Integer>> childNodeChunks = new HashMap<>();
         childNodeChunks.put("verb.Patient", new ImmutablePair<>(1,1));
 
         return GenerationUtils.simpleOrderedCombinations(Arrays.asList(commandStringChunks, nounPhraseChunks),
-                CommandTemplate0::compositionFunction, childNodeChunks);
+                CommandTemplate0::compositionFunction, childNodeChunks, yodaEnvironment);
     }
 
     private static JSONObject compositionFunction(List<JSONObject> children) {

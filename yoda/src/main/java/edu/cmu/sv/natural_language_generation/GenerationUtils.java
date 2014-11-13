@@ -1,5 +1,6 @@
 package edu.cmu.sv.natural_language_generation;
 
+import edu.cmu.sv.YodaEnvironment;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.ThingWithRoles;
@@ -24,10 +25,7 @@ import java.util.stream.IntStream;
  */
 public class GenerationUtils {
 
-    public static int limitPerPreposition = 3;
-//    static int maxCombinations = 5;
-
-    public static Set<String> getPOSForClass(Class<? extends Thing> cls, String partOfSpeech){
+    public static Set<String> getPOSForClass(Class<? extends Thing> cls, String partOfSpeech, YodaEnvironment yodaEnvironment){
         Set<String> ans = new HashSet<>();
         if (Modifier.isAbstract(cls.getModifiers()))
             return ans;
@@ -48,7 +46,10 @@ public class GenerationUtils {
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
-        return ans;
+        if (ans.size()<=yodaEnvironment.nlg.grammarPreferences.maxWordForms)
+            return ans;
+        return new HashSet<>(Arrays.asList(Arrays.copyOf(NaturalLanguageGenerator.randomData.nextSample(ans, yodaEnvironment.nlg.grammarPreferences.maxWordForms),
+                yodaEnvironment.nlg.grammarPreferences.maxWordForms, String[].class)));
     }
 
     /*
@@ -58,7 +59,8 @@ public class GenerationUtils {
     public static Map<String, JSONObject> simpleOrderedCombinations(
             List<Map<String, JSONObject>> chunks,
             Function<List<JSONObject>, JSONObject> compositionFunction,
-            Map<String, Pair<Integer, Integer>> childNodeChunks){
+            Map<String, Pair<Integer, Integer>> childNodeChunks,
+            YodaEnvironment yodaEnvironment){
         Map<String, JSONObject> ans = new HashMap<>();
 
         Map<Integer, Set<Map.Entry<String, JSONObject>>> possibleBindingsInput = new HashMap<>();
@@ -84,7 +86,17 @@ public class GenerationUtils {
 
             ans.put(combinedString, combinedMeaning);
         }
-        return ans;
+        if (ans.size()<=yodaEnvironment.nlg.grammarPreferences.maxCombinations)
+            return ans;
+
+        Map<String, JSONObject> newAns = new HashMap<>();
+        Arrays.asList(Arrays.copyOf(
+                NaturalLanguageGenerator.randomData.nextSample(ans.entrySet(),
+                        yodaEnvironment.nlg.grammarPreferences.maxCombinations),
+                yodaEnvironment.nlg.grammarPreferences.maxCombinations, Map.Entry[].class)).
+                stream().
+                forEach(x -> newAns.put((String)x.getKey(), (JSONObject)x.getValue()));
+        return newAns;
     }
 
     /*

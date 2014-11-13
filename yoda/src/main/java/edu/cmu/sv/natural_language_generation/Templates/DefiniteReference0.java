@@ -3,25 +3,22 @@ package edu.cmu.sv.natural_language_generation.Templates;
 import edu.cmu.sv.YodaEnvironment;
 import edu.cmu.sv.database.Database;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
+import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
 import edu.cmu.sv.natural_language_generation.Template;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.ThingWithRoles;
-import edu.cmu.sv.ontology.adjective.Adjective;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.ontology.misc.WebResource;
-import edu.cmu.sv.ontology.preposition.Preposition;
 import edu.cmu.sv.ontology.quality.TransientQuality;
 import edu.cmu.sv.ontology.role.HasURI;
 import edu.cmu.sv.ontology.role.InRelationTo;
 import edu.cmu.sv.ontology.role.Role;
-import edu.cmu.sv.ontology.role.has_quality_subroles.HasQualityRole;
 import edu.cmu.sv.semantics.SemanticsModel;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
-import org.openrdf.query.algebra.Str;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,7 +31,7 @@ import java.util.stream.Collectors;
  * Generates {cls:UnknownThingWithRoles, X:HasAQD: {cls: Y:aqd}}
  *
  */
-public class DefiniteReferenceWithAdjectiveAndClassTemplate0 implements Template {
+public class DefiniteReference0 implements Template {
     static JSONObject applicabilityConstraint;
     static {
         try {
@@ -48,6 +45,11 @@ public class DefiniteReferenceWithAdjectiveAndClassTemplate0 implements Template
     @Override
     public Map<String, JSONObject> generateAll(JSONObject constraints, YodaEnvironment yodaEnvironment, int remainingDepth) {
         Map<String, JSONObject> ans = new HashMap<>();
+
+        boolean expandPP = NaturalLanguageGenerator.random.nextDouble() <
+                yodaEnvironment.nlg.grammarPreferences.pExpandPrepositionalPhrase;
+        boolean expandAdj = NaturalLanguageGenerator.random.nextDouble() <
+                yodaEnvironment.nlg.grammarPreferences.pIncludeAdjective;
 
         if (SemanticsModel.anySenseConflicts(applicabilityConstraint, constraints))
             return new HashMap<>();
@@ -72,7 +74,7 @@ public class DefiniteReferenceWithAdjectiveAndClassTemplate0 implements Template
             if (!OntologyRegistry.thingNameMap.containsKey(clsName))
                 continue;
             Set<String> singularNounForms = GenerationUtils.getPOSForClass(
-                    OntologyRegistry.thingNameMap.get(clsName), "singularNounForms");
+                    OntologyRegistry.thingNameMap.get(clsName), "singularNounForms", yodaEnvironment);
             for (String singularNounForm : singularNounForms) {
                 clsChunks.put(singularNounForm, SemanticsModel.parseJSON("{\"class\":\"" + clsName + "\"}"));
             }
@@ -90,6 +92,8 @@ public class DefiniteReferenceWithAdjectiveAndClassTemplate0 implements Template
                 // iterate through every possible binding for the quality arguments
                 // adjectives
                 if (qualityArguments.size() == 0) {
+                    if (!expandAdj)
+                        continue;
                     List<String> fullArgumentList = Arrays.asList(entityURI);
 
                     Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> descriptor =
@@ -99,7 +103,7 @@ public class DefiniteReferenceWithAdjectiveAndClassTemplate0 implements Template
                                 evaluateQualityDegree(fullArgumentList,
                                         descriptor.getLeft(), adjectiveClass);
                         if (degreeOfMatch > 0.5) {
-                            Set<String> adjStrings = GenerationUtils.getPOSForClass(adjectiveClass, "adjectives");
+                            Set<String> adjStrings = GenerationUtils.getPOSForClass(adjectiveClass, "adjectives", yodaEnvironment);
                             for (String adjString : adjStrings) {
                                 JSONObject tmp = SemanticsModel.parseJSON("{\"class\":\"" + adjectiveClass.getSimpleName() + "\"}");
                                 SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(),
@@ -120,6 +124,9 @@ public class DefiniteReferenceWithAdjectiveAndClassTemplate0 implements Template
                     List<Class<? extends Thing>> qualityArguments = OntologyRegistry.qualityArguments(qualityClass);
                     // iterate through every possible binding for the quality arguments
                     if (qualityArguments.size() == 1) {
+                        if (!expandPP)
+                            continue;
+
                         Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> descriptor =
                                 OntologyRegistry.qualityDescriptors(qualityClass);
                         // init preposition counter
@@ -127,9 +134,9 @@ public class DefiniteReferenceWithAdjectiveAndClassTemplate0 implements Template
                         for (Class<? extends ThingWithRoles> prepositionClass : descriptor.getRight())
                             prepositionUsageCounter.put(prepositionClass, 0);
 
-                        System.out.println("DefRefWithAdjAndClass(AndPP): about to collect bindings for preposition quality arguments. Args:"+qualityArguments);
+//                        System.out.println("DefRefWithAdjAndClass(AndPP): about to collect bindings for preposition quality arguments. Args:"+qualityArguments);
                         Set<List<String>> bindings = yodaEnvironment.db.possibleBindings(qualityArguments);
-                        System.out.println("DefRefWithAdjAndClass(AndPP): done collecting bindings for quality arguments, about to iterate through them");
+//                        System.out.println("DefRefWithAdjAndClass(AndPP): done collecting bindings for quality arguments, about to iterate through them");
                         for (List<String> binding : bindings) {
                             if (binding.get(0).equals(entityURI)) {
                                 continue;
@@ -143,7 +150,7 @@ public class DefiniteReferenceWithAdjectiveAndClassTemplate0 implements Template
 
                             // prepositions
                             for (Class<? extends ThingWithRoles> prepositionClass : descriptor.getRight()) {
-                                if (prepositionUsageCounter.get(prepositionClass) == GenerationUtils.limitPerPreposition)
+                                if (prepositionUsageCounter.get(prepositionClass) == yodaEnvironment.nlg.grammarPreferences.maxPhrasesPerPreposition)
                                     continue;
                                 Map<String, JSONObject> ppChunks = new HashMap<>();
 //                                System.out.println("DefRefWithAdjAndClass(AndPP): about to calculate degree of match"+ descriptor.getLeft() + ", "+prepositionClass);
@@ -157,17 +164,17 @@ public class DefiniteReferenceWithAdjectiveAndClassTemplate0 implements Template
                                     if (childContent==null){
                                         childContent = SemanticsModel.parseJSON(
                                                 OntologyRegistry.WebResourceWrap(binding.get(0)));
-                                        System.out.println("DefRefWithAdjAndClass(AndPP): about to generate nested NPs. remainingDepth="+remainingDepth);
+//                                        System.out.println("DefRefWithAdjAndClass(AndPP): about to generate nested NPs. remainingDepth="+remainingDepth);
                                         for (Map.Entry<String, JSONObject> entry : yodaEnvironment.nlg.
                                                 generateAll(childContent, yodaEnvironment, remainingDepth-1).entrySet()){
                                             childChunks.put(entry.getKey(), entry.getValue());
                                         }
-                                        System.out.println("DefRefWithAdjAndClass(AndPP): finished generating nested NPs");
 //                                        yodaEnvironment.nlg.generateAll(childContent, yodaEnvironment, remainingDepth-1).
 //                                                entrySet().forEach(y -> childChunks.put(y.getKey(), y.getValue()));
+//                                        System.out.println("DefRefWithAdjAndClass(AndPP): finished generating nested NPs");
                                     }
 
-                                    Set<String> ppStrings = GenerationUtils.getPOSForClass(prepositionClass, "relationalPrepositionalPhrases");
+                                    Set<String> ppStrings = GenerationUtils.getPOSForClass(prepositionClass, "relationalPrepositionalPhrases", yodaEnvironment);
                                     for (String ppString : ppStrings) {
                                         JSONObject tmp = SemanticsModel.parseJSON("{\"class\":\"" + prepositionClass.getSimpleName() + "\"}");
                                         SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(),
@@ -183,7 +190,7 @@ public class DefiniteReferenceWithAdjectiveAndClassTemplate0 implements Template
                                 Map<String, Pair<Integer, Integer>> childChunkingIndexMap = new HashMap<>();
                                 childChunkingIndexMap.put(descriptor.getLeft().getSimpleName() + "." + InRelationTo.class.getSimpleName(), new ImmutablePair<>(4, 4));
                                 for (Map.Entry<String, JSONObject> entry : GenerationUtils.simpleOrderedCombinations(chunks,
-                                        DefiniteReferenceWithAdjectiveAndClassTemplate0::compositionFunctionWithPrepositionPhrase, childChunkingIndexMap).entrySet()) {
+                                        DefiniteReference0::compositionFunctionWithPrepositionPhrase, childChunkingIndexMap, yodaEnvironment).entrySet()) {
                                     ans.put(entry.getKey(), entry.getValue());
                                 }
                             }
@@ -193,9 +200,10 @@ public class DefiniteReferenceWithAdjectiveAndClassTemplate0 implements Template
             }
         }
 
+        // compose without PP
         List<Map<String, JSONObject>> chunks = Arrays.asList(detChunks, adjChunks, clsChunks);
         for (Map.Entry<String, JSONObject> entry : GenerationUtils.simpleOrderedCombinations(chunks,
-                DefiniteReferenceWithAdjectiveAndClassTemplate0::compositionFunction, new HashMap<>()).entrySet()){
+                DefiniteReference0::compositionFunction, new HashMap<>(), yodaEnvironment).entrySet()){
             ans.put(entry.getKey(), entry.getValue());
         }
         return ans;
