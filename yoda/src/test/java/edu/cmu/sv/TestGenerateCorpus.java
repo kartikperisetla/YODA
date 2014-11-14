@@ -13,6 +13,7 @@ import edu.cmu.sv.ontology.role.Patient;
 import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.semantics.SemanticsModel;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.WHQuestion;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.YNQuestion;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
@@ -66,7 +67,7 @@ public class TestGenerateCorpus {
         for (String uri : yodaEnvironment.db.runQuerySelectX(poiSelectionQuery)) {
 
             // Generate YNQ for HasProperty where a PP is the property
-            String YNQQueryBaseString = "{\"dialogAct\":\""+YNQuestion.class.getSimpleName()+
+            String YNQBaseString = "{\"dialogAct\":\""+YNQuestion.class.getSimpleName()+
                     "\", \"verb\": {\"class\":\""+
                     HasProperty.class.getSimpleName()+"\", \""+
                     Agent.class.getSimpleName()+"\":"+empty+", \""+
@@ -80,7 +81,7 @@ public class TestGenerateCorpus {
                         Object[] childURIs = yodaEnvironment.nlg.randomData.nextSample(yodaEnvironment.db.runQuerySelectX(poiSelectionQuery), 3);
                         for (int i = 0; i < 3; i++) {
 
-                            SemanticsModel ex0 = new SemanticsModel(YNQQueryBaseString);
+                            SemanticsModel ex0 = new SemanticsModel(YNQBaseString);
                             ex0.extendAndOverwriteAtPoint("verb." + Agent.class.getSimpleName(),
                                     new SemanticsModel(OntologyRegistry.WebResourceWrap(uri)));
 
@@ -99,7 +100,7 @@ public class TestGenerateCorpus {
                             }
                         }
                     } else if (Adjective.class.isAssignableFrom(absoluteQualityDegreeClass)){
-                        SemanticsModel ex0 = new SemanticsModel(YNQQueryBaseString);
+                        SemanticsModel ex0 = new SemanticsModel(YNQBaseString);
                         ex0.extendAndOverwriteAtPoint("verb." + Agent.class.getSimpleName(),
                                 new SemanticsModel(OntologyRegistry.WebResourceWrap(uri)));
 
@@ -118,6 +119,62 @@ public class TestGenerateCorpus {
                     }
                 }
             }
+
+            // Generate YNQ for HasProperty where a PP is the property
+            String WHQBaseString = "{\"dialogAct\":\""+WHQuestion.class.getSimpleName()+
+                    "\", \"verb\": {\"class\":\""+
+                    HasProperty.class.getSimpleName()+"\", \""+
+                    Agent.class.getSimpleName()+"\":"+empty+", \""+
+                    Patient.class.getSimpleName()+"\":"+empty+"}}";
+            //TODO: adapt YNQ -> WHQ for the following for loop
+            for (Class<? extends TransientQuality> qualityClass : OntologyRegistry.qualityClasses){
+                Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> qualityDescriptor =
+                        OntologyRegistry.qualityDescriptors(qualityClass);
+                for (Class<? extends ThingWithRoles> absoluteQualityDegreeClass : qualityDescriptor.getRight()) {
+                    if (Preposition.class.isAssignableFrom(absoluteQualityDegreeClass)) {
+                        // get 3 example URIs
+                        Object[] childURIs = yodaEnvironment.nlg.randomData.nextSample(yodaEnvironment.db.runQuerySelectX(poiSelectionQuery), 3);
+                        for (int i = 0; i < 3; i++) {
+
+                            SemanticsModel ex0 = new SemanticsModel(WHQBaseString);
+                            ex0.extendAndOverwriteAtPoint("verb." + Agent.class.getSimpleName(),
+                                    new SemanticsModel(OntologyRegistry.WebResourceWrap(uri)));
+
+                            JSONObject tmp = SemanticsModel.parseJSON(OntologyRegistry.WebResourceWrap((String) childURIs[i]));
+                            SemanticsModel.wrap(tmp, absoluteQualityDegreeClass.getSimpleName(), InRelationTo.class.getSimpleName());
+                            SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(),
+                                    qualityDescriptor.getLeft().getSimpleName());
+                            ex0.extendAndOverwriteAtPoint("verb." + Patient.class.getSimpleName(),
+                                    new SemanticsModel(tmp));
+
+                            Map<String, SemanticsModel> generated = yodaEnvironment.nlg.generateAll(ex0, yodaEnvironment, corpusPreferences);
+                            for (String key : generated.keySet()) {
+                                System.out.println(key);
+                                System.out.println(generated.get(key));
+                                System.out.println("---");
+                            }
+                        }
+                    } else if (Adjective.class.isAssignableFrom(absoluteQualityDegreeClass)){
+                        SemanticsModel ex0 = new SemanticsModel(WHQBaseString);
+                        ex0.extendAndOverwriteAtPoint("verb." + Agent.class.getSimpleName(),
+                                new SemanticsModel(OntologyRegistry.WebResourceWrap(uri)));
+
+                        JSONObject tmp = SemanticsModel.parseJSON("{\"class\":\""+absoluteQualityDegreeClass.getSimpleName()+"\"}");
+                        SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(),
+                                qualityDescriptor.getLeft().getSimpleName());
+                        ex0.extendAndOverwriteAtPoint("verb." + Patient.class.getSimpleName(),
+                                new SemanticsModel(tmp));
+
+                        Map<String, SemanticsModel> generated = yodaEnvironment.nlg.generateAll(ex0, yodaEnvironment, corpusPreferences);
+                        for (String key : generated.keySet()) {
+                            System.out.println(key);
+                            System.out.println(generated.get(key));
+                            System.out.println("---");
+                        }
+                    }
+                }
+            }
+
 
 
 //            SemanticsModel ex1 = new SemanticsModel("{\"dialogAct\": \"Fragment\", \"topic\": " +
