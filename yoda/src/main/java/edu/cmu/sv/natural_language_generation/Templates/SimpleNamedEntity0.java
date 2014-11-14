@@ -10,7 +10,6 @@ import edu.cmu.sv.semantics.SemanticsModel;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
 
 import java.util.*;
 
@@ -18,24 +17,22 @@ import java.util.*;
  * Created by David Cohen on 10/29/14.
  */
 public class SimpleNamedEntity0 implements Template {
-    static JSONObject applicabilityConstraint;
-    static {
-        try {
-            applicabilityConstraint= (JSONObject)SemanticsModel.parser.
-                    parse("{\"class\":\"" + WebResource.class.getSimpleName() + "\"}");
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     public Map<String, JSONObject> generateAll(JSONObject constraints, YodaEnvironment yodaEnvironment, int remainingDepth) {
-        Map<String, JSONObject> ans = new HashMap<>();
-        if (SemanticsModel.anySenseConflicts(applicabilityConstraint, constraints))
-            return ans;
-        String entityURI = (String) new SemanticsModel(constraints).
-                newGetSlotPathFiller(HasURI.class.getSimpleName());
+        // required information to generate
+        String entityURI;
+        // ensure that the constraints match this template
+        try {
+            assert constraints.get("class").equals(WebResource.class.getSimpleName());
+            assert constraints.keySet().size()==2;
+            assert constraints.containsKey(HasURI.class.getSimpleName());
+            entityURI = (String) new SemanticsModel(constraints).
+                    newGetSlotPathFiller(HasURI.class.getSimpleName());
+        } catch (AssertionError e){
+            return new HashMap<>();
+        }
 
+        Map<String, JSONObject> ans = new HashMap<>();
         String queryString = yodaEnvironment.db.prefixes +
                 "SELECT ?x WHERE { <"+entityURI+"> rdfs:label ?x .}";
 

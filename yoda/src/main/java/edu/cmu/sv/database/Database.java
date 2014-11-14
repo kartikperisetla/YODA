@@ -249,6 +249,7 @@ public class Database {
 
         } catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {
             e.printStackTrace();
+            System.exit(0);
         }
         return ans;
     }

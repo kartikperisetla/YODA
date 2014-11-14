@@ -1,17 +1,24 @@
 package edu.cmu.sv;
 
+import edu.cmu.sv.natural_language_generation.GenerationUtils;
 import edu.cmu.sv.natural_language_generation.Grammar;
 import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.ThingWithRoles;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.ontology.preposition.Preposition;
 import edu.cmu.sv.ontology.quality.TransientQuality;
 import edu.cmu.sv.ontology.quality.unary_quality.Expensiveness;
 import edu.cmu.sv.ontology.role.Agent;
+import edu.cmu.sv.ontology.role.InRelationTo;
 import edu.cmu.sv.ontology.role.Patient;
+import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.ontology.role.has_quality_subroles.HasExpensiveness;
+import edu.cmu.sv.ontology.role.has_quality_subroles.HasQualityRole;
 import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.YNQuestion;
+import org.apache.commons.lang3.tuple.Pair;
+import org.json.simple.JSONObject;
 import org.junit.Test;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryLanguage;
@@ -61,42 +68,70 @@ public class TestGenerateCorpus {
 
         for (String uri : yodaEnvironment.db.runQuerySelectX(poiSelectionQuery)) {
 
-            SemanticsModel ex0 = new SemanticsModel("{\"dialogAct\":\'"+YNQuestion.class.getSimpleName()+
-                    "\", \"verb\": {\"class\":\""+
-                    HasProperty.class.getSimpleName()+"\", \""+
-                    Agent.class.getSimpleName()+"\":"+empty+", \""+
-                    Patient.class.getSimpleName()+"\":"+empty+"}}");
+            // Generate YNQ for HasProperty where a PP is the property
+            for (Class<? extends TransientQuality> qualityClass : OntologyRegistry.qualityClasses){
+                Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> qualityDescriptor =
+                        OntologyRegistry.qualityDescriptors(qualityClass);
+                for (Class<? extends ThingWithRoles> prepositionClass : qualityDescriptor.getRight()) {
+                    if (!(Preposition.class.isAssignableFrom(prepositionClass)))
+                        continue;
 
-            for (Class<? extends Preposition> prepositionClass : OntologyRegistry.prepositionClasses){
-                //todo: generate YNQ's with PP's acting as the requested property
+                    // get 3 example URIs
+                    Object[] childURIs = yodaEnvironment.nlg.randomData.nextSample(yodaEnvironment.db.runQuerySelectX(poiSelectionQuery), 3);
+                    for (int i = 0; i < 3; i++) {
+
+                        String jsonSource = "{\"dialogAct\":\""+YNQuestion.class.getSimpleName()+
+                                "\", \"verb\": {\"class\":\""+
+                                HasProperty.class.getSimpleName()+"\", \""+
+                                Agent.class.getSimpleName()+"\":"+empty+", \""+
+                                Patient.class.getSimpleName()+"\":"+empty+"}}";
+                        SemanticsModel ex0 = new SemanticsModel(jsonSource);
+                        ex0.extendAndOverwriteAtPoint("verb."+Agent.class.getSimpleName(),
+                                new SemanticsModel(OntologyRegistry.WebResourceWrap(uri)));
+
+                        JSONObject tmp = SemanticsModel.parseJSON(OntologyRegistry.WebResourceWrap((String) childURIs[i]));
+                        SemanticsModel.wrap(tmp, prepositionClass.getSimpleName(), InRelationTo.class.getSimpleName());
+                        SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(),
+                                qualityDescriptor.getLeft().getSimpleName());
+                        ex0.extendAndOverwriteAtPoint("verb."+Patient.class.getSimpleName(),
+                                new SemanticsModel(tmp));
+
+//                        System.out.println("nlg command:"+ex0.getInternalRepresentation().toJSONString());
+
+                        Map<String, SemanticsModel> generated = yodaEnvironment.nlg.generateAll(ex0, yodaEnvironment, corpusPreferences);
+                        for (String key : generated.keySet()) {
+                            System.out.println(key);
+                            System.out.println(generated.get(key));
+                            System.out.println("---");
+                        }
+                    }
+                }
             }
 
 
-
-
-            SemanticsModel ex1 = new SemanticsModel("{\"dialogAct\": \"Fragment\", \"topic\": " +
-                    OntologyRegistry.WebResourceWrap(uri) + "}");
-            Map<String, SemanticsModel> tmp = yodaEnvironment.nlg.generateAll(ex1, yodaEnvironment, corpusPreferences);
-            for (String key : tmp.keySet()){
-                System.out.println(key);
-//                System.out.println(tmp.get(key).getInternalRepresentation().toJSONString() + "\n");
-//                writer.write("---\n");
-                writer.write(key+"\n");
-                writer.write(tmp.get(key).getInternalRepresentation().toJSONString() + "\n");
-            }
-
-            // usually, the command won't have a topic,
-            // but this is a quick way to generate a more interesting corpus for Bing
-            SemanticsModel ex2 = new SemanticsModel("{\"dialogAct\": \"Command\", \"topic\": " +
-                    OntologyRegistry.WebResourceWrap(uri) + "}");
-            Map<String, SemanticsModel> tmp2 = yodaEnvironment.nlg.generateAll(ex2, yodaEnvironment, corpusPreferences);
-            for (String key : tmp2.keySet()){
-                System.out.println(key);
-//                System.out.println(tmp2.get(key).getInternalRepresentation().toJSONString() + "\n");
-//                writer.write("---\n");
-                writer.write(key+"\n");
-                writer.write(tmp2.get(key).getInternalRepresentation().toJSONString() + "\n");
-            }
+//            SemanticsModel ex1 = new SemanticsModel("{\"dialogAct\": \"Fragment\", \"topic\": " +
+//                    OntologyRegistry.WebResourceWrap(uri) + "}");
+//            Map<String, SemanticsModel> tmp = yodaEnvironment.nlg.generateAll(ex1, yodaEnvironment, corpusPreferences);
+//            for (String key : tmp.keySet()){
+//                System.out.println(key);
+////                System.out.println(tmp.get(key).getInternalRepresentation().toJSONString() + "\n");
+////                writer.write("---\n");
+//                writer.write(key+"\n");
+//                writer.write(tmp.get(key).getInternalRepresentation().toJSONString() + "\n");
+//            }
+//
+//            // usually, the command won't have a topic,
+//            // but this is a quick way to generate a more interesting corpus for Bing
+//            SemanticsModel ex2 = new SemanticsModel("{\"dialogAct\": \"Command\", \"topic\": " +
+//                    OntologyRegistry.WebResourceWrap(uri) + "}");
+//            Map<String, SemanticsModel> tmp2 = yodaEnvironment.nlg.generateAll(ex2, yodaEnvironment, corpusPreferences);
+//            for (String key : tmp2.keySet()){
+//                System.out.println(key);
+////                System.out.println(tmp2.get(key).getInternalRepresentation().toJSONString() + "\n");
+////                writer.write("---\n");
+//                writer.write(key+"\n");
+//                writer.write(tmp2.get(key).getInternalRepresentation().toJSONString() + "\n");
+//            }
         }
 
         writer.close();

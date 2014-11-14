@@ -43,7 +43,6 @@ public class HasPropertyYNQTemplate0 implements Template {
             assert agentConstraint.get("class").equals(WebResource.class.getSimpleName());
             patientConstraint = (JSONObject) verbConstraint.get(Patient.class.getSimpleName());
             assert patientConstraint.get("class").equals(UnknownThingWithRoles.class.getSimpleName());
-
         } catch (AssertionError e) {
             return new HashMap<>();
         }
@@ -70,7 +69,7 @@ public class HasPropertyYNQTemplate0 implements Template {
         JSONObject agent = children.get(1);
         JSONObject patient = children.get(2);
 
-        SemanticsModel ans = new SemanticsModel("{\"dialogAct\":\'"+YNQuestion.class.getSimpleName()+
+        SemanticsModel ans = new SemanticsModel("{\"dialogAct\":\""+YNQuestion.class.getSimpleName()+
                 "\", \"verb\": {\"class\":\""+
                 HasProperty.class.getSimpleName()+"\", \""+
                 Agent.class.getSimpleName()+"\":"+empty+", \""+
