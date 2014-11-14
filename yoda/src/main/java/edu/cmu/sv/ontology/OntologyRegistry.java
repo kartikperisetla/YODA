@@ -4,6 +4,7 @@ import edu.cmu.sv.ontology.adjective.*;
 import edu.cmu.sv.ontology.misc.*;
 import edu.cmu.sv.ontology.noun.Noun;
 import edu.cmu.sv.ontology.noun.poi_types.*;
+import edu.cmu.sv.ontology.preposition.DistancePreposition;
 import edu.cmu.sv.ontology.preposition.IsCloseTo;
 import edu.cmu.sv.ontology.preposition.Preposition;
 import edu.cmu.sv.ontology.quality.binary_quality.Distance;
@@ -99,8 +100,10 @@ public class OntologyRegistry {
 
         adjectiveClasses.add(Cheap.class);
         adjectiveClasses.add(Expensive.class);
+        adjectiveClasses.add(ExpensivenessAdjective.class);
 
         prepositionClasses.add(IsCloseTo.class);
+        prepositionClasses.add(DistancePreposition.class);
 
         qualityClasses.add(Expensiveness.class);
         qualityClasses.add(Distance.class);
