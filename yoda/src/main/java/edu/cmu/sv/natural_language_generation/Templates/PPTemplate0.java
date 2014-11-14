@@ -6,8 +6,10 @@ import edu.cmu.sv.natural_language_generation.Template;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
 
+import edu.cmu.sv.ontology.adjective.Adjective;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.ontology.misc.WebResource;
+import edu.cmu.sv.ontology.preposition.Preposition;
 import edu.cmu.sv.ontology.role.InRelationTo;
 import edu.cmu.sv.semantics.SemanticsModel;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -42,6 +44,8 @@ public class PPTemplate0 implements Template {
             child = ((JSONObject) prepositionContent.get(InRelationTo.class.getSimpleName())).toJSONString();
             assert SemanticsModel.parseJSON(child).containsKey("class");
             assert SemanticsModel.parseJSON(child).get("class").equals(WebResource.class.getSimpleName());
+            assert OntologyRegistry.thingNameMap.containsKey(prepositionClassString);
+            assert Preposition.class.isAssignableFrom(OntologyRegistry.thingNameMap.get(prepositionClassString));
         } catch (AssertionError e){
             return new HashMap<>();
         }

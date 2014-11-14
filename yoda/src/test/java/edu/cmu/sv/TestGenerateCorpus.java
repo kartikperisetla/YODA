@@ -1,19 +1,16 @@
 package edu.cmu.sv;
 
-import edu.cmu.sv.natural_language_generation.GenerationUtils;
 import edu.cmu.sv.natural_language_generation.Grammar;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.ThingWithRoles;
+import edu.cmu.sv.ontology.adjective.Adjective;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.ontology.preposition.Preposition;
 import edu.cmu.sv.ontology.quality.TransientQuality;
-import edu.cmu.sv.ontology.quality.unary_quality.Expensiveness;
 import edu.cmu.sv.ontology.role.Agent;
 import edu.cmu.sv.ontology.role.InRelationTo;
 import edu.cmu.sv.ontology.role.Patient;
 import edu.cmu.sv.ontology.role.Role;
-import edu.cmu.sv.ontology.role.has_quality_subroles.HasExpensiveness;
-import edu.cmu.sv.ontology.role.has_quality_subroles.HasQualityRole;
 import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.YNQuestion;
@@ -69,34 +66,48 @@ public class TestGenerateCorpus {
         for (String uri : yodaEnvironment.db.runQuerySelectX(poiSelectionQuery)) {
 
             // Generate YNQ for HasProperty where a PP is the property
+            String YNQQueryBaseString = "{\"dialogAct\":\""+YNQuestion.class.getSimpleName()+
+                    "\", \"verb\": {\"class\":\""+
+                    HasProperty.class.getSimpleName()+"\", \""+
+                    Agent.class.getSimpleName()+"\":"+empty+", \""+
+                    Patient.class.getSimpleName()+"\":"+empty+"}}";
             for (Class<? extends TransientQuality> qualityClass : OntologyRegistry.qualityClasses){
                 Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> qualityDescriptor =
                         OntologyRegistry.qualityDescriptors(qualityClass);
-                for (Class<? extends ThingWithRoles> prepositionClass : qualityDescriptor.getRight()) {
-                    if (!(Preposition.class.isAssignableFrom(prepositionClass)))
-                        continue;
+                for (Class<? extends ThingWithRoles> absoluteQualityDegreeClass : qualityDescriptor.getRight()) {
+                    if (Preposition.class.isAssignableFrom(absoluteQualityDegreeClass)) {
+                        // get 3 example URIs
+                        Object[] childURIs = yodaEnvironment.nlg.randomData.nextSample(yodaEnvironment.db.runQuerySelectX(poiSelectionQuery), 3);
+                        for (int i = 0; i < 3; i++) {
 
-                    // get 3 example URIs
-                    Object[] childURIs = yodaEnvironment.nlg.randomData.nextSample(yodaEnvironment.db.runQuerySelectX(poiSelectionQuery), 3);
-                    for (int i = 0; i < 3; i++) {
+                            SemanticsModel ex0 = new SemanticsModel(YNQQueryBaseString);
+                            ex0.extendAndOverwriteAtPoint("verb." + Agent.class.getSimpleName(),
+                                    new SemanticsModel(OntologyRegistry.WebResourceWrap(uri)));
 
-                        String jsonSource = "{\"dialogAct\":\""+YNQuestion.class.getSimpleName()+
-                                "\", \"verb\": {\"class\":\""+
-                                HasProperty.class.getSimpleName()+"\", \""+
-                                Agent.class.getSimpleName()+"\":"+empty+", \""+
-                                Patient.class.getSimpleName()+"\":"+empty+"}}";
-                        SemanticsModel ex0 = new SemanticsModel(jsonSource);
-                        ex0.extendAndOverwriteAtPoint("verb."+Agent.class.getSimpleName(),
+                            JSONObject tmp = SemanticsModel.parseJSON(OntologyRegistry.WebResourceWrap((String) childURIs[i]));
+                            SemanticsModel.wrap(tmp, absoluteQualityDegreeClass.getSimpleName(), InRelationTo.class.getSimpleName());
+                            SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(),
+                                    qualityDescriptor.getLeft().getSimpleName());
+                            ex0.extendAndOverwriteAtPoint("verb." + Patient.class.getSimpleName(),
+                                    new SemanticsModel(tmp));
+
+                            Map<String, SemanticsModel> generated = yodaEnvironment.nlg.generateAll(ex0, yodaEnvironment, corpusPreferences);
+                            for (String key : generated.keySet()) {
+                                System.out.println(key);
+                                System.out.println(generated.get(key));
+                                System.out.println("---");
+                            }
+                        }
+                    } else if (Adjective.class.isAssignableFrom(absoluteQualityDegreeClass)){
+                        SemanticsModel ex0 = new SemanticsModel(YNQQueryBaseString);
+                        ex0.extendAndOverwriteAtPoint("verb." + Agent.class.getSimpleName(),
                                 new SemanticsModel(OntologyRegistry.WebResourceWrap(uri)));
 
-                        JSONObject tmp = SemanticsModel.parseJSON(OntologyRegistry.WebResourceWrap((String) childURIs[i]));
-                        SemanticsModel.wrap(tmp, prepositionClass.getSimpleName(), InRelationTo.class.getSimpleName());
+                        JSONObject tmp = SemanticsModel.parseJSON("{\"class\":\""+absoluteQualityDegreeClass.getSimpleName()+"\"}");
                         SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(),
                                 qualityDescriptor.getLeft().getSimpleName());
-                        ex0.extendAndOverwriteAtPoint("verb."+Patient.class.getSimpleName(),
+                        ex0.extendAndOverwriteAtPoint("verb." + Patient.class.getSimpleName(),
                                 new SemanticsModel(tmp));
-
-//                        System.out.println("nlg command:"+ex0.getInternalRepresentation().toJSONString());
 
                         Map<String, SemanticsModel> generated = yodaEnvironment.nlg.generateAll(ex0, yodaEnvironment, corpusPreferences);
                         for (String key : generated.keySet()) {
