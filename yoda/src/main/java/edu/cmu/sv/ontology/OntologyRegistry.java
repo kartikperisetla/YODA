@@ -100,10 +100,10 @@ public class OntologyRegistry {
 
         adjectiveClasses.add(Cheap.class);
         adjectiveClasses.add(Expensive.class);
-        adjectiveClasses.add(ExpensivenessAdjective.class);
+//        adjectiveClasses.add(ExpensivenessAdjective.class);
 
         prepositionClasses.add(IsCloseTo.class);
-        prepositionClasses.add(DistancePreposition.class);
+//        prepositionClasses.add(DistancePreposition.class);
 
         qualityClasses.add(Expensiveness.class);
         qualityClasses.add(Distance.class);

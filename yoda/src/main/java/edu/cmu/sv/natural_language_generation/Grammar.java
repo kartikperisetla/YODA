@@ -45,5 +45,6 @@ public class Grammar {
         grammar1_roots.add(FragmentTemplate0.class);
         grammar1_roots.add(CommandTemplate0.class);
         grammar1_roots.add(HasPropertyYNQTemplate0.class);
+        grammar1_roots.add(HasPropertyWHQTemplate0.class);
     }
 }

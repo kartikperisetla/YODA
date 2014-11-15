@@ -53,14 +53,14 @@ public class HasPropertyWHQTemplate0 implements Template {
         Map<String, JSONObject> howChunks = new HashMap<>();
         howChunks.put("how", new JSONObject());
 
+        Map<String, JSONObject> patientChunks = yodaEnvironment.nlg.
+                generateAll(patientConstraint, yodaEnvironment, yodaEnvironment.nlg.grammarPreferences.maxNounPhraseDepth);
+
         Map<String, JSONObject> toBeChunks = new HashMap<>();
         toBeChunks.put("is", new JSONObject());
 
-
         Map<String, JSONObject> agentChunks = yodaEnvironment.nlg.
                 generateAll(agentConstraint, yodaEnvironment, yodaEnvironment.nlg.grammarPreferences.maxNounPhraseDepth);
-        Map<String, JSONObject> patientChunks = yodaEnvironment.nlg.
-                generateAll(patientConstraint, yodaEnvironment, yodaEnvironment.nlg.grammarPreferences.maxNounPhraseDepth);
 
 
         Map<String, Pair<Integer, Integer>> childNodeChunks = new HashMap<>();
@@ -73,9 +73,9 @@ public class HasPropertyWHQTemplate0 implements Template {
     private static JSONObject compositionFunction(List<JSONObject> children){
         String empty = "{\"class\":\""+UnknownThingWithRoles.class.getSimpleName()+"\"}";
         JSONObject how = children.get(0);
-        JSONObject patient = children.get(0);
-        JSONObject toBe = children.get(1);
-        JSONObject agent = children.get(2);
+        JSONObject patient = children.get(1);
+        JSONObject toBe = children.get(2);
+        JSONObject agent = children.get(3);
 
         SemanticsModel ans = new SemanticsModel("{\"dialogAct\":\""+WHQuestion.class.getSimpleName()+
                 "\", \"verb\": {\"class\":\""+

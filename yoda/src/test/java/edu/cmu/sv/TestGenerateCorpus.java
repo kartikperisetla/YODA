@@ -63,7 +63,7 @@ public class TestGenerateCorpus {
         Grammar.GrammarPreferences corpusPreferences = new Grammar.GrammarPreferences(.01, .2, 5, 2, 5, 5, 2, new HashMap<>());
 
         for (String uri : yodaEnvironment.db.runQuerySelectX(poiSelectionQuery)) {
-
+/*
             // Generate YNQ for HasProperty where a PP is the property
             String YNQBaseString = "{\"dialogAct\":\""+YNQuestion.class.getSimpleName()+
                     "\", \"verb\": {\"class\":\""+
@@ -116,7 +116,7 @@ public class TestGenerateCorpus {
                         }
                     }
                 }
-            }
+            }*/
 
             // Generate WHQ for HasProperty where a PP is the property
             String WHQBaseString = "{\"dialogAct\":\""+WHQuestion.class.getSimpleName()+
@@ -124,30 +124,42 @@ public class TestGenerateCorpus {
                     HasProperty.class.getSimpleName()+"\", \""+
                     Agent.class.getSimpleName()+"\":"+empty+", \""+
                     Patient.class.getSimpleName()+"\":"+empty+"}}";
-            //TODO: adapt YNQ -> WHQ for the following for loop
             for (Class<? extends TransientQuality> qualityClass : OntologyRegistry.qualityClasses) {
                 Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> qualityDescriptor =
                         OntologyRegistry.qualityDescriptors(qualityClass);
 
-                Class<? extends ThingWithRoles> abstractQualityDegreeClass;
-                try {
-                    abstractQualityDegreeClass = new LinkedList<>((Set<Class<? extends ThingWithRoles>>)
-                            qualityDescriptor.getLeft().newInstance().getRange()).get(0);
-                } catch (InstantiationException | IllegalAccessException e) {
-                    throw new Error();
-                }
-                if (Preposition.class.isAssignableFrom(abstractQualityDegreeClass)) {
-                    // get 3 example URIs
-                    Object[] childURIs = yodaEnvironment.nlg.randomData.nextSample(yodaEnvironment.db.runQuerySelectX(poiSelectionQuery), 3);
-                    for (int i = 0; i < 3; i++) {
+                for (Class<? extends ThingWithRoles> absoluteQualityDegreeClass : qualityDescriptor.getRight()) {
+                    if (Preposition.class.isAssignableFrom(absoluteQualityDegreeClass)) {
+                        // get 3 example URIs
+                        Object[] childURIs = yodaEnvironment.nlg.randomData.nextSample(yodaEnvironment.db.runQuerySelectX(poiSelectionQuery), 3);
+                        for (int i = 0; i < 3; i++) {
 
+                            SemanticsModel ex0 = new SemanticsModel(WHQBaseString);
+                            ex0.extendAndOverwriteAtPoint("verb." + Agent.class.getSimpleName(),
+                                    new SemanticsModel(OntologyRegistry.WebResourceWrap(uri)));
+
+                            JSONObject tmp = SemanticsModel.parseJSON(OntologyRegistry.WebResourceWrap((String) childURIs[i]));
+                            SemanticsModel.wrap(tmp, absoluteQualityDegreeClass.getSimpleName(), InRelationTo.class.getSimpleName());
+//                        SemanticsModel.wrap(tmp, Requested.class.getSimpleName(), HasValue.class.getSimpleName());
+                            SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(),
+                                    qualityDescriptor.getLeft().getSimpleName());
+                            ex0.extendAndOverwriteAtPoint("verb." + Patient.class.getSimpleName(),
+                                    new SemanticsModel(tmp));
+
+                            Map<String, SemanticsModel> generated = yodaEnvironment.nlg.generateAll(ex0, yodaEnvironment, corpusPreferences);
+                            for (String key : generated.keySet()) {
+                                System.out.println(key);
+                                System.out.println(generated.get(key));
+                                System.out.println("---");
+                            }
+                        }
+                    } else if (Adjective.class.isAssignableFrom(absoluteQualityDegreeClass)) {
                         SemanticsModel ex0 = new SemanticsModel(WHQBaseString);
                         ex0.extendAndOverwriteAtPoint("verb." + Agent.class.getSimpleName(),
                                 new SemanticsModel(OntologyRegistry.WebResourceWrap(uri)));
 
-                        JSONObject tmp = SemanticsModel.parseJSON(OntologyRegistry.WebResourceWrap((String) childURIs[i]));
-                        SemanticsModel.wrap(tmp, abstractQualityDegreeClass.getSimpleName(), InRelationTo.class.getSimpleName());
-//                        SemanticsModel.wrap(tmp, Requested.class.getSimpleName(), HasValue.class.getSimpleName());
+                        JSONObject tmp = SemanticsModel.parseJSON("{\"class\":\"" + absoluteQualityDegreeClass.getSimpleName() + "\"}");
+//                    SemanticsModel.wrap(tmp, Requested.class.getSimpleName(), HasValue.class.getSimpleName());
                         SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(),
                                 qualityDescriptor.getLeft().getSimpleName());
                         ex0.extendAndOverwriteAtPoint("verb." + Patient.class.getSimpleName(),
@@ -159,24 +171,6 @@ public class TestGenerateCorpus {
                             System.out.println(generated.get(key));
                             System.out.println("---");
                         }
-                    }
-                } else if (Adjective.class.isAssignableFrom(abstractQualityDegreeClass)) {
-                    SemanticsModel ex0 = new SemanticsModel(WHQBaseString);
-                    ex0.extendAndOverwriteAtPoint("verb." + Agent.class.getSimpleName(),
-                            new SemanticsModel(OntologyRegistry.WebResourceWrap(uri)));
-
-                    JSONObject tmp = SemanticsModel.parseJSON("{\"class\":\"" + abstractQualityDegreeClass.getSimpleName() + "\"}");
-//                    SemanticsModel.wrap(tmp, Requested.class.getSimpleName(), HasValue.class.getSimpleName());
-                    SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(),
-                            qualityDescriptor.getLeft().getSimpleName());
-                    ex0.extendAndOverwriteAtPoint("verb." + Patient.class.getSimpleName(),
-                            new SemanticsModel(tmp));
-
-                    Map<String, SemanticsModel> generated = yodaEnvironment.nlg.generateAll(ex0, yodaEnvironment, corpusPreferences);
-                    for (String key : generated.keySet()) {
-                        System.out.println(key);
-                        System.out.println(generated.get(key));
-                        System.out.println("---");
                     }
                 }
 
