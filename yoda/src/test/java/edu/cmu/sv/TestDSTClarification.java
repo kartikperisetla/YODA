@@ -65,12 +65,8 @@ public class TestDSTClarification {
         /// Turn 1
         String uri1 = null;
         String uri2 = null;
-        try {
-            uri1 = yodaEnvironment.db.insertValue(1);
-            uri2 = yodaEnvironment.db.insertValue(10);
-        } catch (MalformedQueryException | RepositoryException | UpdateExecutionException e) {
-            e.printStackTrace();
-        }
+        uri1 = yodaEnvironment.db.insertValue(1);
+        uri2 = yodaEnvironment.db.insertValue(10);
 
         jsonString = "{\n" +
                 "\"dialogAct\":\"Command\",\n" +
@@ -106,11 +102,8 @@ public class TestDSTClarification {
 
         /// Turn 2
         String uri3 = null;
-        try {
-            uri3 = yodaEnvironment.db.insertValue(1);
-        } catch (MalformedQueryException | RepositoryException | UpdateExecutionException e) {
-            e.printStackTrace();
-        }
+        uri3 = yodaEnvironment.db.insertValue(1);
+
 
         // Option 0: Confirmation request fragment: "3 o'clock?"
         jsonString = "{\n" +
@@ -137,11 +130,8 @@ public class TestDSTClarification {
 
         /// Turn 3
         String uri5 = null;
-        try {
-            uri5 = yodaEnvironment.db.insertValue(10);
-        } catch (MalformedQueryException | RepositoryException | UpdateExecutionException e) {
-            e.printStackTrace();
-        }
+        uri5 = yodaEnvironment.db.insertValue(10);
+
 
         // Option 0, a confirmation fragment: "At 3"
 //        jsonString = "{\"dialogAct\":\"Fragment\",\n" +
@@ -199,11 +189,8 @@ public class TestDSTClarification {
 
         /// Turn 1
         String uri1 = null;
-        try {
-            uri1 = yodaEnvironment.db.insertValue(2);
-        } catch (MalformedQueryException | RepositoryException | UpdateExecutionException e) {
-            e.printStackTrace();
-        }
+        uri1 = yodaEnvironment.db.insertValue(2);
+
 
         jsonString = "{\n" +
                 "\"dialogAct\":\"Statement\",\n" +
@@ -244,11 +231,8 @@ public class TestDSTClarification {
         /// Turn 3
         // (the system repeats itself)
         String uri2 = null;
-        try {
-            uri2 = yodaEnvironment.db.insertValue(2);
-        } catch (MalformedQueryException | RepositoryException | UpdateExecutionException e) {
-            e.printStackTrace();
-        }
+        uri2 = yodaEnvironment.db.insertValue(2);
+
 
         jsonString = "{\n" +
                 "\"dialogAct\":\"Statement\",\n" +

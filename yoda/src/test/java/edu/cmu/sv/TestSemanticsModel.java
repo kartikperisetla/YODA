@@ -25,14 +25,11 @@ public class TestSemanticsModel {
         String uri2 = null;
         String uri3 = null;
         String uri4 = null;
-        try {
-            uri1 = yodaEnvironment.db.insertValue(1);
-            uri2 = yodaEnvironment.db.insertValue(10);
-            uri3 = yodaEnvironment.db.insertValue(5);
-            uri4 = yodaEnvironment.db.insertValue(30);
-        } catch (MalformedQueryException | RepositoryException | UpdateExecutionException e) {
-            e.printStackTrace();
-        }
+        uri1 = yodaEnvironment.db.insertValue(1);
+        uri2 = yodaEnvironment.db.insertValue(10);
+        uri3 = yodaEnvironment.db.insertValue(5);
+        uri4 = yodaEnvironment.db.insertValue(30);
+
 
         jsonString = "{\n" +
                 "\"dialogAct\":\"Command\",\n" +

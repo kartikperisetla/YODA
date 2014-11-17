@@ -211,24 +211,30 @@ public class Database {
     /*
     * Insert a data value to the triple store, return the unique identifier
     * */
-    public String insertValue(Object obj) throws MalformedQueryException, RepositoryException, UpdateExecutionException {
-        String newURI = "auto_generated_value_URI"+URICounter++;
-        if (obj instanceof String){
-            String updateString = prefixes+"INSERT DATA \n{ base:"+newURI+" rdf:value \""+obj+"\"^^xsd:string}";
+    public String insertValue(Object obj){
+        try {
+            String newURI = "auto_generated_value_URI" + URICounter++;
+            if (obj instanceof String) {
+                String updateString = prefixes + "INSERT DATA \n{ base:" + newURI + " rdf:value \"" + obj + "\"^^xsd:string}";
 //            System.out.println("Database.insertValue: updateString:"+updateString);
-            log(updateString);
-            Update update = connection.prepareUpdate(QueryLanguage.SPARQL, updateString, baseURI);
-            update.execute();
-        } else if (obj instanceof Integer){
-            String updateString = prefixes+"INSERT DATA \n{ base:"+newURI+" rdf:value \""+obj+"\"^^xsd:int}";
+                log(updateString);
+                Update update = connection.prepareUpdate(QueryLanguage.SPARQL, updateString, baseURI);
+                update.execute();
+            } else if (obj instanceof Integer) {
+                String updateString = prefixes + "INSERT DATA \n{ base:" + newURI + " rdf:value \"" + obj + "\"^^xsd:int}";
 //            System.out.println("Database.insertValue: updateString:"+updateString);
-            log(updateString);
-            Update update = connection.prepareUpdate(QueryLanguage.SPARQL, updateString, baseURI);
-            update.execute();
-        } else {
-            throw new Error("Can't insertValue of that type");
+                log(updateString);
+                Update update = connection.prepareUpdate(QueryLanguage.SPARQL, updateString, baseURI);
+                update.execute();
+            } else {
+                throw new Error("Can't insertValue of that type");
+            }
+            return newURI;
+        } catch (MalformedQueryException | RepositoryException | UpdateExecutionException e){
+            e.printStackTrace();
+            System.exit(0);
         }
-        return newURI;
+        return null;
     }
 
     /*
