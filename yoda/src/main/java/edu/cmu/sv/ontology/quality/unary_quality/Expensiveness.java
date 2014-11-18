@@ -30,7 +30,7 @@ public class Expensiveness extends TransientQuality {
     @Override
     public Function<List<String>, String> getQualityCalculatorSPARQLQuery() {
         java.util.function.Function<List<String>, String> queryGen = (List<String> entityURIs) ->
-                "<"+entityURIs.get(0)+"> base:expensiveness ?transient_quality . ";
+                entityURIs.get(0)+" base:expensiveness "+entityURIs.get(1)+" . ";
         return queryGen;
     }
 }

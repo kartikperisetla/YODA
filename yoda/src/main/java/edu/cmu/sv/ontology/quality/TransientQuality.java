@@ -19,6 +19,7 @@ public abstract class TransientQuality {
     * ?x
     * ?fuzzy_mapped_quality
     *
+    * The input list should be able to contain either variables: ?XXX or URIs: <http://sdfs.sdfsdf.sdfsdf#lkjssdf>
     * */
     public abstract java.util.function.Function<List<String>, String> getQualityCalculatorSPARQLQuery();
 

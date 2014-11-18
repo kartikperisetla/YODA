@@ -380,9 +380,11 @@ public class Database {
                 throw new Error("degreeClass is neither an Adjective nor a Preposition class");
             }
 
+            List<String> params = entityURIs.stream().map(x -> "<"+x+">").collect(Collectors.toList());
+            params.add("?transient_quality");
 
             String queryString = prefixes + "SELECT ?fuzzy_mapped_quality WHERE {" +
-                    qualityClass.newInstance().getQualityCalculatorSPARQLQuery().apply(entityURIs) +
+                    qualityClass.newInstance().getQualityCalculatorSPARQLQuery().apply(params) +
                     "BIND(base:LinearFuzzyMap("+center+", "+slope+", ?transient_quality) AS ?fuzzy_mapped_quality)}";
             log(queryString);
             TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);

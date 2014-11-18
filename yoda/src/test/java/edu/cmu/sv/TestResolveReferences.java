@@ -5,14 +5,18 @@ import edu.cmu.sv.natural_language_generation.Grammar;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.ThingWithRoles;
 import edu.cmu.sv.ontology.adjective.Adjective;
+import edu.cmu.sv.ontology.adjective.Expensive;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.ontology.misc.WebResource;
+import edu.cmu.sv.ontology.noun.PointOfInterest;
+import edu.cmu.sv.ontology.preposition.IsCloseTo;
 import edu.cmu.sv.ontology.preposition.Preposition;
 import edu.cmu.sv.ontology.quality.TransientQuality;
 import edu.cmu.sv.ontology.role.Agent;
 import edu.cmu.sv.ontology.role.InRelationTo;
 import edu.cmu.sv.ontology.role.Patient;
 import edu.cmu.sv.ontology.role.Role;
+import edu.cmu.sv.ontology.role.has_quality_subroles.HasExpensiveness;
 import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.WHQuestion;
@@ -64,12 +68,16 @@ public class TestResolveReferences {
 
         String sluNamedEntityChunkURI = yodaEnvironment.db.insertValue("tied house");
         JSONObject reference = SemanticsModel.parseJSON(OntologyRegistry.WebResourceWrap(sluNamedEntityChunkURI));
+        SemanticsModel.wrap(reference, IsCloseTo.class.getSimpleName(), InRelationTo.class.getSimpleName());
+        SemanticsModel.wrap(reference, PointOfInterest.class.getSimpleName(), HasExpensiveness.class.getSimpleName());
         StringDistribution possibleReferences = ReferenceResolution.resolveReference(yodaEnvironment, reference);
         for (String possibleReference : possibleReferences.keySet()){
             String labelQuery = "SELECT ?x WHERE { <"+possibleReference+"> rdfs:label ?x}";
             System.out.println("--- Possible Referent: --- (score = "+possibleReferences.get(possibleReference)+")");
             System.out.println(yodaEnvironment.db.runQuerySelectX(labelQuery));
         }
+
+
 
 
     }
