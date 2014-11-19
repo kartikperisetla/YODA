@@ -39,7 +39,7 @@ public class TestGenerateCorpus {
     public void Test() throws FileNotFoundException, UnsupportedEncodingException {
         String empty = "{\"class\":\""+UnknownThingWithRoles.class.getSimpleName()+"\"}";
 
-        String outputFileName = "/home/cohend/YODA_corpus.txt";
+        String outputFileName = "./src/resources/YODA_corpus.txt";
         PrintWriter writer = new PrintWriter(outputFileName, "UTF-8");
 
         YodaEnvironment yodaEnvironment = YodaEnvironment.dialogTestingEnvironment();

@@ -12,7 +12,7 @@ public class DatabaseRegistry {
 
     static {
         // point of interest database
-        turtleDatabaseSources.add("/home/cohend/yoda/scripts/poi.turtle");
+        turtleDatabaseSources.add("./src/resources/poi.turtle");
 
         nonOntologyRelations.add("gps_lon");
         nonOntologyRelations.add("gps_lat");
