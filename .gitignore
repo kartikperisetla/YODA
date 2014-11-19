@@ -8,3 +8,4 @@
 *.iml
 *.idea
 yoda/target
+src/resources/YODA_corpus.txt
