@@ -1,7 +1,7 @@
 package edu.cmu.sv.dialog_state_tracking;
 
 
-import edu.cmu.sv.YodaEnvironment;
+import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;

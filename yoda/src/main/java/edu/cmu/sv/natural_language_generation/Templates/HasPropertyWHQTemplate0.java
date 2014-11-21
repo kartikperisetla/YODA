@@ -1,6 +1,6 @@
 package edu.cmu.sv.natural_language_generation.Templates;
 
-import edu.cmu.sv.YodaEnvironment;
+import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
 import edu.cmu.sv.natural_language_generation.Template;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
@@ -10,7 +10,6 @@ import edu.cmu.sv.ontology.role.Patient;
 import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.WHQuestion;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.YNQuestion;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;

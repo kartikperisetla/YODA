@@ -1,12 +1,11 @@
 package edu.cmu.sv.natural_language_generation.Templates;
 
-import edu.cmu.sv.YodaEnvironment;
+import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
 import edu.cmu.sv.natural_language_generation.Template;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
 
-import edu.cmu.sv.ontology.adjective.Adjective;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.ontology.misc.WebResource;
 import edu.cmu.sv.ontology.preposition.Preposition;

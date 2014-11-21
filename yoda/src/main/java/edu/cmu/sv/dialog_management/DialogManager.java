@@ -1,6 +1,6 @@
 package edu.cmu.sv.dialog_management;
 
-import edu.cmu.sv.YodaEnvironment;
+import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.system_action.SystemAction;
@@ -10,7 +10,6 @@ import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.Combination;
 import edu.cmu.sv.utils.HypothesisSetManagement;
 import org.apache.commons.lang3.tuple.Pair;
-import org.json.simple.JSONObject;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;

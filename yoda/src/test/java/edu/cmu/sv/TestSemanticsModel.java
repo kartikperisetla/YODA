@@ -1,12 +1,10 @@
 package edu.cmu.sv;
 
 import edu.cmu.sv.semantics.SemanticsModel;
+import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.junit.Test;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.UpdateExecutionException;
-import org.openrdf.repository.RepositoryException;
 
 
 /**

@@ -1,7 +1,6 @@
 package edu.cmu.sv.natural_language_generation.Templates;
 
-import edu.cmu.sv.YodaEnvironment;
-import edu.cmu.sv.natural_language_generation.Grammar;
+import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.natural_language_generation.Template;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;

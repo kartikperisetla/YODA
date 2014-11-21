@@ -1,15 +1,9 @@
 package edu.cmu.sv.natural_language_generation;
 
-import edu.cmu.sv.YodaEnvironment;
-import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.ontology.Thing;
-import edu.cmu.sv.ontology.ThingWithRoles;
-import edu.cmu.sv.ontology.adjective.Adjective;
-import edu.cmu.sv.ontology.quality.TransientQuality;
-import edu.cmu.sv.ontology.role.has_quality_subroles.HasQualityRole;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.Combination;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
@@ -17,7 +11,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**

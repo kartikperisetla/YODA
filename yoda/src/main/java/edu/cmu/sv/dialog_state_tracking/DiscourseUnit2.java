@@ -17,6 +17,7 @@ public class DiscourseUnit2 {
     static final int BEAM_WIDTH = 10;
     StringDistribution hypothesisDistribution;
     Map<String, DialogStateHypothesis> hypotheses;
+    String initiator;
 
     public static class DialogStateHypothesis{
         SemanticsModel spokenByMe;
@@ -60,22 +61,6 @@ public class DiscourseUnit2 {
             this.spokenByThem = spokenByThem;
         }
 
-        public Float getTimeOfLastActByThem() {
-            return timeOfLastActByThem;
-        }
-
-        public void setTimeOfLastActByThem(Float timeOfLastActByThem) {
-            this.timeOfLastActByThem = timeOfLastActByThem;
-        }
-
-        public Float getTimeOfLastActByMe() {
-            return timeOfLastActByMe;
-        }
-
-        public void setTimeOfLastActByMe(Float timeOfLastActByMe) {
-            this.timeOfLastActByMe = timeOfLastActByMe;
-        }
-
         @Override
         public String toString() {
             return "DialogStateHypothesis{" +
@@ -102,10 +87,6 @@ public class DiscourseUnit2 {
 
     public void setHypothesisDistribution(StringDistribution hypothesisDistribution) {
         this.hypothesisDistribution = hypothesisDistribution;
-    }
-
-    public void setHypotheses(Map<String, DialogStateHypothesis> hypotheses) {
-        this.hypotheses = hypotheses;
     }
 
     /*

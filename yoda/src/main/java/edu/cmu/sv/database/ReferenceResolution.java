@@ -1,10 +1,9 @@
 package edu.cmu.sv.database;
 
-import edu.cmu.sv.YodaEnvironment;
+import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.adjective.Adjective;
-import edu.cmu.sv.ontology.misc.WebResource;
 import edu.cmu.sv.ontology.noun.Noun;
 import edu.cmu.sv.ontology.preposition.Preposition;
 import edu.cmu.sv.ontology.quality.TransientQuality;

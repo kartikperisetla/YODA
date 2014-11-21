@@ -7,11 +7,9 @@ import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.noun.Time;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.StringDistribution;
+import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.json.simple.parser.ParseException;
 import org.junit.Test;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.UpdateExecutionException;
-import org.openrdf.repository.RepositoryException;
 
 import java.util.*;
 

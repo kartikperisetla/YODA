@@ -1,6 +1,6 @@
 package edu.cmu.sv.natural_language_generation.Templates;
 
-import edu.cmu.sv.YodaEnvironment;
+import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.database.Database;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
 import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
@@ -18,7 +18,6 @@ import edu.cmu.sv.semantics.SemanticsModel;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
 
 import java.util.*;
 import java.util.stream.Collectors;

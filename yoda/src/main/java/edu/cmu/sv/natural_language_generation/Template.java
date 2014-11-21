@@ -1,12 +1,9 @@
 package edu.cmu.sv.natural_language_generation;
 
-import edu.cmu.sv.YodaEnvironment;
-import edu.cmu.sv.semantics.SemanticsModel;
+import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.json.simple.JSONObject;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by David Cohen on 10/27/14.

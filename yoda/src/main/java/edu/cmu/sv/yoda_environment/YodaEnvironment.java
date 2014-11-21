@@ -1,9 +1,11 @@
-package edu.cmu.sv;
+package edu.cmu.sv.yoda_environment;
 
 import edu.cmu.sv.database.Database;
 import edu.cmu.sv.dialog_management.DialogManager;
 import edu.cmu.sv.dialog_state_tracking.DialogStateTracker2;
 import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
+import edu.cmu.sv.spoken_language_understanding.KeywordUnderstander;
+import edu.cmu.sv.spoken_language_understanding.SpokenLanguageUnderstander;
 
 /**
  * Created by David Cohen on 10/14/14.
@@ -17,7 +19,7 @@ public class YodaEnvironment {
     public DialogManager dm;
     public Database db;
     public NaturalLanguageGenerator nlg;
-    // public SpokenLanguageUnderstander slu;
+    public SpokenLanguageUnderstander slu;
 
 
     public static YodaEnvironment dstTestingEnvironment(){
@@ -33,6 +35,8 @@ public class YodaEnvironment {
         ans.db = new Database(ans);
         ans.dm = new DialogManager(ans);
         ans.nlg = new NaturalLanguageGenerator(ans);
+        ans.slu = new KeywordUnderstander(ans);
         return ans;
     }
+
 }
