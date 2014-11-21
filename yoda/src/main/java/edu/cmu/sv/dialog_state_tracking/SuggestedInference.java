@@ -22,7 +22,7 @@ import java.util.Set;
 public class SuggestedInference implements DiscourseUnitUpdateInference {
     static Double penaltyForReinterpretingFragment = .9;
     @Override
-    public DiscourseUnit2 applyAll(DiscourseUnit2.DialogStateHypothesis currentState, Turn turn, float timeStamp) {
+    public DiscourseUnit2 applyAll(DiscourseUnit2.DialogStateHypothesis currentState, Turn turn, long timeStamp) {
         int newDUHypothesisCounter = 0;
         DiscourseUnit2 ans = new DiscourseUnit2();
 

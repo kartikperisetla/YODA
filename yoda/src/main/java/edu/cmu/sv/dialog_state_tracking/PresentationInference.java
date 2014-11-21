@@ -16,7 +16,7 @@ public class PresentationInference implements DiscourseUnitUpdateInference {
     private final static double penaltyForReinterpretingFragment = .75;
 
     @Override
-    public DiscourseUnit2 applyAll(DiscourseUnit2.DialogStateHypothesis currentState, Turn turn, float timeStamp) {
+    public DiscourseUnit2 applyAll(DiscourseUnit2.DialogStateHypothesis currentState, Turn turn, long timeStamp) {
         int newDUHypothesisCounter = 0;
         DiscourseUnit2 ans = new DiscourseUnit2();
         // if this isn't the first utterance of a DU, this turn can't be interpreted using PresentInference

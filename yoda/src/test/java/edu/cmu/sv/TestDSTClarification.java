@@ -94,8 +94,8 @@ public class TestDSTClarification {
         currentTurn = new Turn("user", null, sluHypotheses, sluDistribution);
         correctState = new DiscourseUnit2.DialogStateHypothesis();
         correctState.setSpokenByThem(sm1.deepCopy());
-        testCase.getTurns().put(currentTurn, (float) 0.0);
-        testCase.getEvaluationStates().put(correctState, (float) 0.0);
+        testCase.getTurns().put(currentTurn, (long) 0.0);
+        testCase.getEvaluationStates().put(correctState, (long) 0.0);
 
 
         /// Turn 2
@@ -123,8 +123,8 @@ public class TestDSTClarification {
         correctState = new DiscourseUnit2.DialogStateHypothesis();
         correctState.setSpokenByThem(sm1.deepCopy());
         correctState.setSpokenByMe(sm3.deepCopy());
-        testCase.getTurns().put(currentTurn, (float) 1.0);
-        testCase.getEvaluationStates().put(correctState, (float) 1.0);
+        testCase.getTurns().put(currentTurn, (long) 1.0);
+        testCase.getEvaluationStates().put(correctState, (long) 1.0);
 
         /// Turn 3
         String uri5 = null;
@@ -157,8 +157,8 @@ public class TestDSTClarification {
         correctState = new DiscourseUnit2.DialogStateHypothesis();
         correctState.setSpokenByThem(sm2.deepCopy());
         correctState.setSpokenByMe(sm3.deepCopy());
-        testCase.getTurns().put(currentTurn, (float) 2.0);
-        testCase.getEvaluationStates().put(correctState, (float) 2.0);
+        testCase.getTurns().put(currentTurn, (long) 2.0);
+        testCase.getEvaluationStates().put(correctState, (long) 2.0);
 
         return testCase;
     }
@@ -202,8 +202,8 @@ public class TestDSTClarification {
         currentTurn = new Turn("system", sm1.deepCopy(), null, null);
         correctState = new DiscourseUnit2.DialogStateHypothesis();
         correctState.setSpokenByMe(sm1.deepCopy());
-        testCase.getTurns().put(currentTurn, (float) 0.0);
-        testCase.getEvaluationStates().put(correctState, (float) 0.0);
+        testCase.getTurns().put(currentTurn, (long) 0.0);
+        testCase.getEvaluationStates().put(correctState, (long) 0.0);
 
         /// Turn 2
         jsonString = "{\"dialogAct\":\"NonHearing\"}";
@@ -223,8 +223,8 @@ public class TestDSTClarification {
         correctState = new DiscourseUnit2.DialogStateHypothesis();
         correctState.setSpokenByMe(sm1.deepCopy());
         correctState.setSpokenByThem(sm2.deepCopy());
-        testCase.getTurns().put(currentTurn, (float) 1.0);
-        testCase.getEvaluationStates().put(correctState, (float) 1.0);
+        testCase.getTurns().put(currentTurn, (long) 1.0);
+        testCase.getEvaluationStates().put(correctState, (long) 1.0);
 
         /// Turn 3
         // (the system repeats itself)
@@ -245,8 +245,8 @@ public class TestDSTClarification {
         correctState = new DiscourseUnit2.DialogStateHypothesis();
         correctState.setSpokenByMe(sm4.deepCopy());
         correctState.setSpokenByThem(sm2.deepCopy());
-        testCase.getTurns().put(currentTurn, (float) 2.0);
-        testCase.getEvaluationStates().put(correctState, (float) 2.0);
+        testCase.getTurns().put(currentTurn, (long) 2.0);
+        testCase.getEvaluationStates().put(correctState, (long) 2.0);
 
         return testCase;
     }
@@ -328,8 +328,8 @@ public class TestDSTClarification {
         currentTurn = new Turn("user", null, sluHypotheses, sluDistribution);
         correctState = new DiscourseUnit2.DialogStateHypothesis();
         correctState.setSpokenByThem(sm1.deepCopy());
-        testCase.getTurns().put(currentTurn, (float) 0.0);
-        testCase.getEvaluationStates().put(correctState, (float) 0.0);
+        testCase.getTurns().put(currentTurn, (long) 0.0);
+        testCase.getEvaluationStates().put(correctState, (long) 0.0);
 
 
         /// Turn 2
@@ -362,8 +362,8 @@ public class TestDSTClarification {
         correctState = new DiscourseUnit2.DialogStateHypothesis();
         correctState.setSpokenByThem(sm1.deepCopy());
         correctState.setSpokenByMe(sm5.deepCopy());
-        testCase.getTurns().put(currentTurn, (float) 1.0);
-        testCase.getEvaluationStates().put(correctState, (float) 1.0);
+        testCase.getTurns().put(currentTurn, (long) 1.0);
+        testCase.getEvaluationStates().put(correctState, (long) 1.0);
 
         /// Turn 3
         SemanticsModel sm6 = new SemanticsModel();
@@ -422,8 +422,8 @@ public class TestDSTClarification {
         correctState = new DiscourseUnit2.DialogStateHypothesis();
         correctState.setSpokenByMe(sm5.deepCopy());
         correctState.setSpokenByThem(sm1.deepCopy());
-        testCase.getTurns().put(currentTurn, (float) 2.0);
-        testCase.getEvaluationStates().put(correctState, (float) 2.0);
+        testCase.getTurns().put(currentTurn, (long) 2.0);
+        testCase.getEvaluationStates().put(correctState, (long) 2.0);
 
 
         return testCase;

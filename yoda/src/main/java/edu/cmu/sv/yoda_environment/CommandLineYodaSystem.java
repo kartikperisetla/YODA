@@ -12,14 +12,14 @@ import java.io.InputStreamReader;
  */
 public class CommandLineYodaSystem {
 
-    YodaEnvironment
-
     public static void main(String[] args) throws IOException {
+        YodaEnvironment yodaEnvironment = YodaEnvironment.dialogTestingEnvironment();
+
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         String s;
-        while ((s = in.readLine()) != null && s.length() != 0)
-            System.out.println(s);
         // An empty line or Ctrl-Z terminates the program
+        while ((s = in.readLine()) != null && s.length() != 0)
+            yodaEnvironment.slu.process1BestAsr(s);
     }
 
 }

@@ -14,16 +14,16 @@ import java.util.*;
  */
 public class DSTTester {
     YodaEnvironment yodaEnvironment;
-    Map<Turn, Float> turns = new HashMap<>();
-    Map<DiscourseUnit2.DialogStateHypothesis, Float> evaluationStates = new HashMap<>();
+    Map<Turn, Long> turns = new HashMap<>();
+    Map<DiscourseUnit2.DialogStateHypothesis, Long> evaluationStates = new HashMap<>();
 
     public DSTTester(YodaEnvironment yodaEnvironment) {
         this.yodaEnvironment = yodaEnvironment;
     }
 
     /*
-        * EvaluationResult contains the important results of an evaluation
-        * */
+    * EvaluationResult contains the important results of an evaluation
+    * */
     public class EvaluationResult{
         List<Integer> correctHypothesisRanks;
         List<Double> correctHypothesisRelativeLikelihoods;
@@ -59,23 +59,19 @@ public class DSTTester {
     }
 
     public EvaluationResult evaluate(){
-        Float startTime = turns.values().stream().min(Float::compare).orElse((float)0)-1;
-        Float endTime = turns.values().stream().max(Float::compare).orElse((float)0)+1;
+        Long startTime = turns.values().stream().min(Long::compare).orElse((long) 0)-1;
+        Long endTime = turns.values().stream().max(Long::compare).orElse((long) 0)+1;
         List<Integer> correctHypothesisRanks = new LinkedList<>();
         List<Double> correctHypothesisRelativeLikelihoods = new LinkedList<>();
 
         Set<Turn> turnsDone = new HashSet<>();
         Set<DiscourseUnit2.DialogStateHypothesis> evaluationStatesDone = new HashSet<>();
         // .1 second increments
-        for (Float t = startTime; t < endTime; t+=(float).1) {
+        for (Long t = startTime; t < endTime; t+=100) {
             for (Turn turn : turns.keySet()){
-                if (turns.get(turn) < t && !turnsDone.contains(turn)){
-                    try {
-                        yodaEnvironment.dst.updateDialogState(turn, t);
-                        turnsDone.add(turn);
-                    } catch (IllegalAccessException | InstantiationException e) {
-                        e.printStackTrace();
-                    }
+                if (turns.get(turn) < t && !turnsDone.contains(turn)) {
+                    yodaEnvironment.dst.updateDialogState(turn, t);
+                    turnsDone.add(turn);
                 }
             }
             for (DiscourseUnit2.DialogStateHypothesis groundTruth : evaluationStates.keySet()){
@@ -91,11 +87,11 @@ public class DSTTester {
         return new EvaluationResult(correctHypothesisRanks, correctHypothesisRelativeLikelihoods);
     }
 
-    public Map<Turn, Float> getTurns() {
+    public Map<Turn, Long> getTurns() {
         return turns;
     }
 
-    public Map<DiscourseUnit2.DialogStateHypothesis, Float> getEvaluationStates() {
+    public Map<DiscourseUnit2.DialogStateHypothesis, Long> getEvaluationStates() {
         return evaluationStates;
     }
 }
