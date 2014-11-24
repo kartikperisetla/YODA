@@ -73,11 +73,6 @@ public class DenyIncorrectSenseSuggestion extends DialogAct {
     }
 
     @Override
-    public Double cost(DiscourseUnit2 DU) {
-        return 0.0;
-    }
-
-    @Override
     public Map<String, Class<? extends Thing>> getParameters() {
         return parameters;
     }

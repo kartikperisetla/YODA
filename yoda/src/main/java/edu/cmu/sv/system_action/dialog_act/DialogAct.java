@@ -19,7 +19,6 @@ import java.util.*;
  */
 public abstract class DialogAct extends SystemAction {
     public abstract Double reward(DiscourseUnit2 DU);
-    public abstract Double cost(DiscourseUnit2 DU);
     public abstract Map<String, Class<? extends Thing>> getParameters();
     public abstract Map<String, Object> getBindings();
     public abstract void bindVariables(Map<String, Object> bindings);

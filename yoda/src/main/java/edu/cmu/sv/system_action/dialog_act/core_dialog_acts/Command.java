@@ -16,11 +16,6 @@ public class Command extends DialogAct {
     }
 
     @Override
-    public Double cost(DiscourseUnit2 DU) {
-        return null;
-    }
-
-    @Override
     public Map<String, Class<? extends Thing>> getParameters() {
         return null;
     }

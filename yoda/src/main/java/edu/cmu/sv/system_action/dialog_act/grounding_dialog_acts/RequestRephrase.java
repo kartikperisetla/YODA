@@ -28,13 +28,6 @@ public class RequestRephrase extends DialogAct {
     }
 
     @Override
-    public Double cost(DiscourseUnit2 DU) {
-        // a complete rephrase will typically involve Subj + Obj + Verb
-        return RewardAndCostCalculator.penaltyForObligingUserPhrase*3 +
-                RewardAndCostCalculator.penaltyForSpeakingPhrase *1;
-    }
-
-    @Override
     public Map<String, Class <? extends Thing>> getParameters() {
         return parameters;
     }

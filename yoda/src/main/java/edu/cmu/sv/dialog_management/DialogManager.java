@@ -87,8 +87,7 @@ public class DialogManager implements Runnable {
                     DialogAct dialogAct = daClass.newInstance();
                     dialogAct.bindVariables(binding);
                     Double expectedReward = dialogAct.reward(currentDialogState);
-                    Double expectedCost = dialogAct.cost(currentDialogState);
-                    actionExpectedReward.put(dialogAct, expectedReward - expectedCost);
+                    actionExpectedReward.put(dialogAct, expectedReward);
                 }
 
             }
