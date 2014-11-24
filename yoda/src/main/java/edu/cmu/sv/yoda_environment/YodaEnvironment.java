@@ -6,7 +6,7 @@ import edu.cmu.sv.dialog_state_tracking.DialogStateTracker2;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
 import edu.cmu.sv.dialog_state_tracking.Turn;
 import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
-import edu.cmu.sv.spoken_language_understanding.KeywordUnderstander;
+import edu.cmu.sv.spoken_language_understanding.RegexUnderstander;
 import edu.cmu.sv.spoken_language_understanding.SpokenLanguageUnderstander;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -59,7 +59,7 @@ public class YodaEnvironment {
         ans.db = new Database(ans);
         ans.dm = new DialogManager(ans);
         ans.nlg = new NaturalLanguageGenerator(ans);
-        ans.slu = new KeywordUnderstander(ans);
+        ans.slu = new RegexUnderstander(ans);
         return ans;
     }
 
@@ -72,7 +72,7 @@ public class YodaEnvironment {
         ans.db = new Database(ans);
         ans.dm = new DialogManager(ans);
         ans.nlg = new NaturalLanguageGenerator(ans);
-        ans.slu = new KeywordUnderstander(ans);
+        ans.slu = new RegexUnderstander(ans);
 
         Thread dstThread = new Thread(ans.dst);
         dstThread.start();

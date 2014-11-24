@@ -115,7 +115,7 @@ public class DialogManager implements Runnable {
                 System.exit(0);
             }
             List<Pair<SystemAction, Double>> rankedActions = selectAction();
-            logger.info("Action Selected: " + rankedActions.get(0).toString());
+            logger.info("Ranked actions: " + rankedActions.toString());
         }
     }
 }

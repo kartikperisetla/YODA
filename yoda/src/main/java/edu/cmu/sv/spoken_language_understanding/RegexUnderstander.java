@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by David Cohen on 11/21/14.
@@ -21,12 +23,12 @@ import java.util.logging.SimpleFormatter;
  * A simple keyword-based SLU system for quick-n-dirty tests
  *
  */
-public class KeywordUnderstander implements SpokenLanguageUnderstander{
-    private static Logger logger = Logger.getLogger("yoda.spoken_language_understanding.KeywordUnderstander");
+public class RegexUnderstander implements SpokenLanguageUnderstander{
+    private static Logger logger = Logger.getLogger("yoda.spoken_language_understanding.RegexUnderstander");
     private static FileHandler fh;
     static {
         try {
-            fh = new FileHandler("KeywordUnderstander.log");
+            fh = new FileHandler("RegexUnderstander.log");
             fh.setFormatter(new SimpleFormatter());
         } catch (IOException e) {
             e.printStackTrace();
@@ -35,7 +37,6 @@ public class KeywordUnderstander implements SpokenLanguageUnderstander{
         logger.addHandler(fh);
     }
 
-
     Calendar calendar = Calendar.getInstance();
 
     @Override
@@ -43,13 +44,29 @@ public class KeywordUnderstander implements SpokenLanguageUnderstander{
         logger.info("input asr result:"+asrResult);
         if (asrResult.length()==0)
             return;
-        String dialogAct = "Command";
-        String[] words = asrResult.split(" ");
-        if (Arrays.asList("is", "am", "are").contains(words[0]))
-            dialogAct="YNQuestion";
-        if (Arrays.asList("what", "who", "when", "where").contains(words[0]))
-            dialogAct="WHQuestion";
-        SemanticsModel interpretation = new SemanticsModel("{\"dialogAct\":\""+dialogAct+"\", \"verb\":{\"class\":\"HasProperty\"}}");
+
+
+        String jsonString = "{}";
+
+        Pattern howExpensivePattern = Pattern.compile("how (cheap|expensive)( is| are| )(.+)");
+        Matcher m = howExpensivePattern.matcher(asrResult);
+        if (m.matches()) {
+            String PoiName = m.group(2);
+            System.out.println(PoiName);
+            String uri = yodaEnvironment.db.insertValue(PoiName);
+            jsonString = "{\"dialogAct\":\"WHQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\""+uri+"\",\"class\":\"WebResource\"},\"class\":\"PlaceOfWorship\"},\"Patient\":{\"class\":\"UnknownThingWithRoles\",\"HasExpensiveness\":{\"class\":\"Expensive\"}},\"class\":\"HasProperty\"}}";
+        }
+
+        Pattern isExpensivePattern = Pattern.compile("(is |are |)(the |)?(.+)(expensive)");
+        Matcher m2 = isExpensivePattern.matcher(asrResult);
+        if (m2.matches()) {
+            String PoiName = m2.group(2);
+            System.out.println(PoiName);
+            String uri = yodaEnvironment.db.insertValue(PoiName);
+            jsonString = "{\"dialogAct\":\"YNQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\""+uri+"\",\"class\":\"WebResource\"},\"class\":\"PlaceOfWorship\"},\"Patient\":{\"class\":\"UnknownThingWithRoles\",\"HasExpensiveness\":{\"class\":\"Expensive\"}},\"class\":\"HasProperty\"}}";
+        }
+
+        SemanticsModel interpretation = new SemanticsModel(jsonString);
 
         // create a turn and update the DST
         Map<String, SemanticsModel> hypotheses = new HashMap<>();
@@ -58,7 +75,7 @@ public class KeywordUnderstander implements SpokenLanguageUnderstander{
         hypothesisDistribution.put("hyp1", 1.0);
         Turn newTurn = new Turn("user", null, hypotheses, hypothesisDistribution);
         yodaEnvironment.DstInputQueue.add(new ImmutablePair<>(newTurn, calendar.getTimeInMillis()));
-        logger.info("interpretation:"+interpretation);
+        logger.info("interpretation:" + interpretation);
 //        yodaEnvironment.dst.updateDialogState(newTurn, calendar.getTimeInMillis());
     }
 
@@ -68,7 +85,7 @@ public class KeywordUnderstander implements SpokenLanguageUnderstander{
     }
 
     YodaEnvironment yodaEnvironment;
-    public KeywordUnderstander(YodaEnvironment yodaEnvironment) {
+    public RegexUnderstander(YodaEnvironment yodaEnvironment) {
         this.yodaEnvironment = yodaEnvironment;
     }
 }
