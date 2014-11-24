@@ -20,8 +20,8 @@ public class RespondToYNQuestionTask extends DialogTask {
 
         // query the entire statement
         // don't make use of the descriptions / bindings which have already been collected
-        // todo: generate a dialog act
-        System.out.println("query result:"+sparqlTools.ynQuestionResult(db, taskSpec));
+        // todo: implement / generate a dialog act
+//        System.out.println("query result:"+sparqlTools.ynQuestionResult(db, taskSpec));
     }
 
     @Override

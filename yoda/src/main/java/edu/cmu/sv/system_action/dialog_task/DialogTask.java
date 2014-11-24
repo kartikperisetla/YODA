@@ -3,6 +3,7 @@ package edu.cmu.sv.system_action.dialog_task;
 import edu.cmu.sv.database.Database;
 import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
 import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.system_action.SystemAction;
@@ -11,6 +12,7 @@ import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestVerbRole;
 import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestVerb;
 import edu.cmu.sv.utils.StringDistribution;
+import org.json.simple.JSONObject;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -43,20 +45,18 @@ public abstract class DialogTask extends SystemAction {
 
     /*
     * RequestVerb is a standard slot-filling act that will be used by most dialog tasks
-    * when the verb is not included in the DU
-    * at least one semantic role is required to generate this dialog act,
-    * so we take the most `important' one
+    * when the verb class is not defined in the DU
     * */
     public DialogAct requestVerb(){
-        String verb = taskSpec.getSlots().get("verb");
-        String parameterValue = taskSpec.getSlots().get("Agent");
+        String verbClass = (String) taskSpec.newGetSlotPathFiller("verb.class");
+        String parameterValue = (String) taskSpec.newGetSlotPathFiller("verb.Agent.class");
         if (parameterValue==null)
-            parameterValue = taskSpec.getSlots().get("Patient");
+            parameterValue = (String) taskSpec.newGetSlotPathFiller("verb.Patient.class");
         if (parameterValue==null)
-            parameterValue = taskSpec.getSlots().get("Theme");
-        if (parameterValue==null && verb==null)
+            parameterValue = (String) taskSpec.newGetSlotPathFiller("verb.Theme.class");
+        if (parameterValue==null)
             return null;
-        if (verb==null) {
+        if (verbClass.equals(UnknownThingWithRoles.class.getSimpleName())) {
             Map<String, Object> bindings = new HashMap<>();
             bindings.put("v1", parameterValue);
             DialogAct ans = new RequestVerb();
@@ -73,23 +73,24 @@ public abstract class DialogTask extends SystemAction {
     * */
     public Collection<DialogAct> requestMissingRequiredVerbRoles(){
         Collection<DialogAct> ans = new HashSet<>();
-        String verb = taskSpec.getSlots().get("verb");
-        if (verb==null) {
+        String verbClassString = (String) taskSpec.newGetSlotPathFiller("verb.class");
+        if (verbClassString.equals(UnknownThingWithRoles.class.getSimpleName())) {
             return ans;
         }
-
-        Class<? extends Verb> verbClass = OntologyRegistry.verbNameMap.get(verb);
+        Class<? extends Verb> verbClass = OntologyRegistry.verbNameMap.get(verbClassString);
         Set<Class <? extends Role>> requiredRoles = null;
         try {
             requiredRoles = verbClass.newInstance().getRequiredRoles();
-            Set<Class<? extends Role>> missingRoles = requiredRoles.stream().
-                    filter(x -> !taskSpec.getSlots().containsKey(x.getSimpleName())).
-                    collect(Collectors.toSet());
+            Set<Class<? extends Role>> missingRoles = new HashSet<>();
+            for (Class<? extends Role> cls : requiredRoles){
+                if (!((JSONObject) taskSpec.newGetSlotPathFiller("verb")).containsKey(cls.getSimpleName()))
+                    missingRoles.add(cls);
+            }
 
             for (Class<? extends Role> roleCls : missingRoles){
                 Map<String, Object> bindings = new HashMap<>();
                 bindings.put("r1", roleCls.getSimpleName());
-                bindings.put("v1", verb);
+                bindings.put("v1", verbClassString);
                 DialogAct tmp = new RequestVerbRole();
                 tmp.bindVariables(bindings);
                 ans.add(tmp);
@@ -107,20 +108,20 @@ public abstract class DialogTask extends SystemAction {
     * This looks at some selected roles, and if they are highly ambiguous in the database,
     * this returns some suggested values which might disambiguate the referents
     * */
+    // TODO: implement this
     public Collection<DialogAct> suggestDisambiguatingValues(){
         Map<String, StringDistribution> bindings = new HashMap<>();
         Map<String, SemanticsModel> descriptions = new HashMap<>();
 
-        for (String slot : taskSpec.getSlots().keySet()){
-            if (slot.equals("dialogAct"))
-                continue;
-            if (taskSpec.getChildren().containsKey(taskSpec.getSlots().get(slot))) {
-                SemanticsModel description = taskSpec.getChildren().get(taskSpec.getSlots().get(slot));
-                bindings.put(slot, sparqlTools.possibleReferents(db, description));
-                descriptions.put(slot, description);
-            }
-        }
-        // TODO: actually implement the part that decides what to suggest
+//        for (String slot : taskSpec.getSlots().keySet()){
+//            if (slot.equals("dialogAct"))
+//                continue;
+//            if (taskSpec.getChildren().containsKey(taskSpec.getSlots().get(slot))) {
+//                SemanticsModel description = taskSpec.getChildren().get(taskSpec.getSlots().get(slot));
+//                bindings.put(slot, sparqlTools.possibleReferents(db, description));
+//                descriptions.put(slot, description);
+//            }
+//        }
         return new HashSet<>();
     }
 

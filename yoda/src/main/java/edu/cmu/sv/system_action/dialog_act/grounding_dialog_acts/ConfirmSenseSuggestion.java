@@ -68,6 +68,7 @@ public class ConfirmSenseSuggestion extends DialogAct {
             ans += RewardAndCostCalculator.penaltyForIgnoringUserRequest *
                     DU.getHypothesisDistribution().get(hypID);
         }
+        ans -= RewardAndCostCalculator.penaltyForSpeakingPhrase;
         return ans;
     }
 

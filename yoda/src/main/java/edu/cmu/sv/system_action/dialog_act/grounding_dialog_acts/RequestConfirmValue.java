@@ -43,7 +43,7 @@ public class RequestConfirmValue extends DialogAct {
         try {
             return RewardAndCostCalculator.clarificationDialogActReward(db, DU,
                     RewardAndCostCalculator.predictConfidenceGainFromValueConfirmation(DU,
-                            boundVariables.get("v1")));
+                            boundVariables.get("v1"))) - RewardAndCostCalculator.penaltyForSpeakingPhrase;
         } catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
             e.printStackTrace();
         }

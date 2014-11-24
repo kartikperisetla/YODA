@@ -546,7 +546,6 @@ public class SemanticsModel {
         return ((SemanticsModel) obj).internalRepresentation.equals(internalRepresentation);
     }
 
-    public Map<String, String> getSlots(){return null;}
     public Map<String, SemanticsModel> getChildren(){return null;}
 
     @Override

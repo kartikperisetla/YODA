@@ -25,38 +25,38 @@ public class TestRespondToYNQuestion {
         Database db = yodaEnvironment.db;
         addTestContent(db);
 
-        // example 0
-        SemanticsModel taskSpec = new SemanticsModel();
-        taskSpec.getSlots().put("dialogAct", "YNQuestion");
-        taskSpec.getSlots().put("verb", "Exist");
-        taskSpec.getSlots().put("Patient", "X");
-        SemanticsModel child = new SemanticsModel();
-        taskSpec.getChildren().put("X", child);
-        child.getSlots().put("class", "Meeting");
-
-        RespondToYNQuestionTask task = new RespondToYNQuestionTask(db);
-        task.setTaskSpec(taskSpec);
-        task.execute();
-
-
-        // example 1
-        taskSpec = new SemanticsModel();
-        taskSpec.getSlots().put("dialogAct", "YNQuestion");
-        taskSpec.getSlots().put("verb", "Create");
-
-        taskSpec.getSlots().put("Agent", "Y");
-        child = new SemanticsModel();
-        taskSpec.getChildren().put("Y", child);
-        child.getSlots().put("class", "Person");
-
-        taskSpec.getSlots().put("Patient", "X");
-        child = new SemanticsModel();
-        taskSpec.getChildren().put("X", child);
-        child.getSlots().put("class", "Meeting");
-
-        task = new RespondToYNQuestionTask(db);
-        task.setTaskSpec(taskSpec);
-        task.execute();
+//        // example 0
+//        SemanticsModel taskSpec = new SemanticsModel();
+//        taskSpec.getSlots().put("dialogAct", "YNQuestion");
+//        taskSpec.getSlots().put("verb", "Exist");
+//        taskSpec.getSlots().put("Patient", "X");
+//        SemanticsModel child = new SemanticsModel();
+//        taskSpec.getChildren().put("X", child);
+//        child.getSlots().put("class", "Meeting");
+//
+//        RespondToYNQuestionTask task = new RespondToYNQuestionTask(db);
+//        task.setTaskSpec(taskSpec);
+//        task.execute();
+//
+//
+//        // example 1
+//        taskSpec = new SemanticsModel();
+//        taskSpec.getSlots().put("dialogAct", "YNQuestion");
+//        taskSpec.getSlots().put("verb", "Create");
+//
+//        taskSpec.getSlots().put("Agent", "Y");
+//        child = new SemanticsModel();
+//        taskSpec.getChildren().put("Y", child);
+//        child.getSlots().put("class", "Person");
+//
+//        taskSpec.getSlots().put("Patient", "X");
+//        child = new SemanticsModel();
+//        taskSpec.getChildren().put("X", child);
+//        child.getSlots().put("class", "Meeting");
+//
+//        task = new RespondToYNQuestionTask(db);
+//        task.setTaskSpec(taskSpec);
+//        task.execute();
 
     }
 

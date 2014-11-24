@@ -20,7 +20,8 @@ public class RequestRephrase extends DialogAct {
     public Double reward(DiscourseUnit2 DU) {
         try{
         return RewardAndCostCalculator.clarificationDialogActReward(db, DU,
-                RewardAndCostCalculator.predictedConfidenceGainFromJointClarification(DU));
+                RewardAndCostCalculator.predictedConfidenceGainFromJointClarification(DU)) -
+                RewardAndCostCalculator.penaltyForSpeakingPhrase;
         } catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
             e.printStackTrace();
         }
