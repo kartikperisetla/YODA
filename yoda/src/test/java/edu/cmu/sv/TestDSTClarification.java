@@ -1,6 +1,6 @@
 package edu.cmu.sv;
 
-import edu.cmu.sv.dialog_state_tracking.DSTTester;
+import edu.cmu.sv.dialog_state_tracking.DialogStateTracker2;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
 import edu.cmu.sv.dialog_state_tracking.Turn;
 import edu.cmu.sv.ontology.OntologyRegistry;
@@ -27,7 +27,7 @@ public class TestDSTClarification {
         // so to reduce the chance of making variable scope mistakes,
         // I made a separate function for each one
         try {
-            for (DSTTester testDialog : Arrays.asList(testCase1())) {
+            for (DialogStateTracker2.DSTTester testDialog : Arrays.asList(testCase1())) {
                 System.out.println(testDialog.evaluate());
             }
         } catch (ParseException e) {
@@ -48,17 +48,17 @@ public class TestDSTClarification {
         S: Accept
         Ok
     */
-    DSTTester testCase1() throws ParseException {
+    DialogStateTracker2.DSTTester testCase1() throws ParseException {
         String jsonString;
         YodaEnvironment yodaEnvironment;
-        DSTTester testCase;
+        DialogStateTracker2.DSTTester testCase;
         Turn currentTurn;
         DiscourseUnit2.DialogStateHypothesis correctState;
         StringDistribution sluDistribution;
         Map<String, SemanticsModel> sluHypotheses;
 
         yodaEnvironment = YodaEnvironment.dstTestingEnvironment();
-        testCase = new DSTTester(yodaEnvironment);
+        testCase = new DialogStateTracker2.DSTTester(yodaEnvironment);
 
         /// Turn 1
         String uri1 = null;
@@ -173,9 +173,9 @@ public class TestDSTClarification {
     S: repeat
     you have a meeting at 2
     */
-    DSTTester testCase2() throws ParseException {
+    DialogStateTracker2.DSTTester testCase2() throws ParseException {
         YodaEnvironment yodaEnvironment;
-        DSTTester testCase;
+        DialogStateTracker2.DSTTester testCase;
         Turn currentTurn;
         DiscourseUnit2.DialogStateHypothesis correctState;
         String jsonString;
@@ -183,7 +183,7 @@ public class TestDSTClarification {
         Map<String, SemanticsModel> sluHypotheses;
 
         yodaEnvironment = YodaEnvironment.dstTestingEnvironment();
-        testCase = new DSTTester(yodaEnvironment);
+        testCase = new DialogStateTracker2.DSTTester(yodaEnvironment);
 
         /// Turn 1
         String uri1 = null;

@@ -4,7 +4,9 @@ import edu.cmu.sv.dialog_state_tracking.Turn;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,8 +22,15 @@ public class KeywordUnderstander implements SpokenLanguageUnderstander{
 
     @Override
     public void process1BestAsr(String asrResult) {
-        SemanticsModel interpretation = new SemanticsModel();
-        //todo: add some content to the interpretation
+        if (asrResult.length()==0)
+            return;
+        String dialogAct = "Command";
+        String[] words = asrResult.split(" ");
+        if (Arrays.asList("is", "am", "are").contains(words[0]))
+            dialogAct="YNQuestion";
+        if (Arrays.asList("what", "who", "when", "where").contains(words[0]))
+            dialogAct="WHQuestion";
+        SemanticsModel interpretation = new SemanticsModel("{\"dialogAct\":\""+dialogAct+"\", \"verb\":{\"class\":\"HasProperty\"}}");
 
         // create a turn and update the DST
         Map<String, SemanticsModel> hypotheses = new HashMap<>();
@@ -29,7 +38,8 @@ public class KeywordUnderstander implements SpokenLanguageUnderstander{
         StringDistribution hypothesisDistribution = new StringDistribution();
         hypothesisDistribution.put("hyp1", 1.0);
         Turn newTurn = new Turn("user", null, hypotheses, hypothesisDistribution);
-        yodaEnvironment.dst.updateDialogState(newTurn, calendar.getTimeInMillis());
+        yodaEnvironment.DstInputQueue.add(new ImmutablePair<>(newTurn, calendar.getTimeInMillis()));
+//        yodaEnvironment.dst.updateDialogState(newTurn, calendar.getTimeInMillis());
     }
 
     @Override

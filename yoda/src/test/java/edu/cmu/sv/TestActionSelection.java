@@ -115,48 +115,48 @@ public class TestActionSelection {
 
     @Test
     public void Test() throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        List<TestCase> testCases = basicClarificationTestSet();
-        List<EvaluationResult> evaluationResults = new LinkedList<>();
-        SummaryStatistics rewardStatistics = new SummaryStatistics();
-        for (TestCase testCase : testCases) {
-            testCase.yodaEnvironment.dst.setDiscourseUnit(testCase.du);
-            List<Pair<SystemAction, Double>> topActions = testCase.yodaEnvironment.dm.selectAction();
-            topActions.stream().map(Pair::getRight).forEach(rewardStatistics::addValue);
-            System.out.println("\nTest case evaluation:");
-            EvaluationResult result = testCase.evaluate(topActions);
-            evaluationResults.add(result);
-            result.printSummary();
-        }
-
-        // aggregate evaluation results
-        EvaluationTools.ConfusionCounter confusionCounter = new EvaluationTools.ConfusionCounter<>(
-                evaluationResults.stream().
-                        map(EvaluationResult::getConfusion).
-                        filter(x -> x != null).
-                        map(x -> new ImmutablePair<>(x.getKey().getSimpleName(), x.getValue().getSimpleName())).
-                        collect(Collectors.toList()));
-
-        System.out.println("\nAggregate Evaluation Results:");
-
-        System.out.println("Mean reward difference: "+evaluationResults.stream().
-                map(EvaluationResult::getCorrectActionRewardDifference).mapToDouble(x -> x).
-                average().getAsDouble());
-
-        System.out.println("Mean normalized reward difference: "+evaluationResults.stream().
-                map(EvaluationResult::getCorrectActionRewardDifference).mapToDouble(x -> x).
-                average().getAsDouble() / rewardStatistics.getStandardDeviation());
-
-
-        System.out.println("Mean correct action rank: "+evaluationResults.stream().
-                map(EvaluationResult::getCorrectActionRank).mapToDouble(x->x).
-                average().getAsDouble());
-
-        System.out.println("Fraction correct: " + evaluationResults.stream().
-                map(EvaluationResult::isCorrectIsTopAction).filter(x -> x).
-                count()*1.0/evaluationResults.size());
-
-        System.out.println("Confusion Counter:");
-        System.out.println(confusionCounter);
+//        List<TestCase> testCases = basicClarificationTestSet();
+//        List<EvaluationResult> evaluationResults = new LinkedList<>();
+//        SummaryStatistics rewardStatistics = new SummaryStatistics();
+//        for (TestCase testCase : testCases) {
+//            testCase.yodaEnvironment.dst.setDiscourseUnit(testCase.du);
+//            List<Pair<SystemAction, Double>> topActions = testCase.yodaEnvironment.dm.selectAction();
+//            topActions.stream().map(Pair::getRight).forEach(rewardStatistics::addValue);
+//            System.out.println("\nTest case evaluation:");
+//            EvaluationResult result = testCase.evaluate(topActions);
+//            evaluationResults.add(result);
+//            result.printSummary();
+//        }
+//
+//        // aggregate evaluation results
+//        EvaluationTools.ConfusionCounter confusionCounter = new EvaluationTools.ConfusionCounter<>(
+//                evaluationResults.stream().
+//                        map(EvaluationResult::getConfusion).
+//                        filter(x -> x != null).
+//                        map(x -> new ImmutablePair<>(x.getKey().getSimpleName(), x.getValue().getSimpleName())).
+//                        collect(Collectors.toList()));
+//
+//        System.out.println("\nAggregate Evaluation Results:");
+//
+//        System.out.println("Mean reward difference: "+evaluationResults.stream().
+//                map(EvaluationResult::getCorrectActionRewardDifference).mapToDouble(x -> x).
+//                average().getAsDouble());
+//
+//        System.out.println("Mean normalized reward difference: "+evaluationResults.stream().
+//                map(EvaluationResult::getCorrectActionRewardDifference).mapToDouble(x -> x).
+//                average().getAsDouble() / rewardStatistics.getStandardDeviation());
+//
+//
+//        System.out.println("Mean correct action rank: "+evaluationResults.stream().
+//                map(EvaluationResult::getCorrectActionRank).mapToDouble(x->x).
+//                average().getAsDouble());
+//
+//        System.out.println("Fraction correct: " + evaluationResults.stream().
+//                map(EvaluationResult::isCorrectIsTopAction).filter(x -> x).
+//                count()*1.0/evaluationResults.size());
+//
+//        System.out.println("Confusion Counter:");
+//        System.out.println(confusionCounter);
 
     }
 
