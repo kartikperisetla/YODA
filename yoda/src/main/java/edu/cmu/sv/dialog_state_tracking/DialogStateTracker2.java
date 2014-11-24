@@ -6,13 +6,31 @@ import edu.cmu.sv.utils.HypothesisSetManagement;
 import edu.cmu.sv.utils.StringDistribution;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 /**
  * Created by David Cohen on 9/19/14.
  */
 public class DialogStateTracker2 implements Runnable {
+    private static Logger logger = Logger.getLogger("yoda.dialog_state_tracking.DialogStateTracker");
+    private static FileHandler fh;
+    static {
+        try {
+            fh = new FileHandler("DialogStateTracker.log");
+            fh.setFormatter(new SimpleFormatter());
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(0);
+        }
+        logger.addHandler(fh);
+    }
+
+
     static Set<Class <? extends DiscourseUnitUpdateInference>> updateInferences;
     static {
         updateInferences = new HashSet<>();
@@ -40,7 +58,7 @@ public class DialogStateTracker2 implements Runnable {
 
     private void updateDialogState(Turn turn, long timeStamp){
         try {
-            System.out.println("\n====== Turn ======");
+            logger.info("====== Turn ======");
             // validate input
             if (turn.hypotheses != null) {
                 for (SemanticsModel sm : turn.hypotheses.values()) {
@@ -62,7 +80,7 @@ public class DialogStateTracker2 implements Runnable {
                             inferredUpdatedState.hypotheses.get(tmpNewDUHypothesisID).getSpokenByMe().validateDSTHypothesis();
                             inferredUpdatedState.hypotheses.get(tmpNewDUHypothesisID).getSpokenByThem().validateDSTHypothesis();
                         } catch (Error error) {
-                            System.out.println(error);
+                            logger.info("discarding invalid DST hypothesis:"+ error.toString());
                             continue;
                         }
 
@@ -86,8 +104,8 @@ public class DialogStateTracker2 implements Runnable {
             discourseUnit.hypothesisDistribution.normalize();
 
             String topHyp = discourseUnit.hypothesisDistribution.getTopHypothesis();
-            System.out.println("top dialog state hypothesis: (p=" + discourseUnit.hypothesisDistribution.get(topHyp) + ")");
-            System.out.println(discourseUnit.hypotheses.get(topHyp));
+            logger.info("top dialog state hypothesis: (p=" + discourseUnit.hypothesisDistribution.get(topHyp) + ")");
+            logger.info(discourseUnit.hypotheses.get(topHyp).toString());
 
             yodaEnvironment.DmInputQueue.add(discourseUnit);
 

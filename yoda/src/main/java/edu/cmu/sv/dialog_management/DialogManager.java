@@ -12,9 +12,11 @@ import edu.cmu.sv.utils.Combination;
 import edu.cmu.sv.utils.HypothesisSetManagement;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.*;
 
 /**
  * Created by David Cohen on 9/2/14.
@@ -25,6 +27,19 @@ import java.util.concurrent.TimeUnit;
  *
  */
 public class DialogManager implements Runnable {
+    private static Logger logger = Logger.getLogger("yoda.dialog_management.DialogManager");
+    private static FileHandler fh;
+    static {
+        try {
+            fh = new FileHandler("DialogManager.log");
+            fh.setFormatter(new SimpleFormatter());
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(0);
+        }
+        logger.addHandler(fh);
+    }
+
     YodaEnvironment yodaEnvironment;
     DiscourseUnit2 currentDialogState = null;
 
@@ -67,8 +82,6 @@ public class DialogManager implements Runnable {
                     }
                 }
 
-//            System.out.println("DialogManager: possibleBindingsPerVariable: "+possibleBindingsPerVariable);
-
                 // create an action and evaluate reward for each possible binding
                 for (Map<String, Object> binding : Combination.possibleBindings(possibleBindingsPerVariable)) {
                     DialogAct dialogAct = daClass.newInstance();
@@ -102,8 +115,7 @@ public class DialogManager implements Runnable {
                 System.exit(0);
             }
             List<Pair<SystemAction, Double>> rankedActions = selectAction();
-            System.out.println("===== Action Selected =====");
-            System.out.println(rankedActions.get(0));
+            logger.info("Action Selected: " + rankedActions.get(0).toString());
         }
     }
 }

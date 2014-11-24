@@ -12,6 +12,9 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
+import java.util.logging.Logger;
 
 /**
  * Created by David Cohen on 10/14/14.
@@ -21,6 +24,16 @@ import java.util.concurrent.LinkedBlockingDeque;
  *
  */
 public class YodaEnvironment {
+    // remove console logging from the root log handler
+    static{
+        Logger rootLogger = Logger.getLogger("");
+        Handler[] handlers = rootLogger.getHandlers();
+        if (handlers[0] instanceof ConsoleHandler) {
+            rootLogger.removeHandler(handlers[0]);
+        }
+    }
+
+
     public DialogStateTracker2 dst;
     public DialogManager dm;
     public Database db;
