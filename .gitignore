@@ -1,6 +1,7 @@
 *~
 *.aux
 *.log
+*.log.lck
 *.out
 *.pyc
 *.class
