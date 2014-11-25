@@ -93,7 +93,7 @@ public class RewardAndCostCalculator {
         // sum up the predicted rewards supposing that each current hypothesis is true,
         // weighting the predicted reward by the current belief that the hypothesis is true.
         for (String hypothesisID : DU.getHypotheses().keySet()){
-            DiscourseUnit2.DialogStateHypothesis hypothesis = DU.getHypotheses().get(hypothesisID);
+            DiscourseUnit2.DiscourseUnitHypothesis hypothesis = DU.getHypotheses().get(hypothesisID);
             SemanticsModel spokenByThem = hypothesis.getSpokenByThem();
             Double currentConfidence = DU.getHypothesisDistribution().get(hypothesisID);
             Double predictedConfidence = currentConfidence + (1-currentConfidence)*

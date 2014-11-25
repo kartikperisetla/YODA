@@ -22,7 +22,7 @@ import java.util.Set;
 public class SuggestedInference implements DiscourseUnitUpdateInference {
     static Double penaltyForReinterpretingFragment = .9;
     @Override
-    public DiscourseUnit2 applyAll(DiscourseUnit2.DialogStateHypothesis currentState, Turn turn, long timeStamp) {
+    public DiscourseUnit2 applyAll(DiscourseUnit2.DiscourseUnitHypothesis currentState, Turn turn, long timeStamp) {
         int newDUHypothesisCounter = 0;
         DiscourseUnit2 ans = new DiscourseUnit2();
 
@@ -60,8 +60,8 @@ public class SuggestedInference implements DiscourseUnitUpdateInference {
 
                     for (String attachmentPoint : attachmentPoints.keySet()){
                         String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
-                        DiscourseUnit2.DialogStateHypothesis newDUHypothesis =
-                                new DiscourseUnit2.DialogStateHypothesis();
+                        DiscourseUnit2.DiscourseUnitHypothesis newDUHypothesis =
+                                new DiscourseUnit2.DiscourseUnitHypothesis();
                         SemanticsModel newSpokenByThemHypothesis = currentState.getSpokenByThem().deepCopy();
                         newSpokenByThemHypothesis.placeAtPoint("verb",
                                 new SemanticsModel(((JSONObject)currentState.getMostRecent().
@@ -97,8 +97,8 @@ public class SuggestedInference implements DiscourseUnitUpdateInference {
 
                 for (String attachmentPoint : attachmentPoints.keySet()){
                     String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
-                    DiscourseUnit2.DialogStateHypothesis newDUHypothesis =
-                            new DiscourseUnit2.DialogStateHypothesis();
+                    DiscourseUnit2.DiscourseUnitHypothesis newDUHypothesis =
+                            new DiscourseUnit2.DiscourseUnitHypothesis();
 
                     SemanticsModel newSpokenByMeHypothesis = currentState.getSpokenByMe().deepCopy();
                     newSpokenByMeHypothesis.placeAtPoint("verb",

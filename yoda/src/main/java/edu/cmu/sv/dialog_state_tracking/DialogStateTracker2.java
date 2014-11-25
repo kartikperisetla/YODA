@@ -46,7 +46,7 @@ public class DialogStateTracker2 implements Runnable {
         this.yodaEnvironment = yodaEnvironment;
         discourseUnit = new DiscourseUnit2();
         discourseUnit.hypothesisDistribution.put("initial_hypothesis", 1.0);
-        discourseUnit.hypotheses.put("initial_hypothesis", new DiscourseUnit2.DialogStateHypothesis());
+        discourseUnit.hypotheses.put("initial_hypothesis", new DiscourseUnit2.DiscourseUnitHypothesis());
         this.yodaEnvironment.DmInputQueue.add(discourseUnit);
     }
 
@@ -67,7 +67,7 @@ public class DialogStateTracker2 implements Runnable {
             }
             int newDUHypothesisCounter = 0;
             StringDistribution newHypothesisDistribution = new StringDistribution();
-            Map<String, DiscourseUnit2.DialogStateHypothesis> newHypotheses = new HashMap<>();
+            Map<String, DiscourseUnit2.DiscourseUnitHypothesis> newHypotheses = new HashMap<>();
 
             for (String currentDialogStateHypothesisID : discourseUnit.getHypothesisDistribution().keySet()) {
                 for (Class<? extends DiscourseUnitUpdateInference> updateInferenceClass : updateInferences) {
@@ -141,7 +141,7 @@ public class DialogStateTracker2 implements Runnable {
     public static class DSTTester {
         YodaEnvironment yodaEnvironment;
         Map<Turn, Long> turns = new HashMap<>();
-        Map<DiscourseUnit2.DialogStateHypothesis, Long> evaluationStates = new HashMap<>();
+        Map<DiscourseUnit2.DiscourseUnitHypothesis, Long> evaluationStates = new HashMap<>();
 
         public DSTTester(YodaEnvironment yodaEnvironment) {
             this.yodaEnvironment = yodaEnvironment;
@@ -191,7 +191,7 @@ public class DialogStateTracker2 implements Runnable {
             List<Double> correctHypothesisRelativeLikelihoods = new LinkedList<>();
 
             Set<Turn> turnsDone = new HashSet<>();
-            Set<DiscourseUnit2.DialogStateHypothesis> evaluationStatesDone = new HashSet<>();
+            Set<DiscourseUnit2.DiscourseUnitHypothesis> evaluationStatesDone = new HashSet<>();
             // .1 second increments
             for (Long t = startTime; t < endTime; t+=100) {
                 for (Turn turn : turns.keySet()){
@@ -200,7 +200,7 @@ public class DialogStateTracker2 implements Runnable {
                         turnsDone.add(turn);
                     }
                 }
-                for (DiscourseUnit2.DialogStateHypothesis groundTruth : evaluationStates.keySet()){
+                for (DiscourseUnit2.DiscourseUnitHypothesis groundTruth : evaluationStates.keySet()){
                     if (evaluationStates.get(groundTruth) < t && !evaluationStatesDone.contains(groundTruth)){
                         Pair<Integer, Double> result = yodaEnvironment.dst.getDiscourseUnit().compareHypothesis(groundTruth);
                         correctHypothesisRanks.add(result.getLeft());
@@ -217,7 +217,7 @@ public class DialogStateTracker2 implements Runnable {
             return turns;
         }
 
-        public Map<DiscourseUnit2.DialogStateHypothesis, Long> getEvaluationStates() {
+        public Map<DiscourseUnit2.DiscourseUnitHypothesis, Long> getEvaluationStates() {
             return evaluationStates;
         }
     }

@@ -5,18 +5,15 @@ import edu.cmu.sv.system_action.SystemAction;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.*;
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.utils.EvaluationTools;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by David Cohen on 9/4/14.
@@ -170,14 +167,14 @@ public class TestActionSelection {
             YodaEnvironment yodaEnvironment = YodaEnvironment.dialogTestingEnvironment();
             DiscourseUnit2 du = new DiscourseUnit2();
 
-            DiscourseUnit2.DialogStateHypothesis hyp1 = new DiscourseUnit2.DialogStateHypothesis();
+            DiscourseUnit2.DiscourseUnitHypothesis hyp1 = new DiscourseUnit2.DiscourseUnitHypothesis();
             String jsonString1 = "{\"dialogAct\":\"Command\",\n" +
                     " \"verb\":{\"class\":\"Create\",\n" +
                     "         \"Patient\":{\"class\":\"Meeting\"}}}";
             SemanticsModel spokenByThemHyp1 = new SemanticsModel(jsonString1);
             hyp1.setSpokenByThem(spokenByThemHyp1);
 
-            DiscourseUnit2.DialogStateHypothesis hyp2 = new DiscourseUnit2.DialogStateHypothesis();
+            DiscourseUnit2.DiscourseUnitHypothesis hyp2 = new DiscourseUnit2.DiscourseUnitHypothesis();
             String jsonString2 = "{\"dialogAct\":\"Command\",\n" +
                     " \"verb\":{\"class\":\"Create\",\n" +
                     "         \"Patient\":{\"class\":\"Email\"}}}";
@@ -207,7 +204,7 @@ public class TestActionSelection {
             YodaEnvironment yodaEnvironment = YodaEnvironment.dialogTestingEnvironment();
             DiscourseUnit2 du = new DiscourseUnit2();
 
-            DiscourseUnit2.DialogStateHypothesis hyp1 = new DiscourseUnit2.DialogStateHypothesis();
+            DiscourseUnit2.DiscourseUnitHypothesis hyp1 = new DiscourseUnit2.DiscourseUnitHypothesis();
             String jsonString1 = "{\"dialogAct\":null,\n" +
                     " \"verb\":{\"class\":\"Create\",\n" +
                     "         \"Patient\":{\"class\":\"Suggested\",\n" +
@@ -222,7 +219,7 @@ public class TestActionSelection {
             hyp1.setSpokenByMe(spokenByMeHyp1);
 
             du.getHypotheses().put("hyp1", hyp1);
-            du.getHypotheses().put("hyp2", new DiscourseUnit2.DialogStateHypothesis());
+            du.getHypotheses().put("hyp2", new DiscourseUnit2.DiscourseUnitHypothesis());
             StringDistribution weights = new StringDistribution();
             weights.put("hyp1", .8);
             weights.put("hyp2", .2);
@@ -241,7 +238,7 @@ public class TestActionSelection {
             YodaEnvironment yodaEnvironment = YodaEnvironment.dialogTestingEnvironment();
             DiscourseUnit2 du = new DiscourseUnit2();
 
-            DiscourseUnit2.DialogStateHypothesis hyp1 = new DiscourseUnit2.DialogStateHypothesis();
+            DiscourseUnit2.DiscourseUnitHypothesis hyp1 = new DiscourseUnit2.DiscourseUnitHypothesis();
             String jsonString1 = "{\"dialogAct\":null,\n" +
                     " \"verb\":{\"class\":\"Create\",\n" +
                     "         \"Patient\":{\"class\":\"Suggested\",\n" +
@@ -256,7 +253,7 @@ public class TestActionSelection {
             hyp1.setSpokenByMe(spokenByMeHyp1);
 
             du.getHypotheses().put("hyp1", hyp1);
-            du.getHypotheses().put("hyp2", new DiscourseUnit2.DialogStateHypothesis());
+            du.getHypotheses().put("hyp2", new DiscourseUnit2.DiscourseUnitHypothesis());
             StringDistribution weights = new StringDistribution();
             weights.put("hyp1", .8);
             weights.put("hyp2", .2);

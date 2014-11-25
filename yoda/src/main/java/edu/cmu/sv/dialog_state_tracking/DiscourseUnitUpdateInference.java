@@ -20,6 +20,6 @@ public interface DiscourseUnitUpdateInference {
     * be weighted by the assumed hypothesis' prior and collected to create the new DU
     *
     * */
-    public DiscourseUnit2 applyAll(DiscourseUnit2.DialogStateHypothesis currentState, Turn turn, long timeStamp);
+    public DiscourseUnit2 applyAll(DiscourseUnit2.DiscourseUnitHypothesis currentState, Turn turn, long timeStamp);
 
 }

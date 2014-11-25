@@ -6,7 +6,6 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,16 +15,48 @@ import java.util.Map;
 public class DiscourseUnit2 {
     static final int BEAM_WIDTH = 10;
     StringDistribution hypothesisDistribution;
-    Map<String, DialogStateHypothesis> hypotheses;
-    String initiator;
+    Map<String, DiscourseUnitHypothesis> hypotheses;
 
-    public static class DialogStateHypothesis{
+    /*
+    * The GroundedDiscourseUnitHypotheses class represents the list of grounded interpretations for a DU hypothesis
+    * and their corresponding analysis
+    * */
+    public static class GroundedDiscourseUnitHypotheses {
+        Map<String, SemanticsModel> groundedHypotheses;
+        StringDistribution groundedHypothesesDistribution;
+
+        public GroundedDiscourseUnitHypotheses(Map<String, SemanticsModel> groundedHypotheses, StringDistribution groundedHypothesesDistribution) {
+            this.groundedHypotheses = groundedHypotheses;
+            this.groundedHypothesesDistribution = groundedHypothesesDistribution;
+        }
+
+        // analysis
+        Map<String, Double> ynqTruth;
+        Map<String, Map<String, Double>> whqTruth;
+
+        // todo: run the queries and fill in the analysis information
+        public void analyse(){
+        }
+    }
+
+    public static class GroundTruthDiscourseUnit {
+        SemanticsModel groundTruth;
+        public GroundTruthDiscourseUnit(SemanticsModel groundTruth) {
+            this.groundTruth = groundTruth;
+        }
+    }
+
+
+    public static class DiscourseUnitHypothesis {
         SemanticsModel spokenByMe;
         SemanticsModel spokenByThem;
         Long timeOfLastActByThem;
         Long timeOfLastActByMe;
+        String initiator;
+        GroundedDiscourseUnitHypotheses gnd; // if other-initiated
+        GroundTruthDiscourseUnit gndTruth; // if self-initiated
 
-        public DialogStateHypothesis() {
+        public DiscourseUnitHypothesis() {
             spokenByMe = new SemanticsModel("{\"dialogAct\":null, \"verb\":{}}");
             spokenByThem = new SemanticsModel("{\"dialogAct\":null, \"verb\":{}}");
             timeOfLastActByThem = null;
@@ -51,6 +82,8 @@ public class DiscourseUnit2 {
 
         public void setSpokenByMe(SemanticsModel spokenByMe) {
             this.spokenByMe = spokenByMe;
+            if (spokenByThem==null)
+                initiator = "system";
         }
 
         public SemanticsModel getSpokenByThem() {
@@ -59,6 +92,8 @@ public class DiscourseUnit2 {
 
         public void setSpokenByThem(SemanticsModel spokenByThem) {
             this.spokenByThem = spokenByThem;
+            if (spokenByMe==null)
+                initiator = "user";
         }
 
         @Override
@@ -70,6 +105,24 @@ public class DiscourseUnit2 {
                     "\nspokenByThem=" + spokenByThem +
                     '}';
         }
+
+        public void groundAndAnalyse(){
+            if (initiator.equals("user")) {
+                // compute the reference resolution marginals
+                Map<String, StringDistribution> referenceResolutionMarginalHypotheses;
+
+
+                // use the marginals to generate an n-best list of grounded hypotheses
+                Map<String, SemanticsModel> nBestHypotheses = new HashMap<>();
+                StringDistribution nBestDistribution = new StringDistribution();
+                // todo: generate the n-best list
+                gnd = new GroundedDiscourseUnitHypotheses(nBestHypotheses, nBestDistribution);
+
+                // compute the analysis of each grounded hypothesis
+                gnd.analyse();
+            }
+        }
+
     }
 
     public DiscourseUnit2() {
@@ -81,7 +134,7 @@ public class DiscourseUnit2 {
         return hypothesisDistribution;
     }
 
-    public Map<String, DialogStateHypothesis> getHypotheses() {
+    public Map<String, DiscourseUnitHypothesis> getHypotheses() {
         return hypotheses;
     }
 
@@ -92,7 +145,7 @@ public class DiscourseUnit2 {
     /*
         * Compare a hypothesis to the actual content of this discourse unit
         * */
-    public Pair<Integer, Double> compareHypothesis(DialogStateHypothesis testCase){
+    public Pair<Integer, Double> compareHypothesis(DiscourseUnitHypothesis testCase){
 
         int rank = -1;
         double relativeLikelihood = 0.0;
@@ -100,7 +153,7 @@ public class DiscourseUnit2 {
         List<String> sortedHypotheses = hypothesisDistribution.sortedHypotheses();
         for (int i = 0; i < sortedHypotheses.size(); i++) {
             String DUHypothesisID = sortedHypotheses.get(i);
-            DialogStateHypothesis hypothesis = hypotheses.get(DUHypothesisID);
+            DiscourseUnitHypothesis hypothesis = hypotheses.get(DUHypothesisID);
 
             if (hypothesis.spokenByThem.equals(testCase.spokenByThem) &&
                     hypothesis.spokenByMe.equals(testCase.spokenByMe)) {

@@ -74,7 +74,7 @@ public class DialogManager implements Runnable {
 //            System.out.println("Enumerating and evaluating actions of class: "+daClass.getSimpleName());
                 Map<String, Set<Object>> possibleBindingsPerVariable = new HashMap<>();
                 Map<String, Class<? extends Thing>> parameters = daClass.newInstance().getClassParameters();
-                Map<String, DiscourseUnit2.DialogStateHypothesis> dialogStateHypothesisMap = currentDialogState.getHypotheses();
+                Map<String, DiscourseUnit2.DiscourseUnitHypothesis> dialogStateHypothesisMap = currentDialogState.getHypotheses();
 
                 // Collect matches
                 for (String dialogStateHypothesisID : dialogStateHypothesisMap.keySet()) {
@@ -100,7 +100,7 @@ public class DialogManager implements Runnable {
 
             //// Get the expected rewards from slot-filling dialog acts,
             for (String hypothesisID : currentDialogState.getHypotheses().keySet()) {
-                DiscourseUnit2.DialogStateHypothesis dsHypothesis = currentDialogState.getHypotheses().get(hypothesisID);
+                DiscourseUnit2.DiscourseUnitHypothesis dsHypothesis = currentDialogState.getHypotheses().get(hypothesisID);
                 SemanticsModel hypothesis = dsHypothesis.getSpokenByThem();
                 Class<? extends DialogAct> daClass = DialogRegistry.dialogActNameMap.
                         get(hypothesis.getSlotPathFiller("dialogAct"));
@@ -121,7 +121,7 @@ public class DialogManager implements Runnable {
             }
             //// Get expected rewards for executing dialog and non-dialog tasks
             for (String hypothesisID : currentDialogState.getHypotheses().keySet()) {
-                DiscourseUnit2.DialogStateHypothesis dsHypothesis = currentDialogState.getHypotheses().get(hypothesisID);
+                DiscourseUnit2.DiscourseUnitHypothesis dsHypothesis = currentDialogState.getHypotheses().get(hypothesisID);
                 SemanticsModel hypothesis = dsHypothesis.getSpokenByThem();
                 Class<? extends DialogAct> daClass = DialogRegistry.dialogActNameMap.
                         get(hypothesis.getSlotPathFiller("dialogAct"));

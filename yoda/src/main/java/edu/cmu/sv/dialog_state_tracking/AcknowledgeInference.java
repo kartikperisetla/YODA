@@ -21,7 +21,7 @@ public class AcknowledgeInference implements DiscourseUnitUpdateInference {
     static Double penaltyForReinterpretingFragment = .5;
 
     @Override
-    public DiscourseUnit2 applyAll(DiscourseUnit2.DialogStateHypothesis currentState, Turn turn, long timeStamp) {
+    public DiscourseUnit2 applyAll(DiscourseUnit2.DiscourseUnitHypothesis currentState, Turn turn, long timeStamp) {
         int newDUHypothesisCounter = 0;
         DiscourseUnit2 ans = new DiscourseUnit2();
 
@@ -41,8 +41,8 @@ public class AcknowledgeInference implements DiscourseUnitUpdateInference {
 
                 if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(ConfirmSenseSuggestion.class)) {
                     String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
-                    DiscourseUnit2.DialogStateHypothesis newDUHypothesis =
-                            new DiscourseUnit2.DialogStateHypothesis();
+                    DiscourseUnit2.DiscourseUnitHypothesis newDUHypothesis =
+                            new DiscourseUnit2.DiscourseUnitHypothesis();
                     SemanticsModel newSpokenByThemHypothesis = currentState.getSpokenByThem().deepCopy();
                     newSpokenByThemHypothesis.placeAtPoint("verb",
                             new SemanticsModel(((JSONObject)currentState.getMostRecent().
@@ -78,8 +78,8 @@ public class AcknowledgeInference implements DiscourseUnitUpdateInference {
                         continue;
 
                     String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
-                    DiscourseUnit2.DialogStateHypothesis newDUHypothesis =
-                            new DiscourseUnit2.DialogStateHypothesis();
+                    DiscourseUnit2.DiscourseUnitHypothesis newDUHypothesis =
+                            new DiscourseUnit2.DiscourseUnitHypothesis();
                     SemanticsModel newSpokenByThemHypothesis = currentState.getSpokenByThem().deepCopy();
                     newSpokenByThemHypothesis.placeAtPoint("verb",
                             new SemanticsModel(((JSONObject)currentState.getMostRecent().
@@ -105,8 +105,8 @@ public class AcknowledgeInference implements DiscourseUnitUpdateInference {
 
             if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(ConfirmSenseSuggestion.class)) {
                 String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
-                DiscourseUnit2.DialogStateHypothesis newDUHypothesis =
-                        new DiscourseUnit2.DialogStateHypothesis();
+                DiscourseUnit2.DiscourseUnitHypothesis newDUHypothesis =
+                        new DiscourseUnit2.DiscourseUnitHypothesis();
                 SemanticsModel newSpokenByMeHypothesis = currentState.getSpokenByMe().deepCopy();
                 newSpokenByMeHypothesis.placeAtPoint("verb",
                         new SemanticsModel(((JSONObject) currentState.getMostRecent().

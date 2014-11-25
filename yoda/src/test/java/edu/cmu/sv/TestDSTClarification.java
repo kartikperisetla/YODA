@@ -53,7 +53,7 @@ public class TestDSTClarification {
         YodaEnvironment yodaEnvironment;
         DialogStateTracker2.DSTTester testCase;
         Turn currentTurn;
-        DiscourseUnit2.DialogStateHypothesis correctState;
+        DiscourseUnit2.DiscourseUnitHypothesis correctState;
         StringDistribution sluDistribution;
         Map<String, SemanticsModel> sluHypotheses;
 
@@ -92,7 +92,7 @@ public class TestDSTClarification {
         sluDistribution.put("hyp2", .4);
 
         currentTurn = new Turn("user", null, sluHypotheses, sluDistribution);
-        correctState = new DiscourseUnit2.DialogStateHypothesis();
+        correctState = new DiscourseUnit2.DiscourseUnitHypothesis();
         correctState.setSpokenByThem(sm1.deepCopy());
         testCase.getTurns().put(currentTurn, (long) 0.0);
         testCase.getEvaluationStates().put(correctState, (long) 0.0);
@@ -120,7 +120,7 @@ public class TestDSTClarification {
         SemanticsModel sm3 = new SemanticsModel(jsonString);
 
         currentTurn = new Turn("system", sm3.deepCopy(), null, null);
-        correctState = new DiscourseUnit2.DialogStateHypothesis();
+        correctState = new DiscourseUnit2.DiscourseUnitHypothesis();
         correctState.setSpokenByThem(sm1.deepCopy());
         correctState.setSpokenByMe(sm3.deepCopy());
         testCase.getTurns().put(currentTurn, (long) 1.0);
@@ -154,7 +154,7 @@ public class TestDSTClarification {
         sluDistribution.put("hyp1", 1.0);
 
         currentTurn = new Turn("user", null, sluHypotheses, sluDistribution);
-        correctState = new DiscourseUnit2.DialogStateHypothesis();
+        correctState = new DiscourseUnit2.DiscourseUnitHypothesis();
         correctState.setSpokenByThem(sm2.deepCopy());
         correctState.setSpokenByMe(sm3.deepCopy());
         testCase.getTurns().put(currentTurn, (long) 2.0);
@@ -177,7 +177,7 @@ public class TestDSTClarification {
         YodaEnvironment yodaEnvironment;
         DialogStateTracker2.DSTTester testCase;
         Turn currentTurn;
-        DiscourseUnit2.DialogStateHypothesis correctState;
+        DiscourseUnit2.DiscourseUnitHypothesis correctState;
         String jsonString;
         StringDistribution sluDistribution;
         Map<String, SemanticsModel> sluHypotheses;
@@ -200,7 +200,7 @@ public class TestDSTClarification {
         SemanticsModel sm1 = new SemanticsModel(jsonString);
 
         currentTurn = new Turn("system", sm1.deepCopy(), null, null);
-        correctState = new DiscourseUnit2.DialogStateHypothesis();
+        correctState = new DiscourseUnit2.DiscourseUnitHypothesis();
         correctState.setSpokenByMe(sm1.deepCopy());
         testCase.getTurns().put(currentTurn, (long) 0.0);
         testCase.getEvaluationStates().put(correctState, (long) 0.0);
@@ -220,7 +220,7 @@ public class TestDSTClarification {
         sluDistribution.put("hyp2", .4);
 
         currentTurn = new Turn("user", null, sluHypotheses, sluDistribution);
-        correctState = new DiscourseUnit2.DialogStateHypothesis();
+        correctState = new DiscourseUnit2.DiscourseUnitHypothesis();
         correctState.setSpokenByMe(sm1.deepCopy());
         correctState.setSpokenByThem(sm2.deepCopy());
         testCase.getTurns().put(currentTurn, (long) 1.0);
@@ -242,7 +242,7 @@ public class TestDSTClarification {
         SemanticsModel sm4 = new SemanticsModel(jsonString);
 
         currentTurn = new Turn("system", sm4.deepCopy(), null, null);
-        correctState = new DiscourseUnit2.DialogStateHypothesis();
+        correctState = new DiscourseUnit2.DiscourseUnitHypothesis();
         correctState.setSpokenByMe(sm4.deepCopy());
         correctState.setSpokenByThem(sm2.deepCopy());
         testCase.getTurns().put(currentTurn, (long) 2.0);
