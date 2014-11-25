@@ -15,27 +15,18 @@ import java.util.Map;
  * Created by David Cohen on 9/8/14.
  */
 public class RequestConfirmValue extends DialogAct {
-    private Map<String, Object> boundVariables = null;
-    static Map<String, Class<? extends Thing>> parameters = new HashMap<>();
-    static {
-        parameters.put("v1", Noun.class);
+    static Map<String, Class<? extends Thing>> individualParameters = new HashMap<>();
+    static Map<String, Class<? extends Thing>> classParameters = new HashMap<>();
+    static{
+        individualParameters.put("topic_individual", Noun.class);
     }
-
-    // template "<v1> ?"
-
     @Override
-    public Map<String, Class<? extends Thing>> getParameters() {
-        return parameters;
+    public Map<String, Class<? extends Thing>> getClassParameters() {
+        return classParameters;
     }
-
     @Override
-    public Map<String, Object> getBindings() {
-        return boundVariables;
-    }
-
-    @Override
-    public void bindVariables(Map<String, Object> bindings) {
-        boundVariables = bindings;
+    public Map<String, Class<? extends Thing>> getIndividualParameters() {
+        return individualParameters;
     }
 
     @Override
@@ -43,7 +34,7 @@ public class RequestConfirmValue extends DialogAct {
         try {
             return RewardAndCostCalculator.clarificationDialogActReward(db, DU,
                     RewardAndCostCalculator.predictConfidenceGainFromValueConfirmation(DU,
-                            boundVariables.get("v1"))) - RewardAndCostCalculator.penaltyForSpeakingPhrase;
+                            individualParameters.get("v1"))) - RewardAndCostCalculator.penaltyForSpeakingPhrase;
         } catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
             e.printStackTrace();
         }

@@ -14,33 +14,23 @@ import java.util.Map;
  * Created by David Cohen on 9/24/14.
  */
 public class RequestVerbRole extends DialogAct{
-    private Map<String, Object> boundVariables = null;
-    static Map<String, Class<? extends Thing>> parameters = new HashMap<>(); // parameters are empty for this DA
+    static Map<String, Class<? extends Thing>> individualParameters = new HashMap<>();
+    static Map<String, Class<? extends Thing>> classParameters = new HashMap<>();
     static{
-        parameters.put("r1", Noun.class);
-        parameters.put("v1", Verb.class); // this is the action whose role is being requested
+        individualParameters.put("topic_individual", Noun.class);
     }
-
-    // template: "WhX <v1> ?"
+    @Override
+    public Map<String, Class<? extends Thing>> getClassParameters() {
+        return classParameters;
+    }
+    @Override
+    public Map<String, Class<? extends Thing>> getIndividualParameters() {
+        return individualParameters;
+    }
 
     @Override
     public Double reward(DiscourseUnit2 DU) {
         return null;
     }
 
-
-    @Override
-    public Map<String, Class<? extends Thing>> getParameters() {
-        return parameters;
-    }
-
-    @Override
-    public Map<String, Object> getBindings() {
-        return boundVariables;
-    }
-
-    @Override
-    public void bindVariables(Map<String, Object> bindings) {
-        boundVariables = bindings;
-    }
 }

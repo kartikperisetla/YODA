@@ -23,9 +23,9 @@ public abstract class SystemAction {
         if (this instanceof DialogAct) {
             DialogAct da1 = (DialogAct) this;
             DialogAct da2 = (DialogAct) other;
-            return (da1.getBindings().equals(da2.getBindings())
-                    && new HashSet<>(da1.getBindings().values()).equals(
-                    new HashSet<>(da2.getBindings().values())));
+            return (da1.getBoundClasses().equals(da2.getBoundClasses())
+                    && new HashSet<>(da1.getBoundClasses().values()).equals(
+                    new HashSet<>(da2.getBoundClasses().values())));
         }
         if (this instanceof DialogTask)
             return ((DialogTask) this).getTaskSpec().equals(((DialogTask) other).getTaskSpec());
