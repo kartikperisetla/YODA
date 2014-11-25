@@ -1,6 +1,7 @@
 package edu.cmu.sv.dialog_management;
 
 import edu.cmu.sv.database.Database;
+import edu.cmu.sv.natural_language_generation.Grammar;
 import edu.cmu.sv.system_action.dialog_task.DialogTask;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -72,7 +73,7 @@ public class DialogManager implements Runnable {
             for (Class<? extends DialogAct> daClass : DialogRegistry.senseClarificationDialogActs) {
 //            System.out.println("Enumerating and evaluating actions of class: "+daClass.getSimpleName());
                 Map<String, Set<Object>> possibleBindingsPerVariable = new HashMap<>();
-                Map<String, Class<? extends Thing>> parameters = daClass.newInstance().getParameters();
+                Map<String, Class<? extends Thing>> parameters = daClass.newInstance().getClassParameters();
                 Map<String, DiscourseUnit2.DialogStateHypothesis> dialogStateHypothesisMap = currentDialogState.getHypotheses();
 
                 // Collect matches
@@ -169,6 +170,9 @@ public class DialogManager implements Runnable {
             }
             List<Pair<SystemAction, Double>> rankedActions = enumerateAndScorePossibleActions();
             logger.info("Ranked actions: " + rankedActions.toString());
+            SystemAction selectedAction = rankedActions.get(0).getKey();
+            if (selectedAction!=null)
+                yodaEnvironment.nlg.speak(((DialogAct)selectedAction).getNlgCommand(), Grammar.DEFAULT_GRAMMAR_PREFERENCES);
         }
     }
 }

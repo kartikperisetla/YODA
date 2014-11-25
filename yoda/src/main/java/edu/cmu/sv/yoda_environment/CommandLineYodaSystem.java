@@ -13,7 +13,11 @@ import java.io.InputStreamReader;
 public class CommandLineYodaSystem {
 
     public static void main(String[] args) throws IOException {
-        YodaEnvironment yodaEnvironment = YodaEnvironment.dialogSystemEnvironment();
+        YodaEnvironment yodaEnvironment = YodaEnvironment.dialogTestingEnvironment();
+        Thread dstThread = new Thread(yodaEnvironment.dst);
+        dstThread.start();
+        Thread dmThread = new Thread(yodaEnvironment.dm);
+        dmThread.start();
 
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         String s;

@@ -1,17 +1,36 @@
 package edu.cmu.sv.natural_language_generation;
 
+import edu.cmu.sv.dialog_state_tracking.Turn;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.semantics.SemanticsModel;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.math3.random.RandomData;
 import org.apache.commons.math3.random.RandomDataImpl;
 import org.json.simple.JSONObject;
 
+import java.io.IOException;
 import java.util.*;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 /**
  * YODA's built-in NLG module
  */
 public class NaturalLanguageGenerator {
+    private static Logger logger = Logger.getLogger("yoda.natural_language_generation.NaturalLanguageGenerator");
+    private static FileHandler fh;
+    static {
+        try {
+            fh = new FileHandler("NaturalLanguageGenerator.log");
+            fh.setFormatter(new SimpleFormatter());
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(0);
+        }
+        logger.addHandler(fh);
+    }
+    Calendar calendar = Calendar.getInstance();
     public static Random random = new Random();
     public static RandomData randomData = new RandomDataImpl();
     YodaEnvironment yodaEnvironment;
@@ -20,6 +39,15 @@ public class NaturalLanguageGenerator {
 
     public NaturalLanguageGenerator(YodaEnvironment yodaEnvironment) {
         this.yodaEnvironment = yodaEnvironment;
+    }
+
+    public void speak(SemanticsModel model, Grammar.GrammarPreferences grammarPreferences){
+        logger.info("nlg request made:"+model);
+        Map.Entry<String, SemanticsModel> chosenUtterance = generateBestForSemantics(model, grammarPreferences);
+        logger.info("chosen utterance:"+chosenUtterance);
+        yodaEnvironment.out.sendOutput(chosenUtterance.getKey());
+        Turn systemTurn = new Turn("system", chosenUtterance.getValue(), null, null);
+        yodaEnvironment.DstInputQueue.add(new ImmutablePair<>(systemTurn, calendar.getTimeInMillis()));
     }
 
     /*
@@ -44,8 +72,11 @@ public class NaturalLanguageGenerator {
                 e.printStackTrace();
             }
         }
+        if (ans.size()==0){
+            ans.put("NLG currently can't generate an utterance for this meaning",
+                    new SemanticsModel(model.getInternalRepresentation().toJSONString()));
+        }
         return ans;
-
     }
 
     // currently, this will overwrite semantic interpretations of identical strings,
@@ -63,11 +94,6 @@ public class NaturalLanguageGenerator {
             }
         }
         return ans;
-    }
-
-    // TODO: implement
-    public Map<String, SemanticsModel> generateCorpus(){
-        return null;
     }
 
 }

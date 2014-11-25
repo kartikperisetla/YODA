@@ -10,6 +10,7 @@ import edu.cmu.sv.spoken_language_understanding.RegexUnderstander;
 import edu.cmu.sv.spoken_language_understanding.SpokenLanguageUnderstander;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.io.BufferedWriter;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.logging.ConsoleHandler;
@@ -33,12 +34,12 @@ public class YodaEnvironment {
         }
     }
 
-
     public DialogStateTracker2 dst;
     public DialogManager dm;
     public Database db;
     public NaturalLanguageGenerator nlg;
     public SpokenLanguageUnderstander slu;
+    public OutputHandler out;
 
     // turn + time stamp of DST input
     public BlockingQueue<Pair<Turn, Long>> DstInputQueue = new LinkedBlockingDeque<>();
@@ -60,29 +61,8 @@ public class YodaEnvironment {
         ans.dm = new DialogManager(ans);
         ans.nlg = new NaturalLanguageGenerator(ans);
         ans.slu = new RegexUnderstander(ans);
+        ans.out = new StandardOutOutputHandler();
         return ans;
     }
-
-    /*
-    * Environment for running actual mixed-initiative dialog systems
-    * */
-    public static YodaEnvironment dialogSystemEnvironment(){
-        YodaEnvironment ans = new YodaEnvironment();
-        ans.dst = new DialogStateTracker2(ans);
-        ans.db = new Database(ans);
-        ans.dm = new DialogManager(ans);
-        ans.nlg = new NaturalLanguageGenerator(ans);
-        ans.slu = new RegexUnderstander(ans);
-
-        Thread dstThread = new Thread(ans.dst);
-        dstThread.start();
-        Thread dmThread = new Thread(ans.dm);
-        dmThread.start();
-
-        return ans;
-    }
-
-
-
 
 }
