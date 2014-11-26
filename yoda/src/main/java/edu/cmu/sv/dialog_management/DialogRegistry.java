@@ -7,9 +7,6 @@ import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Command;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.WHQuestion;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.YNQuestion;
-import edu.cmu.sv.system_action.dialog_task.DialogTask;
-import edu.cmu.sv.system_action.dialog_task.RespondToWHQuestionTask;
-import edu.cmu.sv.system_action.dialog_task.RespondToYNQuestionTask;
 import edu.cmu.sv.system_action.non_dialog_task.CreateMeetingTask;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.system_action.non_dialog_task.SendEmailTask;
@@ -33,10 +30,6 @@ public class DialogRegistry {
     // the full set of discourse unit dialog act types handled by the system
     public static Set<Class <? extends DialogAct>> discourseUnitDialogActs = new HashSet<>();
 
-    // map NDU to the classes that handle the corresponding dialog tasks
-    public static Map<Class <? extends DialogAct>, Set<Class <? extends DialogTask>>>
-            dialogTaskRegistry = new HashMap<>();
-
     // map dialog acts to the classes that handle the corresponding non-dialog tasks
     public static Map<Class <? extends DialogAct>, Set<Class <? extends NonDialogTask>>>
             nonDialogTaskRegistry = new HashMap<>();
@@ -50,11 +43,6 @@ public class DialogRegistry {
         discourseUnitDialogActs.add(WHQuestion.class);
         discourseUnitDialogActs.add(YNQuestion.class);
         discourseUnitDialogActs.add(Command.class);
-
-        dialogTaskRegistry.put(WHQuestion.class, new HashSet<>());
-        dialogTaskRegistry.get(WHQuestion.class).add(RespondToWHQuestionTask.class);
-        dialogTaskRegistry.put(YNQuestion.class, new HashSet<>());
-        dialogTaskRegistry.get(YNQuestion.class).add(RespondToYNQuestionTask.class);
 
         nonDialogTaskRegistry.put(Command.class, new HashSet<>());
         nonDialogTaskRegistry.get(Command.class).add(CreateMeetingTask.class);

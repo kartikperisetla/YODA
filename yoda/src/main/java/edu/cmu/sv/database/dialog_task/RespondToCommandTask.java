@@ -1,7 +1,6 @@
-package edu.cmu.sv.system_action.dialog_task;
+package edu.cmu.sv.database.dialog_task;
 
 import edu.cmu.sv.database.Database;
-import edu.cmu.sv.semantics.SemanticsModel;
 
 /**
  * Created by David Cohen on 9/11/14.

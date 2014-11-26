@@ -1,8 +1,6 @@
 package edu.cmu.sv;
 
 import edu.cmu.sv.database.Database;
-import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.system_action.dialog_task.RespondToYNQuestionTask;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.junit.Test;
 import org.openrdf.query.MalformedQueryException;

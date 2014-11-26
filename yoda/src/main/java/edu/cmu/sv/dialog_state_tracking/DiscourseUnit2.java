@@ -2,6 +2,7 @@ package edu.cmu.sv.dialog_state_tracking;
 
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.StringDistribution;
+import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -30,22 +31,11 @@ public class DiscourseUnit2 {
             this.groundedHypothesesDistribution = groundedHypothesesDistribution;
         }
 
-        // analysis
+        // analysis results
         Map<String, Double> ynqTruth;
         Map<String, Map<String, Double>> whqTruth;
 
-        // todo: run the queries and fill in the analysis information
-        public void analyse(){
-        }
     }
-
-    public static class GroundTruthDiscourseUnit {
-        SemanticsModel groundTruth;
-        public GroundTruthDiscourseUnit(SemanticsModel groundTruth) {
-            this.groundTruth = groundTruth;
-        }
-    }
-
 
     public static class DiscourseUnitHypothesis {
         SemanticsModel spokenByMe;
@@ -54,7 +44,7 @@ public class DiscourseUnit2 {
         Long timeOfLastActByMe;
         String initiator;
         GroundedDiscourseUnitHypotheses gnd; // if other-initiated
-        GroundTruthDiscourseUnit gndTruth; // if self-initiated
+        SemanticsModel gndTruth; // if self-initiated
 
         public DiscourseUnitHypothesis() {
             spokenByMe = new SemanticsModel("{\"dialogAct\":null, \"verb\":{}}");
@@ -105,24 +95,6 @@ public class DiscourseUnit2 {
                     "\nspokenByThem=" + spokenByThem +
                     '}';
         }
-
-        public void groundAndAnalyse(){
-            if (initiator.equals("user")) {
-                // compute the reference resolution marginals
-                Map<String, StringDistribution> referenceResolutionMarginalHypotheses;
-
-
-                // use the marginals to generate an n-best list of grounded hypotheses
-                Map<String, SemanticsModel> nBestHypotheses = new HashMap<>();
-                StringDistribution nBestDistribution = new StringDistribution();
-                // todo: generate the n-best list
-                gnd = new GroundedDiscourseUnitHypotheses(nBestHypotheses, nBestDistribution);
-
-                // compute the analysis of each grounded hypothesis
-                gnd.analyse();
-            }
-        }
-
     }
 
     public DiscourseUnit2() {

@@ -1,6 +1,6 @@
 package edu.cmu.sv;
 
-import edu.cmu.sv.database.ReferenceResolution;
+import edu.cmu.sv.database.dialog_task.ReferenceResolution;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.ontology.noun.Noun;

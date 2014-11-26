@@ -1,5 +1,7 @@
-package edu.cmu.sv.database;
+package edu.cmu.sv.database.dialog_task;
 
+import edu.cmu.sv.database.Product;
+import edu.cmu.sv.database.StringSimilarity;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;

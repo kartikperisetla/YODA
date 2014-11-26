@@ -2,7 +2,6 @@ package edu.cmu.sv.dialog_management;
 
 import edu.cmu.sv.database.Database;
 import edu.cmu.sv.natural_language_generation.Grammar;
-import edu.cmu.sv.system_action.dialog_task.DialogTask;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
@@ -98,43 +97,12 @@ public class DialogManager implements Runnable {
 
             }
 
-            //// Get the expected rewards from slot-filling dialog acts,
+            //// Get expected rewards for executing non-dialog tasks
             for (String hypothesisID : currentDialogState.getHypotheses().keySet()) {
                 DiscourseUnit2.DiscourseUnitHypothesis dsHypothesis = currentDialogState.getHypotheses().get(hypothesisID);
                 SemanticsModel hypothesis = dsHypothesis.getSpokenByThem();
                 Class<? extends DialogAct> daClass = DialogRegistry.dialogActNameMap.
                         get(hypothesis.getSlotPathFiller("dialogAct"));
-                // add contribution from dialog tasks
-                if (DialogRegistry.dialogTaskRegistry.containsKey(daClass)) {
-                    for (Class<? extends DialogTask> taskClass : DialogRegistry.dialogTaskRegistry.get(daClass)) {
-                        DialogTask task = taskClass.getDeclaredConstructor(Database.class).newInstance(yodaEnvironment.db);
-                        task.setTaskSpec(hypothesis.deepCopy());
-                        Collection<DialogAct> slotFillingDialogActs = task.enumerateAndEvaluateSlotFillingActions();
-                        for (DialogAct slotFillingDialogAct : slotFillingDialogActs){
-                            Double expectedReward = RewardAndCostCalculator.
-                                    executabilityRewardGain(task, 1.0/slotFillingDialogActs.size()) *
-                                    currentDialogState.getHypothesisDistribution().get(hypothesisID);
-                            actionExpectedReward.put(slotFillingDialogAct, expectedReward);
-                        }
-                    }
-                }
-            }
-            //// Get expected rewards for executing dialog and non-dialog tasks
-            for (String hypothesisID : currentDialogState.getHypotheses().keySet()) {
-                DiscourseUnit2.DiscourseUnitHypothesis dsHypothesis = currentDialogState.getHypotheses().get(hypothesisID);
-                SemanticsModel hypothesis = dsHypothesis.getSpokenByThem();
-                Class<? extends DialogAct> daClass = DialogRegistry.dialogActNameMap.
-                        get(hypothesis.getSlotPathFiller("dialogAct"));
-
-                // add contribution from dialog tasks
-                if (DialogRegistry.dialogTaskRegistry.containsKey(daClass)) {
-                    for (Class<? extends DialogTask> taskClass : DialogRegistry.dialogTaskRegistry.get(daClass)) {
-                        DialogTask task = taskClass.getDeclaredConstructor(Database.class).newInstance(yodaEnvironment.db);
-                        task.setTaskSpec(hypothesis.deepCopy());
-                        Double expectedReward = RewardAndCostCalculator.dialogTaskReward(currentDialogState, task);
-                        actionExpectedReward.put(task, expectedReward);
-                    }
-                }
                 // add contribution from non dialog tasks
                 if (DialogRegistry.nonDialogTaskRegistry.containsKey(daClass)) {
                     for (Class<? extends NonDialogTask> taskClass : DialogRegistry.nonDialogTaskRegistry.get(daClass)) {

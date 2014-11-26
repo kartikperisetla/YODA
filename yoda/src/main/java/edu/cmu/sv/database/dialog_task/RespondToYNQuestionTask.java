@@ -1,4 +1,4 @@
-package edu.cmu.sv.system_action.dialog_task;
+package edu.cmu.sv.database.dialog_task;
 
 import edu.cmu.sv.database.Database;
 
