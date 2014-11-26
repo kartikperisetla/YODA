@@ -49,4 +49,29 @@ public class HypothesisSetManagement {
         return destination;
     }
 
+    public static Pair<StringDistribution, Map<String, Map<String, String>>>
+    getJointFromMarginals(Map<String, StringDistribution> marginals, int beamSize){
+        Map<String, Set<String>> combinationsInput = new HashMap<>();
+        marginals.entrySet().stream().forEach(x -> combinationsInput.put(x.getKey(), new HashSet<>(x.getValue().keySet())));
+        StringDistribution jointDistribution = new StringDistribution();
+        Map<String, Map<String, String>> jointAssignments = new HashMap<>();
+        int i=0;
+        for (Map<String, String> jointAssignment : Combination.possibleBindings(combinationsInput)){
+            Double probability = 1.0;
+            String assignmentID = "assignmentID_"+i;
+            for (String key : jointAssignment.keySet()){
+                probability*=marginals.get(key).get(jointAssignment.get(key));
+            }
+            jointDistribution.put(assignmentID, probability);
+            jointAssignments.put(assignmentID, jointAssignment);
+            i++;
+        }
+
+        Map<String, Map<String, String>> beamOfAssignments = new HashMap<>();
+        jointDistribution = keepNBestDistribution(jointDistribution, beamSize);
+        final StringDistribution finalJointDistribution = jointDistribution;
+        jointAssignments.entrySet().stream().filter(x -> finalJointDistribution.containsKey(x.getKey())).
+                forEach(x -> beamOfAssignments.put(x.getKey(), x.getValue()));
+        return new ImmutablePair<>(jointDistribution, beamOfAssignments);
+    }
 }

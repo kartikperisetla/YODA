@@ -406,6 +406,19 @@ public class SemanticsModel {
     }
 
     /*
+    * overwrite the source object in place with the replacement content
+    * */
+    public static void overwrite(JSONObject source, JSONObject replacement){
+//        Set<Object> existingKeys = new HashSet<>(source.keySet());
+//        for (Object o : existingKeys){
+//            source.remove(o);
+//        }
+        source.clear();
+        for (Object o : replacement.keySet())
+            source.put(o, replacement.get(o));
+    }
+
+    /*
     * Find all the slot paths who are filled by an entity description of class clsName
     * */
     public Set<String> findAllPathsToClass(String clsName){

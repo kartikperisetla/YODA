@@ -35,6 +35,21 @@ public class DiscourseUnit2 {
         Map<String, Double> ynqTruth;
         Map<String, Map<String, Double>> whqTruth;
 
+        public Map<String, SemanticsModel> getGroundedHypotheses() {
+            return groundedHypotheses;
+        }
+
+        public void setGroundedHypotheses(Map<String, SemanticsModel> groundedHypotheses) {
+            this.groundedHypotheses = groundedHypotheses;
+        }
+
+        public StringDistribution getGroundedHypothesesDistribution() {
+            return groundedHypothesesDistribution;
+        }
+
+        public void setGroundedHypothesesDistribution(StringDistribution groundedHypothesesDistribution) {
+            this.groundedHypothesesDistribution = groundedHypothesesDistribution;
+        }
     }
 
     public static class DiscourseUnitHypothesis {
