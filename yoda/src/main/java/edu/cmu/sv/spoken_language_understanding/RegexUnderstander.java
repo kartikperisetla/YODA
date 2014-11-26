@@ -73,7 +73,7 @@ public class RegexUnderstander implements SpokenLanguageUnderstander{
         hypotheses.put("hyp1", interpretation);
         StringDistribution hypothesisDistribution = new StringDistribution();
         hypothesisDistribution.put("hyp1", 1.0);
-        Turn newTurn = new Turn("user", null, hypotheses, hypothesisDistribution);
+        Turn newTurn = new Turn("user", null, null, hypotheses, hypothesisDistribution);
         yodaEnvironment.DstInputQueue.add(new ImmutablePair<>(newTurn, calendar.getTimeInMillis()));
         logger.info("interpretation:" + interpretation);
 //        yodaEnvironment.dst.updateDialogState(newTurn, calendar.getTimeInMillis());

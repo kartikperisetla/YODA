@@ -39,6 +39,7 @@ public class PresentationInference implements DiscourseUnitUpdateInference {
                         ans.getHypothesisDistribution().put(newDUHypothesisID, penaltyForReinterpretingFragment);
                         newDUHypothesis.timeOfLastActByThem = timeStamp;
                         newDUHypothesis.spokenByThem = newSpokenByThemHypothesis;
+                        newDUHypothesis.groundAndAnalyse();
                         ans.hypotheses.put(newDUHypothesisID, newDUHypothesis);
                     }
                 }
@@ -50,6 +51,7 @@ public class PresentationInference implements DiscourseUnitUpdateInference {
                     ans.getHypothesisDistribution().put(newDUHypothesisID, 1.0);
                     newDUHypothesis.timeOfLastActByThem = timeStamp;
                     newDUHypothesis.spokenByThem = newSpokenByThemHypothesis;
+                    newDUHypothesis.groundAndAnalyse();
                     ans.hypotheses.put(newDUHypothesisID, newDUHypothesis);
                 }
                 // otherwise, this SLU hypothesis can't be interpreted using PresentInference
@@ -62,6 +64,7 @@ public class PresentationInference implements DiscourseUnitUpdateInference {
             ans.getHypothesisDistribution().put(newDUHypothesisID, 1.0);
             newDUHypothesis.timeOfLastActByMe = timeStamp;
             newDUHypothesis.spokenByMe.extendAndOverwrite(turn.systemUtterance);
+            newDUHypothesis.groundAndAnalyse();
             ans.hypotheses.put(newDUHypothesisID, newDUHypothesis);
         }
 

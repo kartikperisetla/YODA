@@ -46,7 +46,7 @@ public class NaturalLanguageGenerator {
         Map.Entry<String, SemanticsModel> chosenUtterance = generateBestForSemantics(model, grammarPreferences);
         logger.info("chosen utterance:"+chosenUtterance);
         yodaEnvironment.out.sendOutput(chosenUtterance.getKey());
-        Turn systemTurn = new Turn("system", chosenUtterance.getValue(), null, null);
+        Turn systemTurn = new Turn("system", chosenUtterance.getValue(), model, null, null);
         yodaEnvironment.DstInputQueue.add(new ImmutablePair<>(systemTurn, calendar.getTimeInMillis()));
     }
 

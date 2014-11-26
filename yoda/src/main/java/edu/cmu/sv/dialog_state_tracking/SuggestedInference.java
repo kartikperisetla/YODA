@@ -75,6 +75,7 @@ public class SuggestedInference implements DiscourseUnitUpdateInference {
                         newDUHypothesis.setSpokenByMe(currentState.spokenByMe.deepCopy());
                         newDUHypothesis.timeOfLastActByThem = timeStamp;
                         newDUHypothesis.spokenByThem = newSpokenByThemHypothesis;
+                        newDUHypothesis.groundAndAnalyse();
                         ans.hypotheses.put(newDUHypothesisID, newDUHypothesis);
                     }
                 }
@@ -113,6 +114,7 @@ public class SuggestedInference implements DiscourseUnitUpdateInference {
                     newDUHypothesis.setSpokenByThem(currentState.spokenByThem.deepCopy());
                     newDUHypothesis.timeOfLastActByMe = timeStamp;
                     newDUHypothesis.spokenByMe = newSpokenByMeHypothesis;
+                    newDUHypothesis.groundAndAnalyse();
                     ans.hypotheses.put(newDUHypothesisID, newDUHypothesis);
                 }
             }

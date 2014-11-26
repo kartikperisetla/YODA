@@ -12,12 +12,14 @@ import java.util.Map;
 public class Turn {
     Map<String, SemanticsModel> hypotheses;
     SemanticsModel systemUtterance;
+    SemanticsModel groundedSystemMeaning;
     StringDistribution hypothesisDistribution;
     String speaker;
 
-    public Turn(String speaker, SemanticsModel systemUtterance, Map<String, SemanticsModel> hypotheses, StringDistribution hypothesisDistribution) {
+    public Turn(String speaker, SemanticsModel systemUtterance, SemanticsModel groundedSystemMeaning, Map<String, SemanticsModel> hypotheses, StringDistribution hypothesisDistribution) {
         this.hypotheses = hypotheses;
         this.systemUtterance = systemUtterance;
+        this.groundedSystemMeaning = groundedSystemMeaning;
         this.hypothesisDistribution = hypothesisDistribution;
         this.speaker = speaker;
     }

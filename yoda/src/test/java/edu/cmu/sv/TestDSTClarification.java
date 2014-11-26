@@ -26,13 +26,13 @@ public class TestDSTClarification {
         // Each test case is fairly complicated,
         // so to reduce the chance of making variable scope mistakes,
         // I made a separate function for each one
-        try {
-            for (DialogStateTracker2.DSTTester testDialog : Arrays.asList(testCase1())) {
-                System.out.println(testDialog.evaluate());
-            }
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            for (DialogStateTracker2.DSTTester testDialog : Arrays.asList(testCase1())) {
+//                System.out.println(testDialog.evaluate());
+//            }
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
     }
 
     /* 
@@ -48,120 +48,120 @@ public class TestDSTClarification {
         S: Accept
         Ok
     */
-    DialogStateTracker2.DSTTester testCase1() throws ParseException {
-        String jsonString;
-        YodaEnvironment yodaEnvironment;
-        DialogStateTracker2.DSTTester testCase;
-        Turn currentTurn;
-        DiscourseUnit2.DiscourseUnitHypothesis correctState;
-        StringDistribution sluDistribution;
-        Map<String, SemanticsModel> sluHypotheses;
-
-        yodaEnvironment = YodaEnvironment.dstTestingEnvironment();
-        testCase = new DialogStateTracker2.DSTTester(yodaEnvironment);
-
-        /// Turn 1
-        String uri1 = null;
-        String uri2 = null;
-        uri1 = yodaEnvironment.db.insertValue(1);
-        uri2 = yodaEnvironment.db.insertValue(10);
-
-        jsonString = "{\n" +
-                "\"dialogAct\":\"Command\",\n" +
-                "\"verb\":{\"class\":\"Create\",\n" +
-                "        \"Patient\":{\"class\":\"Meeting\",\n" +
-                "                   \"HasAtTime\":{\"class\":\"Time\",\n" +
-                "                                \"HasHour\":"+ OntologyRegistry.WebResourceWrap(uri1)+"}}}\n" +
-                "}";
-        SemanticsModel sm1 = new SemanticsModel(jsonString);
-
-        jsonString = "{\n" +
-                "\"dialogAct\":\"Command\",\n" +
-                "\"verb\":{\"class\":\"Create\",\n" +
-                "        \"Patient\":{\"class\":\"Meeting\",\n" +
-                "                   \"HasAtTime\":{\"class\":\"Time\",\n" +
-                "                                \"HasHour\":"+ OntologyRegistry.WebResourceWrap(uri2)+"}}}\n" +
-                "}";
-        SemanticsModel sm2 = new SemanticsModel(jsonString);
-
-        sluHypotheses = new HashMap<>();
-        sluHypotheses.put("hyp1", sm1);
-        sluHypotheses.put("hyp2", sm2);
-        sluDistribution = new StringDistribution();
-        sluDistribution.put("hyp1", .6);
-        sluDistribution.put("hyp2", .4);
-
-        currentTurn = new Turn("user", null, sluHypotheses, sluDistribution);
-        correctState = new DiscourseUnit2.DiscourseUnitHypothesis();
-        correctState.setSpokenByThem(sm1.deepCopy());
-        testCase.getTurns().put(currentTurn, (long) 0.0);
-        testCase.getEvaluationStates().put(correctState, (long) 0.0);
-
-
-        /// Turn 2
-        String uri3 = null;
-        uri3 = yodaEnvironment.db.insertValue(1);
-
-
-        // Option 0: Confirmation request fragment: "3 o'clock?"
-        jsonString = "{\n" +
-                "\"dialogAct\":\"RequestConfirmValue\",\n" +
-                "\"topic\":{\"class\":\""+Time.class.getSimpleName()+"\",\n" +
-                "         \"HasHour\":"+ OntologyRegistry.WebResourceWrap(uri3)+"}\n" +
-                "}\n";
-
-        // Option 1: Confirmation request fragment: "At 3?"
+//    DialogStateTracker2.DSTTester testCase1() throws ParseException {
+//        String jsonString;
+//        YodaEnvironment yodaEnvironment;
+//        DialogStateTracker2.DSTTester testCase;
+//        Turn currentTurn;
+//        DiscourseUnit2.DiscourseUnitHypothesis correctState;
+//        StringDistribution sluDistribution;
+//        Map<String, SemanticsModel> sluHypotheses;
+//
+//        yodaEnvironment = YodaEnvironment.dstTestingEnvironment();
+//        testCase = new DialogStateTracker2.DSTTester(yodaEnvironment);
+//
+//        /// Turn 1
+//        String uri1 = null;
+//        String uri2 = null;
+//        uri1 = yodaEnvironment.db.insertValue(1);
+//        uri2 = yodaEnvironment.db.insertValue(10);
+//
+//        jsonString = "{\n" +
+//                "\"dialogAct\":\"Command\",\n" +
+//                "\"verb\":{\"class\":\"Create\",\n" +
+//                "        \"Patient\":{\"class\":\"Meeting\",\n" +
+//                "                   \"HasAtTime\":{\"class\":\"Time\",\n" +
+//                "                                \"HasHour\":"+ OntologyRegistry.WebResourceWrap(uri1)+"}}}\n" +
+//                "}";
+//        SemanticsModel sm1 = new SemanticsModel(jsonString);
+//
+//        jsonString = "{\n" +
+//                "\"dialogAct\":\"Command\",\n" +
+//                "\"verb\":{\"class\":\"Create\",\n" +
+//                "        \"Patient\":{\"class\":\"Meeting\",\n" +
+//                "                   \"HasAtTime\":{\"class\":\"Time\",\n" +
+//                "                                \"HasHour\":"+ OntologyRegistry.WebResourceWrap(uri2)+"}}}\n" +
+//                "}";
+//        SemanticsModel sm2 = new SemanticsModel(jsonString);
+//
+//        sluHypotheses = new HashMap<>();
+//        sluHypotheses.put("hyp1", sm1);
+//        sluHypotheses.put("hyp2", sm2);
+//        sluDistribution = new StringDistribution();
+//        sluDistribution.put("hyp1", .6);
+//        sluDistribution.put("hyp2", .4);
+//
+//        currentTurn = new Turn("user", null, null, sluHypotheses, sluDistribution);
+//        correctState = new DiscourseUnit2.DiscourseUnitHypothesis();
+//        correctState.setSpokenByThem(sm1.deepCopy());
+//        testCase.getTurns().put(currentTurn, (long) 0.0);
+//        testCase.getEvaluationStates().put(correctState, (long) 0.0);
+//
+//
+//        /// Turn 2
+//        String uri3 = null;
+//        uri3 = yodaEnvironment.db.insertValue(1);
+//
+//
+//        // Option 0: Confirmation request fragment: "3 o'clock?"
 //        jsonString = "{\n" +
 //                "\"dialogAct\":\"RequestConfirmValue\",\n" +
-//                "\"topic\":{\"class\":\"UnknownThingWithRoles\",\n" +
-//                "         \"HasAtTime\":{\"class\":\"Time\",\n" +
-//                "                      \"HasHour\":"+WebResourceWrap(uri3)+"}}\n" +
+//                "\"topic\":{\"class\":\""+Time.class.getSimpleName()+"\",\n" +
+//                "         \"HasHour\":"+ OntologyRegistry.WebResourceWrap(uri3)+"}\n" +
 //                "}\n";
-        SemanticsModel sm3 = new SemanticsModel(jsonString);
-
-        currentTurn = new Turn("system", sm3.deepCopy(), null, null);
-        correctState = new DiscourseUnit2.DiscourseUnitHypothesis();
-        correctState.setSpokenByThem(sm1.deepCopy());
-        correctState.setSpokenByMe(sm3.deepCopy());
-        testCase.getTurns().put(currentTurn, (long) 1.0);
-        testCase.getEvaluationStates().put(correctState, (long) 1.0);
-
-        /// Turn 3
-        String uri5 = null;
-        uri5 = yodaEnvironment.db.insertValue(10);
-
-
-        // Option 0, a confirmation fragment: "At 3"
-//        jsonString = "{\"dialogAct\":\"Fragment\",\n" +
-//                " \"topic\":{\"class\":\""+UnknownThingWithRoles.class.getSimpleName()+"\",\n" +
-//                "          \"HasAtTime\":{\"class\":\"Time\",\n" +
-//                "                       \"HasHour\":"+WebResourceWrap(uri5)+"}}}";
-
-        // Option 1, a confirmation fragment "3 o'clock"
-        jsonString = "{\n" +
-                "\"dialogAct\":\"Fragment\",\n" +
-                "\"topic\":{\"class\":\""+Time.class.getSimpleName()+"\",\n" +
-                "         \"HasHour\":"+ OntologyRegistry.WebResourceWrap(uri5)+"}\n" +
-                "}\n";
-
-        // Option 3, an acknowledgement
-//        jsonString = "{\"dialogAct\":\"Acknowledge\"}";
-        SemanticsModel sm4 = new SemanticsModel(jsonString);
-
-        sluHypotheses = new HashMap<>();
-        sluHypotheses.put("hyp1", sm4);
-        sluDistribution = new StringDistribution();
-        sluDistribution.put("hyp1", 1.0);
-
-        currentTurn = new Turn("user", null, sluHypotheses, sluDistribution);
-        correctState = new DiscourseUnit2.DiscourseUnitHypothesis();
-        correctState.setSpokenByThem(sm2.deepCopy());
-        correctState.setSpokenByMe(sm3.deepCopy());
-        testCase.getTurns().put(currentTurn, (long) 2.0);
-        testCase.getEvaluationStates().put(correctState, (long) 2.0);
-
-        return testCase;
-    }
+//
+//        // Option 1: Confirmation request fragment: "At 3?"
+////        jsonString = "{\n" +
+////                "\"dialogAct\":\"RequestConfirmValue\",\n" +
+////                "\"topic\":{\"class\":\"UnknownThingWithRoles\",\n" +
+////                "         \"HasAtTime\":{\"class\":\"Time\",\n" +
+////                "                      \"HasHour\":"+WebResourceWrap(uri3)+"}}\n" +
+////                "}\n";
+//        SemanticsModel sm3 = new SemanticsModel(jsonString);
+//
+//        currentTurn = new Turn("system", sm3.deepCopy(), null, null);
+//        correctState = new DiscourseUnit2.DiscourseUnitHypothesis();
+//        correctState.setSpokenByThem(sm1.deepCopy());
+//        correctState.setSpokenByMe(sm3.deepCopy());
+//        testCase.getTurns().put(currentTurn, (long) 1.0);
+//        testCase.getEvaluationStates().put(correctState, (long) 1.0);
+//
+//        /// Turn 3
+//        String uri5 = null;
+//        uri5 = yodaEnvironment.db.insertValue(10);
+//
+//
+//        // Option 0, a confirmation fragment: "At 3"
+////        jsonString = "{\"dialogAct\":\"Fragment\",\n" +
+////                " \"topic\":{\"class\":\""+UnknownThingWithRoles.class.getSimpleName()+"\",\n" +
+////                "          \"HasAtTime\":{\"class\":\"Time\",\n" +
+////                "                       \"HasHour\":"+WebResourceWrap(uri5)+"}}}";
+//
+//        // Option 1, a confirmation fragment "3 o'clock"
+//        jsonString = "{\n" +
+//                "\"dialogAct\":\"Fragment\",\n" +
+//                "\"topic\":{\"class\":\""+Time.class.getSimpleName()+"\",\n" +
+//                "         \"HasHour\":"+ OntologyRegistry.WebResourceWrap(uri5)+"}\n" +
+//                "}\n";
+//
+//        // Option 3, an acknowledgement
+////        jsonString = "{\"dialogAct\":\"Acknowledge\"}";
+//        SemanticsModel sm4 = new SemanticsModel(jsonString);
+//
+//        sluHypotheses = new HashMap<>();
+//        sluHypotheses.put("hyp1", sm4);
+//        sluDistribution = new StringDistribution();
+//        sluDistribution.put("hyp1", 1.0);
+//
+//        currentTurn = new Turn("user", null, sluHypotheses, sluDistribution);
+//        correctState = new DiscourseUnit2.DiscourseUnitHypothesis();
+//        correctState.setSpokenByThem(sm2.deepCopy());
+//        correctState.setSpokenByMe(sm3.deepCopy());
+//        testCase.getTurns().put(currentTurn, (long) 2.0);
+//        testCase.getEvaluationStates().put(correctState, (long) 2.0);
+//
+//        return testCase;
+//    }
 
     /*
     2) deal with user non-understanding
@@ -173,83 +173,83 @@ public class TestDSTClarification {
     S: repeat
     you have a meeting at 2
     */
-    DialogStateTracker2.DSTTester testCase2() throws ParseException {
-        YodaEnvironment yodaEnvironment;
-        DialogStateTracker2.DSTTester testCase;
-        Turn currentTurn;
-        DiscourseUnit2.DiscourseUnitHypothesis correctState;
-        String jsonString;
-        StringDistribution sluDistribution;
-        Map<String, SemanticsModel> sluHypotheses;
-
-        yodaEnvironment = YodaEnvironment.dstTestingEnvironment();
-        testCase = new DialogStateTracker2.DSTTester(yodaEnvironment);
-
-        /// Turn 1
-        String uri1 = null;
-        uri1 = yodaEnvironment.db.insertValue(2);
-
-
-        jsonString = "{\n" +
-                "\"dialogAct\":\"Statement\",\n" +
-                "\"verb\":{\"class\":\"Exist\",\n" +
-                "        \"Patient\":{\"class\":\"Meeting\",\n" +
-                "                   \"HasAtTime\":{\"class\":\"Time\",\n" +
-                "                                \"HasHour\":\""+ OntologyRegistry.WebResourceWrap(uri1)+"\"}}}\n" +
-                "}";
-        SemanticsModel sm1 = new SemanticsModel(jsonString);
-
-        currentTurn = new Turn("system", sm1.deepCopy(), null, null);
-        correctState = new DiscourseUnit2.DiscourseUnitHypothesis();
-        correctState.setSpokenByMe(sm1.deepCopy());
-        testCase.getTurns().put(currentTurn, (long) 0.0);
-        testCase.getEvaluationStates().put(correctState, (long) 0.0);
-
-        /// Turn 2
-        jsonString = "{\"dialogAct\":\"NonHearing\"}";
-        SemanticsModel sm2 = new SemanticsModel(jsonString);
-
-        jsonString = "{\"dialogAct\":\"NonUnderstanding\"}";
-        SemanticsModel sm3 = new SemanticsModel(jsonString);
-
-        sluHypotheses = new HashMap<>();
-        sluHypotheses.put("hyp1", sm2);
-        sluHypotheses.put("hyp2", sm3);
-        sluDistribution = new StringDistribution();
-        sluDistribution.put("hyp1", .6);
-        sluDistribution.put("hyp2", .4);
-
-        currentTurn = new Turn("user", null, sluHypotheses, sluDistribution);
-        correctState = new DiscourseUnit2.DiscourseUnitHypothesis();
-        correctState.setSpokenByMe(sm1.deepCopy());
-        correctState.setSpokenByThem(sm2.deepCopy());
-        testCase.getTurns().put(currentTurn, (long) 1.0);
-        testCase.getEvaluationStates().put(correctState, (long) 1.0);
-
-        /// Turn 3
-        // (the system repeats itself)
-        String uri2 = null;
-        uri2 = yodaEnvironment.db.insertValue(2);
-
-
-        jsonString = "{\n" +
-                "\"dialogAct\":\"Statement\",\n" +
-                "\"verb\":{\"class\":\"Exist\",\n" +
-                "        \"Patient\":{\"class\":\"Meeting\",\n" +
-                "                   \"HasAtTime\":{\"class\":\"Time\",\n" +
-                "                                \"HasHour\":\""+ OntologyRegistry.WebResourceWrap(uri2)+"\"}}}\n" +
-                "}";
-        SemanticsModel sm4 = new SemanticsModel(jsonString);
-
-        currentTurn = new Turn("system", sm4.deepCopy(), null, null);
-        correctState = new DiscourseUnit2.DiscourseUnitHypothesis();
-        correctState.setSpokenByMe(sm4.deepCopy());
-        correctState.setSpokenByThem(sm2.deepCopy());
-        testCase.getTurns().put(currentTurn, (long) 2.0);
-        testCase.getEvaluationStates().put(correctState, (long) 2.0);
-
-        return testCase;
-    }
+//    DialogStateTracker2.DSTTester testCase2() throws ParseException {
+//        YodaEnvironment yodaEnvironment;
+//        DialogStateTracker2.DSTTester testCase;
+//        Turn currentTurn;
+//        DiscourseUnit2.DiscourseUnitHypothesis correctState;
+//        String jsonString;
+//        StringDistribution sluDistribution;
+//        Map<String, SemanticsModel> sluHypotheses;
+//
+//        yodaEnvironment = YodaEnvironment.dstTestingEnvironment();
+//        testCase = new DialogStateTracker2.DSTTester(yodaEnvironment);
+//
+//        /// Turn 1
+//        String uri1 = null;
+//        uri1 = yodaEnvironment.db.insertValue(2);
+//
+//
+//        jsonString = "{\n" +
+//                "\"dialogAct\":\"Statement\",\n" +
+//                "\"verb\":{\"class\":\"Exist\",\n" +
+//                "        \"Patient\":{\"class\":\"Meeting\",\n" +
+//                "                   \"HasAtTime\":{\"class\":\"Time\",\n" +
+//                "                                \"HasHour\":\""+ OntologyRegistry.WebResourceWrap(uri1)+"\"}}}\n" +
+//                "}";
+//        SemanticsModel sm1 = new SemanticsModel(jsonString);
+//
+//        currentTurn = new Turn("system", sm1.deepCopy(), null, null);
+//        correctState = new DiscourseUnit2.DiscourseUnitHypothesis();
+//        correctState.setSpokenByMe(sm1.deepCopy());
+//        testCase.getTurns().put(currentTurn, (long) 0.0);
+//        testCase.getEvaluationStates().put(correctState, (long) 0.0);
+//
+//        /// Turn 2
+//        jsonString = "{\"dialogAct\":\"NonHearing\"}";
+//        SemanticsModel sm2 = new SemanticsModel(jsonString);
+//
+//        jsonString = "{\"dialogAct\":\"NonUnderstanding\"}";
+//        SemanticsModel sm3 = new SemanticsModel(jsonString);
+//
+//        sluHypotheses = new HashMap<>();
+//        sluHypotheses.put("hyp1", sm2);
+//        sluHypotheses.put("hyp2", sm3);
+//        sluDistribution = new StringDistribution();
+//        sluDistribution.put("hyp1", .6);
+//        sluDistribution.put("hyp2", .4);
+//
+//        currentTurn = new Turn("user", null, sluHypotheses, sluDistribution);
+//        correctState = new DiscourseUnit2.DiscourseUnitHypothesis();
+//        correctState.setSpokenByMe(sm1.deepCopy());
+//        correctState.setSpokenByThem(sm2.deepCopy());
+//        testCase.getTurns().put(currentTurn, (long) 1.0);
+//        testCase.getEvaluationStates().put(correctState, (long) 1.0);
+//
+//        /// Turn 3
+//        // (the system repeats itself)
+//        String uri2 = null;
+//        uri2 = yodaEnvironment.db.insertValue(2);
+//
+//
+//        jsonString = "{\n" +
+//                "\"dialogAct\":\"Statement\",\n" +
+//                "\"verb\":{\"class\":\"Exist\",\n" +
+//                "        \"Patient\":{\"class\":\"Meeting\",\n" +
+//                "                   \"HasAtTime\":{\"class\":\"Time\",\n" +
+//                "                                \"HasHour\":\""+ OntologyRegistry.WebResourceWrap(uri2)+"\"}}}\n" +
+//                "}";
+//        SemanticsModel sm4 = new SemanticsModel(jsonString);
+//
+//        currentTurn = new Turn("system", sm4.deepCopy(), null, null);
+//        correctState = new DiscourseUnit2.DiscourseUnitHypothesis();
+//        correctState.setSpokenByMe(sm4.deepCopy());
+//        correctState.setSpokenByThem(sm2.deepCopy());
+//        testCase.getTurns().put(currentTurn, (long) 2.0);
+//        testCase.getEvaluationStates().put(correctState, (long) 2.0);
+//
+//        return testCase;
+//    }
 
 
 /*  *//*
