@@ -27,8 +27,6 @@ public abstract class SystemAction {
                     && new HashSet<>(da1.getBoundClasses().values()).equals(
                     new HashSet<>(da2.getBoundClasses().values())));
         }
-        if (this instanceof DialogTask)
-            return ((DialogTask) this).getTaskSpec().equals(((DialogTask) other).getTaskSpec());
         if (this instanceof NonDialogTask)
             return ((NonDialogTask) this).getTaskSpec().equals(((NonDialogTask) other).getTaskSpec());
         return true;
