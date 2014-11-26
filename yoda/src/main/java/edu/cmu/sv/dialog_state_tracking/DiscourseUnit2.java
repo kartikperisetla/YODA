@@ -1,5 +1,7 @@
 package edu.cmu.sv.dialog_state_tracking;
 
+import edu.cmu.sv.database.dialog_task.DialogTask;
+import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -118,6 +120,20 @@ public class DiscourseUnit2 {
                     "\nspokenByThem=" + spokenByThem +
                     '}';
         }
+
+        public void groundAndAnalyse(YodaEnvironment yodaEnvironment){
+            String dialogActString = (String) spokenByThem.newGetSlotPathFiller("dialogAct");
+            Class<? extends DialogTask> taskClass = DialogRegistry.dialogTaskMap.
+                    get(DialogRegistry.dialogActNameMap.get(dialogActString));
+            try {
+                gnd = taskClass.newInstance().ground(this, yodaEnvironment);
+                taskClass.newInstance().analyse(gnd, yodaEnvironment);
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+                System.exit(0);
+            }
+        }
+
     }
 
     public DiscourseUnit2() {

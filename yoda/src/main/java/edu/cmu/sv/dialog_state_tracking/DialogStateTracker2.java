@@ -95,6 +95,10 @@ public class DialogStateTracker2 implements Runnable {
                 }
             }
 
+            for (String key : discourseUnit.getHypotheses().keySet()){
+                discourseUnit.getHypotheses().get(key).groundAndAnalyse(yodaEnvironment);
+            }
+
             discourseUnit.hypothesisDistribution = HypothesisSetManagement.keepNBestDistribution(newHypothesisDistribution,
                     DiscourseUnit2.BEAM_WIDTH);
             discourseUnit.hypotheses = new HashMap<>();

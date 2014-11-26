@@ -1,6 +1,8 @@
 package edu.cmu.sv.dialog_management;
 
 import com.google.common.collect.Iterables;
+import edu.cmu.sv.database.dialog_task.DialogTask;
+import edu.cmu.sv.database.dialog_task.RespondToYNQuestionTask;
 import edu.cmu.sv.system_action.dialog_act.*;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.*;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Command;
@@ -34,6 +36,8 @@ public class DialogRegistry {
     public static Map<Class <? extends DialogAct>, Set<Class <? extends NonDialogTask>>>
             nonDialogTaskRegistry = new HashMap<>();
 
+    public static Map<Class <? extends DialogAct>, Class<? extends DialogTask>> dialogTaskMap = new HashMap<>();
+
     static{
         senseClarificationDialogActs.add(RequestConfirmValue.class);
 //        senseClarificationDialogActs.add(RequestRephrase.class);
@@ -43,6 +47,8 @@ public class DialogRegistry {
         discourseUnitDialogActs.add(WHQuestion.class);
         discourseUnitDialogActs.add(YNQuestion.class);
         discourseUnitDialogActs.add(Command.class);
+
+        dialogTaskMap.put(YNQuestion.class, RespondToYNQuestionTask.class);
 
         nonDialogTaskRegistry.put(Command.class, new HashSet<>());
         nonDialogTaskRegistry.get(Command.class).add(CreateMeetingTask.class);

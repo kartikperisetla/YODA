@@ -57,7 +57,6 @@ public class AcknowledgeInference implements DiscourseUnitUpdateInference {
                     newDUHypothesis.setSpokenByMe(currentState.spokenByMe.deepCopy());
                     newDUHypothesis.timeOfLastActByThem = timeStamp;
                     newDUHypothesis.spokenByThem = newSpokenByThemHypothesis;
-                    newDUHypothesis.groundAndAnalyse();
                     ans.hypotheses.put(newDUHypothesisID, newDUHypothesis);
 
                 } else if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(Fragment.class)){
@@ -97,7 +96,6 @@ public class AcknowledgeInference implements DiscourseUnitUpdateInference {
                     newDUHypothesis.setSpokenByMe(currentState.spokenByMe.deepCopy());
                     newDUHypothesis.timeOfLastActByThem = timeStamp;
                     newDUHypothesis.spokenByThem = newSpokenByThemHypothesis;
-                    newDUHypothesis.groundAndAnalyse();
                     ans.hypotheses.put(newDUHypothesisID, newDUHypothesis);
                 }
             }
@@ -122,7 +120,6 @@ public class AcknowledgeInference implements DiscourseUnitUpdateInference {
                 newDUHypothesis.setSpokenByThem(currentState.spokenByThem.deepCopy());
                 newDUHypothesis.timeOfLastActByMe = timeStamp;
                 newDUHypothesis.spokenByMe = newSpokenByMeHypothesis;
-                newDUHypothesis.groundAndAnalyse();
                 ans.hypotheses.put(newDUHypothesisID, newDUHypothesis);
             }
         }
