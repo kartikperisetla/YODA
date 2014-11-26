@@ -35,6 +35,14 @@ public class DiscourseUnit2 {
         Map<String, Double> ynqTruth;
         Map<String, Map<String, Double>> whqTruth;
 
+        public Map<String, Double> getYnqTruth() {
+            return ynqTruth;
+        }
+
+        public void setYnqTruth(Map<String, Double> ynqTruth) {
+            this.ynqTruth = ynqTruth;
+        }
+
         public Map<String, SemanticsModel> getGroundedHypotheses() {
             return groundedHypotheses;
         }

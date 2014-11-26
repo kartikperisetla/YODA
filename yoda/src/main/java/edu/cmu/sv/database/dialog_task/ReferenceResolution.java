@@ -2,6 +2,7 @@ package edu.cmu.sv.database.dialog_task;
 
 import edu.cmu.sv.database.Product;
 import edu.cmu.sv.database.StringSimilarity;
+import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
@@ -77,13 +78,12 @@ public class ReferenceResolution {
             List<String> scoresToAccumulate = new LinkedList<>();
             for (Object key : reference.keySet()) {
 
-                double center;
-                double slope;
-                Class<? extends TransientQuality> qualityClass;
-
                 if (key.equals("class")) {
                     continue;
                 } else if (HasQualityRole.class.isAssignableFrom(OntologyRegistry.roleNameMap.get((String) key))) {
+                    double center;
+                    double slope;
+                    Class<? extends TransientQuality> qualityClass;
                     Class<? extends Thing> qualityDegreeClass = OntologyRegistry.thingNameMap.
                             get((String) ((JSONObject) reference.get(key)).get("class"));
                     List<String> entityURIs = new LinkedList<>();
@@ -135,6 +135,48 @@ public class ReferenceResolution {
             return new ImmutablePair<>(ans, tmpVarIndex);
 
         } catch (InstantiationException | IllegalAccessException e){
+            e.printStackTrace();
+            throw new Error();
+        }
+    }
+
+    /*
+    * return the truth with which the description describes the grounded individual
+    * Any nested noun phrases in the description must be grounded in advance (WebResources)
+    * */
+    public static double descriptionMatch(YodaEnvironment yodaEnvironment, JSONObject individual, JSONObject description){
+        try {
+            String queryString = yodaEnvironment.db.prefixes + "SELECT ?score WHERE {\n";
+            String individualURI = (String) individual.get(HasURI.class.getSimpleName());
+
+            for (Object key : description.keySet()) {
+                if (key.equals("class")) {
+                    if (description.get(key).equals(UnknownThingWithRoles.class.getSimpleName()))
+                        continue;
+                    queryString += "<" + individualURI + "> rdf:type base:" + description.get(key) + " .\n";
+                } else if (HasQualityRole.class.isAssignableFrom(OntologyRegistry.roleNameMap.get((String) key))) {
+                    double center;
+                    double slope;
+                    Class<? extends Thing> qualityDegreeClass = OntologyRegistry.thingNameMap.
+                            get((String) ((JSONObject) description.get(key)).get("class"));
+                    List<String> entityURIs = new LinkedList<>();
+                    if (Preposition.class.isAssignableFrom(qualityDegreeClass)) {
+
+                    } else if (Adjective.class.isAssignableFrom(qualityDegreeClass)) {
+                        Adjective adjective = (Adjective) qualityDegreeClass.newInstance();
+
+                    } else {
+                        throw new Error("degreeClass is neither an Adjective nor a Preposition class");
+                    }
+                }
+
+            }
+
+
+            queryString += "}";
+
+
+        } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
             throw new Error();
         }
