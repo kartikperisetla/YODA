@@ -24,8 +24,8 @@ public class Product implements Function{
             throw new ValueExprEvaluationException(getURI()+" requires" +
                     "at least 1 argument, got " + values.length);
         }
-        double ans = ((Literal)values[0]).doubleValue();
-        for (int i = 1; i < values.length; i++) {
+        double ans = 1.0;
+        for (int i = 0; i < values.length; i++) {
             ans *= ((Literal)values[i]).doubleValue();
         }
         return valueFactory.createLiteral(ans);

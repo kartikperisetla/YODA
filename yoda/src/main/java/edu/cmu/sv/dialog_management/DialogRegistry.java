@@ -39,10 +39,10 @@ public class DialogRegistry {
     public static Map<Class <? extends DialogAct>, Class<? extends DialogTask>> dialogTaskMap = new HashMap<>();
 
     static{
-        senseClarificationDialogActs.add(RequestConfirmValue.class);
+//        senseClarificationDialogActs.add(RequestConfirmValue.class);
 //        senseClarificationDialogActs.add(RequestRephrase.class);
-        senseClarificationDialogActs.add(ConfirmSenseSuggestion.class);
-        senseClarificationDialogActs.add(DenyIncorrectSenseSuggestion.class);
+//        senseClarificationDialogActs.add(ConfirmSenseSuggestion.class);
+//        senseClarificationDialogActs.add(DenyIncorrectSenseSuggestion.class);
 
         discourseUnitDialogActs.add(WHQuestion.class);
         discourseUnitDialogActs.add(YNQuestion.class);

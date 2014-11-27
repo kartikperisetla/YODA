@@ -3,6 +3,7 @@ package edu.cmu.sv.database.dialog_task;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
+import edu.cmu.sv.ontology.noun.Noun;
 import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
@@ -37,10 +38,12 @@ public class RespondToYNQuestionTask extends DialogTask {
                         || Arrays.asList("", "dialogAct", "verb").contains(path)
                         || slotPathsToResolve.stream().anyMatch(x -> path.startsWith(x)))
                     continue;
-                if (((JSONObject)spokenByThem.newGetSlotPathFiller(path)).get("class").equals(UnknownThingWithRoles.class.getSimpleName()))
+                if (!Noun.class.isAssignableFrom(OntologyRegistry.thingNameMap.get(((JSONObject)spokenByThem.newGetSlotPathFiller(path)).get("class"))))
                     continue;
                 slotPathsToResolve.add(path);
             }
+            System.out.println("RespondToYNQuestion.ground: slotPathsToResolve:"+slotPathsToResolve);
+
         }
 
         Map<String, StringDistribution> referenceMarginals = new HashMap<>();

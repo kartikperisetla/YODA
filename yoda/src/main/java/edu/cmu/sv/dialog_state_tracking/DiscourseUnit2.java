@@ -122,12 +122,15 @@ public class DiscourseUnit2 {
         }
 
         public void groundAndAnalyse(YodaEnvironment yodaEnvironment){
+            System.out.println("DU2.groundAndAnalyse");
+            System.out.println("spokenByThem:"+spokenByThem);
+            System.out.println("spokenByMe:"+spokenByMe);
             String dialogActString = (String) spokenByThem.newGetSlotPathFiller("dialogAct");
             Class<? extends DialogTask> taskClass = DialogRegistry.dialogTaskMap.
                     get(DialogRegistry.dialogActNameMap.get(dialogActString));
             try {
                 gnd = taskClass.newInstance().ground(this, yodaEnvironment);
-                taskClass.newInstance().analyse(gnd, yodaEnvironment);
+                 taskClass.newInstance().analyse(gnd, yodaEnvironment);
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
                 System.exit(0);

@@ -29,13 +29,27 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.Object;
 import java.util.*;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 import java.util.stream.Collectors;
 
 /**
  * Created by David Cohen on 6/21/14.
  */
 public class Database {
-
+    private static Logger logger = Logger.getLogger("yoda.database.Database");
+    private static FileHandler fh;
+    static {
+        try {
+            fh = new FileHandler("Database.log");
+            fh.setFormatter(new SimpleFormatter());
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(0);
+        }
+        logger.addHandler(fh);
+    }
     public YodaEnvironment yodaEnvironment;
 //    Repository repository;
     // a counter used to create new URIs
@@ -47,10 +61,13 @@ public class Database {
             "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
             "PREFIX base: <"+baseURI+">\n";
 
+    public static Logger getLogger() {
+        return logger;
+    }
 
     /*
-    * log interactions with the database
-    * */
+        * log interactions with the database
+        * */
     public void log(String interaction){
 //        System.out.println(interaction);
     }
@@ -85,15 +102,23 @@ public class Database {
             // load the non-ontology relations
             addNonOntologyProperties(DatabaseRegistry.nonOntologyRelations);
 
+            //// randomly insert 'expensiveness' information
+            String restaurantSelectionQuery = prefixes +
+                    "SELECT ?x WHERE { ?x rdf:type base:Restaurant . \n }";
+            List<String> restaurantURIList = new LinkedList<>(runQuerySelectX(restaurantSelectionQuery));
 
-//            String sampleCrashQuery = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
-//                    "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
-//                    "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
-//                    "PREFIX base: <http://sv.cmu.edu/yoda#>\n" +
-//                    "SELECT ?fuzzy_mapped_quality WHERE {<http://sv.cmu.edu/yoda#POI_1016459001> base:gps_lat ?i ; base:gps_lon ?j . <http://sv.cmu.edu/yoda#POI_1312454947> base:gps_lat ?k ; base:gps_lon ?l . BIND(base:DistanceFunction(?i, ?j, ?k, ?l) AS ?transient_quality) BIND(base:LinearFuzzyMap(0.0, 2.0, ?transient_quality) AS ?fuzzy_mapped_quality)}\n";
-//            runQueryForever(sampleCrashQuery);
-
-//            System.exit(0);
+            Random r = new Random();
+            for (String restaurantURI : restaurantURIList){
+                // randomly insert Expensiveness
+                String expensivenessInsertString = prefixes +
+                        "INSERT DATA {<"+restaurantURI+"> base:expensiveness "+r.nextDouble()+"}";
+                try {
+                    Update update = connection.prepareUpdate(QueryLanguage.SPARQL, expensivenessInsertString, baseURI);
+                    update.execute();
+                } catch (RepositoryException | UpdateExecutionException | MalformedQueryException e) {
+                    e.printStackTrace();
+                }
+            }
 
         } catch (RepositoryException | RDFParseException | IOException | MalformedQueryException | UpdateExecutionException e) {
             e.printStackTrace();

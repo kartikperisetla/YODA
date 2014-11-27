@@ -45,22 +45,7 @@ public class TestGenerateCorpus {
 
         String poiSelectionQuery = yodaEnvironment.db.prefixes +
                 "SELECT ?x WHERE { ?x rdf:type base:PointOfInterest . \n }";
-        String restaurantSelectionQuery = yodaEnvironment.db.prefixes +
-                "SELECT ?x WHERE { ?x rdf:type base:Restaurant . \n }";
-        List<String> restaurantURIList = new LinkedList<>(yodaEnvironment.db.runQuerySelectX(restaurantSelectionQuery));
 
-        Random r = new Random();
-        for (String restaurantURI : restaurantURIList){
-            // randomly insert Expensiveness
-            String expensivenessInsertString = yodaEnvironment.db.prefixes +
-                    "INSERT DATA {<"+restaurantURI+"> base:expensiveness "+r.nextDouble()+"}";
-            try {
-                Update update = yodaEnvironment.db.connection.prepareUpdate(QueryLanguage.SPARQL, expensivenessInsertString, yodaEnvironment.db.baseURI);
-                update.execute();
-            } catch (RepositoryException | UpdateExecutionException | MalformedQueryException e) {
-                e.printStackTrace();
-            }
-        }
 
         Grammar.GrammarPreferences corpusPreferences = new Grammar.GrammarPreferences(.01, .2, 5, 2, 5, 5, 2, new HashMap<>());
 

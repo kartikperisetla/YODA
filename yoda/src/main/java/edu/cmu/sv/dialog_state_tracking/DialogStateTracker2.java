@@ -35,8 +35,8 @@ public class DialogStateTracker2 implements Runnable {
     static {
         updateInferences = new HashSet<>();
         updateInferences.add(PresentationInference.class);
-        updateInferences.add(SuggestedInference.class);
-        updateInferences.add(AcknowledgeInference.class);
+//        updateInferences.add(SuggestedInference.class);
+//        updateInferences.add(AcknowledgeInference.class);
     }
 
     YodaEnvironment yodaEnvironment;
@@ -94,9 +94,9 @@ public class DialogStateTracker2 implements Runnable {
                     }
                 }
             }
-
-            for (String key : discourseUnit.getHypotheses().keySet()){
-                discourseUnit.getHypotheses().get(key).groundAndAnalyse(yodaEnvironment);
+            logger.info("dst loop, number of active hypotheses:"+discourseUnit.getHypotheses().size());
+            for (String key : newHypothesisDistribution.keySet()){
+                newHypotheses.get(key).groundAndAnalyse(yodaEnvironment);
             }
 
             discourseUnit.hypothesisDistribution = HypothesisSetManagement.keepNBestDistribution(newHypothesisDistribution,

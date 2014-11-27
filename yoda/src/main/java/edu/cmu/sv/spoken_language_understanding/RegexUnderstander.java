@@ -53,17 +53,18 @@ public class RegexUnderstander implements SpokenLanguageUnderstander{
         if (m.matches()) {
             String PoiName = m.group(2);
             System.out.println(PoiName);
+            logger.info("chunked POI: "+ PoiName);
             String uri = yodaEnvironment.db.insertValue(PoiName);
-            jsonString = "{\"dialogAct\":\"WHQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\""+uri+"\",\"class\":\"WebResource\"},\"class\":\"PlaceOfWorship\"},\"Patient\":{\"class\":\"UnknownThingWithRoles\",\"HasExpensiveness\":{\"class\":\"Expensive\"}},\"class\":\"HasProperty\"}}";
+            jsonString = "{\"dialogAct\":\"WHQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\""+uri+"\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"},\"Patient\":{\"class\":\"UnknownThingWithRoles\",\"HasExpensiveness\":{\"class\":\"Expensive\"}},\"class\":\"HasProperty\"}}";
         }
 
         Pattern isExpensivePattern = Pattern.compile("(is |are |)(the |)?(.+)(expensive)");
         Matcher m2 = isExpensivePattern.matcher(asrResult);
         if (m2.matches()) {
-            String PoiName = m2.group(2);
-            System.out.println(PoiName);
+            String PoiName = m2.group(3);
+            logger.info("chunked POI: "+ PoiName);
             String uri = yodaEnvironment.db.insertValue(PoiName);
-            jsonString = "{\"dialogAct\":\"YNQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\""+uri+"\",\"class\":\"WebResource\"},\"class\":\"PlaceOfWorship\"},\"Patient\":{\"class\":\"UnknownThingWithRoles\",\"HasExpensiveness\":{\"class\":\"Expensive\"}},\"class\":\"HasProperty\"}}";
+            jsonString = "{\"dialogAct\":\"YNQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\""+uri+"\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"},\"Patient\":{\"class\":\"UnknownThingWithRoles\",\"HasExpensiveness\":{\"class\":\"Expensive\"}},\"class\":\"HasProperty\"}}";
         }
 
         SemanticsModel interpretation = new SemanticsModel(jsonString);

@@ -1,5 +1,6 @@
 package edu.cmu.sv.database.dialog_task;
 
+import edu.cmu.sv.database.Database;
 import edu.cmu.sv.database.Product;
 import edu.cmu.sv.database.StringSimilarity;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
@@ -37,6 +38,7 @@ public class ReferenceResolution {
         queryString += "} \nORDER BY DESC(?score0) \nLIMIT 10";
 
         yodaEnvironment.db.log(queryString);
+        Database.getLogger().info("Reference resolution query:\n"+queryString);
         StringDistribution ans = new StringDistribution();
         try {
             TupleQuery query = yodaEnvironment.db.connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
@@ -175,6 +177,7 @@ public class ReferenceResolution {
                     } else {
                         throw new Error("degreeClass is neither an Adjective nor a Preposition class");
                     }
+                    entityURIs.add("?transient_quality"+tmpVarIndex);
                     queryString += qualityClass.newInstance().getQualityCalculatorSPARQLQuery().apply(entityURIs) +
                             "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
                     scoresToAccumulate.add("?score"+tmpVarIndex);
@@ -188,18 +191,26 @@ public class ReferenceResolution {
             queryString += "}";
 
             yodaEnvironment.db.log(queryString);
+            Database.getLogger().info("Description match query:\n"+queryString);
+
             Double ans = null;
             try {
                 TupleQuery query = yodaEnvironment.db.connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
                 TupleQueryResult result = query.evaluate();
 
                 if (result.hasNext()){
+                    System.out.println("result binding names:"+result.getBindingNames());
                     BindingSet bindings = result.next();
                     ans = Double.parseDouble(bindings.getValue("score").stringValue());
+                    result.close();
                 }
-                result.close();
+                else {
+                    // answer is unknown / question doesn't make sense
+                    ans = -1.0;
+                }
             } catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {
                 e.printStackTrace();
+                System.exit(0);
             }
 
             return ans;
