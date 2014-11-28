@@ -60,6 +60,16 @@ public class DiscourseUnit2 {
         public void setGroundedHypothesesDistribution(StringDistribution groundedHypothesesDistribution) {
             this.groundedHypothesesDistribution = groundedHypothesesDistribution;
         }
+
+        @Override
+        public String toString() {
+            return "GroundedDiscourseUnitHypotheses{" +
+                    "\ngroundedHypotheses=" + groundedHypotheses +
+                    "\ngroundedHypothesesDistribution=" + groundedHypothesesDistribution +
+                    "\nynqTruth=" + ynqTruth +
+                    "\nwhqTruth=" + whqTruth +
+                    '}';
+        }
     }
 
     public static class DiscourseUnitHypothesis {
@@ -118,6 +128,7 @@ public class DiscourseUnit2 {
                     ", timeOfLastActByMe=" + timeOfLastActByMe +
                     "\nspokenByMe=" + spokenByMe +
                     "\nspokenByThem=" + spokenByThem +
+                    "\ngnd=" + gnd +
                     '}';
         }
 

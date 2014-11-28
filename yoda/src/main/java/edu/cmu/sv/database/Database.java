@@ -111,7 +111,7 @@ public class Database {
             for (String restaurantURI : restaurantURIList){
                 // randomly insert Expensiveness
                 String expensivenessInsertString = prefixes +
-                        "INSERT DATA {<"+restaurantURI+"> base:expensiveness "+r.nextDouble()+"}";
+                        "INSERT DATA {<"+restaurantURI+"> base:expensiveness "+r.nextDouble()+" . }";
                 try {
                     Update update = connection.prepareUpdate(QueryLanguage.SPARQL, expensivenessInsertString, baseURI);
                     update.execute();

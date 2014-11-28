@@ -4,6 +4,7 @@ import edu.cmu.sv.database.Database;
 import edu.cmu.sv.database.Product;
 import edu.cmu.sv.database.StringSimilarity;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
+import edu.cmu.sv.ontology.noun.Email;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
@@ -54,7 +55,6 @@ public class ReferenceResolution {
             e.printStackTrace();
         }
 
-        System.out.println("result:\n"+ans);
         return ans;
     }
 
@@ -151,8 +151,9 @@ public class ReferenceResolution {
                 if (key.equals("class")) {
                     if (description.get(key).equals(UnknownThingWithRoles.class.getSimpleName()))
                         continue;
-                    // todo: 1 if true, 0 if false
-                    queryString += "BIND(IF({<" + individualURI + "> rdf:type base:" + description.get(key) + "}, 1.0, 0.0) AS ?score"+tmpVarIndex+")\n";
+//                    queryString += "<"+individualURI+"> rdf:type ?x"+tmpVarIndex+" . ";
+//                    queryString += "BIND(IF({<" + individualURI + "> rdf:type base:" + description.get(key) + "}, 1.0, 0.0) AS ?score"+tmpVarIndex+")\n";
+                    System.out.println("requiring individual to have type: base:"+description.get(key));
                 } else if (HasQualityRole.class.isAssignableFrom(OntologyRegistry.roleNameMap.get((String) key))) {
                     double center;
                     double slope;
@@ -195,11 +196,10 @@ public class ReferenceResolution {
 
             Double ans = null;
             try {
-                TupleQuery query = yodaEnvironment.db.connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+                TupleQuery query = yodaEnvironment.db.connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString, Database.baseURI);
                 TupleQueryResult result = query.evaluate();
 
                 if (result.hasNext()){
-                    System.out.println("result binding names:"+result.getBindingNames());
                     BindingSet bindings = result.next();
                     ans = Double.parseDouble(bindings.getValue("score").stringValue());
                     result.close();

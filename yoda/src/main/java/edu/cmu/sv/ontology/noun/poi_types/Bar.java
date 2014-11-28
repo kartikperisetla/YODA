@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * Created by David Cohen on 10/29/14.
  */
-public class Bar extends PointOfInterest {
+public class Bar extends Restaurant {
     static Set<LexicalEntry> lexicalEntries = new HashSet<>();
     static {
         LexicalEntry e1 = new LexicalEntry();
