@@ -4,7 +4,7 @@ import edu.cmu.sv.database.Database;
 import edu.cmu.sv.natural_language_generation.Grammar;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
-import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnitHypothesis;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.system_action.SystemAction;
 import edu.cmu.sv.system_action.dialog_act.*;
@@ -43,7 +43,7 @@ public class DialogManager implements Runnable {
     }
 
     YodaEnvironment yodaEnvironment;
-    DiscourseUnit2 currentDialogState = null;
+    DiscourseUnitHypothesis currentDialogState = null;
 
     public YodaEnvironment getYodaEnvironment() {
         return yodaEnvironment;
@@ -73,7 +73,7 @@ public class DialogManager implements Runnable {
 //            System.out.println("Enumerating and evaluating actions of class: "+daClass.getSimpleName());
                 Map<String, Set<Object>> possibleBindingsPerVariable = new HashMap<>();
                 Map<String, Class<? extends Thing>> parameters = daClass.newInstance().getClassParameters();
-                Map<String, DiscourseUnit2.DiscourseUnitHypothesis> dialogStateHypothesisMap = currentDialogState.getHypotheses();
+                Map<String, DiscourseUnitHypothesis.DiscourseUnitHypothesis> dialogStateHypothesisMap = currentDialogState.getHypotheses();
 
                 // Collect matches
                 for (String dialogStateHypothesisID : dialogStateHypothesisMap.keySet()) {
@@ -99,7 +99,7 @@ public class DialogManager implements Runnable {
 
             //// Get expected rewards for executing non-dialog tasks
             for (String hypothesisID : currentDialogState.getHypotheses().keySet()) {
-                DiscourseUnit2.DiscourseUnitHypothesis dsHypothesis = currentDialogState.getHypotheses().get(hypothesisID);
+                DiscourseUnitHypothesis.DiscourseUnitHypothesis dsHypothesis = currentDialogState.getHypotheses().get(hypothesisID);
                 SemanticsModel hypothesis = dsHypothesis.getSpokenByThem();
                 Class<? extends DialogAct> daClass = DialogRegistry.dialogActNameMap.
                         get(hypothesis.getSlotPathFiller("dialogAct"));
@@ -127,7 +127,7 @@ public class DialogManager implements Runnable {
     public void run() {
         while (true){
             try {
-                DiscourseUnit2 DmInput = yodaEnvironment.DmInputQueue.poll(100, TimeUnit.MILLISECONDS);
+                DiscourseUnitHypothesis DmInput = yodaEnvironment.DmInputQueue.poll(100, TimeUnit.MILLISECONDS);
                 if (DmInput!=null) {
                     currentDialogState = DmInput;
                 }

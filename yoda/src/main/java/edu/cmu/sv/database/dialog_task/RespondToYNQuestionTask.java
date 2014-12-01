@@ -1,8 +1,7 @@
 package edu.cmu.sv.database.dialog_task;
 
-import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnitHypothesis;
 import edu.cmu.sv.ontology.OntologyRegistry;
-import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.ontology.noun.Noun;
 import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.ontology.verb.Verb;
@@ -23,7 +22,7 @@ import java.util.stream.Collectors;
  */
 public class RespondToYNQuestionTask extends DialogTask {
     @Override
-    public DiscourseUnit2.GroundedDiscourseUnitHypotheses ground(DiscourseUnit2.DiscourseUnitHypothesis hypothesis,
+    public DiscourseUnitHypothesis.GroundedDiscourseUnitHypotheses ground(DiscourseUnitHypothesis.DiscourseUnitHypothesis hypothesis,
                                                                  YodaEnvironment yodaEnvironment) {
         List<String> slotPathsToResolve = new LinkedList<>();
         SemanticsModel spokenByThem = hypothesis.getSpokenByThem();
@@ -65,11 +64,11 @@ public class RespondToYNQuestionTask extends DialogTask {
             groundedHypotheses.put(jointHypothesisID, groundedModel);
         }
 
-        return new DiscourseUnit2.GroundedDiscourseUnitHypotheses(groundedHypotheses, referenceJoint.getKey());
+        return new DiscourseUnitHypothesis.GroundedDiscourseUnitHypotheses(groundedHypotheses, referenceJoint.getKey());
     }
 
     @Override
-    public void analyse(DiscourseUnit2.GroundedDiscourseUnitHypotheses groundedDiscourseUnitHypothesis,
+    public void analyse(DiscourseUnitHypothesis.GroundedDiscourseUnitHypotheses groundedDiscourseUnitHypothesis,
                         YodaEnvironment yodaEnvironment) {
         Map<String, Double> ynqTruth = new HashMap<>();
         for (String groundedHypothesisID : groundedDiscourseUnitHypothesis.getGroundedHypotheses().keySet()) {

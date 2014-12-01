@@ -1,7 +1,7 @@
 package edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts;
 
 import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
-import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnitHypothesis;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.misc.Suggested;
 import edu.cmu.sv.ontology.noun.Noun;
@@ -49,7 +49,7 @@ public class DenyIncorrectSenseSuggestion extends DialogAct {
     * there is a high penalty for not confirming.
     * */
     @Override
-    public Double reward(DiscourseUnit2 DU) {
+    public Double reward(DiscourseUnitHypothesis DU) {
         // p(there is an outstanding suggestion) *
         // p(outstanding suggestion is correct | there is a suggestion) *
         // penalty for ignoring discourse obligations

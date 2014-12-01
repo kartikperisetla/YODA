@@ -1,12 +1,11 @@
 package edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts;
 
 import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
-import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnitHypothesis;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.noun.Noun;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 
-import java.lang.Object;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +29,7 @@ public class RequestConfirmValue extends DialogAct {
     }
 
     @Override
-    public Double reward(DiscourseUnit2 DU) {
+    public Double reward(DiscourseUnitHypothesis DU) {
         try {
             return RewardAndCostCalculator.clarificationDialogActReward(db, DU,
                     RewardAndCostCalculator.predictConfidenceGainFromValueConfirmation(DU,

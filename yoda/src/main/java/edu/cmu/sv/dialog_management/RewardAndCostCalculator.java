@@ -1,10 +1,11 @@
 package edu.cmu.sv.dialog_management;
 
 import edu.cmu.sv.database.Database;
-import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnitHypothesis;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.database.dialog_task.DialogTask;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Accept;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Reject;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTaskPreferences;
 import edu.cmu.sv.utils.StringDistribution;
@@ -25,13 +26,12 @@ import java.util.stream.Collectors;
  *
  */
 public class RewardAndCostCalculator {
-    public static double penaltyForContradictingUser = .5;
-    public static double penaltyForObligingUserAction = 2;
-    public static double penaltyForObligingUserPhrase = .1;
     public static double penaltyForSpeakingPhrase = .1;
     public static double penaltyForIgnoringUserRequest = 2;
+    public static double rewardForCorrectAnswer = 5;
+    public static double penaltyForIncorrectAnswer = 10;
 
-    public static Double nonDialogTaskReward(DiscourseUnit2 DU, NonDialogTask nonDialogTask){
+    public static Double nonDialogTaskReward(DiscourseUnitHypothesis DU, NonDialogTask nonDialogTask){
         Double totalReward = 0.0;
         Double probabilityCorrect = 0.0;
         for (String key : DU.getHypotheses().keySet()){
@@ -50,12 +50,41 @@ public class RewardAndCostCalculator {
         return totalReward;
     }
 
+    public static Double discourseDependentReward(){
+
+    }
+
+    public static Double discourseIndependentArgumentationReward(DiscourseUnitHypothesis DU, DialogAct dialogAct){
+        Double probabilityCorrectAnswer = 0.0;
+        for (String hypothesisID : DU.getHypotheses().keySet()){
+            Double duHypothesisProbability = DU.getHypothesisDistribution().get(hypothesisID);
+            DiscourseUnitHypothesis.DiscourseUnitHypothesis hypothesis = DU.getHypotheses().get(hypothesisID);
+            StringDistribution distribution = hypothesis.getGnd().getGroundedHypothesesDistribution();
+            if (dialogAct instanceof Accept){
+                for (String groundedHypothesis : hypothesis.getGnd().getYnqTruth().keySet()){
+                    probabilityCorrectAnswer += duHypothesisProbability *
+                            (distribution.get(groundedHypothesis) *
+                            hypothesis.getGnd().getYnqTruth().get(groundedHypothesis));
+                }
+            } else if (dialogAct instanceof Reject){
+                for (String groundedHypothesis : hypothesis.getGnd().getYnqTruth().keySet()){
+                    probabilityCorrectAnswer += duHypothesisProbability * (
+                            distribution.get(groundedHypothesis) *
+                            (1 - hypothesis.getGnd().getYnqTruth().get(groundedHypothesis)));
+                }
+            }
+
+        }
+        return rewardForCorrectAnswer*probabilityCorrectAnswer - penaltyForIncorrectAnswer*(1-probabilityCorrectAnswer);
+    }
+
+
     /*
     * To compute the reward for a clarification dialog act,
     * estimate the improvement in reward to all possible dialog and non-dialog tasks
     * that relate to all the available DU hypotheses.
     * */
-    public static Double clarificationDialogActReward(Database db, DiscourseUnit2 DU,
+    public static Double clarificationDialogActReward(Database db, DiscourseUnitHypothesis DU,
                                                       StringDistribution predictedRelativeConfidenceGain)
             throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
         Double totalReward = 0.0;
@@ -63,7 +92,7 @@ public class RewardAndCostCalculator {
         // sum up the predicted rewards supposing that each current hypothesis is true,
         // weighting the predicted reward by the current belief that the hypothesis is true.
         for (String hypothesisID : DU.getHypotheses().keySet()){
-            DiscourseUnit2.DiscourseUnitHypothesis hypothesis = DU.getHypotheses().get(hypothesisID);
+            DiscourseUnitHypothesis.DiscourseUnitHypothesis hypothesis = DU.getHypotheses().get(hypothesisID);
             SemanticsModel spokenByThem = hypothesis.getSpokenByThem();
             Double currentConfidence = DU.getHypothesisDistribution().get(hypothesisID);
             Double predictedConfidence = currentConfidence + (1-currentConfidence)*
@@ -90,7 +119,7 @@ public class RewardAndCostCalculator {
         return totalReward;
     }
 
-    public static StringDistribution predictedConfidenceGainFromJointClarification(DiscourseUnit2 DU){
+    public static StringDistribution predictedConfidenceGainFromJointClarification(DiscourseUnitHypothesis DU){
         double relativeImprovement = .5; // every hypothesis is expected to improve by 50% relative if it is correct
         StringDistribution ans = new StringDistribution();
         for (String key : DU.getHypotheses().keySet()){
@@ -103,7 +132,7 @@ public class RewardAndCostCalculator {
     * Confirming a value is confirming that some role is filled by it,
     * it does not confirm anything about which role it fills
     * */
-    public static StringDistribution predictConfidenceGainFromValueConfirmation(DiscourseUnit2 DU, Object value){
+    public static StringDistribution predictConfidenceGainFromValueConfirmation(DiscourseUnitHypothesis DU, Object value){
         double limit = .8; // we will never predict 100% confidence gain
         StringDistribution ans = new StringDistribution();
         if (!(value instanceof JSONObject))

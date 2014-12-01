@@ -1,9 +1,8 @@
 package edu.cmu.sv.system_action.dialog_act.core_dialog_acts;
 
-import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnitHypothesis;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.noun.Noun;
-import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 
 import java.util.HashMap;
@@ -31,7 +30,7 @@ public class Fragment extends DialogAct {
 
 
     @Override
-    public Double reward(DiscourseUnit2 DU) {
+    public Double reward(DiscourseUnitHypothesis DU) {
         return null;
     }
 

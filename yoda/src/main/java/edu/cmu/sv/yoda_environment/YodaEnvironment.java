@@ -2,15 +2,16 @@ package edu.cmu.sv.yoda_environment;
 
 import edu.cmu.sv.database.Database;
 import edu.cmu.sv.dialog_management.DialogManager;
+import edu.cmu.sv.dialog_state_tracking.DialogStateHypothesis;
 import edu.cmu.sv.dialog_state_tracking.DialogStateTracker2;
-import edu.cmu.sv.dialog_state_tracking.DiscourseUnit2;
 import edu.cmu.sv.dialog_state_tracking.Turn;
 import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
 import edu.cmu.sv.spoken_language_understanding.RegexUnderstander;
 import edu.cmu.sv.spoken_language_understanding.SpokenLanguageUnderstander;
+import edu.cmu.sv.utils.StringDistribution;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.io.BufferedWriter;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.logging.ConsoleHandler;
@@ -44,7 +45,7 @@ public class YodaEnvironment {
     // turn + time stamp of DST input
     public BlockingQueue<Pair<Turn, Long>> DstInputQueue = new LinkedBlockingDeque<>();
     // DM input
-    public BlockingQueue<DiscourseUnit2> DmInputQueue = new LinkedBlockingDeque<>();
+    public BlockingQueue<Pair<Map<String, DialogStateHypothesis>, StringDistribution>> DmInputQueue = new LinkedBlockingDeque<>();
 
 
     public static YodaEnvironment dstTestingEnvironment(){

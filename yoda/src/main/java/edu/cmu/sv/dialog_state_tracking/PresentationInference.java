@@ -15,9 +15,9 @@ public class PresentationInference implements DiscourseUnitUpdateInference {
     private final static double penaltyForReinterpretingFragment = .75;
 
     @Override
-    public DiscourseUnit2 applyAll(DiscourseUnit2.DiscourseUnitHypothesis currentState, Turn turn, long timeStamp) {
+    public DiscourseUnitHypothesis applyAll(DiscourseUnitHypothesis.DiscourseUnitHypothesis currentState, Turn turn, long timeStamp) {
         int newDUHypothesisCounter = 0;
-        DiscourseUnit2 ans = new DiscourseUnit2();
+        DiscourseUnitHypothesis ans = new DiscourseUnitHypothesis();
         // if this isn't the first utterance of a DU, this turn can't be interpreted using PresentInference
         if (currentState.timeOfLastActByMe!=null || currentState.timeOfLastActByThem!=null)
             return ans;
@@ -31,8 +31,8 @@ public class PresentationInference implements DiscourseUnitUpdateInference {
                 if (dialogAct.equals(Fragment.class.getSimpleName())){
                     for (Class<? extends DialogAct> newDAClass : DialogRegistry.discourseUnitDialogActs) {
                         String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
-                        DiscourseUnit2.DiscourseUnitHypothesis newDUHypothesis =
-                                new DiscourseUnit2.DiscourseUnitHypothesis();
+                        DiscourseUnitHypothesis.DiscourseUnitHypothesis newDUHypothesis =
+                                new DiscourseUnitHypothesis.DiscourseUnitHypothesis();
                         SemanticsModel newSpokenByThemHypothesis = turn.hypotheses.get(sluHypothesisID).deepCopy();
                         newSpokenByThemHypothesis.extendAndOverwrite(
                                 new SemanticsModel("{\"dialogAct\":\""+newDAClass.getSimpleName()+"\"}"));
@@ -45,7 +45,7 @@ public class PresentationInference implements DiscourseUnitUpdateInference {
                 // if the DA is one of the discourseUnitDialogActs, leave it alone
                 else if (DialogRegistry.discourseUnitDialogActs.contains(DialogRegistry.dialogActNameMap.get(dialogAct))){
                     String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
-                    DiscourseUnit2.DiscourseUnitHypothesis newDUHypothesis = new DiscourseUnit2.DiscourseUnitHypothesis();
+                    DiscourseUnitHypothesis.DiscourseUnitHypothesis newDUHypothesis = new DiscourseUnitHypothesis.DiscourseUnitHypothesis();
                     SemanticsModel newSpokenByThemHypothesis = turn.hypotheses.get(sluHypothesisID).deepCopy();
                     ans.getHypothesisDistribution().put(newDUHypothesisID, 1.0);
                     newDUHypothesis.timeOfLastActByThem = timeStamp;
@@ -57,8 +57,8 @@ public class PresentationInference implements DiscourseUnitUpdateInference {
             }
         } else { // if turn.speaker.equals("system")
             String newDUHypothesisID = "du_hyp_0";
-            DiscourseUnit2.DiscourseUnitHypothesis newDUHypothesis =
-                    new DiscourseUnit2.DiscourseUnitHypothesis();
+            DiscourseUnitHypothesis.DiscourseUnitHypothesis newDUHypothesis =
+                    new DiscourseUnitHypothesis.DiscourseUnitHypothesis();
             ans.getHypothesisDistribution().put(newDUHypothesisID, 1.0);
             newDUHypothesis.timeOfLastActByMe = timeStamp;
             newDUHypothesis.spokenByMe.extendAndOverwrite(turn.systemUtterance);
