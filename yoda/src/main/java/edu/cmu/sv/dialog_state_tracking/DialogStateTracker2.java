@@ -88,7 +88,7 @@ public class DialogStateTracker2 implements Runnable {
                 {
                     for (String key : tmpNewHypotheses.keySet()) {
                         Pair<Map<String, DialogStateHypothesis>, StringDistribution> groundedAndAnalysedUpdatedState =
-                                tmpNewHypotheses.get(key).groundAndAnalyse();
+                                tmpNewHypotheses.get(key).groundAndAnalyse(yodaEnvironment);
                         for (String tmpNewDstHypothesisId : groundedAndAnalysedUpdatedState.getRight().keySet()) {
                             String newDstHypothesisId = "dialog_state_hyp_" + newDialogStateHypothesisCounter++;
                             newHypothesisDistribution.put(newDstHypothesisId,
