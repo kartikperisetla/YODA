@@ -1,16 +1,13 @@
 package edu.cmu.sv.dialog_management;
 
-import edu.cmu.sv.database.Database;
-import edu.cmu.sv.natural_language_generation.Grammar;
-import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
-import edu.cmu.sv.yoda_environment.YodaEnvironment;
+import edu.cmu.sv.dialog_state_tracking.DialogStateHypothesis;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnitHypothesis;
-import edu.cmu.sv.ontology.Thing;
+import edu.cmu.sv.natural_language_generation.Grammar;
+import edu.cmu.sv.utils.StringDistribution;
+import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.system_action.SystemAction;
 import edu.cmu.sv.system_action.dialog_act.*;
 
-import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.utils.Combination;
 import edu.cmu.sv.utils.HypothesisSetManagement;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -43,7 +40,8 @@ public class DialogManager implements Runnable {
     }
 
     YodaEnvironment yodaEnvironment;
-    DiscourseUnitHypothesis currentDialogState = null;
+    StringDistribution dialogStateDistribution = new StringDistribution();
+    Map<String, DialogStateHypothesis> dialogStateHypotheses = new HashMap<>();
 
     public YodaEnvironment getYodaEnvironment() {
         return yodaEnvironment;
@@ -68,35 +66,28 @@ public class DialogManager implements Runnable {
             //// add the null action
             actionExpectedReward.put(null, 0.0);
 
-            //// Enumerate and evaluate sense clarification acts
-            for (Class<? extends DialogAct> daClass : DialogRegistry.senseClarificationDialogActs) {
-//            System.out.println("Enumerating and evaluating actions of class: "+daClass.getSimpleName());
-                Map<String, Set<Object>> possibleBindingsPerVariable = new HashMap<>();
-                Map<String, Class<? extends Thing>> parameters = daClass.newInstance().getClassParameters();
-                Map<String, DiscourseUnitHypothesis.DiscourseUnitHypothesis> dialogStateHypothesisMap = currentDialogState.getHypotheses();
-
-                // Collect matches
-                for (String dialogStateHypothesisID : dialogStateHypothesisMap.keySet()) {
-                    for (String parameter : parameters.keySet()) {
-                        if (!possibleBindingsPerVariable.containsKey(parameter))
-                            possibleBindingsPerVariable.put(parameter, new HashSet<>());
-                        SemanticsModel spokenByThem = dialogStateHypothesisMap.get(dialogStateHypothesisID).getSpokenByThem();
-                        for (String path : spokenByThem.findAllPathsToClass(parameters.get(parameter).getSimpleName())) {
-                            possibleBindingsPerVariable.get(parameter).add(spokenByThem.newGetSlotPathFiller(path));
-                        }
+            // enumerate and evaluate actions that can be enumerated from a single DU hypothesis
+            for (String dialogStateHypothesisId : dialogStateHypotheses.keySet()){
+                DialogStateHypothesis currentDialogStateHypothesis = dialogStateHypotheses.get(dialogStateHypothesisId);
+                for (String discourseUnitHypothesisId : currentDialogStateHypothesis.getDiscourseUnitHypothesisMap().
+                        keySet()) {
+                    DiscourseUnitHypothesis currentDiscourseUnitHypothesis = currentDialogStateHypothesis.
+                            getDiscourseUnitHypothesisMap().get(discourseUnitHypothesisId);
+                    for (Class<? extends DialogAct> dialogActClass : DialogRegistry.argumentationDialogActs) {
+                        DialogAct dialogActInstance = dialogActClass.newInstance();
+                        // todo: enumerate parameters and perform this loop for each parameterization
+                        Double currentReward = dialogActInstance.reward(
+                                currentDialogStateHypothesis, currentDiscourseUnitHypothesis) *
+                                dialogStateDistribution.get(dialogStateHypothesisId);
+                        accumulateReward(actionExpectedReward, dialogActInstance, currentReward);
                     }
                 }
-
-                // create an action and evaluate reward for each possible binding
-                for (Map<String, Object> binding : Combination.possibleBindings(possibleBindingsPerVariable)) {
-                    DialogAct dialogAct = daClass.newInstance();
-                    dialogAct.bindVariables(binding);
-                    Double expectedReward = dialogAct.reward(currentDialogState);
-                    actionExpectedReward.put(dialogAct, expectedReward);
-                }
-
             }
 
+            //todo: enumerate and evaluate actions that require multiple DU hypotheses to be enumerated (ex: disambiguation)
+
+
+            /*
             //// Get expected rewards for executing non-dialog tasks
             for (String hypothesisID : currentDialogState.getHypotheses().keySet()) {
                 DiscourseUnitHypothesis.DiscourseUnitHypothesis dsHypothesis = currentDialogState.getHypotheses().get(hypothesisID);
@@ -113,23 +104,38 @@ public class DialogManager implements Runnable {
                     }
                 }
             }
-
+            */
 
             return HypothesisSetManagement.keepNBestBeam(actionExpectedReward, 10000);
-        } catch (IllegalAccessException | InstantiationException |  NoSuchMethodException | InvocationTargetException e) {
+        } catch (IllegalAccessException | InstantiationException e) {
             e.printStackTrace();
             System.exit(0);
         }
         return null;
     }
 
+    private void accumulateReward(Map<SystemAction, Double> actionExpectedReward, DialogAct dialogAct, Double currentReward){
+        boolean alreadyFound = false;
+        for (SystemAction key : actionExpectedReward.keySet()){
+            if (key.evaluationMatch(dialogAct)){
+                alreadyFound = true;
+                actionExpectedReward.put(key, actionExpectedReward.get(key) + currentReward);
+                break;
+            }
+        }
+        if (!alreadyFound){
+            actionExpectedReward.put(dialogAct, currentReward);
+        }
+    }
+
     @Override
     public void run() {
         while (true){
             try {
-                DiscourseUnitHypothesis DmInput = yodaEnvironment.DmInputQueue.poll(100, TimeUnit.MILLISECONDS);
+                Pair<Map<String, DialogStateHypothesis>, StringDistribution> DmInput = yodaEnvironment.DmInputQueue.poll(100, TimeUnit.MILLISECONDS);
                 if (DmInput!=null) {
-                    currentDialogState = DmInput;
+                    dialogStateHypotheses = DmInput.getLeft();
+                    dialogStateDistribution = DmInput.getRight();
                 }
                 Thread.sleep(100);
             } catch (InterruptedException e) {
