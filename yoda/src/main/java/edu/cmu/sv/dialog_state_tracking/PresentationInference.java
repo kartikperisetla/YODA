@@ -45,8 +45,10 @@ public class PresentationInference implements DialogStateUpdateInference {
                         resultDistribution.put(newDialogStateHypothesisID, penaltyForReinterpretingFragment);
                         newDUHypothesis.timeOfLastActByThem = timeStamp;
                         newDUHypothesis.spokenByThem = newSpokenByThemHypothesis;
+                        newDUHypothesis.initiator = turn.speaker;
+                        newDialogStateHypothesis.discourseUnitCounter += 1;
                         newDialogStateHypothesis.getDiscourseUnitHypothesisMap().
-                                put("du_"+newDialogStateHypothesis.discourseUnitCounter++, newDUHypothesis);
+                                put("du_"+newDialogStateHypothesis.discourseUnitCounter, newDUHypothesis);
                         resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
                     }
                 }
@@ -59,8 +61,10 @@ public class PresentationInference implements DialogStateUpdateInference {
                     resultDistribution.put(newDialogStateHypothesisID, 1.0);
                     newDUHypothesis.timeOfLastActByThem = timeStamp;
                     newDUHypothesis.spokenByThem = newSpokenByThemHypothesis;
+                    newDUHypothesis.initiator = turn.speaker;
+                    newDialogStateHypothesis.discourseUnitCounter += 1;
                     newDialogStateHypothesis.getDiscourseUnitHypothesisMap().
-                            put("du_"+newDialogStateHypothesis.discourseUnitCounter++, newDUHypothesis);
+                            put("du_"+newDialogStateHypothesis.discourseUnitCounter, newDUHypothesis);
                     resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
                 }
                 // otherwise, this SLU hypothesis can't be interpreted using PresentInference
@@ -74,8 +78,11 @@ public class PresentationInference implements DialogStateUpdateInference {
             resultDistribution.put(newDialogStateHypothesisID, 1.0);
             newDUHypothesis.timeOfLastActByMe = timeStamp;
             newDUHypothesis.spokenByMe = newSpokenByMeHypothesis;
+            newDUHypothesis.groundTruth = turn.groundedSystemMeaning;
+            newDUHypothesis.initiator = turn.speaker;
+            newDialogStateHypothesis.discourseUnitCounter += 1;
             newDialogStateHypothesis.getDiscourseUnitHypothesisMap().
-                    put("du_"+newDialogStateHypothesis.discourseUnitCounter++, newDUHypothesis);
+                    put("du_"+newDialogStateHypothesis.discourseUnitCounter, newDUHypothesis);
             resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
         }
 

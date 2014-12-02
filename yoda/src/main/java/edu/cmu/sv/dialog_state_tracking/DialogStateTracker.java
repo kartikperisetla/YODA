@@ -17,7 +17,7 @@ import java.util.logging.SimpleFormatter;
 /**
  * Created by David Cohen on 9/19/14.
  */
-public class DialogStateTracker2 implements Runnable {
+public class DialogStateTracker implements Runnable {
     private static Logger logger = Logger.getLogger("yoda.dialog_state_tracking.DialogStateTracker");
     private static FileHandler fh;
     static {
@@ -42,17 +42,18 @@ public class DialogStateTracker2 implements Runnable {
     Map<String, DialogStateHypothesis> hypothesisMap;
     StringDistribution hypothesisDistribution;
 
-    public DialogStateTracker2(YodaEnvironment yodaEnvironment){
+    public DialogStateTracker(YodaEnvironment yodaEnvironment){
         this.yodaEnvironment = yodaEnvironment;
         hypothesisDistribution = new StringDistribution();
         hypothesisMap = new HashMap<>();
-        // todo: add blank dialog state hypothesis
+        hypothesisDistribution.put("initial_dialog_state_hypothesis", 1.0);
+        hypothesisMap.put("initial_dialog_state_hypothesis", new DialogStateHypothesis());
         this.yodaEnvironment.DmInputQueue.add(new ImmutablePair<>(hypothesisMap, hypothesisDistribution));
     }
 
     private void updateDialogState(Turn turn, long timeStamp){
         try {
-            logger.info("====== Turn ======");
+            logger.info("New turn:\n"+turn);
             // validate input
             if (turn.hypotheses != null) {
                 for (SemanticsModel sm : turn.hypotheses.values()) {
@@ -100,7 +101,6 @@ public class DialogStateTracker2 implements Runnable {
                 }
 
             }
-            logger.info("dst loop, number of active hypotheses:" + hypothesisMap.size());
 
             // todo: replace with new flexible beam
             hypothesisDistribution = HypothesisSetManagement.keepNBestDistribution(newHypothesisDistribution, 10);
@@ -112,6 +112,7 @@ public class DialogStateTracker2 implements Runnable {
             hypothesisDistribution.normalize();
 
             String topHyp = hypothesisDistribution.getTopHypothesis();
+            logger.info("dst loop, number of active hypotheses:" + hypothesisMap.size());
             logger.info("top dialog state hypothesis: (p=" + hypothesisDistribution.get(topHyp) + ")");
             logger.info(hypothesisMap.get(topHyp).toString());
 

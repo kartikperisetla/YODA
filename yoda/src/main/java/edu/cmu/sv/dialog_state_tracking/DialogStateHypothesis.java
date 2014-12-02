@@ -55,6 +55,7 @@ public class DialogStateHypothesis {
         for (String key : discourseUnitHypothesisMap.keySet()){
             ans.discourseUnitHypothesisMap.put(key, discourseUnitHypothesisMap.get(key).deepCopy());
         }
+        ans.discourseUnitCounter = discourseUnitCounter;
         return ans;
     }
 
@@ -63,7 +64,8 @@ public class DialogStateHypothesis {
 
         for (String duId : discourseUnitHypothesisMap.keySet()){
             Set<Pair<DiscourseUnitHypothesis, Double>> weightedGroundings = new HashSet<>();
-            if (discourseUnitHypothesisMap.get(duId).getGroundInterpretation()!=null){
+            if (discourseUnitHypothesisMap.get(duId).getGroundInterpretation()!=null ||
+                    discourseUnitHypothesisMap.get(duId).getGroundTruth()!=null){
                 weightedGroundings.add(new ImmutablePair<>(discourseUnitHypothesisMap.get(duId), 1.0));
             } else {
                 Pair<Map<String, DiscourseUnitHypothesis>, StringDistribution> groundedDuHypotheses =
@@ -82,7 +84,7 @@ public class DialogStateHypothesis {
         int i=0;
         for (Map<String, Pair<DiscourseUnitHypothesis, Double>> binding : possibleDuBindings){
             double hypothesisLikelihood = 1.0;
-            DialogStateHypothesis ans = new DialogStateHypothesis();
+            DialogStateHypothesis ans = this.deepCopy(); // do a deep copy so that all links and counters are copied
             String dialogStateHypothesisId = "DialogStateHypothesis.groundAndAnalyse():dialog_state_"+i++;
             for (String key : binding.keySet()){
                 ans.discourseUnitHypothesisMap.put(key, binding.get(key).getLeft().deepCopy());
@@ -117,5 +119,14 @@ public class DialogStateHypothesis {
 
     public void setRejectLinks(Set<ArgumentationLink> rejectLinks) {
         this.rejectLinks = rejectLinks;
+    }
+
+    @Override
+    public String toString() {
+        return "DialogStateHypothesis{" +
+                "discourseUnitHypothesisMap=" + discourseUnitHypothesisMap +
+                ", acceptLinks=" + acceptLinks +
+                ", rejectLinks=" + rejectLinks +
+                '}';
     }
 }

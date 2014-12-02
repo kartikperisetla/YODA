@@ -30,7 +30,7 @@ public class RewardAndCostCalculator {
     public static double penaltyForSpeakingPhrase = .1;
     public static double penaltyForIgnoringUserRequest = 2;
     public static double rewardForCorrectAnswer = 5;
-    public static double penaltyForIncorrectAnswer = 10;
+    public static double penaltyForIncorrectAnswer = 5;
 
 
     public static Double discourseDependentReward(DiscourseUnitHypothesis duHypothesis, DialogStateHypothesis dsHypothesis,
@@ -39,12 +39,16 @@ public class RewardAndCostCalculator {
     }
 
     public static Double discourseIndependentArgumentationReward(DiscourseUnitHypothesis duHypothesis, DialogAct dialogAct){
+//        System.out.println("discourseIndependentArgumentationReward: "+dialogAct);
         Double probabilityCorrectAnswer = 0.0;
         if (dialogAct instanceof Accept) {
             probabilityCorrectAnswer = duHypothesis.getYnqTruth();
         } else if (dialogAct instanceof Reject) {
             probabilityCorrectAnswer = 1 - duHypothesis.getYnqTruth();
         }
+//        System.out.println("probabilitiy correct:" + probabilityCorrectAnswer);
+//        System.out.println("return value:"+
+//                (rewardForCorrectAnswer*probabilityCorrectAnswer - penaltyForIncorrectAnswer*(1-probabilityCorrectAnswer)));
         return rewardForCorrectAnswer*probabilityCorrectAnswer - penaltyForIncorrectAnswer*(1-probabilityCorrectAnswer);
     }
 

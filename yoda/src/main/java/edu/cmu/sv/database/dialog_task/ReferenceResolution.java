@@ -203,10 +203,12 @@ public class ReferenceResolution {
                     BindingSet bindings = result.next();
                     ans = Double.parseDouble(bindings.getValue("score").stringValue());
                     result.close();
+                    Database.getLogger().info("Description match result:"+ans);
                 }
                 else {
                     // answer is unknown / question doesn't make sense
                     ans = -1.0;
+                    Database.getLogger().info("Description match result is unknown / question doesn't make sense: "+ans);
                 }
             } catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {
                 e.printStackTrace();

@@ -117,6 +117,8 @@ public class DialogManager implements Runnable {
     private void accumulateReward(Map<SystemAction, Double> actionExpectedReward, DialogAct dialogAct, Double currentReward){
         boolean alreadyFound = false;
         for (SystemAction key : actionExpectedReward.keySet()){
+            if (key==null)
+                continue;
             if (key.evaluationMatch(dialogAct)){
                 alreadyFound = true;
                 actionExpectedReward.put(key, actionExpectedReward.get(key) + currentReward);

@@ -23,4 +23,15 @@ public class Turn {
         this.hypothesisDistribution = hypothesisDistribution;
         this.speaker = speaker;
     }
+
+    @Override
+    public String toString() {
+        return "Turn{" +
+                "hypotheses=" + hypotheses +
+                ", systemUtterance=" + systemUtterance +
+                ", groundedSystemMeaning=" + groundedSystemMeaning +
+                ", hypothesisDistribution=" + hypothesisDistribution +
+                ", speaker='" + speaker + '\'' +
+                '}';
+    }
 }

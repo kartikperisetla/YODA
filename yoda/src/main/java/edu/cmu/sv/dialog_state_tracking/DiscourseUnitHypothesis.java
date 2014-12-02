@@ -42,13 +42,19 @@ public class DiscourseUnitHypothesis {
 
     public DiscourseUnitHypothesis deepCopy(){
         DiscourseUnitHypothesis ans = new DiscourseUnitHypothesis();
-        ans.spokenByMe = spokenByMe.deepCopy();
-        ans.spokenByThem = spokenByThem.deepCopy();
+        if (spokenByMe!=null)
+            ans.spokenByMe = spokenByMe.deepCopy();
+        if (spokenByThem!=null)
+            ans.spokenByThem = spokenByThem.deepCopy();
         ans.timeOfLastActByMe = timeOfLastActByMe;
         ans.timeOfLastActByThem = timeOfLastActByThem;
         ans.initiator = initiator;
-        ans.groundTruth = groundTruth.deepCopy();
-        ans.groundInterpretation = groundInterpretation.deepCopy();
+        if (groundTruth!=null)
+            ans.groundTruth = groundTruth.deepCopy();
+        if (groundInterpretation!=null)
+            ans.groundInterpretation = groundInterpretation.deepCopy();
+        ans.ynqTruth = ynqTruth;
+        ans.whqTruth = whqTruth;
         return ans;
     }
 
@@ -122,5 +128,20 @@ public class DiscourseUnitHypothesis {
 
     public void setWhqTruth(double whqTruth) {
         this.whqTruth = whqTruth;
+    }
+
+    @Override
+    public String toString() {
+        return "DiscourseUnitHypothesis{" +
+                "\nspokenByMe=" + spokenByMe +
+                "\nspokenByThem=" + spokenByThem +
+                "\ntimeOfLastActByThem=" + timeOfLastActByThem +
+                ", timeOfLastActByMe=" + timeOfLastActByMe +
+                ", initiator='" + initiator + '\'' +
+                "\ngroundTruth=" + groundTruth +
+                "\ngroundInterpretation=" + groundInterpretation +
+                "\nynqTruth=" + ynqTruth +
+                ", whqTruth=" + whqTruth +
+                '}';
     }
 }
