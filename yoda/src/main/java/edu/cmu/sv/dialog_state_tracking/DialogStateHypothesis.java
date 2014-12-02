@@ -1,5 +1,8 @@
 package edu.cmu.sv.dialog_state_tracking;
 
+import edu.cmu.sv.utils.StringDistribution;
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -12,6 +15,7 @@ public class DialogStateHypothesis {
     Map<String, DiscourseUnitHypothesis> discourseUnitHypothesisMap = new HashMap<>();
     Set<ArgumentationLink> acceptLinks = new HashSet<>();
     Set<ArgumentationLink> rejectLinks = new HashSet<>();
+    long discourseUnitCounter = 0;
 
     public static class ArgumentationLink{
         public ArgumentationLink(String predecessor, String successor) {
@@ -48,6 +52,34 @@ public class DialogStateHypothesis {
         for (String key : discourseUnitHypothesisMap.keySet()){
             ans.discourseUnitHypothesisMap.put(key, discourseUnitHypothesisMap.get(key).deepCopy());
         }
+        return ans;
     }
 
+    public Pair<Map<String, DialogStateHypothesis>, StringDistribution> groundAndAnalyse(){
+
+    }
+
+    public Map<String, DiscourseUnitHypothesis> getDiscourseUnitHypothesisMap() {
+        return discourseUnitHypothesisMap;
+    }
+
+    public void setDiscourseUnitHypothesisMap(Map<String, DiscourseUnitHypothesis> discourseUnitHypothesisMap) {
+        this.discourseUnitHypothesisMap = discourseUnitHypothesisMap;
+    }
+
+    public Set<ArgumentationLink> getAcceptLinks() {
+        return acceptLinks;
+    }
+
+    public void setAcceptLinks(Set<ArgumentationLink> acceptLinks) {
+        this.acceptLinks = acceptLinks;
+    }
+
+    public Set<ArgumentationLink> getRejectLinks() {
+        return rejectLinks;
+    }
+
+    public void setRejectLinks(Set<ArgumentationLink> rejectLinks) {
+        this.rejectLinks = rejectLinks;
+    }
 }
