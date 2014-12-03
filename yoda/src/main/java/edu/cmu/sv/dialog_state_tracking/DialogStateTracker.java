@@ -35,7 +35,8 @@ public class DialogStateTracker implements Runnable {
     static Set<Class <? extends DialogStateUpdateInference>> updateInferences;
     static {
         updateInferences = new HashSet<>();
-        updateInferences.add(PresentationInference.class);
+        updateInferences.add(PresentInference.class);
+        updateInferences.add(AnswerInference.class);
     }
 
     YodaEnvironment yodaEnvironment;
@@ -113,6 +114,7 @@ public class DialogStateTracker implements Runnable {
 
             String topHyp = hypothesisDistribution.getTopHypothesis();
             logger.info("dst loop, number of active hypotheses:" + hypothesisMap.size());
+            logger.info("dialog state distribution:"+hypothesisDistribution);
             logger.info("top dialog state hypothesis: (p=" + hypothesisDistribution.get(topHyp) + ")");
             logger.info(hypothesisMap.get(topHyp).toString());
 

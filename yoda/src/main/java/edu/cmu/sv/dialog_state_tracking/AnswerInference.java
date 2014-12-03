@@ -19,8 +19,7 @@ import java.util.Set;
  * Infers the dialog state after a question is answered.
  *
  */
-public class AnswerInference implements DialogStateUpdateInference {
-    private final static double penaltyForReinterpretingFragment = .75;
+public class AnswerInference extends DialogStateUpdateInference {
 
     @Override
     public Pair<Map<String, DialogStateHypothesis>, StringDistribution> applyAll(
@@ -36,59 +35,67 @@ public class AnswerInference implements DialogStateUpdateInference {
                 if (Arrays.asList(Accept.class.getSimpleName(), Reject.class.getSimpleName(), DontKnow.class.getSimpleName()).
                         contains(dialogAct)) {
 
-                    for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()){
+                    for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
                         DiscourseUnitHypothesis predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId);
                         if (predecessor.initiator.equals("user"))
                             continue;
                         String predecessorDialogAct = predecessor.spokenByThem.getSlotPathFiller("dialogAct");
                         if (!Arrays.asList(YNQuestion.class.getSimpleName()).contains(predecessorDialogAct))
                             continue;
-                        
+                        String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
+                        DialogStateHypothesis newDialogStateHypothesis = currentState.deepCopy();
+                        DiscourseUnitHypothesis newDUHypothesis = new DiscourseUnitHypothesis();
+
+                        SemanticsModel newSpokenByThemHypothesis = turn.hypotheses.get(sluHypothesisID).deepCopy();
+                        resultDistribution.put(newDialogStateHypothesisID, 1.0);
+                        newDUHypothesis.timeOfLastActByThem = timeStamp;
+                        newDUHypothesis.spokenByThem = newSpokenByThemHypothesis;
+                        newDUHypothesis.initiator = turn.speaker;
+                        newDialogStateHypothesis.discourseUnitCounter += 1;
+                        String newDiscourseUnitId = "du_" + newDialogStateHypothesis.discourseUnitCounter;
+                        newDialogStateHypothesis.getDiscourseUnitHypothesisMap().
+                                put(newDiscourseUnitId, newDUHypothesis);
+                        newDialogStateHypothesis.getArgumentationLinks().add(
+                                new DialogStateHypothesis.ArgumentationLink(predecessorId, newDiscourseUnitId));
+                        resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
                     }
-
-
-
-                    String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
-                    DialogStateHypothesis newDialogStateHypothesis = currentState.deepCopy();
-                    DiscourseUnitHypothesis newDUHypothesis = new DiscourseUnitHypothesis();
-                    SemanticsModel newSpokenByThemHypothesis = turn.hypotheses.get(sluHypothesisID).deepCopy();
-                    resultDistribution.put(newDialogStateHypothesisID, penaltyForReinterpretingFragment);
-                    newDUHypothesis.timeOfLastActByThem = timeStamp;
-                    newDUHypothesis.spokenByThem = newSpokenByThemHypothesis;
-                    newDUHypothesis.initiator = turn.speaker;
-                    newDialogStateHypothesis.discourseUnitCounter += 1;
-                    newDialogStateHypothesis.getDiscourseUnitHypothesisMap().
-                            put("du_" + newDialogStateHypothesis.discourseUnitCounter, newDUHypothesis);
-                    resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
                 }
             }
         } else { // if turn.speaker.equals("system")
             String dialogAct = turn.systemUtterance.getSlotPathFiller("dialogAct");
             if (Arrays.asList(Accept.class.getSimpleName(), Reject.class.getSimpleName(), DontKnow.class.getSimpleName()).
                     contains(dialogAct)) {
+                for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
+                    DiscourseUnitHypothesis predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId);
+                    if (predecessor.initiator.equals("system"))
+                        continue;
+                    String predecessorDialogAct = predecessor.spokenByThem.getSlotPathFiller("dialogAct");
+                    if (!Arrays.asList(YNQuestion.class.getSimpleName()).contains(predecessorDialogAct))
+                        continue;
+                    String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
+
+                    DialogStateHypothesis newDialogStateHypothesis = currentState.deepCopy();
+                    DiscourseUnitHypothesis newDUHypothesis = new DiscourseUnitHypothesis();
+                    SemanticsModel newSpokenByMeHypothesis = turn.systemUtterance.deepCopy();
+                    resultDistribution.put(newDialogStateHypothesisID, 1.0);
+                    newDUHypothesis.timeOfLastActByMe = timeStamp;
+                    newDUHypothesis.spokenByMe = newSpokenByMeHypothesis;
+                    newDUHypothesis.groundTruth = turn.groundedSystemMeaning;
+                    newDUHypothesis.initiator = turn.speaker;
+                    newDialogStateHypothesis.discourseUnitCounter += 1;
+                    String newDiscourseUnitId = "du_" + newDialogStateHypothesis.discourseUnitCounter;
+                    newDialogStateHypothesis.getDiscourseUnitHypothesisMap().
+                            put(newDiscourseUnitId, newDUHypothesis);
+                    newDialogStateHypothesis.getArgumentationLinks().add(
+                            new DialogStateHypothesis.ArgumentationLink(predecessorId, newDiscourseUnitId));
+                    resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
+                }
 
             }
 
-            String newDialogStateHypothesisID = "dialog_state_hyp_0";
-            DialogStateHypothesis newDialogStateHypothesis = currentState.deepCopy();
-            DiscourseUnitHypothesis newDUHypothesis = new DiscourseUnitHypothesis();
-            SemanticsModel newSpokenByMeHypothesis = turn.systemUtterance.deepCopy();
-            resultDistribution.put(newDialogStateHypothesisID, 1.0);
-            newDUHypothesis.timeOfLastActByMe = timeStamp;
-            newDUHypothesis.spokenByMe = newSpokenByMeHypothesis;
-            newDUHypothesis.groundTruth = turn.groundedSystemMeaning;
-            newDUHypothesis.initiator = turn.speaker;
-            newDialogStateHypothesis.discourseUnitCounter += 1;
-            newDialogStateHypothesis.getDiscourseUnitHypothesisMap().
-                    put("du_"+newDialogStateHypothesis.discourseUnitCounter, newDUHypothesis);
-            resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
         }
 
         return new ImmutablePair<>(resultHypotheses, resultDistribution);
-    }
-
-    Set<DiscourseUnitHypothesis> possiblePredecessors(DialogStateHypothesis currentState, String respondingSpeaker){
-        for ()
     }
 
 }

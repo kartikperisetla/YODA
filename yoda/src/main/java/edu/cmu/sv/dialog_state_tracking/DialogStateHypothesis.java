@@ -16,8 +16,7 @@ import java.util.Set;
  */
 public class DialogStateHypothesis {
     Map<String, DiscourseUnitHypothesis> discourseUnitHypothesisMap = new HashMap<>();
-    Set<ArgumentationLink> acceptLinks = new HashSet<>();
-    Set<ArgumentationLink> rejectLinks = new HashSet<>();
+    Set<ArgumentationLink> argumentationLinks = new HashSet<>();
     long discourseUnitCounter = 0;
 
     public static class ArgumentationLink{
@@ -48,10 +47,8 @@ public class DialogStateHypothesis {
 
     public DialogStateHypothesis deepCopy(){
         DialogStateHypothesis ans = new DialogStateHypothesis();
-        for (ArgumentationLink link : acceptLinks)
-            ans.acceptLinks.add(new ArgumentationLink(link.predecessor, link.successor));
-        for (ArgumentationLink link : rejectLinks)
-            ans.rejectLinks.add(new ArgumentationLink(link.predecessor, link.successor));
+        for (ArgumentationLink link : argumentationLinks)
+            ans.argumentationLinks.add(new ArgumentationLink(link.predecessor, link.successor));
         for (String key : discourseUnitHypothesisMap.keySet()){
             ans.discourseUnitHypothesisMap.put(key, discourseUnitHypothesisMap.get(key).deepCopy());
         }
@@ -105,28 +102,19 @@ public class DialogStateHypothesis {
         this.discourseUnitHypothesisMap = discourseUnitHypothesisMap;
     }
 
-    public Set<ArgumentationLink> getAcceptLinks() {
-        return acceptLinks;
+    public Set<ArgumentationLink> getArgumentationLinks() {
+        return argumentationLinks;
     }
 
-    public void setAcceptLinks(Set<ArgumentationLink> acceptLinks) {
-        this.acceptLinks = acceptLinks;
-    }
-
-    public Set<ArgumentationLink> getRejectLinks() {
-        return rejectLinks;
-    }
-
-    public void setRejectLinks(Set<ArgumentationLink> rejectLinks) {
-        this.rejectLinks = rejectLinks;
+    public void setArgumentationLinks(Set<ArgumentationLink> argumentationLinks) {
+        this.argumentationLinks = argumentationLinks;
     }
 
     @Override
     public String toString() {
         return "DialogStateHypothesis{" +
                 "discourseUnitHypothesisMap=" + discourseUnitHypothesisMap +
-                ", acceptLinks=" + acceptLinks +
-                ", rejectLinks=" + rejectLinks +
+                ", argumentationLinks=" + argumentationLinks +
                 '}';
     }
 }

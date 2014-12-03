@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 public class RewardAndCostCalculator {
     public static double penaltyForSpeakingPhrase = .1;
     public static double penaltyForIgnoringUserRequest = 2;
-    public static double rewardForCorrectAnswer = 5;
+    public static double rewardForCorrectAnswer = 25;
     public static double penaltyForIncorrectAnswer = 5;
 
 

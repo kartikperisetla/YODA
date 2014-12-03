@@ -1,13 +1,17 @@
 package edu.cmu.sv.dialog_state_tracking;
 
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Accept;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.DontKnow;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
 import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.semantics.SemanticsModel;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Reject;
 import edu.cmu.sv.utils.StringDistribution;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,7 +21,7 @@ import java.util.Map;
  * Infers the dialog state after an initial presentation.
  *
  */
-public class PresentationInference implements DialogStateUpdateInference {
+public class PresentInference extends DialogStateUpdateInference {
     private final static double penaltyForReinterpretingFragment = .75;
 
     @Override
@@ -71,19 +75,22 @@ public class PresentationInference implements DialogStateUpdateInference {
                 else {}
             }
         } else { // if turn.speaker.equals("system")
-            String newDialogStateHypothesisID = "dialog_state_hyp_0";
-            DialogStateHypothesis newDialogStateHypothesis = currentState.deepCopy();
-            DiscourseUnitHypothesis newDUHypothesis = new DiscourseUnitHypothesis();
-            SemanticsModel newSpokenByMeHypothesis = turn.systemUtterance.deepCopy();
-            resultDistribution.put(newDialogStateHypothesisID, 1.0);
-            newDUHypothesis.timeOfLastActByMe = timeStamp;
-            newDUHypothesis.spokenByMe = newSpokenByMeHypothesis;
-            newDUHypothesis.groundTruth = turn.groundedSystemMeaning;
-            newDUHypothesis.initiator = turn.speaker;
-            newDialogStateHypothesis.discourseUnitCounter += 1;
-            newDialogStateHypothesis.getDiscourseUnitHypothesisMap().
-                    put("du_"+newDialogStateHypothesis.discourseUnitCounter, newDUHypothesis);
-            resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
+            String dialogAct = turn.systemUtterance.getSlotPathFiller("dialogAct");
+            if (DialogRegistry.discourseUnitDialogActs.contains(DialogRegistry.dialogActNameMap.get(dialogAct))) {
+                String newDialogStateHypothesisID = "dialog_state_hyp_0";
+                DialogStateHypothesis newDialogStateHypothesis = currentState.deepCopy();
+                DiscourseUnitHypothesis newDUHypothesis = new DiscourseUnitHypothesis();
+                SemanticsModel newSpokenByMeHypothesis = turn.systemUtterance.deepCopy();
+                resultDistribution.put(newDialogStateHypothesisID, 1.0);
+                newDUHypothesis.timeOfLastActByMe = timeStamp;
+                newDUHypothesis.spokenByMe = newSpokenByMeHypothesis;
+                newDUHypothesis.groundTruth = turn.groundedSystemMeaning;
+                newDUHypothesis.initiator = turn.speaker;
+                newDialogStateHypothesis.discourseUnitCounter += 1;
+                newDialogStateHypothesis.getDiscourseUnitHypothesisMap().
+                        put("du_" + newDialogStateHypothesis.discourseUnitCounter, newDUHypothesis);
+                resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
+            }
         }
 
         return new ImmutablePair<>(resultHypotheses, resultDistribution);
