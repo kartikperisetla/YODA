@@ -34,9 +34,9 @@ public class StringSimilarity implements Function{
         if (s1.length()==0 || s2.length()==0){
             return valueFactory.createLiteral(0.0);
         }
-//        System.out.println("L-distance:"+StringUtils.getLevenshteinDistance(s1, s2));
-        double ans = 1.0 - (1.0*StringUtils.getLevenshteinDistance(s1.toLowerCase(), s2.toLowerCase()) / (Integer.max(s1.length(),s2.length())));
-//        System.out.println("ans:"+ans);
-        return valueFactory.createLiteral(ans);
+
+//        double levenshteinSimilarity = 1.0 - (1.0*StringUtils.getLevenshteinDistance(s1.toLowerCase(), s2.toLowerCase()) / (Integer.max(s1.length(),s2.length())));
+        double jaroWinklerSimilarity = StringUtils.getJaroWinklerDistance(s1.toLowerCase(), s2.toLowerCase());
+        return valueFactory.createLiteral(jaroWinklerSimilarity*jaroWinklerSimilarity);
     }
 }

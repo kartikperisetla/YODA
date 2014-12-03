@@ -38,7 +38,9 @@ public class DistanceFunction implements Function{
                 (1 - Math.cos((lon2 - lon1) * Math.PI / 180))/2;
         double distanceInKilometers = 6371 * 2 * Math.asin(Math.sqrt(unscaledDistanceSq));
 //        System.out.println("DistanceFunction: distance in km computed:"+distanceInKilometers);
-        double ans = 1.0 - Math.exp(-1 * distanceInKilometers);
+        double ans = 1.0 - Math.exp(-.5 * distanceInKilometers);
+        if (ans > 1)
+            System.out.println("distance function > 1!"+ans);
 //        System.out.println("ans computed:"+ ans);
         return valueFactory.createLiteral(ans);
     }

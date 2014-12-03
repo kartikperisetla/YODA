@@ -103,10 +103,7 @@ public class StringDistribution{
     * Otherwise, create the key and set it to value
     * */
     public void put(String key, Double value){
-        if (internalDistribution.containsKey(key))
-            internalDistribution.put(key, internalDistribution.get(key)+value);
-        else
-            internalDistribution.put(key,value);
+        internalDistribution.put(key,value);
     }
 
     public Map<String, Double> getInternalDistribution() {

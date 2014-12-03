@@ -52,7 +52,7 @@ public class TestResolveReferences {
         }
 
         // simple named entity reference resolution
-        String sluNamedEntityChunkURI = yodaEnvironment.db.insertValue("tied house");
+        String sluNamedEntityChunkURI = yodaEnvironment.db.insertValue("red rock");
         JSONObject reference = SemanticsModel.parseJSON(OntologyRegistry.WebResourceWrap(sluNamedEntityChunkURI));
         SemanticsModel.wrap(reference, Noun.class.getSimpleName(), HasName.class.getSimpleName());
         System.out.println(reference.toJSONString());

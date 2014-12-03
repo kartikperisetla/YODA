@@ -29,7 +29,7 @@ public class LinearFuzzyMap implements Function{
         double slope = ((Literal)values[1]).doubleValue();
         double actual = ((Literal)values[2]).doubleValue();
 
-        double ans = Doubles.max(1.0 - slope * (Math.abs(center - actual)), 0.0);
+        double ans = Doubles.min(Doubles.max(1.0 - slope * (Math.abs(center - actual)), 0.0), 1.0);
         return valueFactory.createLiteral(ans);
     }
 }
