@@ -24,8 +24,8 @@ public class DiscourseUnitHypothesis {
     SemanticsModel groundInterpretation; // if other-initiated
 
     // analysis for argumentative purposes
-    double ynqTruth;
-    double whqTruth;
+    Double ynqTruth;
+    Double whqTruth;
 
     public Pair<Map<String, DiscourseUnitHypothesis>, StringDistribution> groundAndAnalyse(YodaEnvironment yodaEnvironment){
         try {
@@ -114,19 +114,19 @@ public class DiscourseUnitHypothesis {
         this.groundInterpretation = groundInterpretation;
     }
 
-    public double getYnqTruth() {
+    public Double getYnqTruth() {
         return ynqTruth;
     }
 
-    public void setYnqTruth(double ynqTruth) {
+    public void setYnqTruth(Double ynqTruth) {
         this.ynqTruth = ynqTruth;
     }
 
-    public double getWhqTruth() {
+    public Double getWhqTruth() {
         return whqTruth;
     }
 
-    public void setWhqTruth(double whqTruth) {
+    public void setWhqTruth(Double whqTruth) {
         this.whqTruth = whqTruth;
     }
 

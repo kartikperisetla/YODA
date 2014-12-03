@@ -140,7 +140,7 @@ public class ReferenceResolution {
     * return the truth with which the description describes the grounded individual
     * Any nested noun phrases in the description must be grounded in advance (WebResources)
     * */
-    public static double descriptionMatch(YodaEnvironment yodaEnvironment, JSONObject individual, JSONObject description){
+    public static Double descriptionMatch(YodaEnvironment yodaEnvironment, JSONObject individual, JSONObject description){
         try {
             String queryString = yodaEnvironment.db.prefixes + "SELECT ?score WHERE {\n";
             String individualURI = (String) individual.get(HasURI.class.getSimpleName());
@@ -206,7 +206,6 @@ public class ReferenceResolution {
                 }
                 else {
                     // answer is unknown / question doesn't make sense
-                    ans = -1.0;
                     Database.getLogger().info("Description match result is unknown / question doesn't make sense: "+ans);
                 }
             } catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {

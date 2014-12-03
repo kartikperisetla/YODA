@@ -40,6 +40,7 @@ public class DialogRegistry {
 
         argumentationDialogActs.add(Accept.class);
         argumentationDialogActs.add(Reject.class);
+        argumentationDialogActs.add(DontKnow.class);
 
         discourseUnitDialogActs.add(WHQuestion.class);
         discourseUnitDialogActs.add(YNQuestion.class);

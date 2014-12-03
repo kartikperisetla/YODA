@@ -6,6 +6,7 @@ import edu.cmu.sv.dialog_state_tracking.DiscourseUnitHypothesis;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Accept;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.DontKnow;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Reject;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTaskPreferences;
@@ -42,13 +43,15 @@ public class RewardAndCostCalculator {
 //        System.out.println("discourseIndependentArgumentationReward: "+dialogAct);
         Double probabilityCorrectAnswer = 0.0;
         if (dialogAct instanceof Accept) {
-            probabilityCorrectAnswer = duHypothesis.getYnqTruth();
+            if (duHypothesis.getYnqTruth()!=null)
+                probabilityCorrectAnswer = duHypothesis.getYnqTruth();
         } else if (dialogAct instanceof Reject) {
-            probabilityCorrectAnswer = 1 - duHypothesis.getYnqTruth();
+            if (duHypothesis.getYnqTruth()!=null)
+                probabilityCorrectAnswer = 1 - duHypothesis.getYnqTruth();
+        } else if (dialogAct instanceof DontKnow) {
+            if (duHypothesis.getYnqTruth()==null)
+                probabilityCorrectAnswer = 1.0;
         }
-//        System.out.println("probabilitiy correct:" + probabilityCorrectAnswer);
-//        System.out.println("return value:"+
-//                (rewardForCorrectAnswer*probabilityCorrectAnswer - penaltyForIncorrectAnswer*(1-probabilityCorrectAnswer)));
         return rewardForCorrectAnswer*probabilityCorrectAnswer - penaltyForIncorrectAnswer*(1-probabilityCorrectAnswer);
     }
 

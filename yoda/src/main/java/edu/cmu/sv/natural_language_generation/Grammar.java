@@ -51,5 +51,6 @@ public class Grammar {
         grammar1_roots.add(HasPropertyWHQTemplate0.class);
         grammar1_roots.add(AcceptTemplate.class);
         grammar1_roots.add(RejectTemplate.class);
+        grammar1_roots.add(DontKnowTemplate.class);
     }
 }
