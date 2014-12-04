@@ -64,7 +64,7 @@ public class DialogManager implements Runnable {
             Map<SystemAction, Double> actionExpectedReward = new HashMap<>();
 
             //// add the null action
-            actionExpectedReward.put(null, 0.0);
+            actionExpectedReward.put(null, RewardAndCostCalculator.penaltyForSpeaking);
 
             // enumerate and evaluate actions that can be enumerated from a single DU hypothesis
             for (String dialogStateHypothesisId : dialogStateHypotheses.keySet()){

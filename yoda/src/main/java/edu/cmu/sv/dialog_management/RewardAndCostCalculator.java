@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  *
  */
 public class RewardAndCostCalculator {
-    public static double penaltyForSpeakingPhrase = .1;
+    public static double penaltyForSpeaking = .5;
     public static double penaltyForIgnoringUserRequest = 2;
     public static double rewardForCorrectAnswer = 5;
     public static double penaltyForIncorrectAnswer = 5;
@@ -48,27 +48,32 @@ public class RewardAndCostCalculator {
         if (dialogAct instanceof Accept || dialogAct instanceof Reject || dialogAct instanceof DontKnow) {
             if (!duHypothesis.getInitiator().equals("user"))
                 return 0.0;
-            double probabilityInterpretedAnotherWay =
+            double probabilityInterpretedThisWay =
                     Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(duHypothesis, dsHypothesis, "user"));
-            return answerObliged(duHypothesis, dsHypothesis) ?
-                    (1 - probabilityInterpretedAnotherWay) :
-                    .1 * (1 - probabilityInterpretedAnotherWay);
+            if (answerObliged(duHypothesis) && !answerAlreadyProvided(duHypothesis, dsHypothesis))
+                return probabilityInterpretedThisWay;
+            else if (answerObliged(duHypothesis))
+                return .1 * probabilityInterpretedThisWay;
         }
         return 0.0;
+    }
+
+    public static boolean answerAlreadyProvided(DiscourseUnitHypothesis predecessor, DialogStateHypothesis dsHypothesis){
+        return answerObliged(predecessor) &&
+                dsHypothesis.getArgumentationLinks().stream().anyMatch(
+                        x -> dsHypothesis.getDiscourseUnitHypothesisMap().get(x.getPredecessor()).equals(predecessor));
     }
 
     /*
     * Return weather or not the predecessor obliges a response which has not been given
     * */
-    public static boolean answerObliged(DiscourseUnitHypothesis predecessor, DialogStateHypothesis dsHypothesis){
+    public static boolean answerObliged(DiscourseUnitHypothesis predecessor){
         String predecessorDialogAct;
         if (predecessor.getInitiator().equals("user"))
             predecessorDialogAct = (String) predecessor.getSpokenByThem().newGetSlotPathFiller("dialogAct");
         else
             predecessorDialogAct = (String) predecessor.getSpokenByMe().newGetSlotPathFiller("dialogAct");
-        return predecessorDialogAct.equals(YNQuestion.class.getSimpleName()) &&
-                !dsHypothesis.getArgumentationLinks().stream().anyMatch(
-                        x -> dsHypothesis.getDiscourseUnitHypothesisMap().get(x.getPredecessor()).equals(predecessor));
+        return predecessorDialogAct.equals(YNQuestion.class.getSimpleName());
     }
 
     /*

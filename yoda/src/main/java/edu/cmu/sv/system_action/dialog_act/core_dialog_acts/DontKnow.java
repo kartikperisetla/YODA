@@ -28,7 +28,8 @@ public class DontKnow extends DialogAct {
     public Double reward(DialogStateHypothesis dialogStateHypothesis, DiscourseUnitHypothesis discourseUnitHypothesis){
         return RewardAndCostCalculator.discourseIndependentArgumentationReward(discourseUnitHypothesis, this) *
                 RewardAndCostCalculator.probabilityInterpretedCorrectly(discourseUnitHypothesis, dialogStateHypothesis, this) +
-                (RewardAndCostCalculator.answerObliged(discourseUnitHypothesis, dialogStateHypothesis) ?
-                        1.0 : 0);
+                (RewardAndCostCalculator.answerObliged(discourseUnitHypothesis) &&
+                        !RewardAndCostCalculator.answerAlreadyProvided(discourseUnitHypothesis, dialogStateHypothesis) ?
+                        RewardAndCostCalculator.penaltyForIgnoringUserRequest : 0);
     }
 }
