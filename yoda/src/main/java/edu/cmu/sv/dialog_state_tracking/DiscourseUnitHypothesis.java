@@ -27,6 +27,15 @@ public class DiscourseUnitHypothesis {
     Double ynqTruth;
     Double whqTruth;
 
+    public Long getMostRecentContributionTime(){
+        Long ans = (long) 0;
+        if (timeOfLastActByMe!=null)
+            ans = Long.max(timeOfLastActByMe, ans);
+        if (timeOfLastActByThem!=null)
+            ans = Long.max(timeOfLastActByThem, ans);
+        return ans;
+    }
+
     public Pair<Map<String, DiscourseUnitHypothesis>, StringDistribution> groundAndAnalyse(YodaEnvironment yodaEnvironment){
         try {
             String dialogActString = (String) spokenByThem.newGetSlotPathFiller("dialogAct");
