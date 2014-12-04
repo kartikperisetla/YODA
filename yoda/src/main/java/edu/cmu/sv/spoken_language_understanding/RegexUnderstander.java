@@ -37,7 +37,6 @@ public class RegexUnderstander implements SpokenLanguageUnderstander{
         logger.addHandler(fh);
     }
 
-    Calendar calendar = Calendar.getInstance();
 
     @Override
     public void process1BestAsr(String asrResult) {
@@ -75,6 +74,7 @@ public class RegexUnderstander implements SpokenLanguageUnderstander{
         StringDistribution hypothesisDistribution = new StringDistribution();
         hypothesisDistribution.put("hyp1", 1.0);
         Turn newTurn = new Turn("user", null, null, hypotheses, hypothesisDistribution);
+        Calendar calendar = Calendar.getInstance();
         yodaEnvironment.DstInputQueue.add(new ImmutablePair<>(newTurn, calendar.getTimeInMillis()));
         logger.info("interpretation:" + interpretation);
 //        yodaEnvironment.dst.updateDialogState(newTurn, calendar.getTimeInMillis());
