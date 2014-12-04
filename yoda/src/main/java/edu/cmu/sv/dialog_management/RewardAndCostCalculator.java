@@ -3,6 +3,7 @@ package edu.cmu.sv.dialog_management;
 import edu.cmu.sv.database.Database;
 import edu.cmu.sv.dialog_state_tracking.DialogStateHypothesis;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnitHypothesis;
+import edu.cmu.sv.dialog_state_tracking.Utils;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Accept;
@@ -37,29 +38,26 @@ public class RewardAndCostCalculator {
 
 
     /*
-    * Return the probability that this dialog act will be interpreted correctly in this context.
+    * Return the probability that this dialog act will be interpreted in this context.
+    *
     * If this is a grounding act, duHypothesis is the DU that the system intends to clarify,
     * Otherwise, this is the DU that the system intends to respond to.
     * */
-    public static Double contextualAppropriateness(DiscourseUnitHypothesis duHypothesis, DialogStateHypothesis dsHypothesis,
-                                                   DialogAct dialogAct){
-        Double probabilityInterpretedCorrectly = 1.0;
-        for (String discourseUnitIdentifier : dsHypothesis.getDiscourseUnitHypothesisMap().keySet()){
-            DiscourseUnitHypothesis otherPredecessor = dsHypothesis.getDiscourseUnitHypothesisMap().get(discourseUnitIdentifier);
-            if (otherPredecessor==duHypothesis)
-                continue;
-            if (otherPredecessor.getInitiator().equals("user") &&
-                    otherPredecessor.getMostRecentContributionTime() > duHypothesis.getMostRecentContributionTime())
-                probabilityInterpretedCorrectly *= .1;
-        }
-        return probabilityInterpretedCorrectly;
+    public static Double contextPriority(DiscourseUnitHypothesis duHypothesis, DialogStateHypothesis dsHypothesis,
+                                         DialogAct dialogAct){
+        if (dialogAct instanceof Accept || dialogAct instanceof Reject || dialogAct instanceof DontKnow)
+            return Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(duHypothesis, dsHypothesis, "user"));
+        return 0.0;
     }
 
     /*
-    * Return the reward that this act will achieve, accounting for other discourse units in in the dialog state
+    * Return the probability that the context is available to be extended by this dialog act
+    *
+    * If this is a grounding act, duHypothesis is the DU that the system intends to clarify,
+    * Otherwise, this is the DU that the system intends to respond to.
     * */
-    public static Double discourseDependentReward(DiscourseUnitHypothesis duHypothesis, DialogStateHypothesis dsHypothesis,
-                                                  DialogAct dialogAct){
+    public static Double contextAvailability(DiscourseUnitHypothesis duHypothesis, DialogStateHypothesis dsHypothesis,
+                                             DialogAct dialogAct){
         // argumentation: interpret duHypothesis as the predecessor
         // if duHypothesis is a YNQ, spoken by the user, give a reward
         // if duHypothesis has already been answered, give a penalty
@@ -71,7 +69,6 @@ public class RewardAndCostCalculator {
                         x -> dsHypothesis.getDiscourseUnitHypothesisMap().get(x.getPredecessor()).equals(duHypothesis)) &&
                 (dialogAct instanceof Accept || dialogAct instanceof Reject || dialogAct instanceof DontKnow)) {
             return 1.0;
-
         }
         return 0.0;
     }

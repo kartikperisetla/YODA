@@ -30,7 +30,6 @@ public class NaturalLanguageGenerator {
         }
         logger.addHandler(fh);
     }
-    Calendar calendar = Calendar.getInstance();
     public static Random random = new Random();
     public static RandomData randomData = new RandomDataImpl();
     YodaEnvironment yodaEnvironment;
@@ -47,6 +46,7 @@ public class NaturalLanguageGenerator {
         logger.info("chosen utterance:"+chosenUtterance);
         yodaEnvironment.out.sendOutput(chosenUtterance.getKey());
         Turn systemTurn = new Turn("system", chosenUtterance.getValue(), model, null, null);
+        Calendar calendar = Calendar.getInstance();
         yodaEnvironment.DstInputQueue.add(new ImmutablePair<>(systemTurn, calendar.getTimeInMillis()));
     }
 

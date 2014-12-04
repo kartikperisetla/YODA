@@ -43,6 +43,14 @@ public class DialogStateHypothesis {
         public void setSuccessor(String successor) {
             this.successor = successor;
         }
+
+        @Override
+        public String toString() {
+            return "ArgLink{" +
+                    "predecessor='" + predecessor + '\'' +
+                    ", successor='" + successor + '\'' +
+                    '}';
+        }
     }
 
     public DialogStateHypothesis deepCopy(){
@@ -112,9 +120,14 @@ public class DialogStateHypothesis {
 
     @Override
     public String toString() {
-        return "DialogStateHypothesis{" +
-                "discourseUnitHypothesisMap=" + discourseUnitHypothesisMap +
-                ", argumentationLinks=" + argumentationLinks +
+        String ans = "DialogStateHypothesis{" +
+                "discourseUnitHypothesisMap=\n";
+        for (String key : discourseUnitHypothesisMap.keySet()){
+            ans += key+"\n";
+            ans += discourseUnitHypothesisMap.get(key)+"\n";
+        }
+        ans +="argumentationLinks=" + argumentationLinks +
                 '}';
+        return ans;
     }
 }

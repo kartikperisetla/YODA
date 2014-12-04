@@ -142,15 +142,15 @@ public class DiscourseUnitHypothesis {
     @Override
     public String toString() {
         return "DiscourseUnitHypothesis{" +
-                "\nspokenByMe=" + spokenByMe +
-                "\nspokenByThem=" + spokenByThem +
-                "\ntimeOfLastActByThem=" + timeOfLastActByThem +
+                "initiator='" + initiator +
+                ", timeOfLastActByThem=" + timeOfLastActByThem +
                 ", timeOfLastActByMe=" + timeOfLastActByMe +
-                ", initiator='" + initiator + '\'' +
-                "\ngroundTruth=" + groundTruth +
-                "\ngroundInterpretation=" + groundInterpretation +
                 "\nynqTruth=" + ynqTruth +
                 ", whqTruth=" + whqTruth +
+                "\nspokenByMe=" + spokenByMe +
+                "\nspokenByThem=" + spokenByThem +
+                "\ngroundTruth=" + groundTruth +
+                "\ngroundInterpretation=" + groundInterpretation +
                 '}';
     }
 }

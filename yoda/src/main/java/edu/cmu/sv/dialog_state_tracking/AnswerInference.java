@@ -1,8 +1,6 @@
 package edu.cmu.sv.dialog_state_tracking;
 
-import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.*;
 import edu.cmu.sv.utils.StringDistribution;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -11,7 +9,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by David Cohen on 9/19/14.
@@ -47,7 +44,6 @@ public class AnswerInference extends DialogStateUpdateInference {
                         DiscourseUnitHypothesis newDUHypothesis = new DiscourseUnitHypothesis();
 
                         SemanticsModel newSpokenByThemHypothesis = turn.hypotheses.get(sluHypothesisID).deepCopy();
-                        resultDistribution.put(newDialogStateHypothesisID, 1.0);
                         newDUHypothesis.timeOfLastActByThem = timeStamp;
                         newDUHypothesis.spokenByThem = newSpokenByThemHypothesis;
                         newDUHypothesis.initiator = turn.speaker;
@@ -58,6 +54,8 @@ public class AnswerInference extends DialogStateUpdateInference {
                         newDialogStateHypothesis.getArgumentationLinks().add(
                                 new DialogStateHypothesis.ArgumentationLink(predecessorId, newDiscourseUnitId));
                         resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
+                        resultDistribution.put(newDialogStateHypothesisID,
+                                Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(predecessor, newDialogStateHypothesis, "system")));
                     }
                 }
             }
@@ -77,7 +75,6 @@ public class AnswerInference extends DialogStateUpdateInference {
                     DialogStateHypothesis newDialogStateHypothesis = currentState.deepCopy();
                     DiscourseUnitHypothesis newDUHypothesis = new DiscourseUnitHypothesis();
                     SemanticsModel newSpokenByMeHypothesis = turn.systemUtterance.deepCopy();
-                    resultDistribution.put(newDialogStateHypothesisID, 1.0);
                     newDUHypothesis.timeOfLastActByMe = timeStamp;
                     newDUHypothesis.spokenByMe = newSpokenByMeHypothesis;
                     newDUHypothesis.groundTruth = turn.groundedSystemMeaning;
@@ -89,6 +86,8 @@ public class AnswerInference extends DialogStateUpdateInference {
                     newDialogStateHypothesis.getArgumentationLinks().add(
                             new DialogStateHypothesis.ArgumentationLink(predecessorId, newDiscourseUnitId));
                     resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
+                    resultDistribution.put(newDialogStateHypothesisID,
+                            Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(predecessor, newDialogStateHypothesis, "user")));
                 }
 
             }
