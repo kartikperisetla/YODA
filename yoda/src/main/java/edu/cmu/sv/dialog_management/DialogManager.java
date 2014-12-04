@@ -134,21 +134,30 @@ public class DialogManager implements Runnable {
     public void run() {
         while (true){
             try {
-                Pair<Map<String, DialogStateHypothesis>, StringDistribution> DmInput = yodaEnvironment.DmInputQueue.poll(100, TimeUnit.MILLISECONDS);
+                Pair<Map<String, DialogStateHypothesis>, StringDistribution> DmInput = null;
+                // empty out the queue to get the most recent dialog state
+                while (true) {
+                    Pair<Map<String, DialogStateHypothesis>, StringDistribution> tmp;
+                    tmp = yodaEnvironment.DmInputQueue.poll(100, TimeUnit.MILLISECONDS);
+                    if (tmp==null)
+                        break;
+                    else
+                        DmInput = tmp;
+                }
                 if (DmInput!=null) {
                     dialogStateHypotheses = DmInput.getLeft();
                     dialogStateDistribution = DmInput.getRight();
                 }
+                List<Pair<SystemAction, Double>> rankedActions = enumerateAndScorePossibleActions();
+                logger.info("Ranked actions: " + rankedActions.toString());
+                SystemAction selectedAction = rankedActions.get(0).getKey();
+                if (selectedAction!=null)
+                    yodaEnvironment.nlg.speak(((DialogAct)selectedAction).getNlgCommand(), Grammar.DEFAULT_GRAMMAR_PREFERENCES);
                 Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 System.exit(0);
             }
-            List<Pair<SystemAction, Double>> rankedActions = enumerateAndScorePossibleActions();
-            logger.info("Ranked actions: " + rankedActions.toString());
-            SystemAction selectedAction = rankedActions.get(0).getKey();
-            if (selectedAction!=null)
-                yodaEnvironment.nlg.speak(((DialogAct)selectedAction).getNlgCommand(), Grammar.DEFAULT_GRAMMAR_PREFERENCES);
         }
     }
 }

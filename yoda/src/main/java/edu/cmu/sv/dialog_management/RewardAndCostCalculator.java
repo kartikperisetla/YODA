@@ -43,34 +43,32 @@ public class RewardAndCostCalculator {
     * If this is a grounding act, duHypothesis is the DU that the system intends to clarify,
     * Otherwise, this is the DU that the system intends to respond to.
     * */
-    public static Double contextPriority(DiscourseUnitHypothesis duHypothesis, DialogStateHypothesis dsHypothesis,
-                                         DialogAct dialogAct){
-        if (dialogAct instanceof Accept || dialogAct instanceof Reject || dialogAct instanceof DontKnow)
-            return Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(duHypothesis, dsHypothesis, "user"));
+    public static Double probabilityInterpretedCorrectly(DiscourseUnitHypothesis duHypothesis, DialogStateHypothesis dsHypothesis,
+                                                         DialogAct dialogAct){
+        if (dialogAct instanceof Accept || dialogAct instanceof Reject || dialogAct instanceof DontKnow) {
+            if (!duHypothesis.getInitiator().equals("user"))
+                return 0.0;
+            double probabilityInterpretedAnotherWay =
+                    Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(duHypothesis, dsHypothesis, "user"));
+            return answerObliged(duHypothesis, dsHypothesis) ?
+                    (1 - probabilityInterpretedAnotherWay) :
+                    .1 * (1 - probabilityInterpretedAnotherWay);
+        }
         return 0.0;
     }
 
     /*
-    * Return the probability that the context is available to be extended by this dialog act
-    *
-    * If this is a grounding act, duHypothesis is the DU that the system intends to clarify,
-    * Otherwise, this is the DU that the system intends to respond to.
+    * Return weather or not the predecessor obliges a response which has not been given
     * */
-    public static Double contextAvailability(DiscourseUnitHypothesis duHypothesis, DialogStateHypothesis dsHypothesis,
-                                             DialogAct dialogAct){
-        // argumentation: interpret duHypothesis as the predecessor
-        // if duHypothesis is a YNQ, spoken by the user, give a reward
-        // if duHypothesis has already been answered, give a penalty
-        if (!duHypothesis.getInitiator().equals("user"))
-            return 0.0;
-        String predecessorDialogAct = (String) duHypothesis.getSpokenByThem().newGetSlotPathFiller("dialogAct");
-        if (predecessorDialogAct.equals(YNQuestion.class.getSimpleName()) &&
+    public static boolean answerObliged(DiscourseUnitHypothesis predecessor, DialogStateHypothesis dsHypothesis){
+        String predecessorDialogAct;
+        if (predecessor.getInitiator().equals("user"))
+            predecessorDialogAct = (String) predecessor.getSpokenByThem().newGetSlotPathFiller("dialogAct");
+        else
+            predecessorDialogAct = (String) predecessor.getSpokenByMe().newGetSlotPathFiller("dialogAct");
+        return predecessorDialogAct.equals(YNQuestion.class.getSimpleName()) &&
                 !dsHypothesis.getArgumentationLinks().stream().anyMatch(
-                        x -> dsHypothesis.getDiscourseUnitHypothesisMap().get(x.getPredecessor()).equals(duHypothesis)) &&
-                (dialogAct instanceof Accept || dialogAct instanceof Reject || dialogAct instanceof DontKnow)) {
-            return 1.0;
-        }
-        return 0.0;
+                        x -> dsHypothesis.getDiscourseUnitHypothesisMap().get(x.getPredecessor()).equals(predecessor));
     }
 
     /*
