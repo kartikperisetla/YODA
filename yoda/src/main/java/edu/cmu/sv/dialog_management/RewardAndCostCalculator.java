@@ -98,32 +98,76 @@ public class RewardAndCostCalculator {
     }
 
 
+
+
+    /*
+    * To compute the reward for a clarification dialog act,
+    * estimate the improvement in reward to all possible dialog and non-dialog tasks
+    * that relate to all the available DU hypotheses.
+    * */
+    public static Double clarificationDialogActReward(Database db, DiscourseUnitHypothesis discourseUnitHypothesis,
+                                                      StringDistribution predictedRelativeConfidenceGain)
+            throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
+        Double totalReward = 0.0;
+
+        // sum up the predicted rewards supposing that each current hypothesis is true,
+        // weighting the predicted reward by the current belief that the hypothesis is true.
+        for (String hypothesisID : discourseUnitHypothesis.getHypotheses().keySet()){
+            DiscourseUnit2.DiscourseUnitHypothesis hypothesis = discourseUnitHypothesis.getHypotheses().get(hypothesisID);
+            SemanticsModel spokenByThem = hypothesis.getSpokenByThem();
+            Double currentConfidence = discourseUnitHypothesis.getHypothesisDistribution().get(hypothesisID);
+            Double predictedConfidence = currentConfidence + (1-currentConfidence)*
+                    predictedRelativeConfidenceGain.get(hypothesisID);
+
+            // predict the difference in expected reward after clarification
+            Double predictedRewardDifference = 0.0;
+            Class<? extends DialogAct> daClass = DialogRegistry.dialogActNameMap.
+                    get((String)spokenByThem.newGetSlotPathFiller("dialogAct"));
+
+            // add contribution from non-dialog tasks
+            if (DialogRegistry.nonDialogTaskRegistry.containsKey(daClass)) {
+                for (Class<? extends NonDialogTask> taskClass : DialogRegistry.nonDialogTaskRegistry.get(daClass)) {
+                    NonDialogTaskPreferences preferences = taskClass.getConstructor(Database.class).newInstance(db).getPreferences();
+                    predictedRewardDifference += predictedConfidence * preferences.rewardForCorrectExecution;
+                    predictedRewardDifference -= (1 - predictedConfidence) * preferences.penaltyForIncorrectExecution;
+                    predictedRewardDifference -= currentConfidence * preferences.rewardForCorrectExecution;
+                    predictedRewardDifference += (1 - currentConfidence) * preferences.penaltyForIncorrectExecution;
+                    totalReward += currentConfidence * predictedRewardDifference /
+                            DialogRegistry.nonDialogTaskRegistry.get(daClass).size();
+                }
+            }
+        }
+        return totalReward;
+    }
+
+
     /*
     * Confirming a value is confirming that some role is filled by it,
     * it does not confirm anything about which role it fills
     * */
-    public static StringDistribution predictConfidenceGainFromValueConfirmation(DiscourseUnit2 DU, Object value){
+    public static StringDistribution predictConfidenceGainFromValueConfirmation(DiscourseUnitHypothesis discourseUnitHypothesis,
+                                                                                Object value){
         double limit = .8; // we will never predict 100% confidence gain
         StringDistribution ans = new StringDistribution();
         if (!(value instanceof JSONObject))
             return null;
-        Map<String, Boolean> hasValueMap = DU.getHypotheses().keySet().stream().collect(Collectors.toMap(
+        Map<String, Boolean> hasValueMap = discourseUnitHypothesis.getHypotheses().keySet().stream().collect(Collectors.toMap(
                 x->x,
-                x->!DU.getHypotheses().get(x).getSpokenByThem().
+                x->!discourseUnitHypothesis.getHypotheses().get(x).getSpokenByThem().
                         findAllPathsToNonConflict((JSONObject)value).isEmpty()
         ));
 
-        for (String key : DU.getHypotheses().keySet()){
-            if (DU.getHypothesisDistribution().get(key) >= 1.0) {
+        for (String key : discourseUnitHypothesis.getHypotheses().keySet()){
+            if (discourseUnitHypothesis.getHypothesisDistribution().get(key) >= 1.0) {
                 ans.put(key, 0.0);
             }
             else if (hasValueMap.get(key)) {
                 ans.put(key, limit *
-                        DU.getHypotheses().keySet().stream().
+                        discourseUnitHypothesis.getHypotheses().keySet().stream().
                                 filter(x -> !hasValueMap.get(x)).
-                                map(x -> DU.getHypothesisDistribution().get(x)).
+                                map(x -> discourseUnitHypothesis.getHypothesisDistribution().get(x)).
                                 reduce(0.0, (x, y) -> x + y) * 1.0 /
-                        (1.0 - DU.getHypothesisDistribution().get(key)) /
+                        (1.0 - discourseUnitHypothesis.getHypothesisDistribution().get(key)) /
                         hasValueMap.values().stream().filter(x -> x).count());
             } else {
                 ans.put(key, 0.0);

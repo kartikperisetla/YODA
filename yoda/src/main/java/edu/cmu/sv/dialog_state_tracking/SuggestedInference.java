@@ -4,10 +4,18 @@ import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.ontology.misc.Suggested;
 import edu.cmu.sv.ontology.role.HasValue;
 import edu.cmu.sv.semantics.SemanticsModel;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Accept;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.DontKnow;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Reject;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestConfirmValue;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
+import edu.cmu.sv.utils.StringDistribution;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,104 +27,109 @@ import java.util.Set;
  * and wrapping the suggestion in a Suggested entity description
  *
  */
-public class SuggestedInference implements DiscourseUnitUpdateInference {
+public class SuggestedInference extends DialogStateUpdateInference {
     static Double penaltyForReinterpretingFragment = .9;
     @Override
-    public DiscourseUnit2 applyAll(DiscourseUnit2.DiscourseUnitHypothesis currentState, Turn turn, long timeStamp) {
-        int newDUHypothesisCounter = 0;
-        DiscourseUnit2 ans = new DiscourseUnit2();
+    public Pair<Map<String, DialogStateHypothesis>, StringDistribution> applyAll(DialogStateHypothesis currentState,
+                                                                                 Turn turn, long timeStamp) {
+        StringDistribution resultDistribution = new StringDistribution();
+        Map<String, DialogStateHypothesis> resultHypotheses = new HashMap<>();
 
-        // if the opposite speaker has not yet said anything in this DU,
-        // the SuggestedInference doesn't make sense
-        if ((turn.speaker.equals("user") && currentState.timeOfLastActByMe==null) ||
-                (turn.speaker.equals("system") && currentState.timeOfLastActByThem==null))
-            return ans;
-
+        int newHypothesisCounter = 0;
         if (turn.speaker.equals("user")){
-
-            // we can't add a suggestion if there's already a suggestion
-            Set<String> suggestionPaths = currentState.getSpokenByMe().findAllPathsToClass(Suggested.class.getSimpleName());
-            if (suggestionPaths.size() > 0)
-                return ans;
-
-            for (String sluHypothesisID : turn.hypothesisDistribution.keySet()){
+            for (String sluHypothesisID : turn.hypothesisDistribution.keySet()) {
                 SemanticsModel hypModel = turn.hypotheses.get(sluHypothesisID);
                 String dialogAct = hypModel.getSlotPathFiller("dialogAct");
+                if (Fragment.class.getSimpleName().equals(dialogAct)) {
+                    for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
+                        DiscourseUnitHypothesis predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId);
+                        if (predecessor.initiator.equals("user"))
+                            continue;
+                        Set<String> suggestionPaths = predecessor.getSpokenByMe().findAllPathsToClass(Suggested.class.getSimpleName());
+                        if (suggestionPaths.size() > 0)
+                            continue;
 
-                // Don't currently support interpreting fragments which are conjunctions,
-                // since they correspond to different dialog acts
-                if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(Fragment.class)){
-                    if ("Or".equals(hypModel.newGetSlotPathFiller("topic.class")) ||
-                            "And".equals(hypModel.newGetSlotPathFiller("topic.class")))
-                        continue;
 
-                    JSONObject daContent = (JSONObject) hypModel.newGetSlotPathFiller("topic");
-
-                    Map<String, Double> attachmentPoints = Utils.findPossiblePointsOfAttachment(
-                            currentState.getSpokenByMe(), daContent);
-                    SemanticsModel wrapped = new SemanticsModel(daContent.toJSONString());
-                    SemanticsModel.wrap((JSONObject) wrapped.newGetSlotPathFiller(""),
-                            Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
-
-                    for (String attachmentPoint : attachmentPoints.keySet()){
-                        String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
-                        DiscourseUnit2.DiscourseUnitHypothesis newDUHypothesis =
-                                new DiscourseUnit2.DiscourseUnitHypothesis();
-                        SemanticsModel newSpokenByThemHypothesis = currentState.getSpokenByThem().deepCopy();
-                        newSpokenByThemHypothesis.placeAtPoint("verb",
-                                new SemanticsModel(((JSONObject)currentState.getMostRecent().
-                                        newGetSlotPathFiller("verb"))).deepCopy());
-                        newSpokenByThemHypothesis.extendAndOverwriteAtPoint(attachmentPoint, wrapped);
-                        SemanticsModel.wrap((JSONObject) newSpokenByThemHypothesis.newGetSlotPathFiller(attachmentPoint),
+                        JSONObject daContent = (JSONObject) hypModel.newGetSlotPathFiller("topic");
+                        StringDistribution attachmentPoints = Utils.findPossiblePointsOfAttachment(
+                                predecessor.getSpokenByMe(), daContent);
+                        SemanticsModel wrapped = new SemanticsModel(daContent.toJSONString());
+                        SemanticsModel.wrap((JSONObject) wrapped.newGetSlotPathFiller(""),
                                 Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
-                        ans.getHypothesisDistribution().put(newDUHypothesisID, attachmentPoints.get(attachmentPoint) *
-                                penaltyForReinterpretingFragment);
-                        newDUHypothesis.timeOfLastActByMe = currentState.timeOfLastActByMe;
-                        newDUHypothesis.setSpokenByMe(currentState.spokenByMe.deepCopy());
-                        newDUHypothesis.timeOfLastActByThem = timeStamp;
-                        newDUHypothesis.spokenByThem = newSpokenByThemHypothesis;
-                        ans.hypotheses.put(newDUHypothesisID, newDUHypothesis);
+
+                        for (String attachmentPoint : attachmentPoints.keySet()) {
+                            String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
+                            DialogStateHypothesis newDialogStateHypothesis = currentState.deepCopy();
+                            DiscourseUnitHypothesis updatedPredecessor = newDialogStateHypothesis.discourseUnitHypothesisMap.get(predecessorId);
+
+                            SemanticsModel newSpokenByThemHypothesis = updatedPredecessor.getSpokenByThem().deepCopy();
+                            newSpokenByThemHypothesis.placeAtPoint("verb",
+                                    new SemanticsModel(((JSONObject) updatedPredecessor.getSpokenByMe().
+                                            newGetSlotPathFiller("verb"))).deepCopy());
+                            newSpokenByThemHypothesis.extendAndOverwriteAtPoint(attachmentPoint, wrapped);
+                            SemanticsModel.wrap((JSONObject) newSpokenByThemHypothesis.newGetSlotPathFiller(attachmentPoint),
+                                    Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
+
+                            updatedPredecessor.timeOfLastActByThem = timeStamp;
+                            updatedPredecessor.spokenByThem = newSpokenByThemHypothesis;
+                            resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
+                            Double score = attachmentPoints.get(attachmentPoint) *
+                                    Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(
+                                            updatedPredecessor, newDialogStateHypothesis, "system")) *
+                                    Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(
+                                            updatedPredecessor, newDialogStateHypothesis, "user"));
+                            resultDistribution.put(newDialogStateHypothesisID, score);
+                        }
                     }
                 }
             }
         } else { // if turn.speaker.equals("system")
-            String dialogAct = turn.systemUtterance.getSlotPathFiller("dialogAct");
 
-            // we can't add a suggestion if there's already a suggestion
-            Set<String> suggestionPaths = currentState.getMostRecent().findAllPathsToClass(Suggested.class.getSimpleName());
-            if (suggestionPaths.size() > 0)
-                return ans;
+            SemanticsModel hypModel = turn.systemUtterance;
+            String dialogAct = hypModel.getSlotPathFiller("dialogAct");
+            if (RequestConfirmValue.class.getSimpleName().equals(dialogAct)) {
+                for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
+                    DiscourseUnitHypothesis predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId);
+                    if (predecessor.initiator.equals("system"))
+                        continue;
+                    Set<String> suggestionPaths = predecessor.getSpokenByThem().findAllPathsToClass(Suggested.class.getSimpleName());
+                    if (suggestionPaths.size() > 0)
+                        continue;
 
-            if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(RequestConfirmValue.class)){
-                JSONObject daContent = (JSONObject) turn.systemUtterance.newGetSlotPathFiller("topic");
-                Map<String, Double> attachmentPoints = Utils.findPossiblePointsOfAttachment(
-                        currentState.getMostRecent(), daContent);
-                SemanticsModel wrapped = new SemanticsModel(daContent.toJSONString());
-                SemanticsModel.wrap((JSONObject) wrapped.newGetSlotPathFiller(""),
-                        Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
 
-                for (String attachmentPoint : attachmentPoints.keySet()){
-                    String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
-                    DiscourseUnit2.DiscourseUnitHypothesis newDUHypothesis =
-                            new DiscourseUnit2.DiscourseUnitHypothesis();
-
-                    SemanticsModel newSpokenByMeHypothesis = currentState.getSpokenByMe().deepCopy();
-                    newSpokenByMeHypothesis.placeAtPoint("verb",
-                            new SemanticsModel(((JSONObject) currentState.getMostRecent().
-                                    newGetSlotPathFiller("verb"))).deepCopy());
-
-                    SemanticsModel.wrap((JSONObject)newSpokenByMeHypothesis.newGetSlotPathFiller(attachmentPoint),
+                    JSONObject daContent = (JSONObject) hypModel.newGetSlotPathFiller("topic");
+                    StringDistribution attachmentPoints = Utils.findPossiblePointsOfAttachment(
+                            predecessor.getSpokenByThem(), daContent);
+                    SemanticsModel wrapped = new SemanticsModel(daContent.toJSONString());
+                    SemanticsModel.wrap((JSONObject) wrapped.newGetSlotPathFiller(""),
                             Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
-                    newSpokenByMeHypothesis.extendAndOverwriteAtPoint(attachmentPoint, wrapped);
-                    ans.getHypothesisDistribution().put(newDUHypothesisID, attachmentPoints.get(attachmentPoint));
-                    newDUHypothesis.timeOfLastActByThem = currentState.timeOfLastActByThem;
-                    newDUHypothesis.setSpokenByThem(currentState.spokenByThem.deepCopy());
-                    newDUHypothesis.timeOfLastActByMe = timeStamp;
-                    newDUHypothesis.spokenByMe = newSpokenByMeHypothesis;
-                    ans.hypotheses.put(newDUHypothesisID, newDUHypothesis);
+
+                    for (String attachmentPoint : attachmentPoints.keySet()) {
+                        String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
+                        DialogStateHypothesis newDialogStateHypothesis = currentState.deepCopy();
+                        DiscourseUnitHypothesis updatedPredecessor = newDialogStateHypothesis.discourseUnitHypothesisMap.get(predecessorId);
+
+                        SemanticsModel newSpokenByMeHypothesis = updatedPredecessor.getSpokenByMe().deepCopy();
+                        newSpokenByMeHypothesis.placeAtPoint("verb",
+                                new SemanticsModel(((JSONObject) updatedPredecessor.getSpokenByThem().
+                                        newGetSlotPathFiller("verb"))).deepCopy());
+                        newSpokenByMeHypothesis.extendAndOverwriteAtPoint(attachmentPoint, wrapped);
+                        SemanticsModel.wrap((JSONObject) newSpokenByMeHypothesis.newGetSlotPathFiller(attachmentPoint),
+                                Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
+
+                        updatedPredecessor.timeOfLastActByMe = timeStamp;
+                        updatedPredecessor.spokenByMe = newSpokenByMeHypothesis;
+                        resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
+                        Double score = attachmentPoints.get(attachmentPoint) *
+                                Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(
+                                        updatedPredecessor, newDialogStateHypothesis, "system")) *
+                                Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(
+                                        updatedPredecessor, newDialogStateHypothesis, "user"));
+                        resultDistribution.put(newDialogStateHypothesisID, score);
+                    }
                 }
             }
         }
-        return ans;
+        return new ImmutablePair<>(resultHypotheses, resultDistribution);
     }
 }
