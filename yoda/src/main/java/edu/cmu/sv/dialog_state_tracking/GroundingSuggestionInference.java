@@ -1,12 +1,8 @@
 package edu.cmu.sv.dialog_state_tracking;
 
-import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.ontology.misc.Suggested;
 import edu.cmu.sv.ontology.role.HasValue;
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Accept;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.DontKnow;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Reject;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestConfirmValue;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
 import edu.cmu.sv.utils.StringDistribution;
@@ -14,20 +10,14 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 /**
  * Created by David Cohen on 10/17/14.
- *
- * If a clarification dialog act is spoken which includes a suggested value,
- * Extend the dialog state by copying over the new content,
- * and wrapping the suggestion in a Suggested entity description
- *
  */
-public class SuggestedInference extends DialogStateUpdateInference {
+public class GroundingSuggestionInference extends DialogStateUpdateInference {
     static Double penaltyForReinterpretingFragment = .9;
     @Override
     public Pair<Map<String, DialogStateHypothesis>, StringDistribution> applyAll(DialogStateHypothesis currentState,

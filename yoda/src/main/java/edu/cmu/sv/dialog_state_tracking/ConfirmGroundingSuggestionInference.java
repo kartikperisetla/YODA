@@ -4,59 +4,65 @@ import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.ontology.misc.Suggested;
 import edu.cmu.sv.ontology.role.HasValue;
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ConfirmSenseSuggestion;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Accept;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
+import edu.cmu.sv.utils.StringDistribution;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
 
 /**
  * Created by David Cohen on 10/18/14.
- *
- * The AcknowledgeInference re-interprets fragments as confirmations, or makes use of the Acknowledge dialog act.
- * It has the effect of making the speaker say back everything that has been said or suggested by the other speaker.
  */
-public class AcknowledgeInference implements DiscourseUnitUpdateInference {
+public class ConfirmGroundingSuggestionInference extends DialogStateUpdateInference {
     static Double penaltyForReinterpretingFragment = .5;
 
+
     @Override
-    public DiscourseUnit2 applyAll(DiscourseUnit2.DiscourseUnitHypothesis currentState, Turn turn, long timeStamp) {
-        int newDUHypothesisCounter = 0;
-        DiscourseUnit2 ans = new DiscourseUnit2();
+    public Pair<Map<String, DialogStateHypothesis>, StringDistribution> applyAll(DialogStateHypothesis currentState, Turn turn, long timeStamp) {
+        StringDistribution resultDistribution = new StringDistribution();
+        Map<String, DialogStateHypothesis> resultHypotheses = new HashMap<>();
 
-        // if the opposite speaker has not yet said anything in this DU,
-        // the AcknowledgeInference doesn't make sense
-        if ((turn.speaker.equals("user") && currentState.timeOfLastActByMe==null) ||
-                (turn.speaker.equals("system") && currentState.timeOfLastActByThem==null))
-            return ans;
-
-        if (turn.speaker.equals("user")){
-            // find any suggestions, these will all be unwrapped
-            Set<String> suggestionPaths = currentState.getSpokenByMe().findAllPathsToClass(Suggested.class.getSimpleName());
-
-            for (String sluHypothesisID : turn.hypothesisDistribution.keySet()){
+        int newHypothesisCounter = 0;
+        if (turn.speaker.equals("user")) {
+            for (String sluHypothesisID : turn.hypothesisDistribution.keySet()) {
                 SemanticsModel hypModel = turn.hypotheses.get(sluHypothesisID);
                 String dialogAct = hypModel.getSlotPathFiller("dialogAct");
+                if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(Accept.class)) {
+                    for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
+                        DiscourseUnitHypothesis predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId);
+                        if (!predecessor.initiator.equals("user"))
+                            continue;
+                        Set<String> suggestionPaths = predecessor.getSpokenByMe().findAllPathsToClass(Suggested.class.getSimpleName());
+                        // a single fragment can only be a confirmation for a single suggestion
+                        if (suggestionPaths.size() != 1)
+                            continue;
 
-                if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(ConfirmSenseSuggestion.class)) {
-                    String newDUHypothesisID = "du_hyp_" + newDUHypothesisCounter++;
-                    DiscourseUnit2.DiscourseUnitHypothesis newDUHypothesis =
-                            new DiscourseUnit2.DiscourseUnitHypothesis();
-                    SemanticsModel newSpokenByThemHypothesis = currentState.getSpokenByThem().deepCopy();
-                    newSpokenByThemHypothesis.placeAtPoint("verb",
-                            new SemanticsModel(((JSONObject)currentState.getMostRecent().
-                                    newGetSlotPathFiller("verb"))).deepCopy());
+                        SemanticsModel newSpokenByThemHypothesis = predecessor.getSpokenByThem().deepCopy();
+                        newSpokenByThemHypothesis.placeAtPoint("verb",
+                                new SemanticsModel(((JSONObject)predecessor.getSpokenByMe().
+                                        newGetSlotPathFiller("verb"))).deepCopy());
 //                    SemanticsModel newSpokenByThemHypothesis = currentState.getSpokenByMe().deepCopy();
-                    for (String acceptancePath: suggestionPaths) {
-                        SemanticsModel.unwrap((JSONObject) newSpokenByThemHypothesis.newGetSlotPathFiller(acceptancePath),
-                                HasValue.class.getSimpleName());
+                        for (String acceptancePath: suggestionPaths) {
+                            SemanticsModel.unwrap((JSONObject) newSpokenByThemHypothesis.newGetSlotPathFiller(acceptancePath),
+                                    HasValue.class.getSimpleName());
+                        }
+                        ans.getHypothesisDistribution().put(newDUHypothesisID, 1.0);
+                        newDUHypothesis.timeOfLastActByMe = currentState.timeOfLastActByMe;
+                        newDUHypothesis.setSpokenByMe(currentState.spokenByMe.deepCopy());
+                        newDUHypothesis.timeOfLastActByThem = timeStamp;
+                        newDUHypothesis.spokenByThem = newSpokenByThemHypothesis;
+
+
+
+
+
                     }
-                    ans.getHypothesisDistribution().put(newDUHypothesisID, 1.0);
-                    newDUHypothesis.timeOfLastActByMe = currentState.timeOfLastActByMe;
-                    newDUHypothesis.setSpokenByMe(currentState.spokenByMe.deepCopy());
-                    newDUHypothesis.timeOfLastActByThem = timeStamp;
-                    newDUHypothesis.spokenByThem = newSpokenByThemHypothesis;
                     ans.hypotheses.put(newDUHypothesisID, newDUHypothesis);
 
                 } else if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(Fragment.class)){
@@ -97,8 +103,17 @@ public class AcknowledgeInference implements DiscourseUnitUpdateInference {
                     newDUHypothesis.timeOfLastActByThem = timeStamp;
                     newDUHypothesis.spokenByThem = newSpokenByThemHypothesis;
                     ans.hypotheses.put(newDUHypothesisID, newDUHypothesis);
-                }
+
+
+
+
+
             }
+        }
+
+        return new ImmutablePair<>(resultHypotheses, resultDistribution);
+    }
+
         } else { // if turn.speaker.equals("system")
             String dialogAct = turn.systemUtterance.getSlotPathFiller("dialogAct");
             Set<String> suggestionPaths = currentState.spokenByMe.findAllPathsToClass(Suggested.class.getSimpleName());
