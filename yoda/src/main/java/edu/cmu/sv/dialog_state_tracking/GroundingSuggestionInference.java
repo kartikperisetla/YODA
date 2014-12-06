@@ -39,7 +39,6 @@ public class GroundingSuggestionInference extends DialogStateUpdateInference {
                         if (suggestionPaths.size() > 0)
                             continue;
 
-
                         JSONObject daContent = (JSONObject) hypModel.newGetSlotPathFiller("topic");
                         StringDistribution attachmentPoints = Utils.findPossiblePointsOfAttachment(
                                 predecessor.getSpokenByMe(), daContent);
@@ -52,11 +51,8 @@ public class GroundingSuggestionInference extends DialogStateUpdateInference {
                             DialogStateHypothesis newDialogStateHypothesis = currentState.deepCopy();
                             DiscourseUnitHypothesis updatedPredecessor = newDialogStateHypothesis.discourseUnitHypothesisMap.get(predecessorId);
 
-                            SemanticsModel newSpokenByThemHypothesis = updatedPredecessor.getSpokenByThem().deepCopy();
-                            newSpokenByThemHypothesis.placeAtPoint("verb",
-                                    new SemanticsModel(((JSONObject) updatedPredecessor.getSpokenByMe().
-                                            newGetSlotPathFiller("verb"))).deepCopy());
-                            newSpokenByThemHypothesis.extendAndOverwriteAtPoint(attachmentPoint, wrapped);
+                            SemanticsModel newSpokenByThemHypothesis = updatedPredecessor.getSpokenByMe().deepCopy();
+                            newSpokenByThemHypothesis.extendAndOverwriteAtPoint(attachmentPoint, wrapped.deepCopy());
                             SemanticsModel.wrap((JSONObject) newSpokenByThemHypothesis.newGetSlotPathFiller(attachmentPoint),
                                     Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
 
@@ -86,7 +82,6 @@ public class GroundingSuggestionInference extends DialogStateUpdateInference {
                     if (suggestionPaths.size() > 0)
                         continue;
 
-
                     JSONObject daContent = (JSONObject) hypModel.newGetSlotPathFiller("topic");
                     StringDistribution attachmentPoints = Utils.findPossiblePointsOfAttachment(
                             predecessor.getSpokenByThem(), daContent);
@@ -99,11 +94,8 @@ public class GroundingSuggestionInference extends DialogStateUpdateInference {
                         DialogStateHypothesis newDialogStateHypothesis = currentState.deepCopy();
                         DiscourseUnitHypothesis updatedPredecessor = newDialogStateHypothesis.discourseUnitHypothesisMap.get(predecessorId);
 
-                        SemanticsModel newSpokenByMeHypothesis = updatedPredecessor.getSpokenByMe().deepCopy();
-                        newSpokenByMeHypothesis.placeAtPoint("verb",
-                                new SemanticsModel(((JSONObject) updatedPredecessor.getSpokenByThem().
-                                        newGetSlotPathFiller("verb"))).deepCopy());
-                        newSpokenByMeHypothesis.extendAndOverwriteAtPoint(attachmentPoint, wrapped);
+                        SemanticsModel newSpokenByMeHypothesis = updatedPredecessor.getSpokenByThem().deepCopy();
+                        newSpokenByMeHypothesis.extendAndOverwriteAtPoint(attachmentPoint, wrapped.deepCopy());
                         SemanticsModel.wrap((JSONObject) newSpokenByMeHypothesis.newGetSlotPathFiller(attachmentPoint),
                                 Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
 
