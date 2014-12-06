@@ -110,33 +110,33 @@ public class RewardAndCostCalculator {
             throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
         Double totalReward = 0.0;
 
-        // sum up the predicted rewards supposing that each current hypothesis is true,
-        // weighting the predicted reward by the current belief that the hypothesis is true.
-        for (String hypothesisID : discourseUnitHypothesis.getHypotheses().keySet()){
-            DiscourseUnit2.DiscourseUnitHypothesis hypothesis = discourseUnitHypothesis.getHypotheses().get(hypothesisID);
-            SemanticsModel spokenByThem = hypothesis.getSpokenByThem();
-            Double currentConfidence = discourseUnitHypothesis.getHypothesisDistribution().get(hypothesisID);
-            Double predictedConfidence = currentConfidence + (1-currentConfidence)*
-                    predictedRelativeConfidenceGain.get(hypothesisID);
-
-            // predict the difference in expected reward after clarification
-            Double predictedRewardDifference = 0.0;
-            Class<? extends DialogAct> daClass = DialogRegistry.dialogActNameMap.
-                    get((String)spokenByThem.newGetSlotPathFiller("dialogAct"));
-
-            // add contribution from non-dialog tasks
-            if (DialogRegistry.nonDialogTaskRegistry.containsKey(daClass)) {
-                for (Class<? extends NonDialogTask> taskClass : DialogRegistry.nonDialogTaskRegistry.get(daClass)) {
-                    NonDialogTaskPreferences preferences = taskClass.getConstructor(Database.class).newInstance(db).getPreferences();
-                    predictedRewardDifference += predictedConfidence * preferences.rewardForCorrectExecution;
-                    predictedRewardDifference -= (1 - predictedConfidence) * preferences.penaltyForIncorrectExecution;
-                    predictedRewardDifference -= currentConfidence * preferences.rewardForCorrectExecution;
-                    predictedRewardDifference += (1 - currentConfidence) * preferences.penaltyForIncorrectExecution;
-                    totalReward += currentConfidence * predictedRewardDifference /
-                            DialogRegistry.nonDialogTaskRegistry.get(daClass).size();
-                }
-            }
-        }
+//        // sum up the predicted rewards supposing that each current hypothesis is true,
+//        // weighting the predicted reward by the current belief that the hypothesis is true.
+//        for (String hypothesisID : discourseUnitHypothesis.getHypotheses().keySet()){
+//            DiscourseUnit2.DiscourseUnitHypothesis hypothesis = discourseUnitHypothesis.getHypotheses().get(hypothesisID);
+//            SemanticsModel spokenByThem = hypothesis.getSpokenByThem();
+//            Double currentConfidence = discourseUnitHypothesis.getHypothesisDistribution().get(hypothesisID);
+//            Double predictedConfidence = currentConfidence + (1-currentConfidence)*
+//                    predictedRelativeConfidenceGain.get(hypothesisID);
+//
+//            // predict the difference in expected reward after clarification
+//            Double predictedRewardDifference = 0.0;
+//            Class<? extends DialogAct> daClass = DialogRegistry.dialogActNameMap.
+//                    get((String)spokenByThem.newGetSlotPathFiller("dialogAct"));
+//
+//            // add contribution from non-dialog tasks
+//            if (DialogRegistry.nonDialogTaskRegistry.containsKey(daClass)) {
+//                for (Class<? extends NonDialogTask> taskClass : DialogRegistry.nonDialogTaskRegistry.get(daClass)) {
+//                    NonDialogTaskPreferences preferences = taskClass.getConstructor(Database.class).newInstance(db).getPreferences();
+//                    predictedRewardDifference += predictedConfidence * preferences.rewardForCorrectExecution;
+//                    predictedRewardDifference -= (1 - predictedConfidence) * preferences.penaltyForIncorrectExecution;
+//                    predictedRewardDifference -= currentConfidence * preferences.rewardForCorrectExecution;
+//                    predictedRewardDifference += (1 - currentConfidence) * preferences.penaltyForIncorrectExecution;
+//                    totalReward += currentConfidence * predictedRewardDifference /
+//                            DialogRegistry.nonDialogTaskRegistry.get(daClass).size();
+//                }
+//            }
+//        }
         return totalReward;
     }
 
@@ -149,30 +149,30 @@ public class RewardAndCostCalculator {
                                                                                 Object value){
         double limit = .8; // we will never predict 100% confidence gain
         StringDistribution ans = new StringDistribution();
-        if (!(value instanceof JSONObject))
-            return null;
-        Map<String, Boolean> hasValueMap = discourseUnitHypothesis.getHypotheses().keySet().stream().collect(Collectors.toMap(
-                x->x,
-                x->!discourseUnitHypothesis.getHypotheses().get(x).getSpokenByThem().
-                        findAllPathsToNonConflict((JSONObject)value).isEmpty()
-        ));
-
-        for (String key : discourseUnitHypothesis.getHypotheses().keySet()){
-            if (discourseUnitHypothesis.getHypothesisDistribution().get(key) >= 1.0) {
-                ans.put(key, 0.0);
-            }
-            else if (hasValueMap.get(key)) {
-                ans.put(key, limit *
-                        discourseUnitHypothesis.getHypotheses().keySet().stream().
-                                filter(x -> !hasValueMap.get(x)).
-                                map(x -> discourseUnitHypothesis.getHypothesisDistribution().get(x)).
-                                reduce(0.0, (x, y) -> x + y) * 1.0 /
-                        (1.0 - discourseUnitHypothesis.getHypothesisDistribution().get(key)) /
-                        hasValueMap.values().stream().filter(x -> x).count());
-            } else {
-                ans.put(key, 0.0);
-            }
-        }
+//        if (!(value instanceof JSONObject))
+//            return null;
+//        Map<String, Boolean> hasValueMap = discourseUnitHypothesis.getHypotheses().keySet().stream().collect(Collectors.toMap(
+//                x->x,
+//                x->!discourseUnitHypothesis.getHypotheses().get(x).getSpokenByThem().
+//                        findAllPathsToNonConflict((JSONObject)value).isEmpty()
+//        ));
+//
+//        for (String key : discourseUnitHypothesis.getHypotheses().keySet()){
+//            if (discourseUnitHypothesis.getHypothesisDistribution().get(key) >= 1.0) {
+//                ans.put(key, 0.0);
+//            }
+//            else if (hasValueMap.get(key)) {
+//                ans.put(key, limit *
+//                        discourseUnitHypothesis.getHypotheses().keySet().stream().
+//                                filter(x -> !hasValueMap.get(x)).
+//                                map(x -> discourseUnitHypothesis.getHypothesisDistribution().get(x)).
+//                                reduce(0.0, (x, y) -> x + y) * 1.0 /
+//                        (1.0 - discourseUnitHypothesis.getHypothesisDistribution().get(key)) /
+//                        hasValueMap.values().stream().filter(x -> x).count());
+//            } else {
+//                ans.put(key, 0.0);
+//            }
+//        }
 //        System.out.println("RewardAndCostCalculator.predictConfidenceGainFromValueConfirmation: ans:\n"+ans);
         return ans;
     }

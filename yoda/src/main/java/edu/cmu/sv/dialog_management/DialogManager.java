@@ -80,7 +80,8 @@ public class DialogManager implements Runnable {
                     for (Class<? extends DialogAct> dialogActClass : Iterables.concat(
                             DialogRegistry.argumentationDialogActs, DialogRegistry.groundingDialogActs)) {
                         DialogAct dialogActInstance = dialogActClass.newInstance();
-                        Set<Map<String, Object>> possibleBindings = ActionEnumeration.getPossibleBindings(dialogActInstance, contextDiscourseUnitHypothesis);
+                        Set<Map<String, Object>> possibleBindings = ActionEnumeration.
+                                getPossibleBindings(dialogActInstance, contextDiscourseUnitHypothesis, yodaEnvironment);
                         for (Map<String, Object> binding : possibleBindings){
                             DialogAct newDialogActInstance = dialogActClass.newInstance();
                             newDialogActInstance.bindVariables(binding);
