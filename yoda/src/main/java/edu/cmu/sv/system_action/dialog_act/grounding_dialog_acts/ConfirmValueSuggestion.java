@@ -5,6 +5,7 @@ import edu.cmu.sv.dialog_state_tracking.DialogStateHypothesis;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnitHypothesis;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.noun.Noun;
+import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 
 import java.lang.reflect.InvocationTargetException;
@@ -14,7 +15,7 @@ import java.util.Map;
 /**
  * Created by David Cohen on 9/8/14.
  */
-public class ConfirmSenseSuggestion extends DialogAct {
+public class ConfirmValueSuggestion extends DialogAct {
     static Map<String, Class<? extends Thing>> individualParameters = new HashMap<>();
     static Map<String, Class<? extends Thing>> classParameters = new HashMap<>();
     static{
@@ -40,7 +41,5 @@ public class ConfirmSenseSuggestion extends DialogAct {
         }
         return null;
     }
-
-
 
 }

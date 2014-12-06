@@ -6,14 +6,13 @@ import edu.cmu.sv.ontology.role.HasValue;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Accept;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
-import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ConfirmSenseSuggestion;
+import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ConfirmValueSuggestion;
 import edu.cmu.sv.utils.StringDistribution;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,9 +20,6 @@ import java.util.Set;
  * Created by David Cohen on 10/18/14.
  */
 public class ConfirmGroundingSuggestionInference extends DialogStateUpdateInference {
-    static Double penaltyForReinterpretingFragment = .5;
-
-
     @Override
     public Pair<Map<String, DialogStateHypothesis>, StringDistribution> applyAll(DialogStateHypothesis currentState, Turn turn, long timeStamp) {
         StringDistribution resultDistribution = new StringDistribution();
@@ -69,7 +65,7 @@ public class ConfirmGroundingSuggestionInference extends DialogStateUpdateInfere
             SemanticsModel hypModel = turn.systemUtterance;
             String dialogAct = hypModel.getSlotPathFiller("dialogAct");
 
-            if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(ConfirmSenseSuggestion.class)) {
+            if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(ConfirmValueSuggestion.class)) {
 
                 for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
                     String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;

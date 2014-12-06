@@ -18,7 +18,6 @@ import java.util.Set;
  * Created by David Cohen on 10/17/14.
  */
 public class GroundingSuggestionInference extends DialogStateUpdateInference {
-    static Double penaltyForReinterpretingFragment = .9;
     @Override
     public Pair<Map<String, DialogStateHypothesis>, StringDistribution> applyAll(DialogStateHypothesis currentState,
                                                                                  Turn turn, long timeStamp) {

@@ -19,8 +19,8 @@ import java.util.*;
  *
  */
 public abstract class DialogAct extends SystemAction {
-    private Map<String, Object> boundClasses = null;
-    private Map<String, Object> boundIndividuals = null;
+    private Map<String, Object> boundClasses = new HashMap<>();
+    private Map<String, Object> boundIndividuals = new HashMap<>();
 
     public abstract Map<String, Class<? extends Thing>> getClassParameters();
     public abstract Map<String, Class<? extends Thing>> getIndividualParameters();
