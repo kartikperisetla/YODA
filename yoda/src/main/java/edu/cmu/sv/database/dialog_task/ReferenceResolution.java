@@ -34,7 +34,7 @@ public class ReferenceResolution {
     * return a distribution over URI's that this JSONObject may refer to
     * */
     public static StringDistribution resolveReference(YodaEnvironment yodaEnvironment, JSONObject reference){
-        String queryString = yodaEnvironment.db.prefixes + "SELECT DISTINCT ?x0 ?score0 WHERE {\n";
+        String queryString = Database.prefixes + "SELECT DISTINCT ?x0 ?score0 WHERE {\n";
         queryString += referenceResolutionHelper(reference, 0).getKey();
         queryString += "} \nORDER BY DESC(?score0) \nLIMIT 10";
 

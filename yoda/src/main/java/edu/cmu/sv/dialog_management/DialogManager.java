@@ -1,8 +1,12 @@
 package edu.cmu.sv.dialog_management;
 
+import com.google.common.collect.Iterables;
+import edu.cmu.sv.database.dialog_task.ActionEnumeration;
 import edu.cmu.sv.dialog_state_tracking.DialogStateHypothesis;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnitHypothesis;
 import edu.cmu.sv.natural_language_generation.Grammar;
+import edu.cmu.sv.ontology.Thing;
+import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.system_action.SystemAction;
@@ -71,15 +75,20 @@ public class DialogManager implements Runnable {
                 DialogStateHypothesis currentDialogStateHypothesis = dialogStateHypotheses.get(dialogStateHypothesisId);
                 for (String discourseUnitHypothesisId : currentDialogStateHypothesis.getDiscourseUnitHypothesisMap().
                         keySet()) {
-                    DiscourseUnitHypothesis currentDiscourseUnitHypothesis = currentDialogStateHypothesis.
+                    DiscourseUnitHypothesis contextDiscourseUnitHypothesis = currentDialogStateHypothesis.
                             getDiscourseUnitHypothesisMap().get(discourseUnitHypothesisId);
-                    for (Class<? extends DialogAct> dialogActClass : DialogRegistry.argumentationDialogActs) {
+                    for (Class<? extends DialogAct> dialogActClass : Iterables.concat(
+                            DialogRegistry.argumentationDialogActs, DialogRegistry.groundingDialogActs)) {
                         DialogAct dialogActInstance = dialogActClass.newInstance();
-                        // todo: enumerate parameters and perform this loop for each parameterization
-                        Double currentReward = dialogActInstance.reward(
-                                currentDialogStateHypothesis, currentDiscourseUnitHypothesis) *
-                                dialogStateDistribution.get(dialogStateHypothesisId);
-                        accumulateReward(actionExpectedReward, dialogActInstance, currentReward);
+                        Set<Map<String, Object>> possibleBindings = ActionEnumeration.getPossibleBindings(dialogActInstance, contextDiscourseUnitHypothesis);
+                        for (Map<String, Object> binding : possibleBindings){
+                            DialogAct newDialogActInstance = dialogActClass.newInstance();
+                            newDialogActInstance.bindVariables(binding);
+                            Double currentReward = newDialogActInstance.reward(
+                                    currentDialogStateHypothesis, contextDiscourseUnitHypothesis) *
+                                    dialogStateDistribution.get(dialogStateHypothesisId);
+                            accumulateReward(actionExpectedReward, newDialogActInstance, currentReward);
+                        }
                     }
                 }
             }

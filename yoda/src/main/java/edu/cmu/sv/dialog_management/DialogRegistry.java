@@ -5,6 +5,8 @@ import edu.cmu.sv.database.dialog_task.DialogTask;
 import edu.cmu.sv.database.dialog_task.RespondToYNQuestionTask;
 import edu.cmu.sv.system_action.dialog_act.*;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.*;
+import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ConfirmValueSuggestion;
+import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestConfirmValue;
 import edu.cmu.sv.system_action.non_dialog_task.CreateMeetingTask;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.system_action.non_dialog_task.SendEmailTask;
@@ -22,7 +24,7 @@ public class DialogRegistry {
     // map from string identifier to dialog act
     public static Map<String, Class <? extends DialogAct>> dialogActNameMap = new HashMap<>();
 
-    public static Set<Class <? extends DialogAct>> senseClarificationDialogActs = new HashSet<>();
+    public static Set<Class <? extends DialogAct>> groundingDialogActs = new HashSet<>();
     public static Set<Class <? extends DialogAct>> argumentationDialogActs = new HashSet<>();
     public static Set<Class <? extends DialogAct>> discourseUnitDialogActs = new HashSet<>();
 
@@ -33,10 +35,8 @@ public class DialogRegistry {
     public static Map<Class <? extends DialogAct>, Class<? extends DialogTask>> dialogTaskMap = new HashMap<>();
 
     static{
-//        senseClarificationDialogActs.add(RequestConfirmValue.class);
-//        senseClarificationDialogActs.add(RequestRephrase.class);
-//        senseClarificationDialogActs.add(ConfirmSenseSuggestion.class);
-//        senseClarificationDialogActs.add(DenyIncorrectSenseSuggestion.class);
+        groundingDialogActs.add(ConfirmValueSuggestion.class);
+        groundingDialogActs.add(RequestConfirmValue.class);
 
         argumentationDialogActs.add(Accept.class);
         argumentationDialogActs.add(Reject.class);
@@ -53,7 +53,7 @@ public class DialogRegistry {
         nonDialogTaskRegistry.get(Command.class).add(SendEmailTask.class);
 
         for (Class<? extends DialogAct> cls : Iterables.concat(discourseUnitDialogActs, argumentationDialogActs,
-                senseClarificationDialogActs, Arrays.asList(Fragment.class))) {
+                groundingDialogActs, Arrays.asList(Fragment.class))) {
             dialogActNameMap.put(cls.getSimpleName(), cls);
         }
 

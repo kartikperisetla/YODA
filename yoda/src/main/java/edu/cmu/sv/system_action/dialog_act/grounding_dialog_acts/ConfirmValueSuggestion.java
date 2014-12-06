@@ -18,9 +18,7 @@ import java.util.Map;
 public class ConfirmValueSuggestion extends DialogAct {
     static Map<String, Class<? extends Thing>> individualParameters = new HashMap<>();
     static Map<String, Class<? extends Thing>> classParameters = new HashMap<>();
-    static{
-        individualParameters.put("topic_individual", Noun.class);
-    }
+
     @Override
     public Map<String, Class<? extends Thing>> getClassParameters() {
         return classParameters;
