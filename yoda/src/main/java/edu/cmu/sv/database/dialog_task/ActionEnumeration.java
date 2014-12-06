@@ -49,18 +49,16 @@ public class ActionEnumeration {
 
         String variableEnumerationString = "";
         String classConstraintString = "";
-        String unionOfIndividualsString = "";
+        String focusConstraintString = "";
         for (String parameter : dialogAct.getIndividualParameters().keySet()) {
             variableEnumerationString += "?" + parameter + " ";
             classConstraintString += "?" + parameter + " rdf:type base:" + dialogAct.getIndividualParameters().get(parameter).getSimpleName() + " .\n";
-            unionOfIndividualsString += String.join(" UNION ",
-                    individualsInContext.stream().map(URI -> "{ ?" + parameter + " = <" + URI + "> }").collect(Collectors.toList())) + "\n";
+            focusConstraintString += "?" + parameter + " rdf:type dst:InFocus .\n";
         }
         String queryString = Database.prefixes + "SELECT DISTINCT "+variableEnumerationString+"WHERE {\n";
-        queryString += unionOfIndividualsString;
+        queryString += focusConstraintString;
         queryString += classConstraintString;
         queryString += "}";
-        System.out.println(queryString);
         yodaEnvironment.db.log(queryString);
         Database.getLogger().info("Action enumeration query:\n"+queryString);
 
@@ -81,6 +79,7 @@ public class ActionEnumeration {
         } catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {
             e.printStackTrace();
         }
+
         return ans;
     }
 

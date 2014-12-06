@@ -54,6 +54,21 @@ public class ReferenceResolution {
         } catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {
             e.printStackTrace();
         }
+
+        // insert all possible references into the dst focus (no salience for now)
+        String insertString = Database.prefixes + "INSERT DATA {";
+        for (String uri : ans.keySet()){
+            insertString += "<"+uri+"> rdf:type dst:InFocus .\n";
+        }
+        insertString +="}";
+        Database.getLogger().info("DST update insert:\n"+insertString);
+        try {
+            Update update = yodaEnvironment.db.connection.prepareUpdate(
+                    QueryLanguage.SPARQL, insertString, Database.dstFocusURI);
+            update.execute();
+        } catch (RepositoryException | UpdateExecutionException | MalformedQueryException e) {
+            e.printStackTrace();
+        }
         return ans;
     }
 
