@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * Created by David Cohen on 9/8/14.
  */
-public class ConfirmValueSuggestion extends DialogAct {
+public class ConfirmValueSuggestion extends ClarificationDialogAct {
     static Map<String, Class<? extends Thing>> individualParameters = new HashMap<>();
     static Map<String, Class<? extends Thing>> classParameters = new HashMap<>();
 

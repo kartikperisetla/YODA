@@ -1,12 +1,10 @@
 package edu.cmu.sv.dialog_management;
 
-import com.google.common.collect.Iterables;
 import edu.cmu.sv.database.dialog_task.ActionEnumeration;
 import edu.cmu.sv.dialog_state_tracking.DialogStateHypothesis;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnitHypothesis;
 import edu.cmu.sv.natural_language_generation.Grammar;
-import edu.cmu.sv.ontology.Thing;
-import edu.cmu.sv.semantics.SemanticsModel;
+import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ClarificationDialogAct;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.system_action.SystemAction;
@@ -16,7 +14,6 @@ import edu.cmu.sv.utils.HypothesisSetManagement;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.*;
@@ -70,19 +67,18 @@ public class DialogManager implements Runnable {
             //// add the null action
             actionExpectedReward.put(null, RewardAndCostCalculator.penaltyForSpeaking);
 
-            // enumerate and evaluate actions that can be enumerated from a single DU hypothesis
-            for (String dialogStateHypothesisId : dialogStateHypotheses.keySet()){
+            // enumerate and evaluate actions that can be evaluated by summing marginals across the dialog state distribution
+            for (String dialogStateHypothesisId : dialogStateHypotheses.keySet()) {
                 DialogStateHypothesis currentDialogStateHypothesis = dialogStateHypotheses.get(dialogStateHypothesisId);
-                for (String discourseUnitHypothesisId : currentDialogStateHypothesis.getDiscourseUnitHypothesisMap().
-                        keySet()) {
-                    DiscourseUnitHypothesis contextDiscourseUnitHypothesis = currentDialogStateHypothesis.
-                            getDiscourseUnitHypothesisMap().get(discourseUnitHypothesisId);
-                    for (Class<? extends DialogAct> dialogActClass : Iterables.concat(
-                            DialogRegistry.argumentationDialogActs, DialogRegistry.groundingDialogActs)) {
-                        DialogAct dialogActInstance = dialogActClass.newInstance();
-                        Set<Map<String, Object>> possibleBindings = ActionEnumeration.
-                                getPossibleBindings(dialogActInstance, contextDiscourseUnitHypothesis, yodaEnvironment);
-                        for (Map<String, Object> binding : possibleBindings){
+                for (Class<? extends DialogAct> dialogActClass : DialogRegistry.argumentationDialogActs) {
+                    DialogAct dialogActInstance = dialogActClass.newInstance();
+                    Set<Map<String, Object>> possibleBindings = ActionEnumeration.
+                            getPossibleBindings(dialogActInstance, yodaEnvironment);
+                    for (Map<String, Object> binding : possibleBindings) {
+                        for (String discourseUnitHypothesisId : currentDialogStateHypothesis.getDiscourseUnitHypothesisMap().
+                                keySet()) {
+                            DiscourseUnitHypothesis contextDiscourseUnitHypothesis = currentDialogStateHypothesis.
+                                    getDiscourseUnitHypothesisMap().get(discourseUnitHypothesisId);
                             DialogAct newDialogActInstance = dialogActClass.newInstance();
                             newDialogActInstance.bindVariables(binding);
                             Double currentReward = newDialogActInstance.reward(
@@ -93,6 +89,21 @@ public class DialogManager implements Runnable {
                     }
                 }
             }
+
+
+            // enumerate and evaluate clarification actions
+            for (Class<? extends ClarificationDialogAct> dialogActClass : DialogRegistry.clarificationDialogActs) {
+                ClarificationDialogAct dialogActInstance = dialogActClass.newInstance();
+                Set<Map<String, Object>> possibleBindings = ActionEnumeration.
+                        getPossibleBindings(dialogActInstance, yodaEnvironment);
+                for (Map<String, Object> binding : possibleBindings) {
+                    ClarificationDialogAct newDialogActInstance = dialogActClass.newInstance();
+                    newDialogActInstance.bindVariables(binding);
+                    Double currentReward = newDialogActInstance.reward(dialogStateDistribution, dialogStateHypotheses);
+                    accumulateReward(actionExpectedReward, newDialogActInstance, currentReward);
+                }
+            }
+
 
             //todo: enumerate and evaluate actions that require multiple DU hypotheses to be enumerated (ex: disambiguation)
 

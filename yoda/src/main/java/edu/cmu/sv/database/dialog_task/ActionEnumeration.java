@@ -20,26 +20,25 @@ public class ActionEnumeration {
 
     //todo: also look for classes in context
     public static Set<Map<String, Object>> getPossibleBindings(DialogAct dialogAct,
-                                                         DiscourseUnitHypothesis contextDiscourseUnitHypothesis,
                                                          YodaEnvironment yodaEnvironment){
 
-        Set<String> individualsInContext = new HashSet<>();
-        if (contextDiscourseUnitHypothesis.getGroundTruth()!=null) {
-            Set<String> paths = contextDiscourseUnitHypothesis.getGroundTruth().
-                    findAllPathsToClass(WebResource.class.getSimpleName());
-            for (String path : paths){
-                individualsInContext.add((String)contextDiscourseUnitHypothesis.getGroundTruth().
-                        newGetSlotPathFiller(path+"."+ HasURI.class.getSimpleName()));
-            }
-        }
-        if (contextDiscourseUnitHypothesis.getGroundInterpretation()!=null) {
-            Set<String> paths = contextDiscourseUnitHypothesis.getGroundInterpretation().
-                    findAllPathsToClass(WebResource.class.getSimpleName());
-            for (String path : paths){
-                individualsInContext.add((String)contextDiscourseUnitHypothesis.getGroundInterpretation().
-                        newGetSlotPathFiller(path+"."+ HasURI.class.getSimpleName()));
-            }
-        }
+//        Set<String> individualsInContext = new HashSet<>();
+//        if (contextDiscourseUnitHypothesis.getGroundTruth()!=null) {
+//            Set<String> paths = contextDiscourseUnitHypothesis.getGroundTruth().
+//                    findAllPathsToClass(WebResource.class.getSimpleName());
+//            for (String path : paths){
+//                individualsInContext.add((String)contextDiscourseUnitHypothesis.getGroundTruth().
+//                        newGetSlotPathFiller(path+"."+ HasURI.class.getSimpleName()));
+//            }
+//        }
+//        if (contextDiscourseUnitHypothesis.getGroundInterpretation()!=null) {
+//            Set<String> paths = contextDiscourseUnitHypothesis.getGroundInterpretation().
+//                    findAllPathsToClass(WebResource.class.getSimpleName());
+//            for (String path : paths){
+//                individualsInContext.add((String)contextDiscourseUnitHypothesis.getGroundInterpretation().
+//                        newGetSlotPathFiller(path+"."+ HasURI.class.getSimpleName()));
+//            }
+//        }
 
         if (dialogAct.getIndividualParameters().size()==0){
             Set<Map<String, Object>> ans = new HashSet<>();
