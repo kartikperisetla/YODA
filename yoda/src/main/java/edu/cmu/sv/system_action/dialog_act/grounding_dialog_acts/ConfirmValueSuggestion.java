@@ -7,6 +7,7 @@ import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.noun.Noun;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
+import edu.cmu.sv.utils.StringDistribution;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -29,15 +30,7 @@ public class ConfirmValueSuggestion extends ClarificationDialogAct {
     }
 
     @Override
-    public Double reward(DialogStateHypothesis dialogStateHypothesis, DiscourseUnitHypothesis discourseUnitHypothesis) {
-        try {
-            return RewardAndCostCalculator.clarificationDialogActReward(db, discourseUnitHypothesis,
-                    RewardAndCostCalculator.predictConfidenceGainFromValueConfirmation(discourseUnitHypothesis,
-                            individualParameters.get("v1"))) - RewardAndCostCalculator.penaltyForSpeaking;
-        } catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public Double reward(StringDistribution dialogStateDistribution, Map<String, DialogStateHypothesis> dialogStateHypotheses) {
+        return -1.0;
     }
-
 }

@@ -422,13 +422,10 @@ public class SemanticsModel {
     * Find all the slot paths who are filled by an entity description of class clsName
     * */
     public Set<String> findAllPathsToClass(String clsName){
-        try {
-            JSONObject filter = (JSONObject) parser.parse("{\"class\":\""+clsName+"\"}");
-            return findAllPathsToNonConflict(filter);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return getAllInternalNodePaths().stream().
+                filter(x -> ((JSONObject)newGetSlotPathFiller(x)).containsKey("class") &&
+                        ((JSONObject)newGetSlotPathFiller(x)).get("class").equals(clsName)).
+                collect(Collectors.toSet());
     }
 
 

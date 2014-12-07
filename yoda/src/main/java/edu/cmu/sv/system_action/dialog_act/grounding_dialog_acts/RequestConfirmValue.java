@@ -2,13 +2,12 @@ package edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts;
 
 import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
 import edu.cmu.sv.dialog_state_tracking.DialogStateHypothesis;
-import edu.cmu.sv.dialog_state_tracking.DiscourseUnitHypothesis;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.noun.Noun;
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.system_action.dialog_act.DialogAct;
-import java.lang.reflect.InvocationTargetException;
+import edu.cmu.sv.utils.StringDistribution;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,22 +30,17 @@ public class RequestConfirmValue extends ClarificationDialogAct {
     }
 
     @Override
-    public Double reward(DialogStateHypothesis dialogStateHypothesis, DiscourseUnitHypothesis discourseUnitHypothesis) {
-        try {
-            return RewardAndCostCalculator.clarificationDialogActReward(db, discourseUnitHypothesis,
-                    RewardAndCostCalculator.predictConfidenceGainFromValueConfirmation(discourseUnitHypothesis,
-                            individualParameters.get("v1"))) - RewardAndCostCalculator.penaltyForSpeaking;
-        } catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public Double reward(StringDistribution dialogStateDistribution, Map<String, DialogStateHypothesis> dialogStateHypotheses) {
+        StringDistribution predictedConfidenceGain = RewardAndCostCalculator.predictConfidenceGainFromValueConfirmation(
+                dialogStateDistribution, dialogStateHypotheses, (String) getBoundIndividuals().get("topic_individual"));
+        return RewardAndCostCalculator.clarificationDialogActReward(dialogStateDistribution, dialogStateHypotheses, predictedConfidenceGain);
     }
 
     @Override
     public SemanticsModel getNlgCommand() {
         SemanticsModel ans = super.getNlgCommand();
         String topicString = OntologyRegistry.WebResourceWrap((String) this.getBoundIndividuals().get("topic_individual"));
-        ans.extendAndOverwriteAtPoint("topic", new SemanticsModel(topicString));
+        ans.getInternalRepresentation().put("topic", SemanticsModel.parseJSON(topicString));
         return ans;
     }
 }

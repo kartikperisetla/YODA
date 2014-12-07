@@ -1,9 +1,13 @@
 package edu.cmu.sv.dialog_management;
 
+import com.google.common.primitives.Doubles;
 import edu.cmu.sv.database.Database;
 import edu.cmu.sv.dialog_state_tracking.DialogStateHypothesis;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnitHypothesis;
 import edu.cmu.sv.dialog_state_tracking.Utils;
+import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.misc.WebResource;
+import edu.cmu.sv.ontology.role.HasURI;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Accept;
@@ -16,6 +20,7 @@ import edu.cmu.sv.utils.StringDistribution;
 import org.json.simple.JSONObject;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -32,8 +37,8 @@ import java.util.stream.Collectors;
 public class RewardAndCostCalculator {
     public static double penaltyForSpeaking = .5;
     public static double penaltyForIgnoringUserRequest = 2;
-    public static double rewardForCorrectAnswer = 5;
-    public static double penaltyForIncorrectAnswer = 5;
+    public static double rewardForCorrectDialogTaskExecution = 5;
+    public static double penaltyForIncorrectDialogTaskExecution = 5;
 
 
 
@@ -94,7 +99,7 @@ public class RewardAndCostCalculator {
             if (predecessorDiscourseUnit.getYnqTruth()==null)
                 probabilityCorrectAnswer = 1.0;
         }
-        return rewardForCorrectAnswer*probabilityCorrectAnswer - penaltyForIncorrectAnswer*(1-probabilityCorrectAnswer);
+        return rewardForCorrectDialogTaskExecution *probabilityCorrectAnswer - penaltyForIncorrectDialogTaskExecution *(1-probabilityCorrectAnswer);
     }
 
 
@@ -105,38 +110,53 @@ public class RewardAndCostCalculator {
     * estimate the improvement in reward to all possible dialog and non-dialog tasks
     * that relate to all the available DU hypotheses.
     * */
-    public static Double clarificationDialogActReward(Database db, DiscourseUnitHypothesis discourseUnitHypothesis,
-                                                      StringDistribution predictedRelativeConfidenceGain)
-            throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
+    public static Double clarificationDialogActReward(StringDistribution dialogStateDistribution,
+                                                      Map<String, DialogStateHypothesis> dialogStateHypotheses,
+                                                      StringDistribution predictedRelativeConfidenceGain) {
         Double totalReward = 0.0;
+        // sum up the predicted rewards supposing that each current hypothesis is true,
+        // weighting the predicted reward by the current belief that the hypothesis is true.
+        for (String dialogStateHypothesisID : dialogStateHypotheses.keySet()){
+            DialogStateHypothesis dialogStateHypothesis = dialogStateHypotheses.get(dialogStateHypothesisID);
+            Double currentConfidence = dialogStateDistribution.get(dialogStateHypothesisID);
+            Double predictedConfidence = currentConfidence + (1-currentConfidence)*
+                    predictedRelativeConfidenceGain.get(dialogStateHypothesisID);
 
-//        // sum up the predicted rewards supposing that each current hypothesis is true,
-//        // weighting the predicted reward by the current belief that the hypothesis is true.
-//        for (String hypothesisID : discourseUnitHypothesis.getHypotheses().keySet()){
-//            DiscourseUnit2.DiscourseUnitHypothesis hypothesis = discourseUnitHypothesis.getHypotheses().get(hypothesisID);
-//            SemanticsModel spokenByThem = hypothesis.getSpokenByThem();
-//            Double currentConfidence = discourseUnitHypothesis.getHypothesisDistribution().get(hypothesisID);
-//            Double predictedConfidence = currentConfidence + (1-currentConfidence)*
-//                    predictedRelativeConfidenceGain.get(hypothesisID);
-//
-//            // predict the difference in expected reward after clarification
-//            Double predictedRewardDifference = 0.0;
-//            Class<? extends DialogAct> daClass = DialogRegistry.dialogActNameMap.
-//                    get((String)spokenByThem.newGetSlotPathFiller("dialogAct"));
-//
-//            // add contribution from non-dialog tasks
-//            if (DialogRegistry.nonDialogTaskRegistry.containsKey(daClass)) {
-//                for (Class<? extends NonDialogTask> taskClass : DialogRegistry.nonDialogTaskRegistry.get(daClass)) {
-//                    NonDialogTaskPreferences preferences = taskClass.getConstructor(Database.class).newInstance(db).getPreferences();
-//                    predictedRewardDifference += predictedConfidence * preferences.rewardForCorrectExecution;
-//                    predictedRewardDifference -= (1 - predictedConfidence) * preferences.penaltyForIncorrectExecution;
-//                    predictedRewardDifference -= currentConfidence * preferences.rewardForCorrectExecution;
-//                    predictedRewardDifference += (1 - currentConfidence) * preferences.penaltyForIncorrectExecution;
-//                    totalReward += currentConfidence * predictedRewardDifference /
-//                            DialogRegistry.nonDialogTaskRegistry.get(daClass).size();
+            // predict the difference in expected reward after clarification
+            for (DiscourseUnitHypothesis contextDiscourseUnit : dialogStateHypothesis.getDiscourseUnitHypothesisMap().values()) {
+                if (contextDiscourseUnit.getInitiator().equals("system"))
+                    continue;
+                Double discourseUnitConfidence =
+                        Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(contextDiscourseUnit,
+                                dialogStateHypothesis, "user"));
+
+                SemanticsModel spokenByThem = contextDiscourseUnit.getSpokenByThem();
+                Class<? extends DialogAct> daClass = DialogRegistry.dialogActNameMap.
+                        get((String) spokenByThem.newGetSlotPathFiller("dialogAct"));
+
+//                // add contribution from non-dialog tasks
+//                if (DialogRegistry.nonDialogTaskRegistry.containsKey(daClass)) {
+//                    for (Class<? extends NonDialogTask> taskClass : DialogRegistry.nonDialogTaskRegistry.get(daClass)) {
+//                        NonDialogTaskPreferences preferences = taskClass.getConstructor(Database.class).newInstance(db).getPreferences();
+//                        Double predictedRewardDifference = 0.0;
+//                        predictedRewardDifference += predictedConfidence * preferences.rewardForCorrectExecution;
+//                        predictedRewardDifference -= (1 - predictedConfidence) * preferences.penaltyForIncorrectExecution;
+//                        predictedRewardDifference -= currentConfidence * preferences.rewardForCorrectExecution;
+//                        predictedRewardDifference += (1 - currentConfidence) * preferences.penaltyForIncorrectExecution;
+//                        totalReward += currentConfidence * discourseUnitConfidence * predictedRewardDifference /
+//                                DialogRegistry.nonDialogTaskRegistry.get(daClass).size();
+//                    }
 //                }
-//            }
-//        }
+
+                // add contribution for dialog tasks
+                Double predictedRewardDifference = 0.0;
+                predictedRewardDifference += predictedConfidence * rewardForCorrectDialogTaskExecution;
+                predictedRewardDifference -= (1 - predictedConfidence) * penaltyForIncorrectDialogTaskExecution;
+                predictedRewardDifference -= currentConfidence * rewardForCorrectDialogTaskExecution;
+                predictedRewardDifference += (1 - currentConfidence) * penaltyForIncorrectDialogTaskExecution;
+                totalReward += currentConfidence * discourseUnitConfidence * predictedRewardDifference;
+            }
+        }
         return totalReward;
     }
 
@@ -145,34 +165,50 @@ public class RewardAndCostCalculator {
     * Confirming a value is confirming that some role is filled by it,
     * it does not confirm anything about which role it fills
     * */
-    public static StringDistribution predictConfidenceGainFromValueConfirmation(DiscourseUnitHypothesis discourseUnitHypothesis,
-                                                                                Object value){
+    public static StringDistribution predictConfidenceGainFromValueConfirmation(StringDistribution dialogStateDistribution,
+                                                                                Map<String, DialogStateHypothesis> dialogStateHypotheses,
+                                                                                String valueUri){
         double limit = .8; // we will never predict 100% confidence gain
         StringDistribution ans = new StringDistribution();
-//        if (!(value instanceof JSONObject))
-//            return null;
-//        Map<String, Boolean> hasValueMap = discourseUnitHypothesis.getHypotheses().keySet().stream().collect(Collectors.toMap(
-//                x->x,
-//                x->!discourseUnitHypothesis.getHypotheses().get(x).getSpokenByThem().
-//                        findAllPathsToNonConflict((JSONObject)value).isEmpty()
-//        ));
-//
-//        for (String key : discourseUnitHypothesis.getHypotheses().keySet()){
-//            if (discourseUnitHypothesis.getHypothesisDistribution().get(key) >= 1.0) {
-//                ans.put(key, 0.0);
-//            }
-//            else if (hasValueMap.get(key)) {
-//                ans.put(key, limit *
-//                        discourseUnitHypothesis.getHypotheses().keySet().stream().
-//                                filter(x -> !hasValueMap.get(x)).
-//                                map(x -> discourseUnitHypothesis.getHypothesisDistribution().get(x)).
-//                                reduce(0.0, (x, y) -> x + y) * 1.0 /
-//                        (1.0 - discourseUnitHypothesis.getHypothesisDistribution().get(key)) /
-//                        hasValueMap.values().stream().filter(x -> x).count());
-//            } else {
-//                ans.put(key, 0.0);
-//            }
-//        }
+        // find the degree to which each dialog state hypothesis has the valueURI
+        // (depends on which discourse units are most recent)
+        Map<String, Double> hasValueMap = new HashMap<>();
+        for (String dialogStateHypothesisId : dialogStateDistribution.keySet()){
+            DialogStateHypothesis dialogStateHypothesis = dialogStateHypotheses.get(dialogStateHypothesisId);
+            for (DiscourseUnitHypothesis contextDiscourseUnit : dialogStateHypothesis.getDiscourseUnitHypothesisMap().values()){
+//                System.out.println("predicting confidence gain: contextDU:\n"+contextDiscourseUnit);
+                if (contextDiscourseUnit.getInitiator().equals("system"))
+                    continue;
+                Double discourseUnitConfidence =
+                        Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(contextDiscourseUnit,
+                                dialogStateHypothesis, "user"));
+                boolean anyMatches = false;
+                for (String path : contextDiscourseUnit.getGroundInterpretation().findAllPathsToClass(WebResource.class.getSimpleName())){
+//                    System.out.println("path:"+path);
+                    if (contextDiscourseUnit.getGroundInterpretation().newGetSlotPathFiller(path+"."+ HasURI.class.getSimpleName()).equals(valueUri)){
+                        anyMatches = true;
+                        break;
+                    }
+                }
+                if (anyMatches){
+                    if (!hasValueMap.containsKey(dialogStateHypothesisId))
+                        hasValueMap.put(dialogStateHypothesisId, 0.0);
+                    hasValueMap.put(dialogStateHypothesisId, Doubles.min(1.0, hasValueMap.get(dialogStateHypothesisId) + discourseUnitConfidence));
+                } else {
+                    if (!hasValueMap.containsKey(dialogStateHypothesisId))
+                        hasValueMap.put(dialogStateHypothesisId, 0.0);
+                }
+            }
+        }
+
+        // compute the predicted confidence gain based on hasValueMap
+        Double totalMassEliminated = dialogStateHypotheses.keySet().stream().
+                map(x -> dialogStateDistribution.get(x) * (1 - hasValueMap.get(x))).
+                reduce(0.0, (x, y) -> x + y);
+        // distribute the eliminated probability mass among the non-eliminated hypotheses
+        for (String key : dialogStateHypotheses.keySet()) {
+            ans.put(key, limit * (1 - dialogStateDistribution.get(key)) * hasValueMap.get(key) * totalMassEliminated);
+        }
 //        System.out.println("RewardAndCostCalculator.predictConfidenceGainFromValueConfirmation: ans:\n"+ans);
         return ans;
     }

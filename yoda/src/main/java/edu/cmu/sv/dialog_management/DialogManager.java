@@ -90,7 +90,6 @@ public class DialogManager implements Runnable {
                 }
             }
 
-
             // enumerate and evaluate clarification actions
             for (Class<? extends ClarificationDialogAct> dialogActClass : DialogRegistry.clarificationDialogActs) {
                 ClarificationDialogAct dialogActInstance = dialogActClass.newInstance();
