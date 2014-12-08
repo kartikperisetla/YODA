@@ -100,7 +100,6 @@ public class DialogStateTracker implements Runnable {
                         }
                     }
                 }
-
             }
 
             // todo: replace with new flexible beam

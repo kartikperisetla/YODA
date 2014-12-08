@@ -56,7 +56,7 @@ public class RespondToYNQuestionTask extends DialogTask {
                     continue;
                 slotPathsToResolve.add(path);
             }
-            System.out.println("RespondToYNQuestion.ground: slotPathsToResolve:"+slotPathsToResolve);
+//            System.out.println("RespondToYNQuestion.ground: slotPathsToResolve:"+slotPathsToResolve);
         }
 
         Map<String, StringDistribution> referenceMarginals = new HashMap<>();

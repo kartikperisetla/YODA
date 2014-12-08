@@ -34,6 +34,16 @@ public class Utils {
         return ans;
     }
 
+    public static int numberOfLinksRespondingToDiscourseUnit(DiscourseUnitHypothesis contextDu,
+                                                             DialogStateHypothesis dialogStateHypothesis){
+        int ans = 0;
+        for (DialogStateHypothesis.ArgumentationLink link : dialogStateHypothesis.getArgumentationLinks()){
+            if (dialogStateHypothesis.getDiscourseUnitHypothesisMap().get(link.getPredecessor())==contextDu)
+                ans += 1;
+        }
+        return ans;
+    }
+
     /*
     * Rank the possible places where the suggestion content might attach to the existing semantics model
     * */

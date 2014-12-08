@@ -38,7 +38,7 @@ public class RewardAndCostCalculator {
     public static double penaltyForSpeaking = .5;
     public static double penaltyForIgnoringUserRequest = 2;
     public static double rewardForCorrectDialogTaskExecution = 5;
-    public static double penaltyForIncorrectDialogTaskExecution = 5;
+    public static double penaltyForIncorrectDialogTaskExecution = 10;
 
 
 
@@ -104,6 +104,35 @@ public class RewardAndCostCalculator {
 
 
 
+    /*
+    * Return the probability that there is an outstanding clarification request on a discourse unit initiated by
+    * initiator
+    * */
+    public static Double outstandingGroundingRequest(StringDistribution dialogStateDistribution,
+                                                     Map<String, DialogStateHypothesis> dialogStateHypotheses,
+                                                     String initiator){
+        Double ans = 0.0;
+        for (String dialogStateHypothesisId : dialogStateDistribution.keySet()){
+            for (DiscourseUnitHypothesis discourseUnitHypothesis : dialogStateHypotheses.get(dialogStateHypothesisId).
+                    getDiscourseUnitHypothesisMap().values()){
+                Double probabilityActive = Math.pow(.1,Utils.numberOfIntermediateDiscourseUnitsBySpeaker(
+                                discourseUnitHypothesis, dialogStateHypotheses.get(dialogStateHypothesisId), "user")) *
+                        Math.pow(.1,Utils.numberOfIntermediateDiscourseUnitsBySpeaker(
+                                discourseUnitHypothesis, dialogStateHypotheses.get(dialogStateHypothesisId), "system"));
+                if (!discourseUnitHypothesis.getInitiator().equals(initiator))
+                    continue;
+                if (initiator.equals("system")) {
+                    if (discourseUnitHypothesis.getSpokenByThem()!=null)
+                        ans += probabilityActive * dialogStateDistribution.get(dialogStateHypothesisId);
+                } else { // initiator = "user"
+                    if (discourseUnitHypothesis.getSpokenByMe()!=null)
+                        ans += probabilityActive * dialogStateDistribution.get(dialogStateHypothesisId);
+                }
+            }
+        }
+        return Doubles.min(ans, 1.0);
+    }
+
 
     /*
     * To compute the reward for a clarification dialog act,
@@ -168,12 +197,17 @@ public class RewardAndCostCalculator {
     public static StringDistribution predictConfidenceGainFromValueConfirmation(StringDistribution dialogStateDistribution,
                                                                                 Map<String, DialogStateHypothesis> dialogStateHypotheses,
                                                                                 String valueUri){
+        if (dialogStateDistribution.keySet().size()!=dialogStateHypotheses.size()){
+            System.out.println("BIG PROBLEM:\n"+dialogStateHypotheses+"\n"+dialogStateDistribution);
+            System.exit(0);
+        }
         double limit = .8; // we will never predict 100% confidence gain
         StringDistribution ans = new StringDistribution();
         // find the degree to which each dialog state hypothesis has the valueURI
         // (depends on which discourse units are most recent)
         Map<String, Double> hasValueMap = new HashMap<>();
         for (String dialogStateHypothesisId : dialogStateDistribution.keySet()){
+            hasValueMap.put(dialogStateHypothesisId, 0.0);
             DialogStateHypothesis dialogStateHypothesis = dialogStateHypotheses.get(dialogStateHypothesisId);
             for (DiscourseUnitHypothesis contextDiscourseUnit : dialogStateHypothesis.getDiscourseUnitHypothesisMap().values()){
 //                System.out.println("predicting confidence gain: contextDU:\n"+contextDiscourseUnit);
@@ -182,6 +216,7 @@ public class RewardAndCostCalculator {
                 Double discourseUnitConfidence =
                         Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(contextDiscourseUnit,
                                 dialogStateHypothesis, "user"));
+                discourseUnitConfidence *= Math.pow(.1, Utils.numberOfLinksRespondingToDiscourseUnit(contextDiscourseUnit, dialogStateHypothesis));
                 boolean anyMatches = false;
                 for (String path : contextDiscourseUnit.getGroundInterpretation().findAllPathsToClass(WebResource.class.getSimpleName())){
 //                    System.out.println("path:"+path);
@@ -190,13 +225,8 @@ public class RewardAndCostCalculator {
                         break;
                     }
                 }
-                if (anyMatches){
-                    if (!hasValueMap.containsKey(dialogStateHypothesisId))
-                        hasValueMap.put(dialogStateHypothesisId, 0.0);
+                if (anyMatches) {
                     hasValueMap.put(dialogStateHypothesisId, Doubles.min(1.0, hasValueMap.get(dialogStateHypothesisId) + discourseUnitConfidence));
-                } else {
-                    if (!hasValueMap.containsKey(dialogStateHypothesisId))
-                        hasValueMap.put(dialogStateHypothesisId, 0.0);
                 }
             }
         }
