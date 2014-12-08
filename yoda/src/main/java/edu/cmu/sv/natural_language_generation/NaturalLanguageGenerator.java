@@ -43,6 +43,8 @@ public class NaturalLanguageGenerator {
     public void speak(SemanticsModel model, Grammar.GrammarPreferences grammarPreferences){
         logger.info("nlg request made:"+model);
         Map.Entry<String, SemanticsModel> chosenUtterance = generateBestForSemantics(model, grammarPreferences);
+        chosenUtterance.getValue().filterOutLeafSlot("chunk-start");
+        chosenUtterance.getValue().filterOutLeafSlot("chunk-end");
         logger.info("chosen utterance:"+chosenUtterance);
         yodaEnvironment.out.sendOutput(chosenUtterance.getKey());
         Turn systemTurn = new Turn("system", chosenUtterance.getValue(), model, null, null);

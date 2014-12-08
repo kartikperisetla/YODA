@@ -259,6 +259,15 @@ public class SemanticsModel {
     }
 
 
+    public void filterOutLeafSlot(String slot){
+        Set<String> internalPaths = getAllInternalNodePaths();
+        for (String path: internalPaths){
+            JSONObject node = (JSONObject)newGetSlotPathFiller(path);
+            if (node.containsKey(slot))
+                node.remove(slot);
+        }
+    }
+
     /*
     * Put other at the indicated slotPath. Erase any contents that are there currently.
     * TODO: implement in the case when there isn't already a JSON object at that slotPath
