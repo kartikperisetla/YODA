@@ -165,9 +165,9 @@ public class ReferenceResolution {
                 if (key.equals("class")) {
                     if (description.get(key).equals(UnknownThingWithRoles.class.getSimpleName()))
                         continue;
-//                    queryString += "<"+individualURI+"> rdf:type ?x"+tmpVarIndex+" . ";
+                    queryString += "<"+individualURI+"> rdf:type base:"+description.get(key)+" . \n";
 //                    queryString += "BIND(IF({<" + individualURI + "> rdf:type base:" + description.get(key) + "}, 1.0, 0.0) AS ?score"+tmpVarIndex+")\n";
-                    System.out.println("requiring individual to have type: base:"+description.get(key));
+//                    System.out.println("requiring individual to have type: base:"+description.get(key));
                 } else if (HasQualityRole.class.isAssignableFrom(OntologyRegistry.roleNameMap.get((String) key))) {
                     double center;
                     double slope;
@@ -215,6 +215,7 @@ public class ReferenceResolution {
 
                 if (result.hasNext()){
                     BindingSet bindings = result.next();
+                    System.out.println("bindings:"+bindings);
                     ans = Double.parseDouble(bindings.getValue("score").stringValue());
                     result.close();
                     Database.getLogger().info("Description match result:"+ans);

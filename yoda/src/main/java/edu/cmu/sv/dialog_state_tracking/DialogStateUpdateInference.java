@@ -1,6 +1,7 @@
 package edu.cmu.sv.dialog_state_tracking;
 
 import edu.cmu.sv.utils.StringDistribution;
+import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Map;
@@ -17,6 +18,6 @@ public abstract class DialogStateUpdateInference {
     * be weighted by the assumed hypothesis' prior and collected to create the new tracking state
     * */
     public abstract Pair<Map<String, DialogStateHypothesis>, StringDistribution> applyAll(
-            DialogStateHypothesis currentState, Turn turn, long timeStamp);
+            YodaEnvironment yodaEnvironment, DialogStateHypothesis currentState, Turn turn, long timeStamp);
 
 }

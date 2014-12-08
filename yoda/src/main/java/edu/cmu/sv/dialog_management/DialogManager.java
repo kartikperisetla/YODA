@@ -3,6 +3,7 @@ package edu.cmu.sv.dialog_management;
 import edu.cmu.sv.database.dialog_task.ActionEnumeration;
 import edu.cmu.sv.dialog_state_tracking.DialogStateHypothesis;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnitHypothesis;
+import edu.cmu.sv.dialog_state_tracking.Utils;
 import edu.cmu.sv.natural_language_generation.Grammar;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ClarificationDialogAct;
 import edu.cmu.sv.utils.StringDistribution;
@@ -65,7 +66,10 @@ public class DialogManager implements Runnable {
             Map<SystemAction, Double> actionExpectedReward = new HashMap<>();
 
             //// add the null action
-            actionExpectedReward.put(null, RewardAndCostCalculator.penaltyForSpeaking);
+            actionExpectedReward.put(null,
+                    RewardAndCostCalculator.penaltyForSpeaking +
+                            RewardAndCostCalculator.outstandingGroundingRequest(dialogStateDistribution, dialogStateHypotheses, "user") *
+                                    RewardAndCostCalculator.penaltyForSpeakingOutOfTurn);
 
             // enumerate and evaluate actions that can be evaluated by summing marginals across the dialog state distribution
             for (String dialogStateHypothesisId : dialogStateHypotheses.keySet()) {

@@ -66,6 +66,12 @@ public class RegexUnderstander implements SpokenLanguageUnderstander{
             jsonString = "{\"dialogAct\":\"YNQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\""+uri+"\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"},\"Patient\":{\"class\":\"UnknownThingWithRoles\",\"HasExpensiveness\":{\"class\":\"Expensive\"}},\"class\":\"HasProperty\"}}";
         }
 
+        Pattern acceptPattern = Pattern.compile("yes");
+        Matcher m3 = acceptPattern.matcher(asrResult);
+        if (m3.matches()) {
+            jsonString = "{\"dialogAct\":\"Accept\"}";
+        }
+
         SemanticsModel interpretation = new SemanticsModel(jsonString);
 
         // create a turn and update the DST

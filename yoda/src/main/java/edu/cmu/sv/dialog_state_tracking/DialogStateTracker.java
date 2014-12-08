@@ -77,7 +77,7 @@ public class DialogStateTracker implements Runnable {
                     for (Class<? extends DialogStateUpdateInference> updateInferenceClass : updateInferences) {
                         Pair<Map<String, DialogStateHypothesis>, StringDistribution> inferredUpdatedState =
                                 updateInferenceClass.newInstance().applyAll(
-                                        hypothesisMap.get(currentDialogStateHypothesisID), turn, timeStamp);
+                                        yodaEnvironment, hypothesisMap.get(currentDialogStateHypothesisID), turn, timeStamp);
                         for (String tmpNewDstHypothesisId : inferredUpdatedState.getRight().keySet()) {
                             String newDstHypothesisId = "dialog_state_hyp_" + tmpNewDUHypothesisCounter++;
                             tmpNewHypothesisDistribution.put(newDstHypothesisId,

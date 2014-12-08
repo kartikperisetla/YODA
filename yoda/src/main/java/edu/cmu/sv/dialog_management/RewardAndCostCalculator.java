@@ -39,7 +39,7 @@ public class RewardAndCostCalculator {
     public static double penaltyForIgnoringUserRequest = 2;
     public static double rewardForCorrectDialogTaskExecution = 5;
     public static double penaltyForIncorrectDialogTaskExecution = 10;
-
+    public static double penaltyForSpeakingOutOfTurn = 1.0;
 
 
     /*

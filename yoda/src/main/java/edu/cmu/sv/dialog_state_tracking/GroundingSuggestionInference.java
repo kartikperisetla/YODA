@@ -6,6 +6,7 @@ import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestConfirmValue;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
 import edu.cmu.sv.utils.StringDistribution;
+import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
@@ -19,7 +20,8 @@ import java.util.Set;
  */
 public class GroundingSuggestionInference extends DialogStateUpdateInference {
     @Override
-    public Pair<Map<String, DialogStateHypothesis>, StringDistribution> applyAll(DialogStateHypothesis currentState,
+    public Pair<Map<String, DialogStateHypothesis>, StringDistribution> applyAll(YodaEnvironment yodaEnvironment,
+                                                                                 DialogStateHypothesis currentState,
                                                                                  Turn turn, long timeStamp) {
         StringDistribution resultDistribution = new StringDistribution();
         Map<String, DialogStateHypothesis> resultHypotheses = new HashMap<>();
@@ -84,9 +86,7 @@ public class GroundingSuggestionInference extends DialogStateUpdateInference {
                     JSONObject daContent = (JSONObject) hypModel.newGetSlotPathFiller("topic");
                     StringDistribution attachmentPoints = Utils.findPossiblePointsOfAttachment(
                             predecessor.getSpokenByThem(), daContent);
-                    SemanticsModel wrapped = new SemanticsModel(daContent.toJSONString());
-                    SemanticsModel.wrap((JSONObject) wrapped.newGetSlotPathFiller(""),
-                            Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
+                    SemanticsModel suggestion = new SemanticsModel(daContent.toJSONString());
 
                     for (String attachmentPoint : attachmentPoints.keySet()) {
                         String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
@@ -94,12 +94,13 @@ public class GroundingSuggestionInference extends DialogStateUpdateInference {
                         DiscourseUnitHypothesis updatedPredecessor = newDialogStateHypothesis.discourseUnitHypothesisMap.get(predecessorId);
 
                         SemanticsModel newSpokenByMeHypothesis = updatedPredecessor.getSpokenByThem().deepCopy();
-                        newSpokenByMeHypothesis.extendAndOverwriteAtPoint(attachmentPoint, wrapped.deepCopy());
+                        newSpokenByMeHypothesis.extendAndOverwriteAtPoint(attachmentPoint, suggestion.deepCopy());
                         SemanticsModel.wrap((JSONObject) newSpokenByMeHypothesis.newGetSlotPathFiller(attachmentPoint),
                                 Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
 
                         updatedPredecessor.timeOfLastActByMe = timeStamp;
                         updatedPredecessor.spokenByMe = newSpokenByMeHypothesis;
+                        updatedPredecessor.groundTruth = turn.groundedSystemMeaning;
                         resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
                         Double score = attachmentPoints.get(attachmentPoint) *
                                 Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(

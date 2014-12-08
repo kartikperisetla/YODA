@@ -3,6 +3,7 @@ package edu.cmu.sv.dialog_state_tracking;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.*;
 import edu.cmu.sv.utils.StringDistribution;
+import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -20,7 +21,7 @@ public class AnswerInference extends DialogStateUpdateInference {
 
     @Override
     public Pair<Map<String, DialogStateHypothesis>, StringDistribution> applyAll(
-            DialogStateHypothesis currentState, Turn turn, long timeStamp) {
+            YodaEnvironment yodaEnvironment, DialogStateHypothesis currentState, Turn turn, long timeStamp) {
 
         StringDistribution resultDistribution = new StringDistribution();
         Map<String, DialogStateHypothesis> resultHypotheses = new HashMap<>();
