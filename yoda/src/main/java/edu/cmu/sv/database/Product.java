@@ -20,10 +20,10 @@ public class Product implements Function{
 
     @Override
     public Value evaluate(ValueFactory valueFactory, Value... values) throws ValueExprEvaluationException {
-        if (values.length < 1) {
-            throw new ValueExprEvaluationException(getURI()+" requires" +
-                    "at least 1 argument, got " + values.length);
-        }
+//        if (values.length < 1) {
+//            throw new ValueExprEvaluationException(getURI()+" requires" +
+//                    "at least 1 argument, got " + values.length);
+//        }
         double ans = 1.0;
         for (int i = 0; i < values.length; i++) {
             ans *= ((Literal)values[i]).doubleValue();

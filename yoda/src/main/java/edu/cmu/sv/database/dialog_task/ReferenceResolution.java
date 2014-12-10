@@ -215,7 +215,6 @@ public class ReferenceResolution {
 
                 if (result.hasNext()){
                     BindingSet bindings = result.next();
-                    System.out.println("bindings:"+bindings);
                     ans = Double.parseDouble(bindings.getValue("score").stringValue());
                     result.close();
                     Database.getLogger().info("Description match result:"+ans);
