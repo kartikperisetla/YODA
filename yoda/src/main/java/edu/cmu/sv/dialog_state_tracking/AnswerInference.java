@@ -37,6 +37,8 @@ public class AnswerInference extends DialogStateUpdateInference {
                         DiscourseUnitHypothesis predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId);
                         if (predecessor.initiator.equals("user"))
                             continue;
+                        if (predecessor.spokenByThem==null)
+                            continue;
                         String predecessorDialogAct = predecessor.spokenByThem.getSlotPathFiller("dialogAct");
                         if (!Arrays.asList(YNQuestion.class.getSimpleName()).contains(predecessorDialogAct))
                             continue;

@@ -43,6 +43,8 @@ public class RejectGroundingSuggestionInference extends DialogStateUpdateInferen
                         DiscourseUnitHypothesis updatedPredecessor = newDialogStateHypothesis.discourseUnitHypothesisMap.get(predecessorId);
                         if (!updatedPredecessor.initiator.equals("user"))
                             continue;
+                        if (updatedPredecessor.getSpokenByMe()==null)
+                            continue;
                         Set<String> suggestionPaths = updatedPredecessor.getSpokenByMe().findAllPathsToClass(Suggested.class.getSimpleName());
                         if (suggestionPaths.size() != 1)
                             continue;

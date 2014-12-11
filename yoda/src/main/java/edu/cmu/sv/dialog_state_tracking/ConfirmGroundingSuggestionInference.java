@@ -43,6 +43,8 @@ public class ConfirmGroundingSuggestionInference extends DialogStateUpdateInfere
                         DiscourseUnitHypothesis updatedPredecessor = newDialogStateHypothesis.discourseUnitHypothesisMap.get(predecessorId);
                         if (!updatedPredecessor.initiator.equals("user"))
                             continue;
+                        if (updatedPredecessor.getSpokenByMe()==null)
+                            continue;
                         Set<String> suggestionPaths = updatedPredecessor.getSpokenByMe().findAllPathsToClass(Suggested.class.getSimpleName());
                         if (suggestionPaths.size() != 1)
                             continue;
@@ -79,6 +81,7 @@ public class ConfirmGroundingSuggestionInference extends DialogStateUpdateInfere
                                 Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(
                                         updatedPredecessor, newDialogStateHypothesis, "user"));
                         resultDistribution.put(newDialogStateHypothesisID, score);
+                        System.out.println("accepting a grounding suggestion: predecessor:" + predecessorId + ", score:" + score);
                     }
 
                 } else if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(Fragment.class)) {
