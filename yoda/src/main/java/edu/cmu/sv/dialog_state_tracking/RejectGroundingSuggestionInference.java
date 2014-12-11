@@ -3,11 +3,11 @@ package edu.cmu.sv.dialog_state_tracking;
 import edu.cmu.sv.database.dialog_task.ReferenceResolution;
 import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.ontology.misc.Suggested;
-import edu.cmu.sv.ontology.role.HasURI;
 import edu.cmu.sv.ontology.role.HasValue;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Accept;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Reject;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ConfirmValueSuggestion;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestConfirmValue;
 import edu.cmu.sv.utils.StringDistribution;
@@ -24,7 +24,7 @@ import java.util.Set;
 /**
  * Created by David Cohen on 10/18/14.
  */
-public class ConfirmGroundingSuggestionInference extends DialogStateUpdateInference {
+public class RejectGroundingSuggestionInference extends DialogStateUpdateInference {
     @Override
     public Pair<Map<String, DialogStateHypothesis>, StringDistribution> applyAll(
             YodaEnvironment yodaEnvironment, DialogStateHypothesis currentState, Turn turn, long timeStamp) {
@@ -36,7 +36,7 @@ public class ConfirmGroundingSuggestionInference extends DialogStateUpdateInfere
             for (String sluHypothesisID : turn.hypothesisDistribution.keySet()) {
                 SemanticsModel hypModel = turn.hypotheses.get(sluHypothesisID);
                 String dialogAct = hypModel.getSlotPathFiller("dialogAct");
-                if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(Accept.class)) {
+                if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(Reject.class)) {
                     for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
                         String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
                         DialogStateHypothesis newDialogStateHypothesis = currentState.deepCopy();
@@ -73,7 +73,7 @@ public class ConfirmGroundingSuggestionInference extends DialogStateUpdateInfere
                         updatedPredecessor.spokenByMe = null;
                         updatedPredecessor.timeOfLastActByMe = null;
                         resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
-                        Double score = descriptionMatch *
+                        Double score = (1 - descriptionMatch) *
                                 Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(
                                 updatedPredecessor, newDialogStateHypothesis, "system")) *
                                 Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(
