@@ -37,7 +37,6 @@ public class ConfirmGroundingSuggestionInference extends DialogStateUpdateInfere
                 SemanticsModel hypModel = turn.hypotheses.get(sluHypothesisID);
                 String dialogAct = hypModel.getSlotPathFiller("dialogAct");
                 if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(Accept.class)) {
-//                    System.out.println("ConfirmGroundingSuggestionInference - Accept DA from user");
                     for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
                         String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
                         DialogStateHypothesis newDialogStateHypothesis = currentState.deepCopy();
@@ -62,6 +61,7 @@ public class ConfirmGroundingSuggestionInference extends DialogStateUpdateInfere
                                 equals(RequestConfirmValue.class.getSimpleName())){
                             JSONObject groundedIndividual = (JSONObject)updatedPredecessor.groundTruth.newGetSlotPathFiller("topic");
                             descriptionMatch = ReferenceResolution.descriptionMatch(yodaEnvironment, groundedIndividual, suggestedContent);
+                            System.out.println("Confirm grounding suggestion inference: description match:"+descriptionMatch);
                             if (descriptionMatch==null)
                                 descriptionMatch=0.0;
                         } else {
