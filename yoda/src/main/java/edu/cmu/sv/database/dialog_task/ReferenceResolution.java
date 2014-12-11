@@ -196,6 +196,13 @@ public class ReferenceResolution {
                     queryString += qualityClass.newInstance().getQualityCalculatorSPARQLQuery().apply(entityURIs) +
                             "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
                     scoresToAccumulate.add("?score"+tmpVarIndex);
+                } else if (HasName.class.equals(OntologyRegistry.roleNameMap.get((String) key))) {
+                    queryString += "<"+individualURI+"> rdfs:label ?tmp" + tmpVarIndex + " . \n" +
+                            "base:" + ((JSONObject)description.get(HasName.class.getSimpleName())).
+                            get(HasURI.class.getSimpleName()) + " rdf:value ?tmpV" + tmpVarIndex + " . \n" +
+                            "BIND( base:" + StringSimilarity.class.getSimpleName() +
+                            "(?tmp" + tmpVarIndex + ", ?tmpV" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
+                    scoresToAccumulate.add("?score"+tmpVarIndex);
                 }
                 tmpVarIndex++;
             }

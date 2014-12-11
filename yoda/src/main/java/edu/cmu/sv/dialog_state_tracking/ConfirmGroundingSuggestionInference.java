@@ -56,12 +56,12 @@ public class ConfirmGroundingSuggestionInference extends DialogStateUpdateInfere
 
 
                         Double descriptionMatch = 0.0;
-                        // verify that the suggestion agrees with the grounded content
+                        // verify that the suggestion agrees with the grounded hypothesis
                         if (updatedPredecessor.groundTruth.newGetSlotPathFiller("dialogAct").
                                 equals(RequestConfirmValue.class.getSimpleName())){
-                            JSONObject groundedIndividual = (JSONObject)updatedPredecessor.groundTruth.newGetSlotPathFiller("topic");
+                            JSONObject groundedIndividual = (JSONObject)updatedPredecessor.groundInterpretation.newGetSlotPathFiller(suggestionPath);
                             descriptionMatch = ReferenceResolution.descriptionMatch(yodaEnvironment, groundedIndividual, suggestedContent);
-                            System.out.println("Confirm grounding suggestion inference: description match:"+descriptionMatch);
+//                            System.out.println("Confirm grounding suggestion inference: description match:"+descriptionMatch);
                             if (descriptionMatch==null)
                                 descriptionMatch=0.0;
                         } else {

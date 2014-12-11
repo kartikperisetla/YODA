@@ -40,7 +40,8 @@ public class SimpleNamedEntity0 implements Template {
 //        System.out.println("Label(s) from database:" + labels);
 
         for (String label : labels){
-            JSONObject content = SemanticsModel.parseJSON(constraints.toJSONString());
+            String uri = yodaEnvironment.db.insertValue(label);
+            JSONObject content = SemanticsModel.parseJSON("{\"HasURI\":\""+uri+"\",\"class\":\"WebResource\"}");
             SemanticsModel.wrap(content, yodaEnvironment.db.mostSpecificClass(entityURI),
                     HasName.class.getSimpleName());
             Map<String, JSONObject> nameChunk = new HashMap<>();
