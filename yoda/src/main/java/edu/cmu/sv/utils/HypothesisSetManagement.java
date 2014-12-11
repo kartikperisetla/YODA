@@ -6,6 +6,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 
 /**
  * Created by David Cohen on 9/4/14.
@@ -33,20 +34,41 @@ public class HypothesisSetManagement {
         return ans;
     }
 
-    public static StringDistribution keepNBestDistribution(StringDistribution fullSet, int beamSize){
-        List<Pair<String, Double>> nBest = keepNBestBeam(fullSet.getInternalDistribution(), beamSize);
+
+    public static <T> List<Pair<T, Double>> keepRatioBeam(Map<T, Double> asMap, double ratio, int beamSize){
+        Set<Pair<T, Double>> ans = asMap.keySet().stream().
+                map(key -> new ImmutablePair<>(key, asMap.get(key))).
+                collect(Collectors.toSet());
+        return keepRatioBeam(ans, ratio, beamSize);
+    }
+
+    public static <T> List<Pair<T, Double>> keepRatioBeam(Set<Pair<T, Double>> fullSet, double ratio, int maxBeamSize){
+        assert ratio <= 1;
+        double maxWeight = fullSet.stream().map(Pair::getRight).max(Double::compare).get();
+
+        List<Pair<T, Double>> ans = fullSet.stream().
+                sorted(Comparator.comparing((Function<Pair<T, Double>, Double>) Pair::getValue).reversed()).
+                filter(x -> x.getRight() >= ratio * maxWeight).
+                collect(Collectors.toList());
+
+        if (ans.size()> maxBeamSize){
+            ans = ans.subList(0,maxBeamSize);
+        }
+        return ans;
+    }
+
+    public static StringDistribution keepRatioDistribution(StringDistribution fullSet, double ratio, int maxBeamSize){
+        List<Pair<String, Double>> nBest = keepRatioBeam(fullSet.getInternalDistribution(), ratio, maxBeamSize);
         StringDistribution ans = new StringDistribution();
         nBest.forEach(x -> ans.put(x.getLeft(), x.getRight()));
         return ans;
     }
 
-    public static <T> Map<T, Double> putOrIncrement(Map<T, Double> destination, T obj, Double amount){
-        if (destination.containsKey(obj)){
-            destination.put(obj, destination.get(obj) + amount);
-        } else {
-            destination.put(obj, amount);
-        }
-        return destination;
+    public static StringDistribution keepNBestDistribution(StringDistribution fullSet, int beamSize){
+        List<Pair<String, Double>> nBest = keepNBestBeam(fullSet.getInternalDistribution(), beamSize);
+        StringDistribution ans = new StringDistribution();
+        nBest.forEach(x -> ans.put(x.getLeft(), x.getRight()));
+        return ans;
     }
 
     public static Pair<StringDistribution, Map<String, Map<String, String>>>

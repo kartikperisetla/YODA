@@ -104,8 +104,7 @@ public class DialogStateTracker implements Runnable {
                 }
             }
 
-            // todo: replace with new flexible beam
-            hypothesisDistribution = HypothesisSetManagement.keepNBestDistribution(newHypothesisDistribution, 10);
+            hypothesisDistribution = HypothesisSetManagement.keepRatioDistribution(newHypothesisDistribution, .05, 10);
 
             hypothesisMap = new HashMap<>();
             for (String key : hypothesisDistribution.keySet()) {
