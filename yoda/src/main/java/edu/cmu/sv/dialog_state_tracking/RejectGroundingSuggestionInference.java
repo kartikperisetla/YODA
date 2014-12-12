@@ -10,6 +10,7 @@ import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Reject;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ConfirmValueSuggestion;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestConfirmValue;
+import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -40,46 +41,27 @@ public class RejectGroundingSuggestionInference extends DialogStateUpdateInferen
                     for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
                         String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
                         DialogStateHypothesis newDialogStateHypothesis = currentState.deepCopy();
-                        DiscourseUnitHypothesis updatedPredecessor = newDialogStateHypothesis.discourseUnitHypothesisMap.get(predecessorId);
-                        if (!updatedPredecessor.initiator.equals("user"))
-                            continue;
-                        if (updatedPredecessor.getSpokenByMe()==null)
-                            continue;
-                        Set<String> suggestionPaths = updatedPredecessor.getSpokenByMe().findAllPathsToClass(Suggested.class.getSimpleName());
-                        if (suggestionPaths.size() != 1)
-                            continue;
-                        String suggestionPath = new LinkedList<>(suggestionPaths).get(0);
-                        JSONObject suggestedContent = (JSONObject) updatedPredecessor.getSpokenByMe().deepCopy().
-                                newGetSlotPathFiller(suggestionPath+"."+HasValue.class.getSimpleName());
+                        DiscourseUnitHypothesis predecessor = newDialogStateHypothesis.discourseUnitHypothesisMap.get(predecessorId);
 
-                        SemanticsModel newSpokenByThemHypothesis = updatedPredecessor.getSpokenByMe().deepCopy();
-                        SemanticsModel.unwrap((JSONObject) newSpokenByThemHypothesis.newGetSlotPathFiller(suggestionPath),
-                                HasValue.class.getSimpleName());
-
-
-                        Double descriptionMatch = 0.0;
-                        // verify that the suggestion agrees with the grounded hypothesis
-                        if (updatedPredecessor.groundTruth.newGetSlotPathFiller("dialogAct").
-                                equals(RequestConfirmValue.class.getSimpleName())){
-                            JSONObject groundedIndividual = (JSONObject)updatedPredecessor.groundInterpretation.newGetSlotPathFiller(suggestionPath);
-                            descriptionMatch = ReferenceResolution.descriptionMatch(yodaEnvironment, groundedIndividual, suggestedContent);
-//                            System.out.println("Confirm grounding suggestion inference: description match:"+descriptionMatch);
-                            if (descriptionMatch==null)
-                                descriptionMatch=0.0;
-                        } else {
+                        Utils.DiscourseUnitAnalysis duAnalysis = new Utils.DiscourseUnitAnalysis(predecessor, yodaEnvironment);
+                        try {
+                            Assert.verify(predecessor.initiator.equals("user"));
+                            Assert.verify(duAnalysis.ungroundedByAct(RequestConfirmValue.class));
+                            duAnalysis.analyseSuggestions();
+                        } catch (Assert.AssertException e){
                             continue;
                         }
 
-                        updatedPredecessor.timeOfLastActByThem = timeStamp;
-                        updatedPredecessor.spokenByThem = newSpokenByThemHypothesis;
-                        updatedPredecessor.spokenByMe = null;
-                        updatedPredecessor.timeOfLastActByMe = null;
+                        // copy suggestion and ground the discourse unit
+                        SemanticsModel newSpokenByThemHypothesis = predecessor.getSpokenByMe().deepCopy();
+                        SemanticsModel.unwrap((JSONObject) newSpokenByThemHypothesis.newGetSlotPathFiller(duAnalysis.suggestionPath),
+                                HasValue.class.getSimpleName());
+                        Utils.returnToGround(predecessor, newSpokenByThemHypothesis, timeStamp);
+
+                        // collect the result
                         resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
-                        Double score = (1 - descriptionMatch) *
-                                Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(
-                                updatedPredecessor, newDialogStateHypothesis, "system")) *
-                                Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(
-                                        updatedPredecessor, newDialogStateHypothesis, "user"));
+                        Double score = (1 - duAnalysis.descriptionMatch) *
+                                Utils.groundingContextProbability(newDialogStateHypothesis, predecessor);
                         resultDistribution.put(newDialogStateHypothesisID, score);
                     }
 
