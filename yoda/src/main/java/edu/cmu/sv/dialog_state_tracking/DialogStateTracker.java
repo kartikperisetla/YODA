@@ -37,9 +37,10 @@ public class DialogStateTracker implements Runnable {
         updateInferences = new HashSet<>();
         updateInferences.add(PresentInference.class);
         updateInferences.add(AnswerInference.class);
-        updateInferences.add(GroundingSuggestionInference.class);
+        updateInferences.add(GiveGroundingSuggestionInference.class);
         updateInferences.add(ConfirmGroundingSuggestionInference.class);
         updateInferences.add(RejectGroundingSuggestionInference.class);
+        updateInferences.add(ReiterateIgnoreGroundingSuggestionInference.class);
     }
 
     YodaEnvironment yodaEnvironment;
@@ -69,9 +70,9 @@ public class DialogStateTracker implements Runnable {
             Map<String, DialogStateHypothesis> newHypotheses = new HashMap<>();
 
             for (String currentDialogStateHypothesisID : hypothesisMap.keySet()) {
-                StringDistribution tmpNewHypothesisDistribution = new StringDistribution();
-                Map<String, DialogStateHypothesis> tmpNewHypotheses = new HashMap<>();
-                int tmpNewDUHypothesisCounter = 0;
+//                StringDistribution tmpNewHypothesisDistribution = new StringDistribution();
+//                Map<String, DialogStateHypothesis> tmpNewHypotheses = new HashMap<>();
+//                int tmpNewDUHypothesisCounter = 0;
 
                 // perform dialog state update inferences
                 {
@@ -80,29 +81,29 @@ public class DialogStateTracker implements Runnable {
                                 updateInferenceClass.newInstance().applyAll(
                                         yodaEnvironment, hypothesisMap.get(currentDialogStateHypothesisID), turn, timeStamp);
                         for (String tmpNewDstHypothesisId : inferredUpdatedState.getRight().keySet()) {
-                            String newDstHypothesisId = "dialog_state_hyp_" + tmpNewDUHypothesisCounter++;
-                            tmpNewHypothesisDistribution.put(newDstHypothesisId,
+                            String newDstHypothesisId = "dialog_state_hyp_" + newDialogStateHypothesisCounter++;
+                            newHypothesisDistribution.put(newDstHypothesisId,
                                     inferredUpdatedState.getRight().get(tmpNewDstHypothesisId) *
                                             hypothesisDistribution.get(currentDialogStateHypothesisID));
-                            tmpNewHypotheses.put(newDstHypothesisId, inferredUpdatedState.getLeft().get(tmpNewDstHypothesisId));
+                            newHypotheses.put(newDstHypothesisId, inferredUpdatedState.getLeft().get(tmpNewDstHypothesisId));
                         }
                     }
                 }
 
-                // ground and analyse
-                {
-                    for (String key : tmpNewHypotheses.keySet()) {
-                        Pair<Map<String, DialogStateHypothesis>, StringDistribution> groundedAndAnalysedUpdatedState =
-                                tmpNewHypotheses.get(key).groundAndAnalyse(yodaEnvironment);
-                        for (String tmpNewDstHypothesisId : groundedAndAnalysedUpdatedState.getRight().keySet()) {
-                            String newDstHypothesisId = "dialog_state_hyp_" + newDialogStateHypothesisCounter++;
-                            newHypothesisDistribution.put(newDstHypothesisId,
-                                    groundedAndAnalysedUpdatedState.getRight().get(tmpNewDstHypothesisId) *
-                                    tmpNewHypothesisDistribution.get(key));
-                            newHypotheses.put(newDstHypothesisId, groundedAndAnalysedUpdatedState.getLeft().get(tmpNewDstHypothesisId));
-                        }
-                    }
-                }
+//                // ground and analyse
+//                {
+//                    for (String key : tmpNewHypotheses.keySet()) {
+//                        Pair<Map<String, DialogStateHypothesis>, StringDistribution> groundedAndAnalysedUpdatedState =
+//                                tmpNewHypotheses.get(key).ground(yodaEnvironment);
+//                        for (String tmpNewDstHypothesisId : groundedAndAnalysedUpdatedState.getRight().keySet()) {
+//                            String newDstHypothesisId = "dialog_state_hyp_" + newDialogStateHypothesisCounter++;
+//                            newHypothesisDistribution.put(newDstHypothesisId,
+//                                    groundedAndAnalysedUpdatedState.getRight().get(tmpNewDstHypothesisId) *
+//                                    tmpNewHypothesisDistribution.get(key));
+//                            newHypotheses.put(newDstHypothesisId, groundedAndAnalysedUpdatedState.getLeft().get(tmpNewDstHypothesisId));
+//                        }
+//                    }
+//                }
             }
 
             hypothesisDistribution = HypothesisSetManagement.keepRatioDistribution(newHypothesisDistribution, .05, 10);

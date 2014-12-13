@@ -23,6 +23,9 @@ public abstract class DialogTask{
         return taskSpec;
     }
 
-    public abstract Pair<Map<String, DiscourseUnitHypothesis>, StringDistribution> groundAndAnalyse(
-           DiscourseUnitHypothesis hypothesis, YodaEnvironment yodaEnvironment);
+    public abstract Pair<Map<String, DiscourseUnitHypothesis>, StringDistribution> ground(
+            DiscourseUnitHypothesis hypothesis, YodaEnvironment yodaEnvironment);
+
+    public abstract void analyse(DiscourseUnitHypothesis hypothesis, YodaEnvironment yodaEnvironment);
+
 }

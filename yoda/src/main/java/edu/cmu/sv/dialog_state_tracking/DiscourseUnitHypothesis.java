@@ -5,10 +5,8 @@ import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -36,17 +34,29 @@ public class DiscourseUnitHypothesis {
         return ans;
     }
 
-    public Pair<Map<String, DiscourseUnitHypothesis>, StringDistribution> groundAndAnalyse(YodaEnvironment yodaEnvironment){
+    public Pair<Map<String, DiscourseUnitHypothesis>, StringDistribution> ground(YodaEnvironment yodaEnvironment){
         try {
             String dialogActString = (String) spokenByThem.newGetSlotPathFiller("dialogAct");
             Class<? extends DialogTask> taskClass = DialogRegistry.dialogTaskMap.
                     get(DialogRegistry.dialogActNameMap.get(dialogActString));
-            return taskClass.newInstance().groundAndAnalyse(this, yodaEnvironment);
+            return taskClass.newInstance().ground(this, yodaEnvironment);
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
             System.exit(0);
         }
         return null;
+    }
+
+    public void analyse(YodaEnvironment yodaEnvironment){
+        try {
+            String dialogActString = (String) spokenByThem.newGetSlotPathFiller("dialogAct");
+            Class<? extends DialogTask> taskClass = DialogRegistry.dialogTaskMap.
+                    get(DialogRegistry.dialogActNameMap.get(dialogActString));
+            taskClass.newInstance().analyse(this, yodaEnvironment);
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+            System.exit(0);
+        }
     }
 
     public DiscourseUnitHypothesis deepCopy(){
@@ -143,7 +153,7 @@ public class DiscourseUnitHypothesis {
     public String toString() {
         return "DiscourseUnitHypothesis{" +
                 "initiator='" + initiator +
-                ", timeOfLastActByThem=" + timeOfLastActByThem +
+                "', timeOfLastActByThem=" + timeOfLastActByThem +
                 ", timeOfLastActByMe=" + timeOfLastActByMe +
                 "\nynqTruth=" + ynqTruth +
                 ", whqTruth=" + whqTruth +

@@ -44,6 +44,9 @@ public class RegexUnderstander implements SpokenLanguageUnderstander{
         if (asrResult.length()==0)
             return;
 
+        Map<String, SemanticsModel> hypotheses = new HashMap<>();
+        StringDistribution hypothesisDistribution = new StringDistribution();
+        int hypothesisId = 0;
 
         String jsonString = "{}";
 
@@ -55,6 +58,10 @@ public class RegexUnderstander implements SpokenLanguageUnderstander{
             logger.info("chunked POI: "+ PoiName);
             String uri = yodaEnvironment.db.insertValue(PoiName);
             jsonString = "{\"dialogAct\":\"WHQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\""+uri+"\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"},\"Patient\":{\"class\":\"UnknownThingWithRoles\",\"HasExpensiveness\":{\"class\":\"Expensive\"}},\"class\":\"HasProperty\"}}";
+            SemanticsModel interpretation = new SemanticsModel(jsonString);
+            hypotheses.put("hyp"+hypothesisId, interpretation);
+            hypothesisDistribution.put("hyp"+hypothesisId, 1.0);
+            hypothesisId++;
         }
 
         Pattern isExpensivePattern = Pattern.compile("(is |are |)(the |)?(.+)(expensive)");
@@ -64,33 +71,52 @@ public class RegexUnderstander implements SpokenLanguageUnderstander{
             logger.info("chunked POI: "+ PoiName);
             String uri = yodaEnvironment.db.insertValue(PoiName);
             jsonString = "{\"dialogAct\":\"YNQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\""+uri+"\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"},\"Patient\":{\"class\":\"UnknownThingWithRoles\",\"HasExpensiveness\":{\"class\":\"Expensive\"}},\"class\":\"HasProperty\"}}";
+            SemanticsModel interpretation = new SemanticsModel(jsonString);
+            hypotheses.put("hyp"+hypothesisId, interpretation);
+            hypothesisDistribution.put("hyp"+hypothesisId, 1.0);
+            hypothesisId++;
         }
 
         Pattern acceptPattern = Pattern.compile("yes");
         Matcher m3 = acceptPattern.matcher(asrResult);
         if (m3.matches()) {
             jsonString = "{\"dialogAct\":\"Accept\"}";
+            SemanticsModel interpretation = new SemanticsModel(jsonString);
+            hypotheses.put("hyp"+hypothesisId, interpretation);
+            hypothesisDistribution.put("hyp"+hypothesisId, 1.0);
+            hypothesisId++;
         }
 
         Pattern rejectPattern = Pattern.compile("no");
         Matcher m4 = rejectPattern.matcher(asrResult);
         if (m4.matches()) {
             jsonString = "{\"dialogAct\":\"Reject\"}";
+            SemanticsModel interpretation = new SemanticsModel(jsonString);
+            hypotheses.put("hyp"+hypothesisId, interpretation);
+            hypothesisDistribution.put("hyp"+hypothesisId, 1.0);
+            hypothesisId++;
+        }
+
+        Pattern fragmentNamedEntityPattern = Pattern.compile("(.+)");
+        Matcher m5 = fragmentNamedEntityPattern.matcher(asrResult);
+        if (m5.matches()) {
+            String PoiName = m5.group(0);
+            String uri = yodaEnvironment.db.insertValue(PoiName);
+            jsonString = "{\"dialogAct\":\"Fragment\", \"topic\":{\"HasName\":{\"HasURI\":\""+uri+"\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"}}";
+            SemanticsModel interpretation = new SemanticsModel(jsonString);
+            hypotheses.put("hyp"+hypothesisId, interpretation);
+            hypothesisDistribution.put("hyp"+hypothesisId, 0.1);
+            hypothesisId++;
         }
 
 
-        SemanticsModel interpretation = new SemanticsModel(jsonString);
-
         // create a turn and update the DST
-        Map<String, SemanticsModel> hypotheses = new HashMap<>();
-        hypotheses.put("hyp1", interpretation);
-        StringDistribution hypothesisDistribution = new StringDistribution();
-        hypothesisDistribution.put("hyp1", 1.0);
+        hypothesisDistribution.normalize();
         Turn newTurn = new Turn("user", null, null, hypotheses, hypothesisDistribution);
         Calendar calendar = Calendar.getInstance();
         yodaEnvironment.DstInputQueue.add(new ImmutablePair<>(newTurn, calendar.getTimeInMillis()));
-        logger.info("interpretation:" + interpretation);
-//        yodaEnvironment.dst.updateDialogState(newTurn, calendar.getTimeInMillis());
+        logger.info("hypothesis distribution:" + hypothesisDistribution);
+        logger.info("hypotheses:"+hypotheses);
     }
 
     @Override

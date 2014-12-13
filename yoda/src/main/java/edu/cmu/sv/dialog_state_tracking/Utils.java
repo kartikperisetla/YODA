@@ -1,14 +1,11 @@
 package edu.cmu.sv.dialog_state_tracking;
 
-import com.google.common.collect.Iterables;
 import edu.cmu.sv.database.dialog_task.ReferenceResolution;
 import edu.cmu.sv.ontology.OntologyRegistry;
-import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.misc.Suggested;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.ontology.noun.Noun;
 import edu.cmu.sv.ontology.role.HasValue;
-import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.utils.Assert;
@@ -107,6 +104,26 @@ public class Utils {
             predecessor.timeOfLastActByMe = timeStamp;
         }
     }
+
+    /*
+    * Update the discourse unit by un-grounding it
+    * */
+    public static void unground(DiscourseUnitHypothesis predecessor,
+                                      SemanticsModel newSpokenByOther,
+                                      SemanticsModel groundedByOther,
+                                      long timeStamp){
+        if (predecessor.initiator.equals("user")){
+            predecessor.spokenByMe = newSpokenByOther;
+            predecessor.groundTruth = groundedByOther;
+            predecessor.timeOfLastActByMe = timeStamp;
+        } else { // if predecessor.initiator.equals("system")
+            predecessor.spokenByThem = newSpokenByOther;
+            predecessor.groundInterpretation = groundedByOther;
+            predecessor.timeOfLastActByThem = timeStamp;
+        }
+    }
+
+
 
     /*
     * A class used to perform common types of analysis on a discourse unit and store results

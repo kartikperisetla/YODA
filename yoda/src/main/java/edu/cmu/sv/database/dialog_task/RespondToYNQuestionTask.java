@@ -23,24 +23,25 @@ import java.util.stream.Collectors;
  */
 public class RespondToYNQuestionTask extends DialogTask {
     @Override
-    public Pair<Map<String, DiscourseUnitHypothesis>, StringDistribution> groundAndAnalyse(DiscourseUnitHypothesis hypothesis, YodaEnvironment yodaEnvironment) {
+    public Pair<Map<String, DiscourseUnitHypothesis>, StringDistribution> ground(DiscourseUnitHypothesis hypothesis, YodaEnvironment yodaEnvironment) {
         // get grounded hypotheses / corresponding weights
-        Pair<Map<String, DiscourseUnitHypothesis>, StringDistribution> groundingHypotheses = ground(hypothesis, yodaEnvironment);
+        Pair<Map<String, DiscourseUnitHypothesis>, StringDistribution> groundingHypotheses = groundHelper(hypothesis, yodaEnvironment);
         Map<String, DiscourseUnitHypothesis> discourseUnits = groundingHypotheses.getLeft();
         StringDistribution discourseUnitDistribution = groundingHypotheses.getRight();
 
-        // run analysis on each of the grounded hypotheses
-        for (String key : discourseUnits.keySet()){
-            analyse(discourseUnits.get(key), yodaEnvironment);
-        }
+//        // run analysis on each of the grounded hypotheses
+//        for (String key : discourseUnits.keySet()){
+//            analyse(discourseUnits.get(key), yodaEnvironment);
+//        }
 
         discourseUnitDistribution.normalize();
         return new ImmutablePair<>(discourseUnits, discourseUnitDistribution);
     }
 
-    private Pair<Map<String, DiscourseUnitHypothesis>, StringDistribution> ground(DiscourseUnitHypothesis hypothesis, YodaEnvironment yodaEnvironment) {
+    private Pair<Map<String, DiscourseUnitHypothesis>, StringDistribution> groundHelper(DiscourseUnitHypothesis hypothesis, YodaEnvironment yodaEnvironment) {
         List<String> slotPathsToResolve = new LinkedList<>();
         SemanticsModel spokenByThem = hypothesis.getSpokenByThem();
+        SemanticsModel currentGroundedInterpretation = hypothesis.getGroundInterpretation();
         String verb = (String)spokenByThem.newGetSlotPathFiller("verb.class");
         Class<? extends Verb> verbClass = OntologyRegistry.verbNameMap.get(verb);
         if (verbClass.equals(HasProperty.class)){
@@ -56,8 +57,18 @@ public class RespondToYNQuestionTask extends DialogTask {
                     continue;
                 slotPathsToResolve.add(path);
             }
-//            System.out.println("RespondToYNQuestion.ground: slotPathsToResolve:"+slotPathsToResolve);
+//            System.out.println("RespondToYNQuestion.groundHelper: slotPathsToResolve:"+slotPathsToResolve);
         }
+
+        // keep only the slot paths that haven't already been resolved
+        Set<String> alreadyGroundedPaths;
+        if (currentGroundedInterpretation!=null) {
+            alreadyGroundedPaths = slotPathsToResolve.stream().filter(x -> currentGroundedInterpretation.newGetSlotPathFiller(x) != null).collect(Collectors.toSet());
+        } else {
+            alreadyGroundedPaths = new HashSet<>();
+        }
+        slotPathsToResolve.removeAll(alreadyGroundedPaths);
+//        System.out.println("RespondToYNQuestion: already resolved:"+ alreadyGroundedPaths + ", slot paths to resolve:"+slotPathsToResolve);
 
         Map<String, StringDistribution> referenceMarginals = new HashMap<>();
         for (String slotPathToResolve : slotPathsToResolve) {
@@ -73,9 +84,15 @@ public class RespondToYNQuestionTask extends DialogTask {
             DiscourseUnitHypothesis groundedDiscourseUnitHypothesis = hypothesis.deepCopy();
             SemanticsModel groundedModel = hypothesis.getSpokenByThem().deepCopy();
             Map<String, String> assignment = referenceJoint.getValue().get(jointHypothesisID);
+            // add new bindings
             for (String slotPathVariable : assignment.keySet()){
                 SemanticsModel.overwrite((JSONObject) groundedModel.newGetSlotPathFiller(slotPathVariable),
                         SemanticsModel.parseJSON(OntologyRegistry.WebResourceWrap(assignment.get(slotPathVariable))));
+            }
+            // include previously grounded paths
+            for (String path : alreadyGroundedPaths){
+                SemanticsModel.overwrite((JSONObject) groundedModel.newGetSlotPathFiller(path),
+                        (JSONObject) currentGroundedInterpretation.newGetSlotPathFiller(path));
             }
             groundedDiscourseUnitHypothesis.setGroundInterpretation(groundedModel);
             discourseUnits.put(jointHypothesisID, groundedDiscourseUnitHypothesis);
@@ -84,7 +101,7 @@ public class RespondToYNQuestionTask extends DialogTask {
         return new ImmutablePair<>(discourseUnits, referenceJoint.getLeft());
     }
 
-    private void analyse(DiscourseUnitHypothesis groundedDiscourseUnitHypothesis,
+    public void analyse(DiscourseUnitHypothesis groundedDiscourseUnitHypothesis,
                         YodaEnvironment yodaEnvironment) {
         SemanticsModel hypothesis = groundedDiscourseUnitHypothesis.getGroundInterpretation();
         String verb = (String) hypothesis.newGetSlotPathFiller("verb.class");

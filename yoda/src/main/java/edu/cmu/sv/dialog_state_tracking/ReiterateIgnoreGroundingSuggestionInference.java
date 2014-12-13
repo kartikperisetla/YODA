@@ -1,14 +1,10 @@
 package edu.cmu.sv.dialog_state_tracking;
 
-import edu.cmu.sv.database.dialog_task.ReferenceResolution;
 import edu.cmu.sv.dialog_management.DialogRegistry;
-import edu.cmu.sv.ontology.misc.Suggested;
 import edu.cmu.sv.ontology.role.HasValue;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Accept;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Reject;
-import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ConfirmValueSuggestion;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestConfirmValue;
 import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.utils.StringDistribution;
@@ -18,14 +14,15 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by David Cohen on 10/18/14.
+ *
+ * This can either be a correction or a confirmation /  back-channel agreement
+ *
  */
-public class RejectGroundingSuggestionInference extends DialogStateUpdateInference {
+public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpdateInference {
     @Override
     public Pair<Map<String, DialogStateHypothesis>, StringDistribution> applyAll(
             YodaEnvironment yodaEnvironment, DialogStateHypothesis currentState, Turn turn, long timeStamp) {
@@ -37,34 +34,44 @@ public class RejectGroundingSuggestionInference extends DialogStateUpdateInferen
             for (String sluHypothesisID : turn.hypothesisDistribution.keySet()) {
                 SemanticsModel hypModel = turn.hypotheses.get(sluHypothesisID);
                 String dialogAct = hypModel.getSlotPathFiller("dialogAct");
-                if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(Reject.class)) {
+                if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(Fragment.class)) {
                     for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
-                        String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
-                        DialogStateHypothesis newDialogStateHypothesis = currentState.deepCopy();
-                        DiscourseUnitHypothesis predecessor = newDialogStateHypothesis.discourseUnitHypothesisMap.get(predecessorId);
+                        DiscourseUnitHypothesis predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId).deepCopy();
 
+                        JSONObject correctionContent;
                         Utils.DiscourseUnitAnalysis duAnalysis = new Utils.DiscourseUnitAnalysis(predecessor, yodaEnvironment);
                         try {
                             Assert.verify(predecessor.initiator.equals("user"));
                             Assert.verify(duAnalysis.ungroundedByAct(RequestConfirmValue.class));
                             duAnalysis.analyseSuggestions();
+                            correctionContent = (JSONObject) hypModel.newGetSlotPathFiller("topic");
                         } catch (Assert.AssertException e){
                             continue;
                         }
 
-                        // copy suggestion and ground the discourse unit
-                        SemanticsModel newSpokenByThemHypothesis = predecessor.getSpokenByMe().deepCopy();
-                        SemanticsModel.unwrap((JSONObject) newSpokenByThemHypothesis.newGetSlotPathFiller(duAnalysis.suggestionPath),
-                                HasValue.class.getSimpleName());
-                        Utils.returnToGround(predecessor, newSpokenByThemHypothesis, timeStamp);
+                        // copy suggestion, re-resolve the discourse unit
+                        SemanticsModel newSpokenByThemHypothesis = predecessor.getSpokenByThem().deepCopy();
+                        SemanticsModel.overwrite(((JSONObject) newSpokenByThemHypothesis.newGetSlotPathFiller(duAnalysis.suggestionPath)),
+                                correctionContent);
+                        SemanticsModel.putAtPath(predecessor.groundInterpretation.getInternalRepresentation(),
+                                duAnalysis.suggestionPath, null);
 
-                        // collect the result
-                        resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
-                        Double score = (1 - duAnalysis.descriptionMatch) *
-                                Utils.groundingContextProbability(newDialogStateHypothesis, predecessor);
-                        resultDistribution.put(newDialogStateHypothesisID, score);
+                        Pair<Map<String, DiscourseUnitHypothesis>, StringDistribution> groundedHypotheses =
+                                predecessor.ground(yodaEnvironment);
+                        for (String groundedDuKey: groundedHypotheses.getRight().keySet()) {
+                            String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
+                            DiscourseUnitHypothesis currentDu = groundedHypotheses.getLeft().get(groundedDuKey);
+                            DialogStateHypothesis newDialogStateHypothesis = currentState.deepCopy();
+                            newDialogStateHypothesis.getDiscourseUnitHypothesisMap().put(predecessorId, currentDu);
+
+                            Utils.returnToGround(currentDu, newSpokenByThemHypothesis, timeStamp);
+                            resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
+                            Double score = groundedHypotheses.getRight().get(groundedDuKey) *
+                                    Utils.groundingContextProbability(newDialogStateHypothesis, currentDu);
+                            resultDistribution.put(newDialogStateHypothesisID, score);
+                        }
+
                     }
-
                 }
             }
         } else { // if turn.speaker.equals("system")

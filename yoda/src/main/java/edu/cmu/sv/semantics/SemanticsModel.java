@@ -348,6 +348,20 @@ public class SemanticsModel {
         return ans;
     }
 
+    public static void putAtPath(JSONObject source, String slotPath, Object insertContent){
+        if (!slotPath.contains("."))
+            source.put(slotPath, insertContent);
+        else {
+            String[] fillerPath = slotPath.split("\\.");
+            String thisFiller = fillerPath[0];
+            List<String> remainingFillers = new LinkedList<>(Arrays.asList(fillerPath));
+            remainingFillers.remove(0);
+            String remainingSlotPath = String.join(".", remainingFillers);
+            putAtPath((JSONObject) source.get(thisFiller), remainingSlotPath, insertContent);
+        }
+
+    }
+
     public Set<Object> getSlotsAtPath(String slotPath){
         Object ans = getSlotPathFillerHelper(internalRepresentation, slotPath);
         if (ans==null)
@@ -453,11 +467,6 @@ public class SemanticsModel {
     * */
     public Set<String> getAllInternalNodePaths(){
         return getAllInternalNodePathsHelper(internalRepresentation);
-    }
-
-    // TODO: re-implement
-    public Map<String, String> getAllSlotFillerPairs(){
-        return null;
     }
 
     /*
