@@ -20,12 +20,11 @@ import java.util.*;
  */
 public class Utils {
 
-    public static double groundingContextProbability(DialogStateHypothesis dialogStateHypothesis,
-                                                     DiscourseUnitHypothesis predecessor){
-        return Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(
-                predecessor, dialogStateHypothesis, "system")) *
-                Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(
-                        predecessor, dialogStateHypothesis, "user"));
+    public static double discourseUnitContextProbability(DialogStateHypothesis dialogStateHypothesis,
+                                                         DiscourseUnitHypothesis predecessor){
+        return Math.pow(.1, numberOfIntermediateDiscourseUnitsBySpeaker(predecessor, dialogStateHypothesis, "system")) *
+                Math.pow(.1, numberOfIntermediateDiscourseUnitsBySpeaker(predecessor, dialogStateHypothesis, "user")) *
+                Math.pow(.1, numberOfLinksRespondingToDiscourseUnit(predecessor, dialogStateHypothesis));
     }
 
     public static int numberOfIntermediateDiscourseUnitsBySpeaker(DiscourseUnitHypothesis predecessorDu,

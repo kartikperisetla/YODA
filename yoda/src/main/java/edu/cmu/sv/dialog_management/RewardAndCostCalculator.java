@@ -53,8 +53,7 @@ public class RewardAndCostCalculator {
         if (dialogAct instanceof Accept || dialogAct instanceof Reject || dialogAct instanceof DontKnow) {
             if (!duHypothesis.getInitiator().equals("user"))
                 return 0.0;
-            double probabilityInterpretedThisWay =
-                    Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(duHypothesis, dsHypothesis, "user"));
+            double probabilityInterpretedThisWay = Utils.discourseUnitContextProbability(dsHypothesis, duHypothesis);
             if (answerObliged(duHypothesis) && !answerAlreadyProvided(duHypothesis, dsHypothesis))
                 return probabilityInterpretedThisWay;
             else if (answerObliged(duHypothesis))
@@ -70,7 +69,7 @@ public class RewardAndCostCalculator {
     }
 
     /*
-    * Return weather or not the predecessor obliges a response which has not been given
+    * Return weather or not the predecessor obliges a response
     * */
     public static boolean answerObliged(DiscourseUnitHypothesis predecessor){
         String predecessorDialogAct;
@@ -115,10 +114,9 @@ public class RewardAndCostCalculator {
         for (String dialogStateHypothesisId : dialogStateDistribution.keySet()){
             for (DiscourseUnitHypothesis discourseUnitHypothesis : dialogStateHypotheses.get(dialogStateHypothesisId).
                     getDiscourseUnitHypothesisMap().values()){
-                Double probabilityActive = Math.pow(.1,Utils.numberOfIntermediateDiscourseUnitsBySpeaker(
-                                discourseUnitHypothesis, dialogStateHypotheses.get(dialogStateHypothesisId), "user")) *
-                        Math.pow(.1,Utils.numberOfIntermediateDiscourseUnitsBySpeaker(
-                                discourseUnitHypothesis, dialogStateHypotheses.get(dialogStateHypothesisId), "system"));
+                Double probabilityActive = Utils.discourseUnitContextProbability(
+                        dialogStateHypotheses.get(dialogStateHypothesisId),
+                        discourseUnitHypothesis);
                 if (!discourseUnitHypothesis.getInitiator().equals(initiator))
                     continue;
                 if (initiator.equals("system")) {
@@ -155,13 +153,11 @@ public class RewardAndCostCalculator {
             for (DiscourseUnitHypothesis contextDiscourseUnit : dialogStateHypothesis.getDiscourseUnitHypothesisMap().values()) {
                 if (contextDiscourseUnit.getInitiator().equals("system"))
                     continue;
-                Double discourseUnitConfidence =
-                        Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(contextDiscourseUnit,
-                                dialogStateHypothesis, "user"));
+                Double discourseUnitConfidence = Utils.discourseUnitContextProbability(dialogStateHypothesis, contextDiscourseUnit);
 
-                SemanticsModel spokenByThem = contextDiscourseUnit.getSpokenByThem();
-                Class<? extends DialogAct> daClass = DialogRegistry.dialogActNameMap.
-                        get((String) spokenByThem.newGetSlotPathFiller("dialogAct"));
+//                SemanticsModel spokenByThem = contextDiscourseUnit.getSpokenByThem();
+//                Class<? extends DialogAct> daClass = DialogRegistry.dialogActNameMap.
+//                        get((String) spokenByThem.newGetSlotPathFiller("dialogAct"));
 
 //                // add contribution from non-dialog tasks
 //                if (DialogRegistry.nonDialogTaskRegistry.containsKey(daClass)) {
@@ -213,10 +209,8 @@ public class RewardAndCostCalculator {
 //                System.out.println("predicting confidence gain: contextDU:\n"+contextDiscourseUnit);
                 if (contextDiscourseUnit.getInitiator().equals("system"))
                     continue;
-                Double discourseUnitConfidence =
-                        Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(contextDiscourseUnit,
-                                dialogStateHypothesis, "user"));
-                discourseUnitConfidence *= Math.pow(.1, Utils.numberOfLinksRespondingToDiscourseUnit(contextDiscourseUnit, dialogStateHypothesis));
+                Double discourseUnitConfidence = Utils.discourseUnitContextProbability(dialogStateHypothesis, contextDiscourseUnit);
+//                discourseUnitConfidence *= Math.pow(.1, Utils.numberOfLinksRespondingToDiscourseUnit(contextDiscourseUnit, dialogStateHypothesis));
                 boolean anyMatches = false;
                 for (String path : contextDiscourseUnit.getGroundInterpretation().findAllPathsToClass(WebResource.class.getSimpleName())){
 //                    System.out.println("path:"+path);

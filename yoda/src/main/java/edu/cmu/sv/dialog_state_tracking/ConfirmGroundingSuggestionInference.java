@@ -55,7 +55,7 @@ public class ConfirmGroundingSuggestionInference extends DialogStateUpdateInfere
                         // collect the result
                         resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
                         Double score = duAnalysis.descriptionMatch *
-                                Utils.groundingContextProbability(newDialogStateHypothesis, predecessor);
+                                Utils.discourseUnitContextProbability(newDialogStateHypothesis, predecessor);
                         resultDistribution.put(newDialogStateHypothesisID, score);
                     }
 

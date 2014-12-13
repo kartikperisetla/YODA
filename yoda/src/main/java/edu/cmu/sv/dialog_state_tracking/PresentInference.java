@@ -50,9 +50,11 @@ public class PresentInference extends DialogStateUpdateInference {
                     for (String groundedDuKey: groundedHypotheses.getRight().keySet()){
                         String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
                         DialogStateHypothesis newDialogStateHypothesis = currentState.deepCopy();
+                        DiscourseUnitHypothesis currentDu = groundedHypotheses.getLeft().get(groundedDuKey);
+                        currentDu.analyse(yodaEnvironment);
                         newDialogStateHypothesis.discourseUnitCounter += 1;
                         newDialogStateHypothesis.getDiscourseUnitHypothesisMap().
-                                put("du_"+newDialogStateHypothesis.discourseUnitCounter, groundedHypotheses.getLeft().get(groundedDuKey));
+                                put("du_"+newDialogStateHypothesis.discourseUnitCounter, currentDu);
                         newDialogStateHypothesis.getDiscourseUnitHypothesisMap().
                                 get("du_"+newDialogStateHypothesis.discourseUnitCounter).analyse(yodaEnvironment);
                         resultDistribution.put(newDialogStateHypothesisID, groundedHypotheses.getRight().get(groundedDuKey));

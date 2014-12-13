@@ -69,6 +69,7 @@ public class ReferenceResolution {
         } catch (RepositoryException | UpdateExecutionException | MalformedQueryException e) {
             e.printStackTrace();
         }
+        ans.normalize();
         return ans;
     }
 

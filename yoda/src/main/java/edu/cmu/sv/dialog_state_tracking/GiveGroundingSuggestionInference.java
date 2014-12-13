@@ -104,7 +104,7 @@ public class GiveGroundingSuggestionInference extends DialogStateUpdateInference
                         Utils.unground(updatedPredecessor, newSpokenByMeHypothesis, turn.groundedSystemMeaning, timeStamp);
                         resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
                         Double score = attachmentPoints.get(attachmentPoint) *
-                                Utils.groundingContextProbability(newDialogStateHypothesis, updatedPredecessor);
+                                Utils.discourseUnitContextProbability(newDialogStateHypothesis, updatedPredecessor);
                         resultDistribution.put(newDialogStateHypothesisID, score);
                     }
                 }

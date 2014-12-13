@@ -1,14 +1,9 @@
 package edu.cmu.sv.dialog_state_tracking;
 
-import edu.cmu.sv.database.dialog_task.ReferenceResolution;
 import edu.cmu.sv.dialog_management.DialogRegistry;
-import edu.cmu.sv.ontology.misc.Suggested;
 import edu.cmu.sv.ontology.role.HasValue;
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Accept;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Reject;
-import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ConfirmValueSuggestion;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestConfirmValue;
 import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.utils.StringDistribution;
@@ -18,9 +13,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by David Cohen on 10/18/14.
@@ -61,7 +54,7 @@ public class RejectGroundingSuggestionInference extends DialogStateUpdateInferen
                         // collect the result
                         resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
                         Double score = (1 - duAnalysis.descriptionMatch) *
-                                Utils.groundingContextProbability(newDialogStateHypothesis, predecessor);
+                                Utils.discourseUnitContextProbability(newDialogStateHypothesis, predecessor);
                         resultDistribution.put(newDialogStateHypothesisID, score);
                     }
 

@@ -26,8 +26,8 @@ public class Reject extends DialogAct {
 
     @Override
     public Double reward(DialogStateHypothesis dialogStateHypothesis, DiscourseUnitHypothesis discourseUnitHypothesis){
-        return RewardAndCostCalculator.discourseIndependentArgumentationReward(discourseUnitHypothesis, this) *
-                RewardAndCostCalculator.probabilityInterpretedCorrectly(discourseUnitHypothesis, dialogStateHypothesis, this) +
+        return (RewardAndCostCalculator.discourseIndependentArgumentationReward(discourseUnitHypothesis, this) *
+                RewardAndCostCalculator.probabilityInterpretedCorrectly(discourseUnitHypothesis, dialogStateHypothesis, this)) +
                 (RewardAndCostCalculator.answerObliged(discourseUnitHypothesis) &&
                         !RewardAndCostCalculator.answerAlreadyProvided(discourseUnitHypothesis, dialogStateHypothesis) ?
                         RewardAndCostCalculator.penaltyForIgnoringUserRequest : 0);
