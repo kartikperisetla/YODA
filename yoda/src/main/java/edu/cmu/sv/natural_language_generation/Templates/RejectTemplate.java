@@ -4,6 +4,7 @@ import edu.cmu.sv.natural_language_generation.Template;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Accept;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Reject;
+import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.json.simple.JSONObject;
 
@@ -18,9 +19,9 @@ public class RejectTemplate implements Template {
     public Map<String, JSONObject> generateAll(JSONObject constraints, YodaEnvironment yodaEnvironment, int remainingDepth) {
         // ensure that the constraints match this template
         try {
-            assert constraints.get("dialogAct").equals(Reject.class.getSimpleName());
-            assert constraints.keySet().size()==1;
-        } catch (AssertionError e){
+            Assert.verify(constraints.get("dialogAct").equals(Reject.class.getSimpleName()));
+            Assert.verify(constraints.keySet().size()==1);
+        } catch (Assert.AssertException e){
             return new HashMap<>();
         }
 

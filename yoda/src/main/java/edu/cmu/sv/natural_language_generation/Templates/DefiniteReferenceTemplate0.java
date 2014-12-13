@@ -1,5 +1,6 @@
 package edu.cmu.sv.natural_language_generation.Templates;
 
+import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.database.Database;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
@@ -37,12 +38,12 @@ public class DefiniteReferenceTemplate0 implements Template {
         String entityURI;
         // ensure that the constraints match this template
         try {
-            assert constraints.get("class").equals(WebResource.class.getSimpleName());
-            assert constraints.keySet().size()==2;
-            assert constraints.containsKey(HasURI.class.getSimpleName());
+            Assert.verify(constraints.get("class").equals(WebResource.class.getSimpleName()));
+            Assert.verify(constraints.keySet().size()==2);
+            Assert.verify(constraints.containsKey(HasURI.class.getSimpleName()));
             entityURI = (String) new SemanticsModel(constraints).
                     newGetSlotPathFiller(HasURI.class.getSimpleName());
-        } catch (AssertionError e){
+        } catch (Assert.AssertException e){
             return new HashMap<>();
         }
 

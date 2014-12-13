@@ -1,5 +1,6 @@
 package edu.cmu.sv.natural_language_generation.Templates;
 
+import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
 import edu.cmu.sv.natural_language_generation.Template;
@@ -30,22 +31,22 @@ public class PPTemplate0 implements Template {
         String child;
         // ensure that the constraints match this template
         try {
-            assert constraints.get("class").equals(UnknownThingWithRoles.class.getSimpleName());
-            assert constraints.keySet().size()==2;
+            Assert.verify(constraints.get("class").equals(UnknownThingWithRoles.class.getSimpleName()));
+            Assert.verify(constraints.keySet().size()==2);
             List<String> keys = (List<String>) constraints.keySet().stream().map(x -> (String)x).collect(Collectors.toList());
             keys.remove("class");
             hasQualityRole = keys.get(0);
             JSONObject prepositionContent = (JSONObject) constraints.get(hasQualityRole);
-            assert prepositionContent.keySet().size()==2;
-            assert prepositionContent.containsKey("class");
-            assert prepositionContent.containsKey(InRelationTo.class.getSimpleName());
+            Assert.verify(prepositionContent.keySet().size()==2);
+            Assert.verify(prepositionContent.containsKey("class"));
+            Assert.verify(prepositionContent.containsKey(InRelationTo.class.getSimpleName()));
             prepositionClassString = (String) prepositionContent.get("class");
             child = ((JSONObject) prepositionContent.get(InRelationTo.class.getSimpleName())).toJSONString();
-            assert SemanticsModel.parseJSON(child).containsKey("class");
-            assert SemanticsModel.parseJSON(child).get("class").equals(WebResource.class.getSimpleName());
-            assert OntologyRegistry.thingNameMap.containsKey(prepositionClassString);
-            assert Preposition.class.isAssignableFrom(OntologyRegistry.thingNameMap.get(prepositionClassString));
-        } catch (AssertionError e){
+            Assert.verify(SemanticsModel.parseJSON(child).containsKey("class"));
+            Assert.verify(SemanticsModel.parseJSON(child).get("class").equals(WebResource.class.getSimpleName()));
+            Assert.verify(OntologyRegistry.thingNameMap.containsKey(prepositionClassString));
+            Assert.verify(Preposition.class.isAssignableFrom(OntologyRegistry.thingNameMap.get(prepositionClassString)));
+        } catch (Assert.AssertException e){
             return new HashMap<>();
         }
 

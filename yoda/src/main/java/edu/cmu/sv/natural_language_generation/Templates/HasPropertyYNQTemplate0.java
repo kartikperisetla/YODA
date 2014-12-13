@@ -1,5 +1,6 @@
 package edu.cmu.sv.natural_language_generation.Templates;
 
+import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
 import edu.cmu.sv.natural_language_generation.Template;
@@ -30,19 +31,19 @@ public class HasPropertyYNQTemplate0 implements Template {
 
         // ensure that the constraints match this template
         try {
-            assert constraints.keySet().size()==2;
-            assert constraints.containsKey("dialogAct") && constraints.containsKey("verb");
-            assert constraints.get("dialogAct").equals(YNQuestion.class.getSimpleName());
+            Assert.verify(constraints.keySet().size()==2);
+            Assert.verify(constraints.containsKey("dialogAct") && constraints.containsKey("verb"));
+            Assert.verify(constraints.get("dialogAct").equals(YNQuestion.class.getSimpleName()));
             JSONObject verbConstraint = (JSONObject) constraints.get("verb");
-            assert verbConstraint.keySet().size()==3;
-            assert verbConstraint.get("class").equals(HasProperty.class.getSimpleName());
-            assert verbConstraint.containsKey(Agent.class.getSimpleName());
-            assert verbConstraint.containsKey(Patient.class.getSimpleName());
+            Assert.verify(verbConstraint.keySet().size()==3);
+            Assert.verify(verbConstraint.get("class").equals(HasProperty.class.getSimpleName()));
+            Assert.verify(verbConstraint.containsKey(Agent.class.getSimpleName()));
+            Assert.verify(verbConstraint.containsKey(Patient.class.getSimpleName()));
             agentConstraint = (JSONObject) verbConstraint.get(Agent.class.getSimpleName());
-            assert agentConstraint.get("class").equals(WebResource.class.getSimpleName());
+            Assert.verify(agentConstraint.get("class").equals(WebResource.class.getSimpleName()));
             patientConstraint = (JSONObject) verbConstraint.get(Patient.class.getSimpleName());
-            assert patientConstraint.get("class").equals(UnknownThingWithRoles.class.getSimpleName());
-        } catch (AssertionError e) {
+            Assert.verify(patientConstraint.get("class").equals(UnknownThingWithRoles.class.getSimpleName()));
+        } catch (Assert.AssertException e) {
             return new HashMap<>();
         }
 

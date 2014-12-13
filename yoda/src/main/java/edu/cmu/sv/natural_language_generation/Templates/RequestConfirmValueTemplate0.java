@@ -14,6 +14,7 @@ import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.YNQuestion;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestConfirmValue;
+import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -33,11 +34,11 @@ public class RequestConfirmValueTemplate0 implements Template {
         JSONObject topicWebResource;
         // ensure that the constraints match this template
         try {
-            assert constraints.get("dialogAct").equals(RequestConfirmValue.class.getSimpleName());
-            assert constraints.keySet().size()==2;
-            assert constraints.containsKey("topic");
+            Assert.verify(constraints.get("dialogAct").equals(RequestConfirmValue.class.getSimpleName()));
+            Assert.verify(constraints.keySet().size()==2);
+            Assert.verify(constraints.containsKey("topic"));
             topicWebResource = (JSONObject) constraints.get("topic");
-        } catch (AssertionError e){
+        } catch (Assert.AssertException e){
             return new HashMap<>();
         }
 

@@ -1,5 +1,6 @@
 package edu.cmu.sv.natural_language_generation.Templates;
 
+import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
 import edu.cmu.sv.natural_language_generation.Template;
@@ -24,18 +25,18 @@ public class AdjTemplate0 implements Template {
         String adjectiveClassString;
         // ensure that the constraints match this template
         try {
-            assert constraints.get("class").equals(UnknownThingWithRoles.class.getSimpleName());
-            assert constraints.keySet().size()==2;
+            Assert.verify(constraints.get("class").equals(UnknownThingWithRoles.class.getSimpleName()));
+            Assert.verify(constraints.keySet().size()==2);
             List<String> keys = (List<String>) constraints.keySet().stream().map(x -> (String)x).collect(Collectors.toList());
             keys.remove("class");
             hasQualityRole = keys.get(0);
             JSONObject adjectiveContent = (JSONObject) constraints.get(hasQualityRole);
-            assert adjectiveContent.keySet().size()==1;
-            assert adjectiveContent.containsKey("class");
+            Assert.verify(adjectiveContent.keySet().size()==1);
+            Assert.verify(adjectiveContent.containsKey("class"));
             adjectiveClassString = (String) adjectiveContent.get("class");
-            assert OntologyRegistry.thingNameMap.containsKey(adjectiveClassString);
-            assert Adjective.class.isAssignableFrom(OntologyRegistry.thingNameMap.get(adjectiveClassString));
-        } catch (AssertionError e){
+            Assert.verify(OntologyRegistry.thingNameMap.containsKey(adjectiveClassString));
+            Assert.verify(Adjective.class.isAssignableFrom(OntologyRegistry.thingNameMap.get(adjectiveClassString)));
+        } catch (Assert.AssertException e){
             return new HashMap<>();
         }
 
