@@ -19,13 +19,18 @@
 # along with YODA.  If not, see <http://www.gnu.org/licenses/>.
 # -------------------------------------------------------------
 
-(README last updated Sept. 16, 2014)
-
-To get an idea of what YODA is intended to be, see tutorials/tutorial.pdf
+(README last updated Dec. 13, 2014)
 
 Running current code:
 This project is structured as a maven project which is supported by all the major IDEs by importing the yoda/yoda/pom.xml file .
 It requires the Java 8 language level and SDK.
 
-The easiest way to view the code and run a demonstration of some dialog management test cases is to import the pom.xml file into IntelliJ or Eclipse and run the test program: 
-src/test/java/edu/cmu/sv/TestActionSelection.java .
+To run the CommandLineYodaSystem program, go to /yoda/yoda/ and run:
+> mvn exec:java
+
+You may see messages such as:
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+
+But you can ignore them and proceed to type your utterances into the command line.
