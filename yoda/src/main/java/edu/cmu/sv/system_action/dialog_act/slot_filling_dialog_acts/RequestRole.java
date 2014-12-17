@@ -49,7 +49,7 @@ public class RequestRole extends DialogAct{
 
     @Override
     public Double reward(DialogStateHypothesis dialogStateHypothesis, DiscourseUnitHypothesis discourseUnitHypothesis) {
-        return null;
+        return 0.0;
     }
 
     @Override

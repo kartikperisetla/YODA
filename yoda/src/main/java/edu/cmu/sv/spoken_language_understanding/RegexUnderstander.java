@@ -109,6 +109,17 @@ public class RegexUnderstander implements SpokenLanguageUnderstander{
             hypothesisId++;
         }
 
+        Pattern isExpensivePattern2 = Pattern.compile("(is |are |)(expensive)");
+        Matcher m6 = isExpensivePattern2.matcher(asrResult);
+        if (m6.matches()) {
+            jsonString = "{\"dialogAct\":\"YNQuestion\",\"verb\":{\"class\":\"PointOfInterest\",\"Patient\":{\"class\":\"UnknownThingWithRoles\",\"HasExpensiveness\":{\"class\":\"Expensive\"}},\"class\":\"HasProperty\"}}";
+            SemanticsModel interpretation = new SemanticsModel(jsonString);
+            hypotheses.put("hyp"+hypothesisId, interpretation);
+            hypothesisDistribution.put("hyp"+hypothesisId, 1.0);
+            hypothesisId++;
+        }
+
+
 
         // create a turn and update the DST
         hypothesisDistribution.normalize();

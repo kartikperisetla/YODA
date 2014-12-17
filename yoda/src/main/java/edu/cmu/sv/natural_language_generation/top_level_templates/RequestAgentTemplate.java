@@ -23,7 +23,6 @@ import java.util.*;
  */
 public class RequestAgentTemplate implements Template {
 
-
     @Override
     public Map<String, JSONObject> generateAll(JSONObject constraints, YodaEnvironment yodaEnvironment, int remainingDepth) {
         SemanticsModel constraintsModel = new SemanticsModel(constraints);

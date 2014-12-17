@@ -9,8 +9,4 @@ import java.util.Set;
  * Created by David Cohen on 10/8/14.
  */
 public class Requested extends DiscourseMarker {
-    @Override
-    public Set<Class<? extends Role>> getRequiredRoles() {
-        return new HashSet<>();
-    }
 }

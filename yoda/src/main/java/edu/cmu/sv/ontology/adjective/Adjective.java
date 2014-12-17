@@ -14,11 +14,7 @@ import java.util.Set;
  * Created by David Cohen on 11/2/14.
  */
 public abstract class Adjective extends ThingWithRoles {
-    static Set<Class<? extends Role>> requiredRoles = new HashSet<>();
-    @Override
-    public Set<Class<? extends Role>> getRequiredRoles() {
-        return requiredRoles;
-    }
+
 
     public abstract double getCenter();
     public abstract double getSlope();

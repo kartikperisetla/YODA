@@ -14,11 +14,7 @@ import java.util.Set;
  * Ex: IsCloseTo (pairwise role) is a specific degree of Distance (pairwise quality)
  */
 public abstract class Preposition extends ThingWithRoles{
-    static Set<Class<? extends Role>> requiredRoles = new HashSet<>();
-    @Override
-    public Set<Class<? extends Role>> getRequiredRoles() {
-        return requiredRoles;
-    }
+
     public abstract double getCenter();
     public abstract double getSlope();
     public abstract Class<? extends TransientQuality> getQuality();

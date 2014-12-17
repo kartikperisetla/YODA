@@ -11,6 +11,5 @@ import java.util.Set;
  *
  */
 public abstract class ThingWithRoles extends Thing {
-    public abstract Set<Class <? extends Role>> getRequiredRoles();
 
 }

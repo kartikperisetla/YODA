@@ -32,7 +32,7 @@ public class Cheap extends ExpensivenessAdjective {
     }
 
     @Override
-    public Set<Class<? extends Role>> getRequiredRoles() {
+    public Set<Class<? extends Role>> getRequiredGroundedRoles() {
         return new HashSet<>();
     }
 }

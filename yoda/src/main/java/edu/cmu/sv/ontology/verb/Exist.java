@@ -12,7 +12,7 @@ import java.util.Set;
  */
 public class Exist extends Verb {
     @Override
-    public Set<Class<? extends Role>> getRequiredRoles() {
+    public Set<Class<? extends Role>> getRequiredDescriptions() {
         return new HashSet<>(Arrays.asList(Patient.class));
     }
 }

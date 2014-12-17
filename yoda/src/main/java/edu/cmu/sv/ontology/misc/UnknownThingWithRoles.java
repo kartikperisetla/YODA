@@ -10,8 +10,5 @@ import java.util.Set;
  * Created by David Cohen on 10/14/14.
  */
 public class UnknownThingWithRoles extends ThingWithRoles{
-    @Override
-    public Set<Class<? extends Role>> getRequiredRoles() {
-        return new HashSet<>();
-    }
+
 }
