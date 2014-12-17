@@ -3,8 +3,11 @@ package edu.cmu.sv.dialog_management;
 import edu.cmu.sv.database.dialog_task.ActionEnumeration;
 import edu.cmu.sv.dialog_state_tracking.DialogStateHypothesis;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnitHypothesis;
-import edu.cmu.sv.dialog_state_tracking.Utils;
 import edu.cmu.sv.natural_language_generation.Grammar;
+import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.Thing;
+import edu.cmu.sv.ontology.ThingWithRoles;
+import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ClarificationDialogAct;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -18,6 +21,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by David Cohen on 9/2/14.
@@ -92,6 +96,31 @@ public class DialogManager implements Runnable {
                         }
                     }
                 }
+
+                for (Class<? extends DialogAct> dialogActClass : DialogRegistry.slotFillingDialogActs){
+                    DialogAct dialogActInstance = dialogActClass.newInstance();
+
+                    for (String discourseUnitHypothesisId : currentDialogStateHypothesis.getDiscourseUnitHypothesisMap().
+                            keySet()) {
+                        DiscourseUnitHypothesis contextDiscourseUnitHypothesis = currentDialogStateHypothesis.
+                                getDiscourseUnitHypothesisMap().get(discourseUnitHypothesisId);
+
+                        Class<? extends ThingWithRoles> verbClass =
+                                (Class<? extends ThingWithRoles>)
+                                OntologyRegistry.thingNameMap.get(
+                                        (String)contextDiscourseUnitHypothesis.getVerb().get("class"));
+
+                        Map<String, Set<String>> possibleBindingsPerVariable = new HashMap<>();
+                        if (dialogActInstance.getPathParameters().containsKey("given_role_path")) {
+                            possibleBindingsPerVariable.put("given_role_path",
+                                    OntologyRegistry.roleClasses.stream().
+                                            filter(x -> OntologyRegistry.inDomain(x, verbClass)).
+                                            map(x -> "verb." + x.getSimpleName()).
+                                            collect(Collectors.toSet()));
+                        }
+                    }
+                }
+
             }
 
             // enumerate and evaluate clarification actions
@@ -102,7 +131,7 @@ public class DialogManager implements Runnable {
                 for (Map<String, Object> binding : possibleBindings) {
                     ClarificationDialogAct newDialogActInstance = dialogActClass.newInstance();
                     newDialogActInstance.bindVariables(binding);
-                    Double currentReward = newDialogActInstance.reward(dialogStateDistribution, dialogStateHypotheses);
+                    Double currentReward = newDialogActInstance.clarificationReward(dialogStateDistribution, dialogStateHypotheses);
                     accumulateReward(actionExpectedReward, newDialogActInstance, currentReward);
                 }
             }

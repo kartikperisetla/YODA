@@ -6,6 +6,7 @@ import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.Pair;
+import org.json.simple.JSONObject;
 
 import java.util.Map;
 
@@ -45,6 +46,18 @@ public class DiscourseUnitHypothesis {
             System.exit(0);
         }
         return null;
+    }
+
+    public JSONObject getVerb(){
+        if (initiator.equals("user")){
+            if (spokenByThem.newGetSlotPathFiller("verb")==null)
+                return null;
+            return (JSONObject)spokenByThem.newGetSlotPathFiller("verb");
+        } else {
+            if (spokenByMe.newGetSlotPathFiller("verb")==null)
+                return null;
+            return (JSONObject)spokenByMe.newGetSlotPathFiller("verb");
+        }
     }
 
     public void analyse(YodaEnvironment yodaEnvironment){

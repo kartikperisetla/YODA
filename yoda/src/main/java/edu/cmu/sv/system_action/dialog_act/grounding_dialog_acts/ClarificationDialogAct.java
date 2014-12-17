@@ -29,7 +29,7 @@ public abstract class ClarificationDialogAct extends DialogAct {
         return null;
     }
 
-    public abstract Double reward(StringDistribution dialogStateDistribution,
-                                  Map<String, DialogStateHypothesis> dialogStateHypotheses);
+    public abstract Double clarificationReward(StringDistribution dialogStateDistribution,
+                                               Map<String, DialogStateHypothesis> dialogStateHypotheses);
 
 }

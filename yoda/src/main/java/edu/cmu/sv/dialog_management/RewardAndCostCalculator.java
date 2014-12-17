@@ -29,8 +29,8 @@ import java.util.stream.Collectors;
  *
  * Contains standard values and functions that are used to compute utility for possible system actions
  *
- * The basic rule-of-thumb is that 1 reward ~= the reward for successfully executing a dialog task.
- * To set a reward for some other condition, estimate the relative importance of that condition
+ * The basic rule-of-thumb is that 1 clarificationReward ~= the clarificationReward for successfully executing a dialog task.
+ * To set a clarificationReward for some other condition, estimate the relative importance of that condition
  * compared to successfully completing a dialog task.
  *
  */
@@ -81,7 +81,7 @@ public class RewardAndCostCalculator {
     }
 
     /*
-    * Return the specific reward that this argumentation act should give,
+    * Return the specific clarificationReward that this argumentation act should give,
     * based on the analysis of the predecessor discourse unit
     * */
     public static Double discourseIndependentArgumentationReward(DiscourseUnitHypothesis predecessorDiscourseUnit,
@@ -133,8 +133,8 @@ public class RewardAndCostCalculator {
 
 
     /*
-    * To compute the reward for a clarification dialog act,
-    * estimate the improvement in reward to all possible dialog and non-dialog tasks
+    * To compute the clarificationReward for a clarification dialog act,
+    * estimate the improvement in clarificationReward to all possible dialog and non-dialog tasks
     * that relate to all the available DU hypotheses.
     * */
     public static Double clarificationDialogActReward(StringDistribution dialogStateDistribution,
@@ -142,14 +142,14 @@ public class RewardAndCostCalculator {
                                                       StringDistribution predictedRelativeConfidenceGain) {
         Double totalReward = 0.0;
         // sum up the predicted rewards supposing that each current hypothesis is true,
-        // weighting the predicted reward by the current belief that the hypothesis is true.
+        // weighting the predicted clarificationReward by the current belief that the hypothesis is true.
         for (String dialogStateHypothesisID : dialogStateHypotheses.keySet()){
             DialogStateHypothesis dialogStateHypothesis = dialogStateHypotheses.get(dialogStateHypothesisID);
             Double currentConfidence = dialogStateDistribution.get(dialogStateHypothesisID);
             Double predictedConfidence = currentConfidence + (1-currentConfidence)*
                     predictedRelativeConfidenceGain.get(dialogStateHypothesisID);
 
-            // predict the difference in expected reward after clarification
+            // predict the difference in expected clarificationReward after clarification
             for (DiscourseUnitHypothesis contextDiscourseUnit : dialogStateHypothesis.getDiscourseUnitHypothesisMap().values()) {
                 if (contextDiscourseUnit.getInitiator().equals("system"))
                     continue;

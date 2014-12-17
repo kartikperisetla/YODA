@@ -8,6 +8,7 @@ import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.*;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ClarificationDialogAct;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ConfirmValueSuggestion;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestConfirmValue;
+import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestRole;
 import edu.cmu.sv.system_action.non_dialog_task.CreateMeetingTask;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.system_action.non_dialog_task.SendEmailTask;
@@ -27,6 +28,8 @@ public class DialogRegistry {
 
     public static Set<Class <? extends ClarificationDialogAct>> clarificationDialogActs = new HashSet<>();
     public static Set<Class <? extends DialogAct>> argumentationDialogActs = new HashSet<>();
+    public static Set<Class <? extends DialogAct>> slotFillingDialogActs = new HashSet<>();
+
     public static Set<Class <? extends DialogAct>> discourseUnitDialogActs = new HashSet<>();
 
     // map dialog acts to the classes that handle the corresponding non-dialog tasks
@@ -42,6 +45,8 @@ public class DialogRegistry {
         argumentationDialogActs.add(Accept.class);
         argumentationDialogActs.add(Reject.class);
         argumentationDialogActs.add(DontKnow.class);
+
+        slotFillingDialogActs.add(RequestRole.class);
 
         discourseUnitDialogActs.add(WHQuestion.class);
         discourseUnitDialogActs.add(YNQuestion.class);

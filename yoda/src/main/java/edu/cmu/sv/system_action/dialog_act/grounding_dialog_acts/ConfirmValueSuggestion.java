@@ -41,7 +41,7 @@ public class ConfirmValueSuggestion extends ClarificationDialogAct {
     }
 
     @Override
-    public Double reward(StringDistribution dialogStateDistribution, Map<String, DialogStateHypothesis> dialogStateHypotheses) {
+    public Double clarificationReward(StringDistribution dialogStateDistribution, Map<String, DialogStateHypothesis> dialogStateHypotheses) {
         return -1.0;
     }
 }
