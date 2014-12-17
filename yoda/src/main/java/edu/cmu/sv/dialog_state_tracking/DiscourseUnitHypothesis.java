@@ -48,15 +48,11 @@ public class DiscourseUnitHypothesis {
         return null;
     }
 
-    public JSONObject getVerb(){
+    public Object getFromInitiator(String slotPath){
         if (initiator.equals("user")){
-            if (spokenByThem.newGetSlotPathFiller("verb")==null)
-                return null;
-            return (JSONObject)spokenByThem.newGetSlotPathFiller("verb");
-        } else {
-            if (spokenByMe.newGetSlotPathFiller("verb")==null)
-                return null;
-            return (JSONObject)spokenByMe.newGetSlotPathFiller("verb");
+            return spokenByThem.newGetSlotPathFiller(slotPath);
+        } else { //initiator.equals("system")
+            return spokenByMe.newGetSlotPathFiller("verb");
         }
     }
 

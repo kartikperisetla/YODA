@@ -9,6 +9,7 @@ import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.ThingWithRoles;
 import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ClarificationDialogAct;
+import edu.cmu.sv.utils.Combination;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.system_action.SystemAction;
@@ -16,6 +17,7 @@ import edu.cmu.sv.system_action.dialog_act.*;
 
 import edu.cmu.sv.utils.HypothesisSetManagement;
 import org.apache.commons.lang3.tuple.Pair;
+import org.json.simple.JSONObject;
 
 import java.io.IOException;
 import java.util.*;
@@ -97,6 +99,7 @@ public class DialogManager implements Runnable {
                     }
                 }
 
+                //// slot-filling dialog acts
                 for (Class<? extends DialogAct> dialogActClass : DialogRegistry.slotFillingDialogActs){
                     DialogAct dialogActInstance = dialogActClass.newInstance();
 
@@ -108,9 +111,9 @@ public class DialogManager implements Runnable {
                         Class<? extends ThingWithRoles> verbClass =
                                 (Class<? extends ThingWithRoles>)
                                 OntologyRegistry.thingNameMap.get(
-                                        (String)contextDiscourseUnitHypothesis.getVerb().get("class"));
+                                        (String) contextDiscourseUnitHypothesis.getFromInitiator("verb.class"));
 
-                        Map<String, Set<String>> possibleBindingsPerVariable = new HashMap<>();
+                        Map<String, Set<Object>> possibleBindingsPerVariable = new HashMap<>();
                         if (dialogActInstance.getPathParameters().containsKey("given_role_path")) {
                             possibleBindingsPerVariable.put("given_role_path",
                                     OntologyRegistry.roleClasses.stream().
@@ -118,6 +121,33 @@ public class DialogManager implements Runnable {
                                             map(x -> "verb." + x.getSimpleName()).
                                             collect(Collectors.toSet()));
                         }
+                        if (dialogActInstance.getPathParameters().containsKey("requested_role_path")){
+                            possibleBindingsPerVariable.put("requested_role_path",
+                                    OntologyRegistry.roleClasses.stream().
+                                            filter(x -> OntologyRegistry.inDomain(x, verbClass)).
+                                            map(x -> "verb." + x.getSimpleName()).
+                                            collect(Collectors.toSet()));
+                        }
+                        possibleBindingsPerVariable.put("verb_class", new HashSet<>(Arrays.asList(verbClass.getSimpleName())));
+
+                        Set<Map<String, Object>> possibleBindings = Combination.possibleBindings(possibleBindingsPerVariable);
+                        for (Map<String, Object> binding : possibleBindings){
+                            if (binding.containsKey("given_role_path")){
+                                Object givenRoleDescription = contextDiscourseUnitHypothesis.getFromInitiator("given_role_path");
+                                if (givenRoleDescription==null)
+                                    continue;
+                                // add description parameter that corresponds to the path parameter
+                                if(dialogActInstance.getDescriptionParameters().containsKey("given_role_description")) {
+                                    binding.put("given_role_description", givenRoleDescription);
+                                }
+                            }
+                            DialogAct newDialogActInstance = dialogActClass.newInstance();
+                            newDialogActInstance.bindVariables(binding);
+                            Double currentReward = newDialogActInstance.reward(currentDialogStateHypothesis, contextDiscourseUnitHypothesis);
+                            accumulateReward(actionExpectedReward, newDialogActInstance, currentReward);
+
+                        }
+
                     }
                 }
 
