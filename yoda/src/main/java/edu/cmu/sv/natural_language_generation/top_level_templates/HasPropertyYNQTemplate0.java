@@ -1,4 +1,4 @@
-package edu.cmu.sv.natural_language_generation.Templates;
+package edu.cmu.sv.natural_language_generation.top_level_templates;
 
 import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;

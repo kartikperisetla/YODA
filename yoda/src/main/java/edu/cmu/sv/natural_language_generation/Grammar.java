@@ -1,7 +1,8 @@
 package edu.cmu.sv.natural_language_generation;
 
 
-import edu.cmu.sv.natural_language_generation.Templates.*;
+import edu.cmu.sv.natural_language_generation.internal_templates.*;
+import edu.cmu.sv.natural_language_generation.top_level_templates.*;
 
 import java.util.HashMap;
 import java.util.HashSet;

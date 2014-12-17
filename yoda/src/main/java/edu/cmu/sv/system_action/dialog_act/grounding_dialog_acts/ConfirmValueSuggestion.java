@@ -19,6 +19,17 @@ import java.util.Map;
 public class ConfirmValueSuggestion extends ClarificationDialogAct {
     static Map<String, Class<? extends Thing>> individualParameters = new HashMap<>();
     static Map<String, Class<? extends Thing>> classParameters = new HashMap<>();
+    static Map<String, Class<? extends Thing>> descriptionParameters = new HashMap<>();
+    static Map<String, Class<? extends Thing>> pathParameters = new HashMap<>();
+    @Override
+    public Map<String, Class<? extends Thing>> getPathParameters() {
+        return pathParameters;
+    }
+
+    @Override
+    public Map<String, Class<? extends Thing>> getDescriptionParameters() {
+        return descriptionParameters;
+    }
 
     @Override
     public Map<String, Class<? extends Thing>> getClassParameters() {
