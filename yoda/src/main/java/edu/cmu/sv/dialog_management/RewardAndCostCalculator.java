@@ -1,28 +1,20 @@
 package edu.cmu.sv.dialog_management;
 
 import com.google.common.primitives.Doubles;
-import edu.cmu.sv.database.Database;
-import edu.cmu.sv.dialog_state_tracking.DialogStateHypothesis;
-import edu.cmu.sv.dialog_state_tracking.DiscourseUnitHypothesis;
+import edu.cmu.sv.dialog_state_tracking.DialogState;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.dialog_state_tracking.Utils;
-import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.misc.WebResource;
 import edu.cmu.sv.ontology.role.HasURI;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
-import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Accept;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.DontKnow;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Reject;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.YNQuestion;
-import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
-import edu.cmu.sv.system_action.non_dialog_task.NonDialogTaskPreferences;
 import edu.cmu.sv.utils.StringDistribution;
-import org.json.simple.JSONObject;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Created by David Cohen on 9/8/14.
@@ -48,7 +40,7 @@ public class RewardAndCostCalculator {
     * If this is a grounding act, duHypothesis is the DU that the system intends to clarify,
     * Otherwise, this is the DU that the system intends to respond to.
     * */
-    public static Double probabilityInterpretedCorrectly(DiscourseUnitHypothesis duHypothesis, DialogStateHypothesis dsHypothesis,
+    public static Double probabilityInterpretedCorrectly(DiscourseUnit duHypothesis, DialogState dsHypothesis,
                                                          DialogAct dialogAct){
         if (dialogAct instanceof Accept || dialogAct instanceof Reject || dialogAct instanceof DontKnow) {
             if (!duHypothesis.getInitiator().equals("user"))
@@ -62,7 +54,7 @@ public class RewardAndCostCalculator {
         return 0.0;
     }
 
-    public static boolean answerAlreadyProvided(DiscourseUnitHypothesis predecessor, DialogStateHypothesis dsHypothesis){
+    public static boolean answerAlreadyProvided(DiscourseUnit predecessor, DialogState dsHypothesis){
         return answerObliged(predecessor) &&
                 dsHypothesis.getArgumentationLinks().stream().anyMatch(
                         x -> dsHypothesis.getDiscourseUnitHypothesisMap().get(x.getPredecessor()).equals(predecessor));
@@ -71,7 +63,7 @@ public class RewardAndCostCalculator {
     /*
     * Return weather or not the predecessor obliges a response
     * */
-    public static boolean answerObliged(DiscourseUnitHypothesis predecessor){
+    public static boolean answerObliged(DiscourseUnit predecessor){
         String predecessorDialogAct;
         if (predecessor.getInitiator().equals("user"))
             predecessorDialogAct = (String) predecessor.getSpokenByThem().newGetSlotPathFiller("dialogAct");
@@ -84,7 +76,7 @@ public class RewardAndCostCalculator {
     * Return the specific clarificationReward that this argumentation act should give,
     * based on the analysis of the predecessor discourse unit
     * */
-    public static Double discourseIndependentArgumentationReward(DiscourseUnitHypothesis predecessorDiscourseUnit,
+    public static Double discourseIndependentArgumentationReward(DiscourseUnit predecessorDiscourseUnit,
                                                                  DialogAct dialogAct){
 //        System.out.println("discourseIndependentArgumentationReward: "+dialogAct);
         Double probabilityCorrectAnswer = 0.0;
@@ -108,22 +100,22 @@ public class RewardAndCostCalculator {
     * initiator
     * */
     public static Double outstandingGroundingRequest(StringDistribution dialogStateDistribution,
-                                                     Map<String, DialogStateHypothesis> dialogStateHypotheses,
+                                                     Map<String, DialogState> dialogStateHypotheses,
                                                      String initiator){
         Double ans = 0.0;
         for (String dialogStateHypothesisId : dialogStateDistribution.keySet()){
-            for (DiscourseUnitHypothesis discourseUnitHypothesis : dialogStateHypotheses.get(dialogStateHypothesisId).
+            for (DiscourseUnit discourseUnit : dialogStateHypotheses.get(dialogStateHypothesisId).
                     getDiscourseUnitHypothesisMap().values()){
                 Double probabilityActive = Utils.discourseUnitContextProbability(
                         dialogStateHypotheses.get(dialogStateHypothesisId),
-                        discourseUnitHypothesis);
-                if (!discourseUnitHypothesis.getInitiator().equals(initiator))
+                        discourseUnit);
+                if (!discourseUnit.getInitiator().equals(initiator))
                     continue;
                 if (initiator.equals("system")) {
-                    if (discourseUnitHypothesis.getSpokenByThem()!=null)
+                    if (discourseUnit.getSpokenByThem()!=null)
                         ans += probabilityActive * dialogStateDistribution.get(dialogStateHypothesisId);
                 } else { // initiator = "user"
-                    if (discourseUnitHypothesis.getSpokenByMe()!=null)
+                    if (discourseUnit.getSpokenByMe()!=null)
                         ans += probabilityActive * dialogStateDistribution.get(dialogStateHypothesisId);
                 }
             }
@@ -138,22 +130,22 @@ public class RewardAndCostCalculator {
     * that relate to all the available DU hypotheses.
     * */
     public static Double clarificationDialogActReward(StringDistribution dialogStateDistribution,
-                                                      Map<String, DialogStateHypothesis> dialogStateHypotheses,
+                                                      Map<String, DialogState> dialogStateHypotheses,
                                                       StringDistribution predictedRelativeConfidenceGain) {
         Double totalReward = 0.0;
         // sum up the predicted rewards supposing that each current hypothesis is true,
         // weighting the predicted clarificationReward by the current belief that the hypothesis is true.
         for (String dialogStateHypothesisID : dialogStateHypotheses.keySet()){
-            DialogStateHypothesis dialogStateHypothesis = dialogStateHypotheses.get(dialogStateHypothesisID);
+            DialogState dialogState = dialogStateHypotheses.get(dialogStateHypothesisID);
             Double currentConfidence = dialogStateDistribution.get(dialogStateHypothesisID);
             Double predictedConfidence = currentConfidence + (1-currentConfidence)*
                     predictedRelativeConfidenceGain.get(dialogStateHypothesisID);
 
             // predict the difference in expected clarificationReward after clarification
-            for (DiscourseUnitHypothesis contextDiscourseUnit : dialogStateHypothesis.getDiscourseUnitHypothesisMap().values()) {
+            for (DiscourseUnit contextDiscourseUnit : dialogState.getDiscourseUnitHypothesisMap().values()) {
                 if (contextDiscourseUnit.getInitiator().equals("system"))
                     continue;
-                Double discourseUnitConfidence = Utils.discourseUnitContextProbability(dialogStateHypothesis, contextDiscourseUnit);
+                Double discourseUnitConfidence = Utils.discourseUnitContextProbability(dialogState, contextDiscourseUnit);
 
 //                SemanticsModel spokenByThem = contextDiscourseUnit.getSpokenByThem();
 //                Class<? extends DialogAct> daClass = DialogRegistry.dialogActNameMap.
@@ -191,7 +183,7 @@ public class RewardAndCostCalculator {
     * it does not confirm anything about which role it fills
     * */
     public static StringDistribution predictConfidenceGainFromValueConfirmation(StringDistribution dialogStateDistribution,
-                                                                                Map<String, DialogStateHypothesis> dialogStateHypotheses,
+                                                                                Map<String, DialogState> dialogStateHypotheses,
                                                                                 String valueUri){
         if (dialogStateDistribution.keySet().size()!=dialogStateHypotheses.size()){
             System.out.println("BIG PROBLEM:\n"+dialogStateHypotheses+"\n"+dialogStateDistribution);
@@ -204,12 +196,12 @@ public class RewardAndCostCalculator {
         Map<String, Double> hasValueMap = new HashMap<>();
         for (String dialogStateHypothesisId : dialogStateDistribution.keySet()){
             hasValueMap.put(dialogStateHypothesisId, 0.0);
-            DialogStateHypothesis dialogStateHypothesis = dialogStateHypotheses.get(dialogStateHypothesisId);
-            for (DiscourseUnitHypothesis contextDiscourseUnit : dialogStateHypothesis.getDiscourseUnitHypothesisMap().values()){
+            DialogState dialogState = dialogStateHypotheses.get(dialogStateHypothesisId);
+            for (DiscourseUnit contextDiscourseUnit : dialogState.getDiscourseUnitHypothesisMap().values()){
 //                System.out.println("predicting confidence gain: contextDU:\n"+contextDiscourseUnit);
                 if (contextDiscourseUnit.getInitiator().equals("system"))
                     continue;
-                Double discourseUnitConfidence = Utils.discourseUnitContextProbability(dialogStateHypothesis, contextDiscourseUnit);
+                Double discourseUnitConfidence = Utils.discourseUnitContextProbability(dialogState, contextDiscourseUnit);
 //                discourseUnitConfidence *= Math.pow(.1, Utils.numberOfLinksRespondingToDiscourseUnit(contextDiscourseUnit, dialogStateHypothesis));
                 boolean anyMatches = false;
                 for (String path : contextDiscourseUnit.getGroundInterpretation().findAllPathsToClass(WebResource.class.getSimpleName())){

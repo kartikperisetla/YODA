@@ -21,11 +21,11 @@ import java.util.Map;
 public class AnswerInference extends DialogStateUpdateInference {
 
     @Override
-    public Pair<Map<String, DialogStateHypothesis>, StringDistribution> applyAll(
-            YodaEnvironment yodaEnvironment, DialogStateHypothesis currentState, Turn turn, long timeStamp) {
+    public Pair<Map<String, DialogState>, StringDistribution> applyAll(
+            YodaEnvironment yodaEnvironment, DialogState currentState, Turn turn, long timeStamp) {
 
         StringDistribution resultDistribution = new StringDistribution();
-        Map<String, DialogStateHypothesis> resultHypotheses = new HashMap<>();
+        Map<String, DialogState> resultHypotheses = new HashMap<>();
 
         int newHypothesisCounter = 0;
         if (turn.speaker.equals("user")){
@@ -68,7 +68,7 @@ public class AnswerInference extends DialogStateUpdateInference {
             if (Arrays.asList(Accept.class.getSimpleName(), Reject.class.getSimpleName(), DontKnow.class.getSimpleName()).
                     contains(dialogAct)) {
                 for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
-                    DiscourseUnitHypothesis predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId);
+                    DiscourseUnit predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId);
                     try {
                         Assert.verify(!predecessor.initiator.equals("system"));
                         String predecessorDialogAct = predecessor.spokenByThem.getSlotPathFiller("dialogAct");
@@ -79,22 +79,22 @@ public class AnswerInference extends DialogStateUpdateInference {
 
                     String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
 
-                    DialogStateHypothesis newDialogStateHypothesis = currentState.deepCopy();
-                    DiscourseUnitHypothesis newDUHypothesis = new DiscourseUnitHypothesis();
+                    DialogState newDialogState = currentState.deepCopy();
+                    DiscourseUnit newDUHypothesis = new DiscourseUnit();
                     SemanticsModel newSpokenByMeHypothesis = turn.systemUtterance.deepCopy();
                     newDUHypothesis.timeOfLastActByMe = timeStamp;
                     newDUHypothesis.spokenByMe = newSpokenByMeHypothesis;
                     newDUHypothesis.groundTruth = turn.groundedSystemMeaning;
                     newDUHypothesis.initiator = turn.speaker;
-                    newDialogStateHypothesis.discourseUnitCounter += 1;
-                    String newDiscourseUnitId = "du_" + newDialogStateHypothesis.discourseUnitCounter;
-                    newDialogStateHypothesis.getDiscourseUnitHypothesisMap().
+                    newDialogState.discourseUnitCounter += 1;
+                    String newDiscourseUnitId = "du_" + newDialogState.discourseUnitCounter;
+                    newDialogState.getDiscourseUnitHypothesisMap().
                             put(newDiscourseUnitId, newDUHypothesis);
-                    newDialogStateHypothesis.getArgumentationLinks().add(
-                            new DialogStateHypothesis.ArgumentationLink(predecessorId, newDiscourseUnitId));
-                    resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
+                    newDialogState.getArgumentationLinks().add(
+                            new DialogState.ArgumentationLink(predecessorId, newDiscourseUnitId));
+                    resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
                     resultDistribution.put(newDialogStateHypothesisID,
-                            Utils.discourseUnitContextProbability(newDialogStateHypothesis, predecessor));
+                            Utils.discourseUnitContextProbability(newDialogState, predecessor));
                 }
 
             }

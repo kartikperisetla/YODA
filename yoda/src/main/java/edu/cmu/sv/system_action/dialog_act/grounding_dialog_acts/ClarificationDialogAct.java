@@ -1,14 +1,10 @@
 package edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts;
 
-import edu.cmu.sv.dialog_state_tracking.DialogStateHypothesis;
-import edu.cmu.sv.dialog_state_tracking.DiscourseUnitHypothesis;
-import edu.cmu.sv.ontology.Thing;
-import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.system_action.SystemAction;
+import edu.cmu.sv.dialog_state_tracking.DialogState;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.utils.StringDistribution;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -24,12 +20,12 @@ import java.util.Map;
 public abstract class ClarificationDialogAct extends DialogAct {
 
     @Override
-    public Double reward(DialogStateHypothesis dialogStateHypothesis,
-                         DiscourseUnitHypothesis discourseUnitHypothesis) {
+    public Double reward(DialogState dialogState,
+                         DiscourseUnit discourseUnit) {
         return null;
     }
 
     public abstract Double clarificationReward(StringDistribution dialogStateDistribution,
-                                               Map<String, DialogStateHypothesis> dialogStateHypotheses);
+                                               Map<String, DialogState> dialogStateHypotheses);
 
 }

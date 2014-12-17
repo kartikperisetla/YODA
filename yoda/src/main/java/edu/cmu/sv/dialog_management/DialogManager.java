@@ -1,13 +1,11 @@
 package edu.cmu.sv.dialog_management;
 
 import edu.cmu.sv.database.dialog_task.ActionEnumeration;
-import edu.cmu.sv.dialog_state_tracking.DialogStateHypothesis;
-import edu.cmu.sv.dialog_state_tracking.DiscourseUnitHypothesis;
+import edu.cmu.sv.dialog_state_tracking.DialogState;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.natural_language_generation.Grammar;
 import edu.cmu.sv.ontology.OntologyRegistry;
-import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.ThingWithRoles;
-import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ClarificationDialogAct;
 import edu.cmu.sv.utils.Combination;
 import edu.cmu.sv.utils.StringDistribution;
@@ -17,7 +15,6 @@ import edu.cmu.sv.system_action.dialog_act.*;
 
 import edu.cmu.sv.utils.HypothesisSetManagement;
 import org.apache.commons.lang3.tuple.Pair;
-import org.json.simple.JSONObject;
 
 import java.io.IOException;
 import java.util.*;
@@ -49,7 +46,7 @@ public class DialogManager implements Runnable {
 
     YodaEnvironment yodaEnvironment;
     StringDistribution dialogStateDistribution = new StringDistribution();
-    Map<String, DialogStateHypothesis> dialogStateHypotheses = new HashMap<>();
+    Map<String, DialogState> dialogStateHypotheses = new HashMap<>();
 
     public YodaEnvironment getYodaEnvironment() {
         return yodaEnvironment;
@@ -79,20 +76,20 @@ public class DialogManager implements Runnable {
 
             // enumerate and evaluate actions that can be evaluated by summing marginals across the dialog state distribution
             for (String dialogStateHypothesisId : dialogStateHypotheses.keySet()) {
-                DialogStateHypothesis currentDialogStateHypothesis = dialogStateHypotheses.get(dialogStateHypothesisId);
+                DialogState currentDialogState = dialogStateHypotheses.get(dialogStateHypothesisId);
                 for (Class<? extends DialogAct> dialogActClass : DialogRegistry.argumentationDialogActs) {
                     DialogAct dialogActInstance = dialogActClass.newInstance();
                     Set<Map<String, Object>> possibleBindings = ActionEnumeration.
                             getPossibleBindings(dialogActInstance, yodaEnvironment);
                     for (Map<String, Object> binding : possibleBindings) {
-                        for (String discourseUnitHypothesisId : currentDialogStateHypothesis.getDiscourseUnitHypothesisMap().
+                        for (String discourseUnitHypothesisId : currentDialogState.getDiscourseUnitHypothesisMap().
                                 keySet()) {
-                            DiscourseUnitHypothesis contextDiscourseUnitHypothesis = currentDialogStateHypothesis.
+                            DiscourseUnit contextDiscourseUnit = currentDialogState.
                                     getDiscourseUnitHypothesisMap().get(discourseUnitHypothesisId);
                             DialogAct newDialogActInstance = dialogActClass.newInstance();
                             newDialogActInstance.bindVariables(binding);
                             Double currentReward = newDialogActInstance.reward(
-                                    currentDialogStateHypothesis, contextDiscourseUnitHypothesis) *
+                                    currentDialogState, contextDiscourseUnit) *
                                     dialogStateDistribution.get(dialogStateHypothesisId);
                             accumulateReward(actionExpectedReward, newDialogActInstance, currentReward);
                         }
@@ -103,15 +100,15 @@ public class DialogManager implements Runnable {
                 for (Class<? extends DialogAct> dialogActClass : DialogRegistry.slotFillingDialogActs){
                     DialogAct dialogActInstance = dialogActClass.newInstance();
 
-                    for (String discourseUnitHypothesisId : currentDialogStateHypothesis.getDiscourseUnitHypothesisMap().
+                    for (String discourseUnitHypothesisId : currentDialogState.getDiscourseUnitHypothesisMap().
                             keySet()) {
-                        DiscourseUnitHypothesis contextDiscourseUnitHypothesis = currentDialogStateHypothesis.
+                        DiscourseUnit contextDiscourseUnit = currentDialogState.
                                 getDiscourseUnitHypothesisMap().get(discourseUnitHypothesisId);
 
                         Class<? extends ThingWithRoles> verbClass =
                                 (Class<? extends ThingWithRoles>)
                                 OntologyRegistry.thingNameMap.get(
-                                        (String) contextDiscourseUnitHypothesis.getFromInitiator("verb.class"));
+                                        (String) contextDiscourseUnit.getFromInitiator("verb.class"));
 
                         Map<String, Set<Object>> possibleBindingsPerVariable = new HashMap<>();
                         if (dialogActInstance.getPathParameters().containsKey("given_role_path")) {
@@ -133,7 +130,7 @@ public class DialogManager implements Runnable {
                         Set<Map<String, Object>> possibleBindings = Combination.possibleBindings(possibleBindingsPerVariable);
                         for (Map<String, Object> binding : possibleBindings){
                             if (binding.containsKey("given_role_path")){
-                                Object givenRoleDescription = contextDiscourseUnitHypothesis.getFromInitiator("given_role_path");
+                                Object givenRoleDescription = contextDiscourseUnit.getFromInitiator("given_role_path");
                                 if (givenRoleDescription==null)
                                     continue;
                                 // add description parameter that corresponds to the path parameter
@@ -143,7 +140,7 @@ public class DialogManager implements Runnable {
                             }
                             DialogAct newDialogActInstance = dialogActClass.newInstance();
                             newDialogActInstance.bindVariables(binding);
-                            Double currentReward = newDialogActInstance.reward(currentDialogStateHypothesis, contextDiscourseUnitHypothesis);
+                            Double currentReward = newDialogActInstance.reward(currentDialogState, contextDiscourseUnit);
                             accumulateReward(actionExpectedReward, newDialogActInstance, currentReward);
 
                         }
@@ -217,10 +214,10 @@ public class DialogManager implements Runnable {
     public void run() {
         while (true){
             try {
-                Pair<Map<String, DialogStateHypothesis>, StringDistribution> DmInput = null;
+                Pair<Map<String, DialogState>, StringDistribution> DmInput = null;
                 // empty out the queue to get the most recent dialog state
                 while (true) {
-                    Pair<Map<String, DialogStateHypothesis>, StringDistribution> tmp;
+                    Pair<Map<String, DialogState>, StringDistribution> tmp;
                     tmp = yodaEnvironment.DmInputQueue.poll(100, TimeUnit.MILLISECONDS);
                     if (tmp==null)
                         break;

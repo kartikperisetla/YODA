@@ -22,10 +22,10 @@ import java.util.Map;
  */
 public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpdateInference {
     @Override
-    public Pair<Map<String, DialogStateHypothesis>, StringDistribution> applyAll(
-            YodaEnvironment yodaEnvironment, DialogStateHypothesis currentState, Turn turn, long timeStamp) {
+    public Pair<Map<String, DialogState>, StringDistribution> applyAll(
+            YodaEnvironment yodaEnvironment, DialogState currentState, Turn turn, long timeStamp) {
         StringDistribution resultDistribution = new StringDistribution();
-        Map<String, DialogStateHypothesis> resultHypotheses = new HashMap<>();
+        Map<String, DialogState> resultHypotheses = new HashMap<>();
 
         int newHypothesisCounter = 0;
         if (turn.speaker.equals("user")) {
@@ -34,7 +34,7 @@ public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpda
                 String dialogAct = hypModel.getSlotPathFiller("dialogAct");
                 if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(Fragment.class)) {
                     for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
-                        DiscourseUnitHypothesis predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId).deepCopy();
+                        DiscourseUnit predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId).deepCopy();
 
                         JSONObject correctionContent;
                         Utils.DiscourseUnitAnalysis duAnalysis = new Utils.DiscourseUnitAnalysis(predecessor, yodaEnvironment);
@@ -54,19 +54,19 @@ public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpda
                         SemanticsModel.putAtPath(predecessor.groundInterpretation.getInternalRepresentation(),
                                 duAnalysis.suggestionPath, null);
 
-                        Pair<Map<String, DiscourseUnitHypothesis>, StringDistribution> groundedHypotheses =
+                        Pair<Map<String, DiscourseUnit>, StringDistribution> groundedHypotheses =
                                 predecessor.ground(yodaEnvironment);
                         for (String groundedDuKey: groundedHypotheses.getRight().keySet()) {
                             String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
-                            DiscourseUnitHypothesis currentDu = groundedHypotheses.getLeft().get(groundedDuKey);
-                            DialogStateHypothesis newDialogStateHypothesis = currentState.deepCopy();
-                            newDialogStateHypothesis.getDiscourseUnitHypothesisMap().put(predecessorId, currentDu);
+                            DiscourseUnit currentDu = groundedHypotheses.getLeft().get(groundedDuKey);
+                            DialogState newDialogState = currentState.deepCopy();
+                            newDialogState.getDiscourseUnitHypothesisMap().put(predecessorId, currentDu);
 
                             Utils.returnToGround(currentDu, newSpokenByThemHypothesis, timeStamp);
                             currentDu.analyse(yodaEnvironment);
-                            resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
+                            resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
                             Double score = groundedHypotheses.getRight().get(groundedDuKey) *
-                                    Utils.discourseUnitContextProbability(newDialogStateHypothesis, currentDu);
+                                    Utils.discourseUnitContextProbability(newDialogState, currentDu);
                             resultDistribution.put(newDialogStateHypothesisID, score);
                         }
 

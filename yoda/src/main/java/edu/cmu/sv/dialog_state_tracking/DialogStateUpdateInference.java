@@ -17,7 +17,7 @@ public abstract class DialogStateUpdateInference {
     * The returned values won't replace the previous hypotheses, but its hypotheses will
     * be weighted by the assumed hypothesis' prior and collected to create the new tracking state
     * */
-    public abstract Pair<Map<String, DialogStateHypothesis>, StringDistribution> applyAll(
-            YodaEnvironment yodaEnvironment, DialogStateHypothesis currentState, Turn turn, long timeStamp);
+    public abstract Pair<Map<String, DialogState>, StringDistribution> applyAll(
+            YodaEnvironment yodaEnvironment, DialogState currentState, Turn turn, long timeStamp);
 
 }

@@ -1,15 +1,9 @@
 package edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts;
 
-import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
-import edu.cmu.sv.dialog_state_tracking.DialogStateHypothesis;
-import edu.cmu.sv.dialog_state_tracking.DiscourseUnitHypothesis;
+import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.ontology.Thing;
-import edu.cmu.sv.ontology.noun.Noun;
-import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.utils.StringDistribution;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,7 +35,7 @@ public class ConfirmValueSuggestion extends ClarificationDialogAct {
     }
 
     @Override
-    public Double clarificationReward(StringDistribution dialogStateDistribution, Map<String, DialogStateHypothesis> dialogStateHypotheses) {
+    public Double clarificationReward(StringDistribution dialogStateDistribution, Map<String, DialogState> dialogStateHypotheses) {
         return -1.0;
     }
 }

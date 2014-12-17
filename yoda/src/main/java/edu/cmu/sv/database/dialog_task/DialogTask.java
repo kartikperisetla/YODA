@@ -1,6 +1,6 @@
 package edu.cmu.sv.database.dialog_task;
 
-import edu.cmu.sv.dialog_state_tracking.DiscourseUnitHypothesis;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -23,9 +23,9 @@ public abstract class DialogTask{
         return taskSpec;
     }
 
-    public abstract Pair<Map<String, DiscourseUnitHypothesis>, StringDistribution> ground(
-            DiscourseUnitHypothesis hypothesis, YodaEnvironment yodaEnvironment);
+    public abstract Pair<Map<String, DiscourseUnit>, StringDistribution> ground(
+            DiscourseUnit hypothesis, YodaEnvironment yodaEnvironment);
 
-    public abstract void analyse(DiscourseUnitHypothesis hypothesis, YodaEnvironment yodaEnvironment);
+    public abstract void analyse(DiscourseUnit hypothesis, YodaEnvironment yodaEnvironment);
 
 }

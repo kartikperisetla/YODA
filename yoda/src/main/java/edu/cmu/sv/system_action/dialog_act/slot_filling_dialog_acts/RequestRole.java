@@ -1,15 +1,12 @@
 package edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts;
 
-import edu.cmu.sv.dialog_state_tracking.DialogStateHypothesis;
-import edu.cmu.sv.dialog_state_tracking.DiscourseUnitHypothesis;
-import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.dialog_state_tracking.DialogState;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.misc.Requested;
-import edu.cmu.sv.ontology.noun.Noun;
 import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
-import org.json.simple.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +45,7 @@ public class RequestRole extends DialogAct{
     }
 
     @Override
-    public Double reward(DialogStateHypothesis dialogStateHypothesis, DiscourseUnitHypothesis discourseUnitHypothesis) {
+    public Double reward(DialogState dialogState, DiscourseUnit discourseUnit) {
         return 0.0;
     }
 

@@ -1,18 +1,13 @@
 package edu.cmu.sv.dialog_state_tracking;
 
-import edu.cmu.sv.system_action.dialog_act.DialogAct;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Accept;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.DontKnow;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
 import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Reject;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,11 +21,11 @@ public class PresentInference extends DialogStateUpdateInference {
     private final static double penaltyForReinterpretingFragment = .5;
 
     @Override
-    public Pair<Map<String, DialogStateHypothesis>, StringDistribution> applyAll(
-            YodaEnvironment yodaEnvironment, DialogStateHypothesis currentState, Turn turn, long timeStamp) {
+    public Pair<Map<String, DialogState>, StringDistribution> applyAll(
+            YodaEnvironment yodaEnvironment, DialogState currentState, Turn turn, long timeStamp) {
 
         StringDistribution resultDistribution = new StringDistribution();
-        Map<String, DialogStateHypothesis> resultHypotheses = new HashMap<>();
+        Map<String, DialogState> resultHypotheses = new HashMap<>();
 
         int newHypothesisCounter = 0;
         if (turn.speaker.equals("user")){
@@ -39,26 +34,26 @@ public class PresentInference extends DialogStateUpdateInference {
 
                 // if the DA is one of the discourseUnitDialogActs, leave it alone
                 if (DialogRegistry.discourseUnitDialogActs.contains(DialogRegistry.dialogActNameMap.get(dialogAct))){
-                    DiscourseUnitHypothesis newDUHypothesis = new DiscourseUnitHypothesis();
+                    DiscourseUnit newDUHypothesis = new DiscourseUnit();
                     SemanticsModel newSpokenByThemHypothesis = turn.hypotheses.get(sluHypothesisID).deepCopy();
                     newDUHypothesis.timeOfLastActByThem = timeStamp;
                     newDUHypothesis.spokenByThem = newSpokenByThemHypothesis;
                     newDUHypothesis.initiator = turn.speaker;
 
-                    Pair<Map<String, DiscourseUnitHypothesis>, StringDistribution> groundedHypotheses =
+                    Pair<Map<String, DiscourseUnit>, StringDistribution> groundedHypotheses =
                             newDUHypothesis.ground(yodaEnvironment);
                     for (String groundedDuKey: groundedHypotheses.getRight().keySet()){
                         String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
-                        DialogStateHypothesis newDialogStateHypothesis = currentState.deepCopy();
-                        DiscourseUnitHypothesis currentDu = groundedHypotheses.getLeft().get(groundedDuKey);
+                        DialogState newDialogState = currentState.deepCopy();
+                        DiscourseUnit currentDu = groundedHypotheses.getLeft().get(groundedDuKey);
                         currentDu.analyse(yodaEnvironment);
-                        newDialogStateHypothesis.discourseUnitCounter += 1;
-                        newDialogStateHypothesis.getDiscourseUnitHypothesisMap().
-                                put("du_"+newDialogStateHypothesis.discourseUnitCounter, currentDu);
-                        newDialogStateHypothesis.getDiscourseUnitHypothesisMap().
-                                get("du_"+newDialogStateHypothesis.discourseUnitCounter).analyse(yodaEnvironment);
+                        newDialogState.discourseUnitCounter += 1;
+                        newDialogState.getDiscourseUnitHypothesisMap().
+                                put("du_"+ newDialogState.discourseUnitCounter, currentDu);
+                        newDialogState.getDiscourseUnitHypothesisMap().
+                                get("du_"+ newDialogState.discourseUnitCounter).analyse(yodaEnvironment);
                         resultDistribution.put(newDialogStateHypothesisID, groundedHypotheses.getRight().get(groundedDuKey));
-                        resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
+                        resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
                     }
 
                 } else if (dialogAct.equals(Fragment.class.getSimpleName())){
@@ -71,19 +66,19 @@ public class PresentInference extends DialogStateUpdateInference {
             String dialogAct = turn.systemUtterance.getSlotPathFiller("dialogAct");
             if (DialogRegistry.discourseUnitDialogActs.contains(DialogRegistry.dialogActNameMap.get(dialogAct))) {
                 String newDialogStateHypothesisID = "dialog_state_hyp_0";
-                DiscourseUnitHypothesis newDUHypothesis = new DiscourseUnitHypothesis();
+                DiscourseUnit newDUHypothesis = new DiscourseUnit();
                 SemanticsModel newSpokenByMeHypothesis = turn.systemUtterance.deepCopy();
                 newDUHypothesis.timeOfLastActByMe = timeStamp;
                 newDUHypothesis.spokenByMe = newSpokenByMeHypothesis;
                 newDUHypothesis.groundTruth = turn.groundedSystemMeaning;
                 newDUHypothesis.initiator = turn.speaker;
 
-                DialogStateHypothesis newDialogStateHypothesis = currentState.deepCopy();
-                newDialogStateHypothesis.discourseUnitCounter += 1;
-                newDialogStateHypothesis.getDiscourseUnitHypothesisMap().
-                        put("du_" + newDialogStateHypothesis.discourseUnitCounter, newDUHypothesis);
+                DialogState newDialogState = currentState.deepCopy();
+                newDialogState.discourseUnitCounter += 1;
+                newDialogState.getDiscourseUnitHypothesisMap().
+                        put("du_" + newDialogState.discourseUnitCounter, newDUHypothesis);
                 resultDistribution.put(newDialogStateHypothesisID, 1.0);
-                resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
+                resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
             }
         }
 

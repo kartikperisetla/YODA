@@ -6,14 +6,13 @@ import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.Pair;
-import org.json.simple.JSONObject;
 
 import java.util.Map;
 
 /**
  * Created by David Cohen on 9/17/14.
  */
-public class DiscourseUnitHypothesis {
+public class DiscourseUnit {
     SemanticsModel spokenByMe;
     SemanticsModel spokenByThem;
     Long timeOfLastActByThem;
@@ -35,7 +34,7 @@ public class DiscourseUnitHypothesis {
         return ans;
     }
 
-    public Pair<Map<String, DiscourseUnitHypothesis>, StringDistribution> ground(YodaEnvironment yodaEnvironment){
+    public Pair<Map<String, DiscourseUnit>, StringDistribution> ground(YodaEnvironment yodaEnvironment){
         try {
             String dialogActString = (String) spokenByThem.newGetSlotPathFiller("dialogAct");
             Class<? extends DialogTask> taskClass = DialogRegistry.dialogTaskMap.
@@ -68,8 +67,8 @@ public class DiscourseUnitHypothesis {
         }
     }
 
-    public DiscourseUnitHypothesis deepCopy(){
-        DiscourseUnitHypothesis ans = new DiscourseUnitHypothesis();
+    public DiscourseUnit deepCopy(){
+        DiscourseUnit ans = new DiscourseUnit();
         if (spokenByMe!=null)
             ans.spokenByMe = spokenByMe.deepCopy();
         if (spokenByThem!=null)

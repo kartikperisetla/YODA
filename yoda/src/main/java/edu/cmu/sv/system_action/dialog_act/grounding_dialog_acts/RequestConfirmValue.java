@@ -1,7 +1,7 @@
 package edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts;
 
 import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
-import edu.cmu.sv.dialog_state_tracking.DialogStateHypothesis;
+import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.noun.Noun;
@@ -40,7 +40,7 @@ public class RequestConfirmValue extends ClarificationDialogAct {
     }
 
     @Override
-    public Double clarificationReward(StringDistribution dialogStateDistribution, Map<String, DialogStateHypothesis> dialogStateHypotheses) {
+    public Double clarificationReward(StringDistribution dialogStateDistribution, Map<String, DialogState> dialogStateHypotheses) {
         StringDistribution predictedConfidenceGain = RewardAndCostCalculator.predictConfidenceGainFromValueConfirmation(
                 dialogStateDistribution, dialogStateHypotheses, (String) getBoundIndividuals().get("topic_individual"));
         Double probabilityOutstandingGroundingRequest =

@@ -21,11 +21,11 @@ import java.util.Set;
  */
 public class GiveGroundingSuggestionInference extends DialogStateUpdateInference {
     @Override
-    public Pair<Map<String, DialogStateHypothesis>, StringDistribution> applyAll(YodaEnvironment yodaEnvironment,
-                                                                                 DialogStateHypothesis currentState,
+    public Pair<Map<String, DialogState>, StringDistribution> applyAll(YodaEnvironment yodaEnvironment,
+                                                                                 DialogState currentState,
                                                                                  Turn turn, long timeStamp) {
         StringDistribution resultDistribution = new StringDistribution();
-        Map<String, DialogStateHypothesis> resultHypotheses = new HashMap<>();
+        Map<String, DialogState> resultHypotheses = new HashMap<>();
 
         int newHypothesisCounter = 0;
         if (turn.speaker.equals("user")){
@@ -77,7 +77,7 @@ public class GiveGroundingSuggestionInference extends DialogStateUpdateInference
             String dialogAct = hypModel.getSlotPathFiller("dialogAct");
             if (RequestConfirmValue.class.getSimpleName().equals(dialogAct)) {
                 for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
-                    DiscourseUnitHypothesis predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId);
+                    DiscourseUnit predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId);
                     try{
                         Assert.verify(!predecessor.initiator.equals("system"));
                         Set<String> suggestionPaths = predecessor.getSpokenByThem().findAllPathsToClass(Suggested.class.getSimpleName());
@@ -93,8 +93,8 @@ public class GiveGroundingSuggestionInference extends DialogStateUpdateInference
 
                     for (String attachmentPoint : attachmentPoints.keySet()) {
                         String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
-                        DialogStateHypothesis newDialogStateHypothesis = currentState.deepCopy();
-                        DiscourseUnitHypothesis updatedPredecessor = newDialogStateHypothesis.discourseUnitHypothesisMap.get(predecessorId);
+                        DialogState newDialogState = currentState.deepCopy();
+                        DiscourseUnit updatedPredecessor = newDialogState.discourseUnitHypothesisMap.get(predecessorId);
 
                         SemanticsModel newSpokenByMeHypothesis = updatedPredecessor.getSpokenByThem().deepCopy();
                         newSpokenByMeHypothesis.extendAndOverwriteAtPoint(attachmentPoint, suggestion.deepCopy());
@@ -102,9 +102,9 @@ public class GiveGroundingSuggestionInference extends DialogStateUpdateInference
                                 Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
 
                         Utils.unground(updatedPredecessor, newSpokenByMeHypothesis, turn.groundedSystemMeaning, timeStamp);
-                        resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
+                        resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
                         Double score = attachmentPoints.get(attachmentPoint) *
-                                Utils.discourseUnitContextProbability(newDialogStateHypothesis, updatedPredecessor);
+                                Utils.discourseUnitContextProbability(newDialogState, updatedPredecessor);
                         resultDistribution.put(newDialogStateHypothesisID, score);
                     }
                 }

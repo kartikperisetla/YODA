@@ -21,10 +21,10 @@ import java.util.Map;
  */
 public class ConfirmGroundingSuggestionInference extends DialogStateUpdateInference {
     @Override
-    public Pair<Map<String, DialogStateHypothesis>, StringDistribution> applyAll(
-            YodaEnvironment yodaEnvironment, DialogStateHypothesis currentState, Turn turn, long timeStamp) {
+    public Pair<Map<String, DialogState>, StringDistribution> applyAll(
+            YodaEnvironment yodaEnvironment, DialogState currentState, Turn turn, long timeStamp) {
         StringDistribution resultDistribution = new StringDistribution();
-        Map<String, DialogStateHypothesis> resultHypotheses = new HashMap<>();
+        Map<String, DialogState> resultHypotheses = new HashMap<>();
 
         int newHypothesisCounter = 0;
         if (turn.speaker.equals("user")) {
@@ -34,8 +34,8 @@ public class ConfirmGroundingSuggestionInference extends DialogStateUpdateInfere
                 if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(Accept.class)) {
                     for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
                         String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
-                        DialogStateHypothesis newDialogStateHypothesis = currentState.deepCopy();
-                        DiscourseUnitHypothesis predecessor = newDialogStateHypothesis.discourseUnitHypothesisMap.get(predecessorId);
+                        DialogState newDialogState = currentState.deepCopy();
+                        DiscourseUnit predecessor = newDialogState.discourseUnitHypothesisMap.get(predecessorId);
 
                         Utils.DiscourseUnitAnalysis duAnalysis = new Utils.DiscourseUnitAnalysis(predecessor, yodaEnvironment);
                         try {
@@ -53,9 +53,9 @@ public class ConfirmGroundingSuggestionInference extends DialogStateUpdateInfere
                         Utils.returnToGround(predecessor, newSpokenByThemHypothesis, timeStamp);
 
                         // collect the result
-                        resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
+                        resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
                         Double score = duAnalysis.descriptionMatch *
-                                Utils.discourseUnitContextProbability(newDialogStateHypothesis, predecessor);
+                                Utils.discourseUnitContextProbability(newDialogState, predecessor);
                         resultDistribution.put(newDialogStateHypothesisID, score);
                     }
 

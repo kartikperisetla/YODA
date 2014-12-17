@@ -1,11 +1,10 @@
 package edu.cmu.sv.system_action.dialog_act;
 
-import edu.cmu.sv.dialog_state_tracking.DialogStateHypothesis;
-import edu.cmu.sv.dialog_state_tracking.DiscourseUnitHypothesis;
+import edu.cmu.sv.dialog_state_tracking.DialogState;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.SystemAction;
-import org.json.simple.JSONObject;
 
 import java.util.*;
 
@@ -53,8 +52,8 @@ public abstract class DialogAct extends SystemAction {
         }
     }
 
-    public abstract Double reward(DialogStateHypothesis dialogStateHypothesis,
-                                  DiscourseUnitHypothesis discourseUnitHypothesis);
+    public abstract Double reward(DialogState dialogState,
+                                  DiscourseUnit discourseUnit);
 
     public SemanticsModel getNlgCommand(){
         String dA = this.getClass().getSimpleName();

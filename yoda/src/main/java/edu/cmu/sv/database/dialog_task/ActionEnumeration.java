@@ -1,17 +1,12 @@
 package edu.cmu.sv.database.dialog_task;
 
 import edu.cmu.sv.database.Database;
-import edu.cmu.sv.dialog_state_tracking.DiscourseUnitHypothesis;
-import edu.cmu.sv.ontology.misc.WebResource;
-import edu.cmu.sv.ontology.role.HasURI;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
-import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.openrdf.query.*;
 import org.openrdf.repository.RepositoryException;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by David Cohen on 12/6/14.

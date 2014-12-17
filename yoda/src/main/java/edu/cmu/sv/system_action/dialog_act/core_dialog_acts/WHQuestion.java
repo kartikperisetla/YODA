@@ -1,7 +1,7 @@
 package edu.cmu.sv.system_action.dialog_act.core_dialog_acts;
 
-import edu.cmu.sv.dialog_state_tracking.DialogStateHypothesis;
-import edu.cmu.sv.dialog_state_tracking.DiscourseUnitHypothesis;
+import edu.cmu.sv.dialog_state_tracking.DialogState;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.noun.Noun;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
@@ -37,7 +37,7 @@ public class WHQuestion extends DialogAct {
         return individualParameters;
     }
     @Override
-    public Double reward(DialogStateHypothesis dialogStateHypothesis, DiscourseUnitHypothesis discourseUnitHypothesis) {
+    public Double reward(DialogState dialogState, DiscourseUnit discourseUnit) {
         return null;
     }
 }

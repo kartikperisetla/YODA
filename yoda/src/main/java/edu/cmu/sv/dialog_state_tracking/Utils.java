@@ -20,18 +20,18 @@ import java.util.*;
  */
 public class Utils {
 
-    public static double discourseUnitContextProbability(DialogStateHypothesis dialogStateHypothesis,
-                                                         DiscourseUnitHypothesis predecessor){
-        return Math.pow(.1, numberOfIntermediateDiscourseUnitsBySpeaker(predecessor, dialogStateHypothesis, "system")) *
-                Math.pow(.1, numberOfIntermediateDiscourseUnitsBySpeaker(predecessor, dialogStateHypothesis, "user")) *
-                Math.pow(.1, numberOfLinksRespondingToDiscourseUnit(predecessor, dialogStateHypothesis));
+    public static double discourseUnitContextProbability(DialogState dialogState,
+                                                         DiscourseUnit predecessor){
+        return Math.pow(.1, numberOfIntermediateDiscourseUnitsBySpeaker(predecessor, dialogState, "system")) *
+                Math.pow(.1, numberOfIntermediateDiscourseUnitsBySpeaker(predecessor, dialogState, "user")) *
+                Math.pow(.1, numberOfLinksRespondingToDiscourseUnit(predecessor, dialogState));
     }
 
-    public static int numberOfIntermediateDiscourseUnitsBySpeaker(DiscourseUnitHypothesis predecessorDu,
-                                                           DialogStateHypothesis dialogStateHypothesis, String speaker){
+    public static int numberOfIntermediateDiscourseUnitsBySpeaker(DiscourseUnit predecessorDu,
+                                                           DialogState dialogState, String speaker){
         int ans = 0;
-        for (String discourseUnitIdentifier : dialogStateHypothesis.getDiscourseUnitHypothesisMap().keySet()){
-            DiscourseUnitHypothesis otherPredecessor = dialogStateHypothesis.getDiscourseUnitHypothesisMap().get(discourseUnitIdentifier);
+        for (String discourseUnitIdentifier : dialogState.getDiscourseUnitHypothesisMap().keySet()){
+            DiscourseUnit otherPredecessor = dialogState.getDiscourseUnitHypothesisMap().get(discourseUnitIdentifier);
             if (otherPredecessor==predecessorDu)
                 continue;
             if (otherPredecessor.getInitiator().equals(speaker) &&
@@ -41,11 +41,11 @@ public class Utils {
         return ans;
     }
 
-    public static int numberOfLinksRespondingToDiscourseUnit(DiscourseUnitHypothesis contextDu,
-                                                             DialogStateHypothesis dialogStateHypothesis){
+    public static int numberOfLinksRespondingToDiscourseUnit(DiscourseUnit contextDu,
+                                                             DialogState dialogState){
         int ans = 0;
-        for (DialogStateHypothesis.ArgumentationLink link : dialogStateHypothesis.getArgumentationLinks()){
-            if (dialogStateHypothesis.getDiscourseUnitHypothesisMap().get(link.getPredecessor())==contextDu)
+        for (DialogState.ArgumentationLink link : dialogState.getArgumentationLinks()){
+            if (dialogState.getDiscourseUnitHypothesisMap().get(link.getPredecessor())==contextDu)
                 ans += 1;
         }
         return ans;
@@ -88,7 +88,7 @@ public class Utils {
     /*
     * Update the discourse unit by bringing it back to a grounded state from a non-grounded state
     * */
-    public static void returnToGround(DiscourseUnitHypothesis predecessor,
+    public static void returnToGround(DiscourseUnit predecessor,
                                       SemanticsModel newSpokenByInitiator,
                                       long timeStamp){
         if (predecessor.initiator.equals("user")){
@@ -107,7 +107,7 @@ public class Utils {
     /*
     * Update the discourse unit by un-grounding it
     * */
-    public static void unground(DiscourseUnitHypothesis predecessor,
+    public static void unground(DiscourseUnit predecessor,
                                       SemanticsModel newSpokenByOther,
                                       SemanticsModel groundedByOther,
                                       long timeStamp){
@@ -130,50 +130,50 @@ public class Utils {
     * modifying the stored analysis result JSONObjects should modify the source discourse unit
     * */
     public static class DiscourseUnitAnalysis{
-        private DiscourseUnitHypothesis discourseUnitHypothesis;
+        private DiscourseUnit discourseUnit;
         private YodaEnvironment yodaEnvironment;
         public String suggestionPath;
         public JSONObject suggestedContent;
         public JSONObject groundedSuggestionIndividual;
         public Double descriptionMatch;
 
-        public DiscourseUnitAnalysis(DiscourseUnitHypothesis discourseUnitHypothesis, YodaEnvironment yodaEnvironment) {
-            this.discourseUnitHypothesis = discourseUnitHypothesis;
+        public DiscourseUnitAnalysis(DiscourseUnit discourseUnit, YodaEnvironment yodaEnvironment) {
+            this.discourseUnit = discourseUnit;
             this.yodaEnvironment = yodaEnvironment;
         }
 
         public boolean ungroundedByAct(Class<? extends DialogAct> ungroundingAction) throws Assert.AssertException {
-            if (discourseUnitHypothesis.initiator.equals("user")){
-                Assert.verify(discourseUnitHypothesis.spokenByMe!= null);
-                Assert.verify(discourseUnitHypothesis.groundTruth != null);
-                return discourseUnitHypothesis.groundTruth.newGetSlotPathFiller("dialogAct").
+            if (discourseUnit.initiator.equals("user")){
+                Assert.verify(discourseUnit.spokenByMe!= null);
+                Assert.verify(discourseUnit.groundTruth != null);
+                return discourseUnit.groundTruth.newGetSlotPathFiller("dialogAct").
                         equals(ungroundingAction.getSimpleName());
             } else { //discourseUnitHypothesis.initiator.equals("system")
-                Assert.verify(discourseUnitHypothesis.spokenByThem!= null);
-                Assert.verify(discourseUnitHypothesis.groundInterpretation != null);
-                return discourseUnitHypothesis.groundInterpretation.newGetSlotPathFiller("dialogAct").
+                Assert.verify(discourseUnit.spokenByThem!= null);
+                Assert.verify(discourseUnit.groundInterpretation != null);
+                return discourseUnit.groundInterpretation.newGetSlotPathFiller("dialogAct").
                         equals(ungroundingAction.getSimpleName());
             }
         }
 
         public void analyseSuggestions() throws Assert.AssertException {
-            if (discourseUnitHypothesis.initiator.equals("user")) {
-                Set<String> suggestionPaths = discourseUnitHypothesis.getSpokenByMe().
+            if (discourseUnit.initiator.equals("user")) {
+                Set<String> suggestionPaths = discourseUnit.getSpokenByMe().
                         findAllPathsToClass(Suggested.class.getSimpleName());
                 Assert.verify(suggestionPaths.size() == 1);
                 suggestionPath = new LinkedList<>(suggestionPaths).get(0);
-                suggestedContent = (JSONObject) discourseUnitHypothesis.getSpokenByMe().deepCopy().
+                suggestedContent = (JSONObject) discourseUnit.getSpokenByMe().deepCopy().
                         newGetSlotPathFiller(suggestionPath + "." + HasValue.class.getSimpleName());
-                groundedSuggestionIndividual = (JSONObject)discourseUnitHypothesis.groundInterpretation.
+                groundedSuggestionIndividual = (JSONObject) discourseUnit.groundInterpretation.
                         newGetSlotPathFiller(suggestionPath);
             } else { //discourseUnitHypothesis.initiator.equals("system")
-                Set<String> suggestionPaths = discourseUnitHypothesis.getSpokenByThem().
+                Set<String> suggestionPaths = discourseUnit.getSpokenByThem().
                         findAllPathsToClass(Suggested.class.getSimpleName());
                 Assert.verify(suggestionPaths.size() == 1);
                 suggestionPath = new LinkedList<>(suggestionPaths).get(0);
-                suggestedContent = (JSONObject) discourseUnitHypothesis.getSpokenByThem().deepCopy().
+                suggestedContent = (JSONObject) discourseUnit.getSpokenByThem().deepCopy().
                         newGetSlotPathFiller(suggestionPath + "." + HasValue.class.getSimpleName());
-                groundedSuggestionIndividual = (JSONObject)discourseUnitHypothesis.groundTruth.
+                groundedSuggestionIndividual = (JSONObject) discourseUnit.groundTruth.
                         newGetSlotPathFiller(suggestionPath);
             }
             descriptionMatch = ReferenceResolution.descriptionMatch(yodaEnvironment,

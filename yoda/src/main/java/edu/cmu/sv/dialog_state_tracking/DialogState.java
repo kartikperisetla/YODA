@@ -1,11 +1,5 @@
 package edu.cmu.sv.dialog_state_tracking;
 
-import edu.cmu.sv.utils.Combination;
-import edu.cmu.sv.utils.StringDistribution;
-import edu.cmu.sv.yoda_environment.YodaEnvironment;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -14,8 +8,8 @@ import java.util.Set;
 /**
  * Created by David Cohen on 12/1/14.
  */
-public class DialogStateHypothesis {
-    Map<String, DiscourseUnitHypothesis> discourseUnitHypothesisMap = new HashMap<>();
+public class DialogState {
+    Map<String, DiscourseUnit> discourseUnitHypothesisMap = new HashMap<>();
     Set<ArgumentationLink> argumentationLinks = new HashSet<>();
     long discourseUnitCounter = 0;
 
@@ -53,8 +47,8 @@ public class DialogStateHypothesis {
         }
     }
 
-    public DialogStateHypothesis deepCopy(){
-        DialogStateHypothesis ans = new DialogStateHypothesis();
+    public DialogState deepCopy(){
+        DialogState ans = new DialogState();
         for (ArgumentationLink link : argumentationLinks)
             ans.argumentationLinks.add(new ArgumentationLink(link.predecessor, link.successor));
         for (String key : discourseUnitHypothesisMap.keySet()){
@@ -102,11 +96,11 @@ public class DialogStateHypothesis {
 //        return new ImmutablePair<>(outputHypotheses, outputDistribution);
 //    }
 
-    public Map<String, DiscourseUnitHypothesis> getDiscourseUnitHypothesisMap() {
+    public Map<String, DiscourseUnit> getDiscourseUnitHypothesisMap() {
         return discourseUnitHypothesisMap;
     }
 
-    public void setDiscourseUnitHypothesisMap(Map<String, DiscourseUnitHypothesis> discourseUnitHypothesisMap) {
+    public void setDiscourseUnitHypothesisMap(Map<String, DiscourseUnit> discourseUnitHypothesisMap) {
         this.discourseUnitHypothesisMap = discourseUnitHypothesisMap;
     }
 

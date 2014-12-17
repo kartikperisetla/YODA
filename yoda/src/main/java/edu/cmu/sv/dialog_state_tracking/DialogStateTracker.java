@@ -44,7 +44,7 @@ public class DialogStateTracker implements Runnable {
     }
 
     YodaEnvironment yodaEnvironment;
-    Map<String, DialogStateHypothesis> hypothesisMap;
+    Map<String, DialogState> hypothesisMap;
     StringDistribution hypothesisDistribution;
 
     public DialogStateTracker(YodaEnvironment yodaEnvironment){
@@ -52,7 +52,7 @@ public class DialogStateTracker implements Runnable {
         hypothesisDistribution = new StringDistribution();
         hypothesisMap = new HashMap<>();
         hypothesisDistribution.put("initial_dialog_state_hypothesis", 1.0);
-        hypothesisMap.put("initial_dialog_state_hypothesis", new DialogStateHypothesis());
+        hypothesisMap.put("initial_dialog_state_hypothesis", new DialogState());
         this.yodaEnvironment.DmInputQueue.add(new ImmutablePair<>(hypothesisMap, hypothesisDistribution));
     }
 
@@ -67,7 +67,7 @@ public class DialogStateTracker implements Runnable {
             }
             int newDialogStateHypothesisCounter = 0;
             StringDistribution newHypothesisDistribution = new StringDistribution();
-            Map<String, DialogStateHypothesis> newHypotheses = new HashMap<>();
+            Map<String, DialogState> newHypotheses = new HashMap<>();
 
             for (String currentDialogStateHypothesisID : hypothesisMap.keySet()) {
 //                StringDistribution tmpNewHypothesisDistribution = new StringDistribution();
@@ -77,7 +77,7 @@ public class DialogStateTracker implements Runnable {
                 // perform dialog state update inferences
                 {
                     for (Class<? extends DialogStateUpdateInference> updateInferenceClass : updateInferences) {
-                        Pair<Map<String, DialogStateHypothesis>, StringDistribution> inferredUpdatedState =
+                        Pair<Map<String, DialogState>, StringDistribution> inferredUpdatedState =
                                 updateInferenceClass.newInstance().applyAll(
                                         yodaEnvironment, hypothesisMap.get(currentDialogStateHypothesisID), turn, timeStamp);
                         for (String tmpNewDstHypothesisId : inferredUpdatedState.getRight().keySet()) {

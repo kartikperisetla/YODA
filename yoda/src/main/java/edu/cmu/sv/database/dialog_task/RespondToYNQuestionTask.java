@@ -1,7 +1,7 @@
 package edu.cmu.sv.database.dialog_task;
 
 import com.google.common.collect.Iterables;
-import edu.cmu.sv.dialog_state_tracking.DiscourseUnitHypothesis;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.noun.Noun;
 import edu.cmu.sv.ontology.role.Role;
@@ -25,16 +25,16 @@ import java.util.stream.Collectors;
  */
 public class RespondToYNQuestionTask extends DialogTask {
     @Override
-    public Pair<Map<String, DiscourseUnitHypothesis>, StringDistribution> ground(DiscourseUnitHypothesis hypothesis, YodaEnvironment yodaEnvironment) {
+    public Pair<Map<String, DiscourseUnit>, StringDistribution> ground(DiscourseUnit hypothesis, YodaEnvironment yodaEnvironment) {
         // get grounded hypotheses / corresponding weights
-        Pair<Map<String, DiscourseUnitHypothesis>, StringDistribution> groundingHypotheses = groundHelper(hypothesis, yodaEnvironment);
-        Map<String, DiscourseUnitHypothesis> discourseUnits = groundingHypotheses.getLeft();
+        Pair<Map<String, DiscourseUnit>, StringDistribution> groundingHypotheses = groundHelper(hypothesis, yodaEnvironment);
+        Map<String, DiscourseUnit> discourseUnits = groundingHypotheses.getLeft();
         StringDistribution discourseUnitDistribution = groundingHypotheses.getRight();
         discourseUnitDistribution.normalize();
         return new ImmutablePair<>(discourseUnits, discourseUnitDistribution);
     }
 
-    private Pair<Map<String, DiscourseUnitHypothesis>, StringDistribution> groundHelper(DiscourseUnitHypothesis targetDiscourseUnit, YodaEnvironment yodaEnvironment) {
+    private Pair<Map<String, DiscourseUnit>, StringDistribution> groundHelper(DiscourseUnit targetDiscourseUnit, YodaEnvironment yodaEnvironment) {
         List<String> slotPathsToResolve = new LinkedList<>();
         SemanticsModel spokenByThem = targetDiscourseUnit.getSpokenByThem();
         SemanticsModel currentGroundedInterpretation = targetDiscourseUnit.getGroundInterpretation();
@@ -83,10 +83,10 @@ public class RespondToYNQuestionTask extends DialogTask {
             }
             Pair<StringDistribution, Map<String, Map<String, String>>> referenceJoint =
                     HypothesisSetManagement.getJointFromMarginals(referenceMarginals, 10);
-            Map<String, DiscourseUnitHypothesis> discourseUnits = new HashMap<>();
+            Map<String, DiscourseUnit> discourseUnits = new HashMap<>();
 
             for (String jointHypothesisID : referenceJoint.getKey().keySet()){
-                DiscourseUnitHypothesis groundedDiscourseUnitHypothesis = targetDiscourseUnit.deepCopy();
+                DiscourseUnit groundedDiscourseUnit = targetDiscourseUnit.deepCopy();
                 SemanticsModel groundedModel = targetDiscourseUnit.getSpokenByThem().deepCopy();
                 Map<String, String> assignment = referenceJoint.getValue().get(jointHypothesisID);
                 // add new bindings
@@ -99,8 +99,8 @@ public class RespondToYNQuestionTask extends DialogTask {
                     SemanticsModel.overwrite((JSONObject) groundedModel.newGetSlotPathFiller(path),
                             (JSONObject) currentGroundedInterpretation.newGetSlotPathFiller(path));
                 }
-                groundedDiscourseUnitHypothesis.setGroundInterpretation(groundedModel);
-                discourseUnits.put(jointHypothesisID, groundedDiscourseUnitHypothesis);
+                groundedDiscourseUnit.setGroundInterpretation(groundedModel);
+                discourseUnits.put(jointHypothesisID, groundedDiscourseUnit);
             }
 
             return new ImmutablePair<>(discourseUnits, referenceJoint.getLeft());
@@ -112,9 +112,9 @@ public class RespondToYNQuestionTask extends DialogTask {
         return null;
     }
 
-    public void analyse(DiscourseUnitHypothesis groundedDiscourseUnitHypothesis,
+    public void analyse(DiscourseUnit groundedDiscourseUnit,
                         YodaEnvironment yodaEnvironment) {
-        SemanticsModel groundedMeaning = groundedDiscourseUnitHypothesis.getGroundInterpretation();
+        SemanticsModel groundedMeaning = groundedDiscourseUnit.getGroundInterpretation();
         String verb = (String) groundedMeaning.newGetSlotPathFiller("verb.class");
         Class<? extends Verb> verbClass = OntologyRegistry.verbNameMap.get(verb);
 
@@ -126,7 +126,7 @@ public class RespondToYNQuestionTask extends DialogTask {
             }
 
             if (verbClass.equals(HasProperty.class)) {
-                groundedDiscourseUnitHypothesis.setYnqTruth(ReferenceResolution.descriptionMatch(yodaEnvironment,
+                groundedDiscourseUnit.setYnqTruth(ReferenceResolution.descriptionMatch(yodaEnvironment,
                         (JSONObject) groundedMeaning.newGetSlotPathFiller("verb.Agent"),
                         (JSONObject) groundedMeaning.newGetSlotPathFiller("verb.Patient")));
             }
