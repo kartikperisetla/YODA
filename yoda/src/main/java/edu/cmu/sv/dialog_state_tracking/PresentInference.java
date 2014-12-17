@@ -1,5 +1,6 @@
 package edu.cmu.sv.dialog_state_tracking;
 
+import edu.cmu.sv.database.dialog_task.ReferenceResolution;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
 import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.semantics.SemanticsModel;
@@ -41,17 +42,15 @@ public class PresentInference extends DialogStateUpdateInference {
                     newDUHypothesis.initiator = turn.speaker;
 
                     Pair<Map<String, DiscourseUnit>, StringDistribution> groundedHypotheses =
-                            newDUHypothesis.ground(yodaEnvironment);
+                            ReferenceResolution.resolve(newDUHypothesis, yodaEnvironment);
                     for (String groundedDuKey: groundedHypotheses.getRight().keySet()){
                         String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
                         DialogState newDialogState = currentState.deepCopy();
                         DiscourseUnit currentDu = groundedHypotheses.getLeft().get(groundedDuKey);
-                        currentDu.analyse(yodaEnvironment);
                         newDialogState.discourseUnitCounter += 1;
                         newDialogState.getDiscourseUnitHypothesisMap().
-                                put("du_"+ newDialogState.discourseUnitCounter, currentDu);
-                        newDialogState.getDiscourseUnitHypothesisMap().
-                                get("du_"+ newDialogState.discourseUnitCounter).analyse(yodaEnvironment);
+                                put("du_" + newDialogState.discourseUnitCounter, currentDu);
+                        currentDu.actionAnalysis.update(yodaEnvironment, currentDu);
                         resultDistribution.put(newDialogStateHypothesisID, groundedHypotheses.getRight().get(groundedDuKey));
                         resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
                     }

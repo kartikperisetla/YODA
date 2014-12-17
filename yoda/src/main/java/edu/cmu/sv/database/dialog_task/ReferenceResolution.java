@@ -3,8 +3,12 @@ package edu.cmu.sv.database.dialog_task;
 import edu.cmu.sv.database.Database;
 import edu.cmu.sv.database.Product;
 import edu.cmu.sv.database.StringSimilarity;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
-import edu.cmu.sv.ontology.noun.Email;
+import edu.cmu.sv.ontology.role.Role;
+import edu.cmu.sv.ontology.verb.Verb;
+import edu.cmu.sv.semantics.SemanticsModel;
+import edu.cmu.sv.utils.HypothesisSetManagement;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
@@ -24,6 +28,7 @@ import org.openrdf.query.*;
 import org.openrdf.repository.RepositoryException;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by David Cohen on 11/17/14.
@@ -243,5 +248,94 @@ public class ReferenceResolution {
             throw new Error();
         }
     }
+
+    public static Pair<Map<String, DiscourseUnit>, StringDistribution> resolve(DiscourseUnit hypothesis, YodaEnvironment yodaEnvironment) {
+        // get grounded hypotheses / corresponding weights
+        Pair<Map<String, DiscourseUnit>, StringDistribution> groundingHypotheses = resolveHelper(hypothesis, yodaEnvironment);
+        Map<String, DiscourseUnit> discourseUnits = groundingHypotheses.getLeft();
+        StringDistribution discourseUnitDistribution = groundingHypotheses.getRight();
+        discourseUnitDistribution.normalize();
+        return new ImmutablePair<>(discourseUnits, discourseUnitDistribution);
+    }
+
+    private static Pair<Map<String, DiscourseUnit>, StringDistribution> resolveHelper(DiscourseUnit targetDiscourseUnit, YodaEnvironment yodaEnvironment) {
+        List<String> slotPathsToResolve = new LinkedList<>();
+        SemanticsModel spokenByThem = targetDiscourseUnit.getSpokenByThem();
+        SemanticsModel currentGroundedInterpretation = targetDiscourseUnit.getGroundInterpretation();
+        String verb = (String)spokenByThem.newGetSlotPathFiller("verb.class");
+        Class<? extends Verb> verbClass = OntologyRegistry.verbNameMap.get(verb);
+
+        try {
+            for (String path : targetDiscourseUnit.getSpokenByThem().getAllInternalNodePaths().stream().
+                    sorted((x,y) -> Integer.compare(x.length(), y.length())).collect(Collectors.toList())){
+                if (slotPathsToResolve.contains(path)
+                        || Arrays.asList("", "dialogAct", "verb").contains(path)
+                        || slotPathsToResolve.stream().anyMatch(x -> path.startsWith(x)))
+                    continue;
+                if (!Noun.class.isAssignableFrom(OntologyRegistry.thingNameMap.get(((JSONObject)spokenByThem.newGetSlotPathFiller(path)).get("class"))))
+                    continue;
+                slotPathsToResolve.add(path);
+            }
+
+            // keep only the slot paths that haven't already been resolved
+            Set<String> alreadyGroundedPaths;
+            if (currentGroundedInterpretation!=null) {
+                alreadyGroundedPaths = slotPathsToResolve.stream().filter(x -> currentGroundedInterpretation.newGetSlotPathFiller(x) != null).collect(Collectors.toSet());
+            } else {
+                alreadyGroundedPaths = new HashSet<>();
+            }
+            slotPathsToResolve.removeAll(alreadyGroundedPaths);
+
+            // only attempt to resolve slots that have associated semantic information
+            // do not try to resolve slots for which the verb only requires descriptions
+            slotPathsToResolve = slotPathsToResolve.stream().
+                    filter(x -> targetDiscourseUnit.getSpokenByThem().newGetSlotPathFiller(x)!=null).
+                    collect(Collectors.toList());
+
+            Set<Class <? extends Role>> requiredDescriptions = verbClass.newInstance().getRequiredDescriptions();
+            slotPathsToResolve.removeAll(
+                    requiredDescriptions.stream().
+                            map(x -> "verb." + x.getSimpleName()).
+                            collect(Collectors.toSet()));
+
+
+            Map<String, StringDistribution> referenceMarginals = new HashMap<>();
+            for (String slotPathToResolve : slotPathsToResolve) {
+                referenceMarginals.put(slotPathToResolve,
+                        ReferenceResolution.resolveReference(yodaEnvironment,
+                                (JSONObject) targetDiscourseUnit.getSpokenByThem().newGetSlotPathFiller(slotPathToResolve)));
+            }
+            Pair<StringDistribution, Map<String, Map<String, String>>> referenceJoint =
+                    HypothesisSetManagement.getJointFromMarginals(referenceMarginals, 10);
+            Map<String, DiscourseUnit> discourseUnits = new HashMap<>();
+
+            for (String jointHypothesisID : referenceJoint.getKey().keySet()){
+                DiscourseUnit groundedDiscourseUnit = targetDiscourseUnit.deepCopy();
+                SemanticsModel groundedModel = targetDiscourseUnit.getSpokenByThem().deepCopy();
+                Map<String, String> assignment = referenceJoint.getValue().get(jointHypothesisID);
+                // add new bindings
+                for (String slotPathVariable : assignment.keySet()){
+                    SemanticsModel.overwrite((JSONObject) groundedModel.newGetSlotPathFiller(slotPathVariable),
+                            SemanticsModel.parseJSON(OntologyRegistry.WebResourceWrap(assignment.get(slotPathVariable))));
+                }
+                // include previously grounded paths
+                for (String path : alreadyGroundedPaths){
+                    SemanticsModel.overwrite((JSONObject) groundedModel.newGetSlotPathFiller(path),
+                            (JSONObject) currentGroundedInterpretation.newGetSlotPathFiller(path));
+                }
+                groundedDiscourseUnit.setGroundInterpretation(groundedModel);
+                discourseUnits.put(jointHypothesisID, groundedDiscourseUnit);
+            }
+
+            return new ImmutablePair<>(discourseUnits, referenceJoint.getLeft());
+
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+            System.exit(0);
+        }
+        return null;
+    }
+
+
 
 }

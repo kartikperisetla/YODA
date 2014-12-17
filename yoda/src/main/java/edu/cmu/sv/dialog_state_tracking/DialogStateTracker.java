@@ -70,10 +70,6 @@ public class DialogStateTracker implements Runnable {
             Map<String, DialogState> newHypotheses = new HashMap<>();
 
             for (String currentDialogStateHypothesisID : hypothesisMap.keySet()) {
-//                StringDistribution tmpNewHypothesisDistribution = new StringDistribution();
-//                Map<String, DialogStateHypothesis> tmpNewHypotheses = new HashMap<>();
-//                int tmpNewDUHypothesisCounter = 0;
-
                 // perform dialog state update inferences
                 {
                     for (Class<? extends DialogStateUpdateInference> updateInferenceClass : updateInferences) {
@@ -89,21 +85,6 @@ public class DialogStateTracker implements Runnable {
                         }
                     }
                 }
-
-//                // ground and analyse
-//                {
-//                    for (String key : tmpNewHypotheses.keySet()) {
-//                        Pair<Map<String, DialogStateHypothesis>, StringDistribution> groundedAndAnalysedUpdatedState =
-//                                tmpNewHypotheses.get(key).ground(yodaEnvironment);
-//                        for (String tmpNewDstHypothesisId : groundedAndAnalysedUpdatedState.getRight().keySet()) {
-//                            String newDstHypothesisId = "dialog_state_hyp_" + newDialogStateHypothesisCounter++;
-//                            newHypothesisDistribution.put(newDstHypothesisId,
-//                                    groundedAndAnalysedUpdatedState.getRight().get(tmpNewDstHypothesisId) *
-//                                    tmpNewHypothesisDistribution.get(key));
-//                            newHypotheses.put(newDstHypothesisId, groundedAndAnalysedUpdatedState.getLeft().get(tmpNewDstHypothesisId));
-//                        }
-//                    }
-//                }
             }
 
             hypothesisDistribution = HypothesisSetManagement.keepRatioDistribution(newHypothesisDistribution, .05, 10);

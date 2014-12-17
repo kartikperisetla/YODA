@@ -1,5 +1,6 @@
 package edu.cmu.sv.dialog_state_tracking;
 
+import edu.cmu.sv.database.dialog_task.ReferenceResolution;
 import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
@@ -37,7 +38,7 @@ public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpda
                         DiscourseUnit predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId).deepCopy();
 
                         JSONObject correctionContent;
-                        DiscourseUnit.DiscourseAnalysis duAnalysis = new DiscourseUnit.DiscourseAnalysis(predecessor, yodaEnvironment);
+                        DiscourseAnalysis duAnalysis = new DiscourseAnalysis(predecessor, yodaEnvironment);
                         try {
                             Assert.verify(predecessor.initiator.equals("user"));
                             Assert.verify(duAnalysis.ungroundedByAct(RequestConfirmValue.class));
@@ -55,7 +56,7 @@ public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpda
                                 duAnalysis.suggestionPath, null);
 
                         Pair<Map<String, DiscourseUnit>, StringDistribution> groundedHypotheses =
-                                predecessor.ground(yodaEnvironment);
+                                ReferenceResolution.resolve(predecessor, yodaEnvironment);
                         for (String groundedDuKey: groundedHypotheses.getRight().keySet()) {
                             String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
                             DiscourseUnit currentDu = groundedHypotheses.getLeft().get(groundedDuKey);
@@ -63,7 +64,7 @@ public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpda
                             newDialogState.getDiscourseUnitHypothesisMap().put(predecessorId, currentDu);
 
                             Utils.returnToGround(currentDu, newSpokenByThemHypothesis, timeStamp);
-                            currentDu.analyse(yodaEnvironment);
+                            currentDu.actionAnalysis.update(yodaEnvironment, currentDu);
                             resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
                             Double score = groundedHypotheses.getRight().get(groundedDuKey) *
                                     Utils.discourseUnitContextProbability(newDialogState, currentDu);
