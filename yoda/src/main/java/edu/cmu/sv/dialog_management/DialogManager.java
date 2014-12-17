@@ -109,6 +109,8 @@ public class DialogManager implements Runnable {
                                 (Class<? extends ThingWithRoles>)
                                 OntologyRegistry.thingNameMap.get(
                                         (String) contextDiscourseUnit.getFromInitiator("verb.class"));
+                        if (verbClass==null)
+                            continue;
 
                         Map<String, Set<Object>> possibleBindingsPerVariable = new HashMap<>();
                         if (dialogActInstance.getPathParameters().containsKey("given_role_path")) {
@@ -127,10 +129,14 @@ public class DialogManager implements Runnable {
                         }
                         possibleBindingsPerVariable.put("verb_class", new HashSet<>(Arrays.asList(verbClass.getSimpleName())));
 
+//                        System.out.println("DM: possibleBindingsPerVariable:\n"+possibleBindingsPerVariable);
+
+
                         Set<Map<String, Object>> possibleBindings = Combination.possibleBindings(possibleBindingsPerVariable);
                         for (Map<String, Object> binding : possibleBindings){
                             if (binding.containsKey("given_role_path")){
-                                Object givenRoleDescription = contextDiscourseUnit.getFromInitiator("given_role_path");
+                                Object givenRoleDescription = contextDiscourseUnit.getFromInitiator(
+                                        (String) binding.get("given_role_path"));
                                 if (givenRoleDescription==null)
                                     continue;
                                 // add description parameter that corresponds to the path parameter
@@ -142,12 +148,9 @@ public class DialogManager implements Runnable {
                             newDialogActInstance.bindVariables(binding);
                             Double currentReward = newDialogActInstance.reward(currentDialogState, contextDiscourseUnit);
                             accumulateReward(actionExpectedReward, newDialogActInstance, currentReward);
-
                         }
-
                     }
                 }
-
             }
 
             // enumerate and evaluate clarification actions
@@ -162,9 +165,6 @@ public class DialogManager implements Runnable {
                     accumulateReward(actionExpectedReward, newDialogActInstance, currentReward);
                 }
             }
-
-
-            //todo: enumerate and evaluate actions that require multiple DU hypotheses to be enumerated (ex: disambiguation)
 
 
             /*

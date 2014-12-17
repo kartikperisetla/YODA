@@ -17,7 +17,7 @@ public class DiscourseUnit {
     SemanticsModel groundTruth; // if self-initiated
     SemanticsModel groundInterpretation; // if other-initiated
 
-    public ActionAnalysis actionAnalysis;
+    public ActionAnalysis actionAnalysis = new ActionAnalysis();
 
 
     public Long getMostRecentContributionTime(){

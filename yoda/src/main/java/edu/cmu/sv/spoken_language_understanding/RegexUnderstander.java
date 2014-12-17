@@ -64,7 +64,7 @@ public class RegexUnderstander implements SpokenLanguageUnderstander{
             hypothesisId++;
         }
 
-        Pattern isExpensivePattern = Pattern.compile("(is |are |)(the |)?(.+)(expensive)");
+        Pattern isExpensivePattern = Pattern.compile("(is |are )(the |)?(.+)(expensive)");
         Matcher m2 = isExpensivePattern.matcher(asrResult);
         if (m2.matches()) {
             String PoiName = m2.group(3);
@@ -112,7 +112,7 @@ public class RegexUnderstander implements SpokenLanguageUnderstander{
         Pattern isExpensivePattern2 = Pattern.compile("(is |are |)(expensive)");
         Matcher m6 = isExpensivePattern2.matcher(asrResult);
         if (m6.matches()) {
-            jsonString = "{\"dialogAct\":\"YNQuestion\",\"verb\":{\"class\":\"PointOfInterest\",\"Patient\":{\"class\":\"UnknownThingWithRoles\",\"HasExpensiveness\":{\"class\":\"Expensive\"}},\"class\":\"HasProperty\"}}";
+            jsonString = "{\"dialogAct\":\"YNQuestion\",\"verb\":{\"Patient\":{\"class\":\"UnknownThingWithRoles\",\"HasExpensiveness\":{\"class\":\"Expensive\"}},\"class\":\"HasProperty\"}}";
             SemanticsModel interpretation = new SemanticsModel(jsonString);
             hypotheses.put("hyp"+hypothesisId, interpretation);
             hypothesisDistribution.put("hyp"+hypothesisId, 1.0);

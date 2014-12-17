@@ -87,7 +87,8 @@ public class RewardAndCostCalculator {
             if (predecessorDiscourseUnit.actionAnalysis.ynqTruth!=null)
                 probabilityCorrectAnswer = 1 - predecessorDiscourseUnit.actionAnalysis.ynqTruth;
         } else if (dialogAct instanceof DontKnow) {
-            if (predecessorDiscourseUnit.actionAnalysis.ynqTruth==null)
+            if (predecessorDiscourseUnit.actionAnalysis.ynqTruth==null &&
+                    predecessorDiscourseUnit.actionAnalysis.missingRequiredVerbSlots.size()==0)
                 probabilityCorrectAnswer = 1.0;
         }
         return rewardForCorrectDialogTaskExecution *probabilityCorrectAnswer - penaltyForIncorrectDialogTaskExecution *(1-probabilityCorrectAnswer);
@@ -227,6 +228,17 @@ public class RewardAndCostCalculator {
         }
 //        System.out.println("RewardAndCostCalculator.predictConfidenceGainFromValueConfirmation: ans:\n"+ans);
         return ans;
+    }
+
+
+    public static Double requestSlotFillingReward(DialogState dialogState,
+                                                  DiscourseUnit discourseUnit,
+                                                  DialogAct dialogAct){
+        if (discourseUnit.actionAnalysis.missingRequiredVerbSlots.contains(
+                (String) dialogAct.getBoundPaths().get("requested_role_path"))) {
+            return 1.0;
+        }
+        return 0.0;
     }
 
 }

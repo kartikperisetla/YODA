@@ -1,5 +1,6 @@
 package edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts;
 
+import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.ontology.Thing;
@@ -46,7 +47,7 @@ public class RequestRole extends DialogAct{
 
     @Override
     public Double reward(DialogState dialogState, DiscourseUnit discourseUnit) {
-        return 0.0;
+        return RewardAndCostCalculator.requestSlotFillingReward(dialogState, discourseUnit, this);
     }
 
     @Override

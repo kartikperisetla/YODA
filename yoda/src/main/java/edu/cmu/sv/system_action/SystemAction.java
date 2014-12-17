@@ -1,9 +1,7 @@
 package edu.cmu.sv.system_action;
 
 import edu.cmu.sv.database.Database;
-import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
-import edu.cmu.sv.database.dialog_task.DialogTask;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 
 import java.util.HashSet;
@@ -30,6 +28,14 @@ public abstract class SystemAction {
             }
             for (String key : da1.getClassParameters().keySet()){
                 if (!da1.getBoundClasses().get(key).equals(da2.getBoundClasses().get(key)))
+                    return false;
+            }
+            for (String key : da1.getDescriptionParameters().keySet()){
+                if (!da1.getBoundDescriptions().get(key).equals(da2.getBoundDescriptions().get(key)))
+                    return false;
+            }
+            for (String key : da1.getPathParameters().keySet()){
+                if (!da1.getBoundPaths().get(key).equals(da2.getBoundPaths().get(key)))
                     return false;
             }
             return true;
