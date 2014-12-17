@@ -37,7 +37,7 @@ public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpda
                         DiscourseUnit predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId).deepCopy();
 
                         JSONObject correctionContent;
-                        Utils.DiscourseUnitAnalysis duAnalysis = new Utils.DiscourseUnitAnalysis(predecessor, yodaEnvironment);
+                        DiscourseUnit.DiscourseAnalysis duAnalysis = new DiscourseUnit.DiscourseAnalysis(predecessor, yodaEnvironment);
                         try {
                             Assert.verify(predecessor.initiator.equals("user"));
                             Assert.verify(duAnalysis.ungroundedByAct(RequestConfirmValue.class));

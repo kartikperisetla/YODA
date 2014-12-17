@@ -37,7 +37,7 @@ public class ConfirmGroundingSuggestionInference extends DialogStateUpdateInfere
                         DialogState newDialogState = currentState.deepCopy();
                         DiscourseUnit predecessor = newDialogState.discourseUnitHypothesisMap.get(predecessorId);
 
-                        Utils.DiscourseUnitAnalysis duAnalysis = new Utils.DiscourseUnitAnalysis(predecessor, yodaEnvironment);
+                        DiscourseUnit.DiscourseAnalysis duAnalysis = new DiscourseUnit.DiscourseAnalysis(predecessor, yodaEnvironment);
                         try {
                             Assert.verify(predecessor.initiator.equals("user"));
                             Assert.verify(duAnalysis.ungroundedByAct(RequestConfirmValue.class));

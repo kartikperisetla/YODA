@@ -81,13 +81,13 @@ public class RewardAndCostCalculator {
 //        System.out.println("discourseIndependentArgumentationReward: "+dialogAct);
         Double probabilityCorrectAnswer = 0.0;
         if (dialogAct instanceof Accept) {
-            if (predecessorDiscourseUnit.getYnqTruth()!=null)
-                probabilityCorrectAnswer = predecessorDiscourseUnit.getYnqTruth();
+            if (predecessorDiscourseUnit.actionAnalysis.ynqTruth!=null)
+                probabilityCorrectAnswer = predecessorDiscourseUnit.actionAnalysis.ynqTruth;
         } else if (dialogAct instanceof Reject) {
-            if (predecessorDiscourseUnit.getYnqTruth()!=null)
-                probabilityCorrectAnswer = 1 - predecessorDiscourseUnit.getYnqTruth();
+            if (predecessorDiscourseUnit.actionAnalysis.ynqTruth!=null)
+                probabilityCorrectAnswer = 1 - predecessorDiscourseUnit.actionAnalysis.ynqTruth;
         } else if (dialogAct instanceof DontKnow) {
-            if (predecessorDiscourseUnit.getYnqTruth()==null)
+            if (predecessorDiscourseUnit.actionAnalysis.ynqTruth==null)
                 probabilityCorrectAnswer = 1.0;
         }
         return rewardForCorrectDialogTaskExecution *probabilityCorrectAnswer - penaltyForIncorrectDialogTaskExecution *(1-probabilityCorrectAnswer);

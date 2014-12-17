@@ -126,9 +126,9 @@ public class RespondToYNQuestionTask extends DialogTask {
             }
 
             if (verbClass.equals(HasProperty.class)) {
-                groundedDiscourseUnit.setYnqTruth(ReferenceResolution.descriptionMatch(yodaEnvironment,
+                groundedDiscourseUnit.actionAnalysis.ynqTruth = ReferenceResolution.descriptionMatch(yodaEnvironment,
                         (JSONObject) groundedMeaning.newGetSlotPathFiller("verb.Agent"),
-                        (JSONObject) groundedMeaning.newGetSlotPathFiller("verb.Patient")));
+                        (JSONObject) groundedMeaning.newGetSlotPathFiller("verb.Patient"));
             }
 
 
