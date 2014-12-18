@@ -55,6 +55,9 @@ public class RequestAgentTemplate implements Template {
         Map<String, JSONObject> descriptionChunks = yodaEnvironment.nlg.
                 generateAll(patientDescription, yodaEnvironment, yodaEnvironment.nlg.grammarPreferences.maxNounPhraseDepth);
 
+//        System.out.println("RequestAgentTemplate:\nwhChunks:"+whChunks+"\nverbChunks:"+verbChunks+"\ndescriptionChunks:"+descriptionChunks);
+
+
         Map<String, Pair<Integer, Integer>> childNodeChunks = new HashMap<>();
         childNodeChunks.put("verb.Agent", new ImmutablePair<>(1,1));
         childNodeChunks.put("verb.Patient", new ImmutablePair<>(2,2));

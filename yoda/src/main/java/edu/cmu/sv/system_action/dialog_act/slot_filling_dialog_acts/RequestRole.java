@@ -8,6 +8,7 @@ import edu.cmu.sv.ontology.misc.Requested;
 import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
+import org.json.simple.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,8 +57,9 @@ public class RequestRole extends DialogAct{
         String verbString = "{\"class\":\""+this.getBoundClasses().get("verb_class")+"\"}";
         String requestedString = "{\"class\":\""+ Requested.class.getSimpleName()+"\"}";
         ans.getInternalRepresentation().put("verb", SemanticsModel.parseJSON(verbString));
-        ans.getInternalRepresentation().put(this.getBoundPaths().get("given_role_path"),
-                this.getBoundDescriptions().get("given_role_description"));
+        SemanticsModel.putAtPath(ans.getInternalRepresentation(),
+                (String) this.getBoundPaths().get("given_role_path"),
+                (JSONObject) this.getBoundDescriptions().get("given_role_description"));
         SemanticsModel.putAtPath(ans.getInternalRepresentation(),
                 (String) this.getBoundPaths().get("requested_role_path"),
                 SemanticsModel.parseJSON(requestedString));
