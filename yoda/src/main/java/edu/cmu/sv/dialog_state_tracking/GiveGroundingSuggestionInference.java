@@ -80,8 +80,8 @@ public class GiveGroundingSuggestionInference extends DialogStateUpdateInference
                     DiscourseUnit predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId);
                     try{
                         Assert.verify(!predecessor.initiator.equals("system"));
-                        Set<String> suggestionPaths = predecessor.getSpokenByThem().findAllPathsToClass(Suggested.class.getSimpleName());
-                        Assert.verify(suggestionPaths.size()==0);
+//                        Set<String> suggestionPaths = predecessor.getSpokenByThem().findAllPathsToClass(Suggested.class.getSimpleName());
+//                        Assert.verify(suggestionPaths.size()==0);
                     } catch (Assert.AssertException e){
                         continue;
                     }

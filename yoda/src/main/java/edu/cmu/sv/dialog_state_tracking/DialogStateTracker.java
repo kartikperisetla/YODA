@@ -41,6 +41,8 @@ public class DialogStateTracker implements Runnable {
         updateInferences.add(ConfirmGroundingSuggestionInference.class);
         updateInferences.add(RejectGroundingSuggestionInference.class);
         updateInferences.add(ReiterateIgnoreGroundingSuggestionInference.class);
+        updateInferences.add(RequestSlotInference.class);
+        updateInferences.add(ElaborateInference.class);
     }
 
     YodaEnvironment yodaEnvironment;

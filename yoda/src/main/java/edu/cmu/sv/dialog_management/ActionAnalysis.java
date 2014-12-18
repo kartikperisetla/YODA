@@ -27,6 +27,7 @@ public class ActionAnalysis {
     public ActionAnalysis deepCopy(){
         ActionAnalysis ans = new ActionAnalysis();
         ans.ynqTruth = ynqTruth;
+        ans.missingRequiredVerbSlots = new HashSet<>(missingRequiredVerbSlots);
         return ans;
     }
 

@@ -1,6 +1,7 @@
 package edu.cmu.sv.dialog_state_tracking;
 
 import edu.cmu.sv.database.dialog_task.ReferenceResolution;
+import edu.cmu.sv.ontology.misc.Requested;
 import edu.cmu.sv.ontology.misc.Suggested;
 import edu.cmu.sv.ontology.role.HasValue;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
@@ -21,7 +22,8 @@ public class DiscourseAnalysis {
     private DiscourseUnit discourseUnit;
     private YodaEnvironment yodaEnvironment;
 
-    // parameters primarily used for dialog state tracking
+    public String requestPath;
+
     public String suggestionPath;
     public JSONObject suggestedContent;
     public JSONObject groundedSuggestionIndividual;
@@ -43,6 +45,14 @@ public class DiscourseAnalysis {
             Assert.verify(discourseUnit.groundInterpretation != null);
             return discourseUnit.groundInterpretation.newGetSlotPathFiller("dialogAct").
                     equals(ungroundingAction.getSimpleName());
+        }
+    }
+
+    public void analyseSlotFilling() throws Assert.AssertException {
+        if (discourseUnit.initiator.equals("user")){
+            Set<String> requestPaths = discourseUnit.spokenByThem.findAllPathsToClass(Requested.class.getSimpleName());
+            Assert.verify(requestPaths.size()==1);
+            requestPath = new LinkedList<>(requestPaths).get(0);
         }
     }
 
@@ -71,7 +81,4 @@ public class DiscourseAnalysis {
         if (descriptionMatch==null)
             descriptionMatch=0.0;
     }
-
-
-
 }
