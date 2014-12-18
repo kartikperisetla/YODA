@@ -50,7 +50,8 @@ public class DiscourseAnalysis {
 
     public void analyseSlotFilling() throws Assert.AssertException {
         if (discourseUnit.initiator.equals("user")){
-            Set<String> requestPaths = discourseUnit.spokenByThem.findAllPathsToClass(Requested.class.getSimpleName());
+            Assert.verify(discourseUnit.spokenByMe!=null);
+            Set<String> requestPaths = discourseUnit.spokenByMe.findAllPathsToClass(Requested.class.getSimpleName());
             Assert.verify(requestPaths.size()==1);
             requestPath = new LinkedList<>(requestPaths).get(0);
         }

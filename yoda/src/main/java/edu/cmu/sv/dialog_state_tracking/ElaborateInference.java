@@ -1,5 +1,6 @@
 package edu.cmu.sv.dialog_state_tracking;
 
+import edu.cmu.sv.database.dialog_task.ReferenceResolution;
 import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.ontology.misc.Requested;
 import edu.cmu.sv.ontology.role.HasValue;
@@ -21,6 +22,9 @@ import java.util.Set;
 
 /**
  * Created by David Cohen on 10/18/14.
+ *
+ * Elaborating is adding in additional details to an existing discourse unit
+ *
  */
 public class ElaborateInference extends DialogStateUpdateInference {
     @Override
@@ -34,37 +38,56 @@ public class ElaborateInference extends DialogStateUpdateInference {
             for (String sluHypothesisID : turn.hypothesisDistribution.keySet()) {
                 SemanticsModel hypModel = turn.hypotheses.get(sluHypothesisID);
                 String dialogAct = hypModel.getSlotPathFiller("dialogAct");
-                if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(Accept.class)) {
+                if (DialogRegistry.discourseUnitDialogActs.contains(DialogRegistry.dialogActNameMap.get(dialogAct))) {
+                    // todo: implement non-fragment case
+                } else if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(Fragment.class)) {
                     for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
-                        String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
-                        DialogState newDialogState = currentState.deepCopy();
-                        DiscourseUnit predecessor = newDialogState.discourseUnitHypothesisMap.get(predecessorId);
+                        DiscourseUnit predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId).deepCopy();
 
+
+                        System.out.println("ElaborateInference: here 1");
+
+                        JSONObject topicContent;
                         DiscourseAnalysis duAnalysis = new DiscourseAnalysis(predecessor, yodaEnvironment);
                         try {
                             Assert.verify(!predecessor.initiator.equals("system"));
+                            Assert.verify(hypModel.newGetSlotPathFiller("topic")!=null);
+                            topicContent = (JSONObject)hypModel.newGetSlotPathFiller("topic");
                             duAnalysis.analyseSlotFilling();
+                            System.out.println("ElaborateInference: here 2");
                         } catch (Assert.AssertException e){
                             continue;
                         }
 
-                        //todo: implement the rest
+                        System.out.println("ElaborateInference: here 2");
 
                         // copy suggestion and ground the discourse unit
                         SemanticsModel newSpokenByThemHypothesis = predecessor.getSpokenByMe().deepCopy();
-                        SemanticsModel.unwrap((JSONObject) newSpokenByThemHypothesis.newGetSlotPathFiller(duAnalysis.suggestionPath),
-                                HasValue.class.getSimpleName());
+                        SemanticsModel.putAtPath(newSpokenByThemHypothesis.getInternalRepresentation(),
+                                duAnalysis.requestPath,
+                                topicContent);
                         Utils.returnToGround(predecessor, newSpokenByThemHypothesis, timeStamp);
 
-                        // collect the result
-                        resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
-                        Double score = duAnalysis.descriptionMatch *
-                                Utils.discourseUnitContextProbability(newDialogState, predecessor);
-                        resultDistribution.put(newDialogStateHypothesisID, score);
-                    }
+                        System.out.println("ElaborateInference: here 3");
 
-                } else if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(Fragment.class)) {
-                    // todo: interpret the fragment as a confirmation if it has an attachment point
+
+                        Pair<Map<String, DiscourseUnit>, StringDistribution> groundedHypotheses =
+                                ReferenceResolution.resolve(predecessor, yodaEnvironment);
+                        for (String groundedDuKey: groundedHypotheses.getRight().keySet()) {
+                            System.out.println("ElaborateInference: here 4");
+                            String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
+                            DialogState newDialogState = currentState.deepCopy();
+                            DiscourseUnit currentDu = groundedHypotheses.getLeft().get(groundedDuKey);
+                            newDialogState.discourseUnitCounter += 1;
+                            newDialogState.getDiscourseUnitHypothesisMap().
+                                    put("du_" + newDialogState.discourseUnitCounter, currentDu);
+                            currentDu.actionAnalysis.update(yodaEnvironment, currentDu);
+                            Double score = Utils.discourseUnitContextProbability(newDialogState, predecessor) *
+                                    groundedHypotheses.getRight().get(groundedDuKey);
+                            resultDistribution.put(newDialogStateHypothesisID, score);
+                            resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
+                        }
+                    }
                 }
             }
         } else { // if turn.speaker.equals("system")
