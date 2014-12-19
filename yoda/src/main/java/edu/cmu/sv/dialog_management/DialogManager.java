@@ -177,7 +177,7 @@ public class DialogManager implements Runnable {
                 // add contribution from non dialog tasks
                 if (DialogRegistry.nonDialogTaskRegistry.containsKey(daClass)) {
                     for (Class<? extends NonDialogTask> taskClass : DialogRegistry.nonDialogTaskRegistry.get(daClass)) {
-                        NonDialogTask task = taskClass.getDeclaredConstructor(Database.class).newInstance(yodaEnvironment.db);
+                        NonDialogTask task = taskClass.getDeclaredConstructor(Database.class).newInstance(yodaEnvironment.yodaEnvironment);
                         task.setTaskSpec(hypothesis.deepCopy());
                         Double expectedReward = RewardAndCostCalculator.nonDialogTaskReward(currentDialogState, task);
                         actionExpectedReward.put(task, expectedReward);

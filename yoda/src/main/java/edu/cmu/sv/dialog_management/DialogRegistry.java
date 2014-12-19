@@ -1,15 +1,16 @@
 package edu.cmu.sv.dialog_management;
 
 import com.google.common.collect.Iterables;
+import edu.cmu.sv.ontology.verb.GiveDirections;
+import edu.cmu.sv.system_action.ActionSchema;
+import edu.cmu.sv.system_action.GenericCommandSchema;
 import edu.cmu.sv.system_action.dialog_act.*;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.*;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ClarificationDialogAct;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ConfirmValueSuggestion;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestConfirmValue;
 import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestRole;
-import edu.cmu.sv.system_action.non_dialog_task.CreateMeetingTask;
-import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
-import edu.cmu.sv.system_action.non_dialog_task.SendEmailTask;
+import edu.cmu.sv.system_action.non_dialog_task.GiveDirectionsTask;
 
 import java.util.*;
 
@@ -30,9 +31,7 @@ public class DialogRegistry {
 
     public static Set<Class <? extends DialogAct>> discourseUnitDialogActs = new HashSet<>();
 
-    // map dialog acts to the classes that handle the corresponding non-dialog tasks
-    public static Map<Class <? extends DialogAct>, Set<Class <? extends NonDialogTask>>>
-            nonDialogTaskRegistry = new HashMap<>();
+    public static Set<ActionSchema> actionSchemata = new HashSet<>();
 
     static{
         clarificationDialogActs.add(ConfirmValueSuggestion.class);
@@ -48,9 +47,7 @@ public class DialogRegistry {
         discourseUnitDialogActs.add(YNQuestion.class);
         discourseUnitDialogActs.add(Command.class);
 
-        nonDialogTaskRegistry.put(Command.class, new HashSet<>());
-        nonDialogTaskRegistry.get(Command.class).add(CreateMeetingTask.class);
-        nonDialogTaskRegistry.get(Command.class).add(SendEmailTask.class);
+        actionSchemata.add(new GenericCommandSchema(GiveDirections.class, GiveDirectionsTask.class));
 
         for (Class<? extends DialogAct> cls : Iterables.concat(discourseUnitDialogActs, argumentationDialogActs,
                 clarificationDialogActs, Arrays.asList(Fragment.class))) {

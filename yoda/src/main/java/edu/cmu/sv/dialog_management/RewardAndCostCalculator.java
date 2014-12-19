@@ -156,7 +156,7 @@ public class RewardAndCostCalculator {
 //                // add contribution from non-dialog tasks
 //                if (DialogRegistry.nonDialogTaskRegistry.containsKey(daClass)) {
 //                    for (Class<? extends NonDialogTask> taskClass : DialogRegistry.nonDialogTaskRegistry.get(daClass)) {
-//                        NonDialogTaskPreferences preferences = taskClass.getConstructor(Database.class).newInstance(db).getPreferences();
+//                        NonDialogTaskPreferences preferences = taskClass.getConstructor(Database.class).newInstance(yodaEnvironment).getPreferences();
 //                        Double predictedRewardDifference = 0.0;
 //                        predictedRewardDifference += predictedConfidence * preferences.rewardForCorrectExecution;
 //                        predictedRewardDifference -= (1 - predictedConfidence) * preferences.penaltyForIncorrectExecution;

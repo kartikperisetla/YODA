@@ -1,23 +1,22 @@
 package edu.cmu.sv.system_action.non_dialog_task;
 
-import edu.cmu.sv.database.Database;
 import edu.cmu.sv.semantics.SemanticsModel;
+import org.json.simple.JSONObject;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 /**
- * Created by David Cohen on 8/28/14.
+ * Created by David Cohen on 12/19/14.
  */
-public class CreateMeetingTask extends NonDialogTask {
+public class GiveDirectionsTask extends NonDialogTask {
     private static Integer instanceCounter = 0;
     private static Map<String, TaskStatus> executionStatus = new HashMap<>();
     private static NonDialogTaskPreferences preferences =
             new NonDialogTaskPreferences(false, 1, 20, 15,
                     new HashSet<>(Arrays.asList()));
-
-    public CreateMeetingTask(Database db) {
-        this.db = db;
-    }
 
     @Override
     public NonDialogTaskPreferences getPreferences() {
@@ -38,7 +37,7 @@ public class CreateMeetingTask extends NonDialogTask {
     }
 
     @Override
-    public SemanticsModel getTaskSpec() {
+    public JSONObject getTaskSpec() {
         return taskSpec;
     }
 

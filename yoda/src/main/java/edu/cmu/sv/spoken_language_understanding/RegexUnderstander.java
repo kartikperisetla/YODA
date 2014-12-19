@@ -55,7 +55,6 @@ public class RegexUnderstander implements SpokenLanguageUnderstander{
         if (m.matches()) {
             String PoiName = m.group(2);
             System.out.println(PoiName);
-            logger.info("chunked POI: "+ PoiName);
             String uri = yodaEnvironment.db.insertValue(PoiName);
             jsonString = "{\"dialogAct\":\"WHQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\""+uri+"\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"},\"Patient\":{\"class\":\"UnknownThingWithRoles\",\"HasExpensiveness\":{\"class\":\"Expensive\"}},\"class\":\"HasProperty\"}}";
             SemanticsModel interpretation = new SemanticsModel(jsonString);
@@ -68,7 +67,6 @@ public class RegexUnderstander implements SpokenLanguageUnderstander{
         Matcher m2 = isExpensivePattern.matcher(asrResult);
         if (m2.matches()) {
             String PoiName = m2.group(3);
-            logger.info("chunked POI: "+ PoiName);
             String uri = yodaEnvironment.db.insertValue(PoiName);
             jsonString = "{\"dialogAct\":\"YNQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\""+uri+"\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"},\"Patient\":{\"class\":\"UnknownThingWithRoles\",\"HasExpensiveness\":{\"class\":\"Expensive\"}},\"class\":\"HasProperty\"}}";
             SemanticsModel interpretation = new SemanticsModel(jsonString);
@@ -113,6 +111,30 @@ public class RegexUnderstander implements SpokenLanguageUnderstander{
         Matcher m6 = isExpensivePattern2.matcher(asrResult);
         if (m6.matches()) {
             jsonString = "{\"dialogAct\":\"YNQuestion\",\"verb\":{\"Patient\":{\"class\":\"UnknownThingWithRoles\",\"HasExpensiveness\":{\"class\":\"Expensive\"}},\"class\":\"HasProperty\"}}";
+            SemanticsModel interpretation = new SemanticsModel(jsonString);
+            hypotheses.put("hyp"+hypothesisId, interpretation);
+            hypothesisDistribution.put("hyp"+hypothesisId, 1.0);
+            hypothesisId++;
+        }
+
+        // "give me directions"
+        Pattern giveDirectionsPattern = Pattern.compile("(give |)(me |)directions");
+        Matcher m7 = giveDirectionsPattern.matcher(asrResult);
+        if (m7.matches()) {
+            jsonString = "{\"dialogAct\":\"Command\",\"verb\":{\"class\":\"GiveDirections\"}}";
+            SemanticsModel interpretation = new SemanticsModel(jsonString);
+            hypotheses.put("hyp"+hypothesisId, interpretation);
+            hypothesisDistribution.put("hyp"+hypothesisId, 1.0);
+            hypothesisId++;
+        }
+
+        // "give me directions to X"
+        Pattern giveDirectionsToXPattern = Pattern.compile("(give |)(me |)directions to (.+)");
+        Matcher m8 = giveDirectionsToXPattern.matcher(asrResult);
+        if (m8.matches()) {
+            String PoiName = m8.group(3);
+            String uri = yodaEnvironment.db.insertValue(PoiName);
+            jsonString = "{\"dialogAct\":\"Command\",\"verb\":{\"class\":\"GiveDirections\", \"Destination\":{\"HasName\":{\"HasURI\":\""+uri+"\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"}}}";
             SemanticsModel interpretation = new SemanticsModel(jsonString);
             hypotheses.put("hyp"+hypothesisId, interpretation);
             hypothesisDistribution.put("hyp"+hypothesisId, 1.0);

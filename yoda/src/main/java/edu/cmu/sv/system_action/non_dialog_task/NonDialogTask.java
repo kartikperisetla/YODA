@@ -2,6 +2,7 @@ package edu.cmu.sv.system_action.non_dialog_task;
 
 import edu.cmu.sv.system_action.SystemAction;
 import edu.cmu.sv.semantics.SemanticsModel;
+import org.json.simple.JSONObject;
 
 /**
  * Created by David Cohen on 8/27/14.
@@ -9,13 +10,13 @@ import edu.cmu.sv.semantics.SemanticsModel;
 public abstract class NonDialogTask extends SystemAction {
 
     public enum TaskStatus {SUCCESSFULLY_COMPLETED, CURRENTLY_EXECUTING_BLOCKING, CURRENTLY_EXECUTING_NOT_BLOCKING, FAILED}
-    protected SemanticsModel taskSpec;
+    protected JSONObject taskSpec;
 
-    public void setTaskSpec(SemanticsModel taskSpec){
+    public void setTaskSpec(JSONObject taskSpec){
         this.taskSpec = taskSpec;
     }
 
-    public SemanticsModel getTaskSpec(){
+    public JSONObject getTaskSpec(){
         return taskSpec;
     }
 
