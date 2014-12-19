@@ -44,9 +44,6 @@ public class ElaborateInference extends DialogStateUpdateInference {
                     for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
                         DiscourseUnit predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId).deepCopy();
 
-
-                        System.out.println("ElaborateInference: here 1");
-
                         JSONObject topicContent;
                         DiscourseAnalysis duAnalysis = new DiscourseAnalysis(predecessor, yodaEnvironment);
                         try {
@@ -54,12 +51,9 @@ public class ElaborateInference extends DialogStateUpdateInference {
                             Assert.verify(hypModel.newGetSlotPathFiller("topic")!=null);
                             topicContent = (JSONObject)hypModel.newGetSlotPathFiller("topic");
                             duAnalysis.analyseSlotFilling();
-                            System.out.println("ElaborateInference: here 2");
                         } catch (Assert.AssertException e){
                             continue;
                         }
-
-                        System.out.println("ElaborateInference: here 2");
 
                         // copy suggestion and ground the discourse unit
                         SemanticsModel newSpokenByThemHypothesis = predecessor.getSpokenByMe().deepCopy();
@@ -68,21 +62,16 @@ public class ElaborateInference extends DialogStateUpdateInference {
                                 topicContent);
                         Utils.returnToGround(predecessor, newSpokenByThemHypothesis, timeStamp);
 
-                        System.out.println("ElaborateInference: here 3");
-
-
                         Pair<Map<String, DiscourseUnit>, StringDistribution> groundedHypotheses =
                                 ReferenceResolution.resolve(predecessor, yodaEnvironment);
                         for (String groundedDuKey: groundedHypotheses.getRight().keySet()) {
-                            System.out.println("ElaborateInference: here 4");
                             String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
                             DialogState newDialogState = currentState.deepCopy();
                             DiscourseUnit currentDu = groundedHypotheses.getLeft().get(groundedDuKey);
-                            newDialogState.discourseUnitCounter += 1;
-                            newDialogState.getDiscourseUnitHypothesisMap().
-                                    put("du_" + newDialogState.discourseUnitCounter, currentDu);
+                            newDialogState.getDiscourseUnitHypothesisMap().put(predecessorId, currentDu);
+
                             currentDu.actionAnalysis.update(yodaEnvironment, currentDu);
-                            Double score = Utils.discourseUnitContextProbability(newDialogState, predecessor) *
+                            Double score = Utils.discourseUnitContextProbability(newDialogState, currentDu) *
                                     groundedHypotheses.getRight().get(groundedDuKey);
                             resultDistribution.put(newDialogStateHypothesisID, score);
                             resultHypotheses.put(newDialogStateHypothesisID, newDialogState);

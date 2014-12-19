@@ -95,10 +95,12 @@ public class Utils {
             predecessor.timeOfLastActByThem = timeStamp;
             predecessor.spokenByThem = newSpokenByInitiator;
             predecessor.spokenByMe = null;
+            predecessor.groundTruth = null;
             predecessor.timeOfLastActByMe = null;
         } else { // if predecessor.initiator.equals("system")
             predecessor.timeOfLastActByThem = null;
             predecessor.spokenByThem = null;
+            predecessor.groundInterpretation = null;
             predecessor.spokenByMe = newSpokenByInitiator;
             predecessor.timeOfLastActByMe = timeStamp;
         }

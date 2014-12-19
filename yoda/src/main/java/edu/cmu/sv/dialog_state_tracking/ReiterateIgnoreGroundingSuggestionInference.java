@@ -54,6 +54,7 @@ public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpda
                                 correctionContent);
                         SemanticsModel.putAtPath(predecessor.groundInterpretation.getInternalRepresentation(),
                                 duAnalysis.suggestionPath, null);
+                        Utils.returnToGround(predecessor, newSpokenByThemHypothesis, timeStamp);
 
                         Pair<Map<String, DiscourseUnit>, StringDistribution> groundedHypotheses =
                                 ReferenceResolution.resolve(predecessor, yodaEnvironment);
@@ -63,7 +64,6 @@ public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpda
                             DialogState newDialogState = currentState.deepCopy();
                             newDialogState.getDiscourseUnitHypothesisMap().put(predecessorId, currentDu);
 
-                            Utils.returnToGround(currentDu, newSpokenByThemHypothesis, timeStamp);
                             currentDu.actionAnalysis.update(yodaEnvironment, currentDu);
                             resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
                             Double score = groundedHypotheses.getRight().get(groundedDuKey) *

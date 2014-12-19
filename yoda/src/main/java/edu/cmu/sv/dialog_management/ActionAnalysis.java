@@ -32,6 +32,7 @@ public class ActionAnalysis {
     }
 
     public void update(YodaEnvironment yodaEnvironment, DiscourseUnit discourseUnit) {
+        missingRequiredVerbSlots.clear();
         String dialogActString = (String) discourseUnit.getSpokenByThem().newGetSlotPathFiller("dialogAct");
 
         SemanticsModel groundedMeaning = discourseUnit.getGroundInterpretation();
