@@ -6,7 +6,10 @@ import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.natural_language_generation.Grammar;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.ThingWithRoles;
+import edu.cmu.sv.semantics.SemanticsModel;
+import edu.cmu.sv.system_action.ActionSchema;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ClarificationDialogAct;
+import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.utils.Combination;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -166,25 +169,40 @@ public class DialogManager implements Runnable {
                 }
             }
 
-
-            /*
-            //// Get expected rewards for executing non-dialog tasks
-            for (String hypothesisID : currentDialogState.getHypotheses().keySet()) {
-                DiscourseUnitHypothesis.DiscourseUnitHypothesis dsHypothesis = currentDialogState.getHypotheses().get(hypothesisID);
-                SemanticsModel hypothesis = dsHypothesis.getSpokenByThem();
-                Class<? extends DialogAct> daClass = DialogRegistry.dialogActNameMap.
-                        get(hypothesis.getSlotPathFiller("dialogAct"));
-                // add contribution from non dialog tasks
-                if (DialogRegistry.nonDialogTaskRegistry.containsKey(daClass)) {
-                    for (Class<? extends NonDialogTask> taskClass : DialogRegistry.nonDialogTaskRegistry.get(daClass)) {
-                        NonDialogTask task = taskClass.getDeclaredConstructor(Database.class).newInstance(yodaEnvironment.yodaEnvironment);
-                        task.setTaskSpec(hypothesis.deepCopy());
-                        Double expectedReward = RewardAndCostCalculator.nonDialogTaskReward(currentDialogState, task);
-                        actionExpectedReward.put(task, expectedReward);
+            // enumerate non-dialog tasks
+            Set<NonDialogTask> enumeratedNonDialogTasks = new HashSet<>();
+            for (ActionSchema actionSchema : DialogRegistry.actionSchemata) {
+                for (String dialogStateHypothesisId : dialogStateHypotheses.keySet()) {
+                    DialogState currentDialogState = dialogStateHypotheses.get(dialogStateHypothesisId);
+                    for (String discourseUnitHypothesisId : currentDialogState.getDiscourseUnitHypothesisMap().
+                            keySet()) {
+                        DiscourseUnit contextDiscourseUnit = currentDialogState.
+                                getDiscourseUnitHypothesisMap().get(discourseUnitHypothesisId);
+                        SemanticsModel resolvedMeaning = contextDiscourseUnit.getGroundInterpretation();
+                        if (resolvedMeaning==null)
+                            continue;
+                        if (actionSchema.matchSchema(resolvedMeaning)){
+                            NonDialogTask enumeratedTask = actionSchema.applySchema(resolvedMeaning);
+                            boolean alreadyFound = false;
+                            for (NonDialogTask existingTask : enumeratedNonDialogTasks) {
+                                if (enumeratedTask.evaluationMatch(existingTask)) {
+                                    alreadyFound = true;
+                                    break;
+                                }
+                            }
+                            if (!alreadyFound){
+                                enumeratedNonDialogTasks.add(enumeratedTask);
+                            }
+                        }
                     }
                 }
             }
-            */
+
+            // evaluate non-dialog tasks
+            for (NonDialogTask task : enumeratedNonDialogTasks){
+                Double currentReward = RewardAndCostCalculator.nonDialogTaskReward(task, dialogStateHypotheses, dialogStateDistribution);
+                accumulateReward(actionExpectedReward, task, currentReward);
+            }
 
             return HypothesisSetManagement.keepNBestBeam(actionExpectedReward, 10000);
         } catch (IllegalAccessException | InstantiationException e) {
@@ -194,19 +212,19 @@ public class DialogManager implements Runnable {
         return null;
     }
 
-    private void accumulateReward(Map<SystemAction, Double> actionExpectedReward, DialogAct dialogAct, Double currentReward){
+    private void accumulateReward(Map<SystemAction, Double> actionExpectedReward, SystemAction systemAction, Double currentReward){
         boolean alreadyFound = false;
         for (SystemAction key : actionExpectedReward.keySet()){
             if (key==null)
                 continue;
-            if (key.evaluationMatch(dialogAct)){
+            if (key.evaluationMatch(systemAction)){
                 alreadyFound = true;
                 actionExpectedReward.put(key, actionExpectedReward.get(key) + currentReward);
                 break;
             }
         }
         if (!alreadyFound){
-            actionExpectedReward.put(dialogAct, currentReward);
+            actionExpectedReward.put(systemAction, currentReward);
         }
     }
 
@@ -231,8 +249,13 @@ public class DialogManager implements Runnable {
                 List<Pair<SystemAction, Double>> rankedActions = enumerateAndScorePossibleActions();
                 logger.info("Ranked actions: " + rankedActions.toString());
                 SystemAction selectedAction = rankedActions.get(0).getKey();
-                if (selectedAction!=null)
-                    yodaEnvironment.nlg.speak(((DialogAct)selectedAction).getNlgCommand(), Grammar.DEFAULT_GRAMMAR_PREFERENCES);
+                if (selectedAction!=null) {
+                    if (selectedAction instanceof DialogAct) {
+                        yodaEnvironment.nlg.speak(((DialogAct) selectedAction).getNlgCommand(), Grammar.DEFAULT_GRAMMAR_PREFERENCES);
+                    } else if (selectedAction instanceof NonDialogTask) {
+                        System.out.println("performing non-dialog task:\n"+selectedAction);
+                    }
+                }
                 Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();

@@ -26,14 +26,7 @@ public class GiveDirectionsTask extends NonDialogTask {
 
     @Override
     public double assessExecutability() {
-        if (taskSpec==null)
-            return 0;
-        if (taskSpec.getSlotPathFiller("action")!=null &&
-                taskSpec.getSlotPathFiller("action").equals("Create") &&
-                taskSpec.getSlotPathFiller("theme.class")!=null &&
-                taskSpec.getSlotPathFiller("theme.class").equals("Meeting"))
-            return 1.0;
-        return 0;
+        return 0.0;
     }
 
     @Override

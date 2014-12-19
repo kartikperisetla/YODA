@@ -3,7 +3,6 @@ package edu.cmu.sv.system_action;
 import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
-import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.json.simple.JSONObject;
 
 /**
@@ -20,7 +19,8 @@ public class GenericCommandSchema extends ActionSchema {
 
     @Override
     public boolean matchSchema(SemanticsModel resolvedMeaning) {
-        return (resolvedMeaning.newGetSlotPathFiller("verb.class").equals(verbClass.getSimpleName()) &&
+        return (resolvedMeaning.newGetSlotPathFiller("verb.class")!=null &&
+                resolvedMeaning.newGetSlotPathFiller("verb.class").equals(verbClass.getSimpleName()) &&
                 resolvedMeaning.newGetSlotPathFiller("dialogAct").equals("Command"));
     }
 

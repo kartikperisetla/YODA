@@ -6,11 +6,15 @@ import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.dialog_state_tracking.Utils;
 import edu.cmu.sv.ontology.misc.WebResource;
 import edu.cmu.sv.ontology.role.HasURI;
+import edu.cmu.sv.semantics.SemanticsModel;
+import edu.cmu.sv.system_action.ActionSchema;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Accept;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.DontKnow;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Reject;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.YNQuestion;
+import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
+import edu.cmu.sv.system_action.non_dialog_task.NonDialogTaskPreferences;
 import edu.cmu.sv.utils.StringDistribution;
 
 import java.util.HashMap;
@@ -34,6 +38,44 @@ public class RewardAndCostCalculator {
     public static double penaltyForIncorrectDialogTaskExecution = 10;
     public static double penaltyForSpeakingOutOfTurn = 1.0;
 
+    public static Double nonDialogTaskReward(NonDialogTask task,
+                                             Map<String, DialogState> dialogStateHypotheses,
+                                             StringDistribution dialogStateDistribution){
+
+        // find the probability that an equivalent task is being requested
+        Double probabilityTaskAppropriate = 0.0;
+        for (String dialogStateHypothesisId : dialogStateHypotheses.keySet()){
+            DialogState currentDialogState = dialogStateHypotheses.get(dialogStateHypothesisId);
+            Double probabilityTaskAppropriateInDialogState = 0.0;
+            for (String contextDiscourseUnitId : currentDialogState.getDiscourseUnitHypothesisMap().keySet()){
+                DiscourseUnit contextDiscourseUnit = currentDialogState.getDiscourseUnitHypothesisMap().get(contextDiscourseUnitId);
+
+                SemanticsModel resolvedMeaning = contextDiscourseUnit.getGroundInterpretation();
+                if (resolvedMeaning==null)
+                    continue;
+
+                boolean anyMatches = false;
+                for (ActionSchema actionSchema : DialogRegistry.actionSchemata) {
+                    if (actionSchema.matchSchema(resolvedMeaning)){
+                        NonDialogTask enumeratedTask = actionSchema.applySchema(resolvedMeaning);
+                        if (enumeratedTask.evaluationMatch(task)){
+                            anyMatches = true;
+                        }
+                    }
+                }
+                if (anyMatches) {
+                    probabilityTaskAppropriateInDialogState +=
+                            Utils.discourseUnitContextProbability(currentDialogState, contextDiscourseUnit);
+                }
+            }
+            probabilityTaskAppropriate += probabilityTaskAppropriateInDialogState * dialogStateDistribution.get(dialogStateHypothesisId);
+        }
+
+        probabilityTaskAppropriate = Doubles.min(1.0, probabilityTaskAppropriate);
+        NonDialogTaskPreferences preferences = task.getPreferences();
+        return preferences.rewardForCorrectExecution * probabilityTaskAppropriate -
+                preferences.penaltyForIncorrectExecution * (1 - probabilityTaskAppropriate);
+    }
 
     /*
     * Return the probability that this dialog act will be interpreted in this context.
