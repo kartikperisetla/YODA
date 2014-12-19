@@ -14,14 +14,12 @@ import edu.cmu.sv.ontology.role.*;
 import edu.cmu.sv.ontology.role.has_quality_subroles.HasDistance;
 import edu.cmu.sv.ontology.role.has_quality_subroles.HasExpensiveness;
 import edu.cmu.sv.ontology.role.has_quality_subroles.HasQualityRole;
-import edu.cmu.sv.ontology.verb.Exist;
-import edu.cmu.sv.ontology.verb.Verb;
-import edu.cmu.sv.ontology.verb.Create;
-import edu.cmu.sv.ontology.verb.HasProperty;
+import edu.cmu.sv.ontology.verb.*;
 import edu.cmu.sv.ontology.noun.*;
 import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import sun.security.krb5.internal.crypto.Des;
 
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -52,6 +50,7 @@ public class OntologyRegistry {
         verbClasses.add(Create.class);
         verbClasses.add(HasProperty.class);
         verbClasses.add(Exist.class);
+        verbClasses.add(GiveDirections.class);
 
         nounClasses.add(Noun.class);
         nounClasses.add(Person.class);
@@ -97,6 +96,8 @@ public class OntologyRegistry {
         roleClasses.add(HasDistance.class);
         roleClasses.add(HasExpensiveness.class);
         roleClasses.add(InRelationTo.class);
+        roleClasses.add(Origin.class);
+        roleClasses.add(Destination.class);
 
         adjectiveClasses.add(Cheap.class);
         adjectiveClasses.add(Expensive.class);

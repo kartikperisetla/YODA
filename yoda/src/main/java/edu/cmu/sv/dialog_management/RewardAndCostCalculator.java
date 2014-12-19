@@ -30,6 +30,7 @@ public class RewardAndCostCalculator {
     public static double penaltyForSpeaking = .5;
     public static double penaltyForIgnoringUserRequest = 2;
     public static double rewardForCorrectDialogTaskExecution = 5;
+    public static double rewardForFillingRequiredSlot = 1.0;
     public static double penaltyForIncorrectDialogTaskExecution = 10;
     public static double penaltyForSpeakingOutOfTurn = 1.0;
 
@@ -236,7 +237,7 @@ public class RewardAndCostCalculator {
                                                   DialogAct dialogAct){
         if (discourseUnit.actionAnalysis.missingRequiredVerbSlots.contains(
                 (String) dialogAct.getBoundPaths().get("requested_role_path"))) {
-            return 1.0;
+            return rewardForFillingRequiredSlot;
         }
         return 0.0;
     }
