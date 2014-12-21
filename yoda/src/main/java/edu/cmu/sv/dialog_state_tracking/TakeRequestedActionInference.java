@@ -9,6 +9,7 @@ import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.json.simple.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,13 +34,11 @@ public class TakeRequestedActionInference extends DialogStateUpdateInference {
                 for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
                     DiscourseUnit predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId);
 
-                    boolean anyMatchingSchema = false;
-
                     try {
+                        boolean anyMatchingSchema = false;
                         NonDialogTask thisTask = ((Class<? extends NonDialogTask>)
                                 DialogRegistry.actionNameMap.get(dialogAct)).newInstance();
-                        thisTask.setTaskSpec(turn.groundedSystemMeaning.getInternalRepresentation());
-                        thisTask.getTaskSpec().remove("dialogAct");
+                        thisTask.setTaskSpec((JSONObject) turn.groundedSystemMeaning.newGetSlotPathFiller("verb"));
 
                         Assert.verify(!predecessor.initiator.equals("system"));
                         SemanticsModel resolvedMeaning = predecessor.getGroundInterpretation();

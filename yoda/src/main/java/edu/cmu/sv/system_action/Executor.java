@@ -46,8 +46,8 @@ public class Executor {
 
         } else if (systemAction instanceof NonDialogTask){
 
-            JSONObject taskSemantics = SemanticsModel.parseJSON(((NonDialogTask) systemAction).getTaskSpec().toJSONString());
-            taskSemantics.put("dialogAct", systemAction.getClass().getSimpleName());
+            JSONObject taskSemantics = SemanticsModel.parseJSON("{\"dialogAct\":\""+systemAction.getClass().getSimpleName()+"\"}");
+            taskSemantics.put("verb", SemanticsModel.parseJSON(((NonDialogTask) systemAction).getTaskSpec().toJSONString()));
 
             SemanticsModel taskSemanticModel = new SemanticsModel(taskSemantics);
             ((NonDialogTask) systemAction).execute();

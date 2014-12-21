@@ -6,7 +6,7 @@ import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.misc.Requested;
 import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestRole;
+import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestRoleGivenRole;
 import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -29,7 +29,7 @@ public class RequestAgentTemplate implements Template {
         String verbClassString;
         JSONObject patientDescription;
         try{
-            Assert.verify(constraints.get("dialogAct").equals(RequestRole.class.getSimpleName()));
+            Assert.verify(constraints.get("dialogAct").equals(RequestRoleGivenRole.class.getSimpleName()));
             Assert.verify(constraints.containsKey("verb"));
             JSONObject verbObject = (JSONObject)constraints.get("verb");
             verbClassString = (String)verbObject.get("class");

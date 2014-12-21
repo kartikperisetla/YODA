@@ -277,6 +277,7 @@ public class RewardAndCostCalculator {
     public static Double requestSlotFillingReward(DialogState dialogState,
                                                   DiscourseUnit discourseUnit,
                                                   DialogAct dialogAct){
+
         if (discourseUnit.actionAnalysis.missingRequiredVerbSlots.contains(
                 (String) dialogAct.getBoundPaths().get("requested_role_path"))) {
             return rewardForFillingRequiredSlot;

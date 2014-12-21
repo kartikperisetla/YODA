@@ -1,12 +1,8 @@
 package edu.cmu.sv.dialog_state_tracking;
 
 import edu.cmu.sv.ontology.misc.Requested;
-import edu.cmu.sv.ontology.misc.Suggested;
-import edu.cmu.sv.ontology.role.HasValue;
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
-import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestConfirmValue;
-import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestRole;
+import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestRoleGivenRole;
 import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -34,7 +30,7 @@ public class RequestSlotInference extends DialogStateUpdateInference {
 
             SemanticsModel hypModel = turn.systemUtterance;
             String dialogAct = hypModel.getSlotPathFiller("dialogAct");
-            if (RequestRole.class.getSimpleName().equals(dialogAct)) {
+            if (RequestRoleGivenRole.class.getSimpleName().equals(dialogAct)) {
                 for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
                     DiscourseUnit predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId);
                     String requestPath;

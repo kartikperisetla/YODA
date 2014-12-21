@@ -11,6 +11,7 @@ import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ClarificationDi
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ConfirmValueSuggestion;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestConfirmValue;
 import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestRole;
+import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestRoleGivenRole;
 import edu.cmu.sv.system_action.non_dialog_task.GiveDirectionsTask;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 
@@ -44,6 +45,7 @@ public class DialogRegistry {
         argumentationDialogActs.add(Reject.class);
         argumentationDialogActs.add(DontKnow.class);
 
+        slotFillingDialogActs.add(RequestRoleGivenRole.class);
         slotFillingDialogActs.add(RequestRole.class);
 
         discourseUnitDialogActs.add(WHQuestion.class);

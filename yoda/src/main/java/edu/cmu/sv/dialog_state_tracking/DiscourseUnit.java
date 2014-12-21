@@ -33,7 +33,7 @@ public class DiscourseUnit {
         if (initiator.equals("user")){
             return spokenByThem.newGetSlotPathFiller(slotPath);
         } else { //initiator.equals("system")
-            return spokenByMe.newGetSlotPathFiller("verb");
+            return spokenByMe.newGetSlotPathFiller(slotPath);
         }
     }
 

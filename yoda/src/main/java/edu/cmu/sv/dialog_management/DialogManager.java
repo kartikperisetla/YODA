@@ -102,7 +102,6 @@ public class DialogManager implements Runnable {
                 //// slot-filling dialog acts
                 for (Class<? extends DialogAct> dialogActClass : DialogRegistry.slotFillingDialogActs){
                     DialogAct dialogActInstance = dialogActClass.newInstance();
-
                     for (String discourseUnitHypothesisId : currentDialogState.getDiscourseUnitHypothesisMap().
                             keySet()) {
                         DiscourseUnit contextDiscourseUnit = currentDialogState.

@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * Created by David Cohen on 9/24/14.
  */
-public class RequestRole extends DialogAct{
+public class RequestRoleGivenRole extends DialogAct{
     static Map<String, Class<? extends Thing>> individualParameters = new HashMap<>();
     static Map<String, Class<? extends Thing>> classParameters = new HashMap<>();
     static Map<String, Class<? extends Thing>> descriptionParameters = new HashMap<>();
@@ -29,6 +29,8 @@ public class RequestRole extends DialogAct{
     static{
         classParameters.put("verb_class", Verb.class);
         pathParameters.put("requested_role_path", Thing.class);
+        pathParameters.put("given_role_path", Thing.class);
+        descriptionParameters.put("given_role_description", Thing.class);
     }
     @Override
     public Map<String, Class<? extends Thing>> getClassParameters() {
@@ -55,6 +57,9 @@ public class RequestRole extends DialogAct{
         String verbString = "{\"class\":\""+this.getBoundClasses().get("verb_class")+"\"}";
         String requestedString = "{\"class\":\""+ Requested.class.getSimpleName()+"\"}";
         ans.getInternalRepresentation().put("verb", SemanticsModel.parseJSON(verbString));
+        SemanticsModel.putAtPath(ans.getInternalRepresentation(),
+                (String) this.getBoundPaths().get("given_role_path"),
+                (JSONObject) this.getBoundDescriptions().get("given_role_description"));
         SemanticsModel.putAtPath(ans.getInternalRepresentation(),
                 (String) this.getBoundPaths().get("requested_role_path"),
                 SemanticsModel.parseJSON(requestedString));

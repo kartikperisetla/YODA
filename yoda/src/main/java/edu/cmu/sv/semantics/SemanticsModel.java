@@ -269,27 +269,6 @@ public class SemanticsModel {
     }
 
     /*
-    * Put other at the indicated slotPath. Erase any contents that are there currently.
-    * TODO: implement in the case when there isn't already a JSON object at that slotPath
-    * */
-    public void placeAtPoint(String slotPath, SemanticsModel other){
-        Object currentInhabitantOfPoint = newGetSlotPathFiller(slotPath);
-        if (currentInhabitantOfPoint instanceof JSONObject){
-            List<Object> keyList = new LinkedList<Object>(((JSONObject)currentInhabitantOfPoint).keySet());
-            for (Object key: keyList){
-                ((JSONObject) currentInhabitantOfPoint).remove(key);
-            }
-            for (Object key : other.internalRepresentation.keySet()){
-                ((JSONObject) currentInhabitantOfPoint).put(key, other.internalRepresentation.get(key));
-            }
-        } else if (currentInhabitantOfPoint instanceof String){
-            throw new Error("NOT YET IMPLEMENTED: the current inhabitant of the point:"+ slotPath + " is a string");
-        } else {
-            throw new Error("Not YET IMPLEMENTED.");
-        }
-    }
-
-    /*
     * Extend other and overwrite what is there currently at the point specified by slotPath
     *
     * If slotPath filler is null or a String, throw an error
@@ -493,31 +472,6 @@ public class SemanticsModel {
             }
         }
     }
-
-    /*
-    * Throws an error if the dialog state hypothesis model is invalid
-    * according to the registered ontology
-    * */
-    public void validateDSTHypothesis(){
-        // there is a specific set of permitted slots in the top level
-        if (getSlotsAtPath("").stream().
-                anyMatch(x -> !x.equals("dialogAct") && !x.equals("verb")))
-            throw new Error("the top level contains unpermitted slots");
-
-        // check all children
-        for (Object child : internalRepresentation.values()){
-            try {
-                if (!(child instanceof JSONObject))
-                    continue;
-                if (((JSONObject)child).keySet().isEmpty())
-                    continue;
-                validateThingDescription((JSONObject)child);
-            } catch (IllegalAccessException | InstantiationException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
 
     /*
     * Recursively check that all the slots in a node are valid for the class of that node
