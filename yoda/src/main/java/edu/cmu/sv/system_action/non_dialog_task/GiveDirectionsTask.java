@@ -34,18 +34,6 @@ public class GiveDirectionsTask extends NonDialogTask {
     }
 
     @Override
-    public void execute() {
-        System.out.println("Executing task: create meeting");
-        System.out.println(taskSpec);
-        String ans = "CreateMeetingTask:"+instanceCounter.toString();
-        instanceCounter += 1;
-        // There is no real implementation, so we just set the status to successfully completed
-        executionStatus.put(ans, TaskStatus.SUCCESSFULLY_COMPLETED);
-        System.out.println("taskID: "+ans);
-        return ans;
-    }
-
-    @Override
     public TaskStatus status(String taskID) {
         return executionStatus.get(taskID);
     }

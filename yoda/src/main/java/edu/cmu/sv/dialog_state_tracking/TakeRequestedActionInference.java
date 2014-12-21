@@ -2,14 +2,14 @@ package edu.cmu.sv.dialog_state_tracking;
 
 import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.YNQuestion;
+import edu.cmu.sv.system_action.ActionSchema;
+import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,21 +31,32 @@ public class TakeRequestedActionInference extends DialogStateUpdateInference {
             String dialogAct = turn.systemUtterance.getSlotPathFiller("dialogAct");
             if (DialogRegistry.nonDialogTasks.contains(DialogRegistry.actionNameMap.get(dialogAct))) {
                 for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
-                    //todo: search for predecessors that fit this action
-                    //todo: add an argumentation link responding to the predecessor
-
-
                     DiscourseUnit predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId);
+
+                    boolean anyMatchingSchema = false;
+
                     try {
+                        NonDialogTask thisTask = ((Class<? extends NonDialogTask>)
+                                DialogRegistry.actionNameMap.get(dialogAct)).newInstance();
+                        thisTask.setTaskSpec(turn.groundedSystemMeaning.getInternalRepresentation());
+                        thisTask.getTaskSpec().remove("dialogAct");
+
                         Assert.verify(!predecessor.initiator.equals("system"));
-                        String predecessorDialogAct = predecessor.spokenByThem.getSlotPathFiller("dialogAct");
-                        Assert.verify(Arrays.asList(YNQuestion.class.getSimpleName()).contains(predecessorDialogAct));
-                    } catch (Assert.AssertException e){
+                        SemanticsModel resolvedMeaning = predecessor.getGroundInterpretation();
+                        Assert.verify(resolvedMeaning != null);
+                        for (ActionSchema actionSchema : DialogRegistry.actionSchemata) {
+                            if (actionSchema.matchSchema(resolvedMeaning)) {
+                                NonDialogTask enumeratedTask = actionSchema.applySchema(resolvedMeaning);
+                                if (enumeratedTask.evaluationMatch(thisTask)) {
+                                    anyMatchingSchema = true;
+                                    break;
+                                }
+                            }
+                        }
+                        Assert.verify(anyMatchingSchema);
+                    } catch (Assert.AssertException | InstantiationException | IllegalAccessException e){
                         continue;
                     }
-
-
-
 
                     String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
 
