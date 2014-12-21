@@ -40,18 +40,6 @@ public class NaturalLanguageGenerator {
         this.yodaEnvironment = yodaEnvironment;
     }
 
-    public void speak(SemanticsModel model, Grammar.GrammarPreferences grammarPreferences){
-        logger.info("nlg request made:"+model);
-        Map.Entry<String, SemanticsModel> chosenUtterance = generateBestForSemantics(model, grammarPreferences);
-        chosenUtterance.getValue().filterOutLeafSlot("chunk-start");
-        chosenUtterance.getValue().filterOutLeafSlot("chunk-end");
-        logger.info("chosen utterance:"+chosenUtterance);
-        yodaEnvironment.out.sendOutput(chosenUtterance.getKey());
-        Turn systemTurn = new Turn("system", chosenUtterance.getValue(), model, null, null);
-        Calendar calendar = Calendar.getInstance();
-        yodaEnvironment.DstInputQueue.add(new ImmutablePair<>(systemTurn, calendar.getTimeInMillis()));
-    }
-
     /*
     * The NLG function that is called by a dialog system at each turn.
     * This function may make use of various information in the yodaEnvironment
@@ -96,6 +84,10 @@ public class NaturalLanguageGenerator {
             }
         }
         return ans;
+    }
+
+    public static Logger getLogger() {
+        return logger;
     }
 
 }

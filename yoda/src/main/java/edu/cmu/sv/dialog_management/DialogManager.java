@@ -250,11 +250,7 @@ public class DialogManager implements Runnable {
                 logger.info("Ranked actions: " + rankedActions.toString());
                 SystemAction selectedAction = rankedActions.get(0).getKey();
                 if (selectedAction!=null) {
-                    if (selectedAction instanceof DialogAct) {
-                        yodaEnvironment.nlg.speak(((DialogAct) selectedAction).getNlgCommand(), Grammar.DEFAULT_GRAMMAR_PREFERENCES);
-                    } else if (selectedAction instanceof NonDialogTask) {
-                        System.out.println("performing non-dialog task:\n"+selectedAction);
-                    }
+                    yodaEnvironment.exe.execute(selectedAction);
                 }
                 Thread.sleep(100);
             } catch (InterruptedException e) {

@@ -1,7 +1,8 @@
 package edu.cmu.sv.dialog_state_tracking;
 
+import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.*;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.YNQuestion;
 import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -13,17 +14,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by David Cohen on 9/19/14.
- *
- * Infers the dialog state after a question is answered.
- *
+ * Created by David Cohen on 12/21/14.
  */
-public class AnswerInference extends DialogStateUpdateInference {
-
+public class TakeRequestedActionInference extends DialogStateUpdateInference {
     @Override
-    public Pair<Map<String, DialogState>, StringDistribution> applyAll(
-            YodaEnvironment yodaEnvironment, DialogState currentState, Turn turn, long timeStamp) {
-
+    public Pair<Map<String, DialogState>, StringDistribution> applyAll(YodaEnvironment yodaEnvironment,
+                                                                       DialogState currentState,
+                                                                       Turn turn, long timeStamp) {
         StringDistribution resultDistribution = new StringDistribution();
         Map<String, DialogState> resultHypotheses = new HashMap<>();
 
@@ -32,9 +29,12 @@ public class AnswerInference extends DialogStateUpdateInference {
 
         } else { // if turn.speaker.equals("system")
             String dialogAct = turn.systemUtterance.getSlotPathFiller("dialogAct");
-            if (Arrays.asList(Accept.class.getSimpleName(), Reject.class.getSimpleName(), DontKnow.class.getSimpleName()).
-                    contains(dialogAct)) {
+            if (DialogRegistry.nonDialogTasks.contains(DialogRegistry.actionNameMap.get(dialogAct))) {
                 for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
+                    //todo: search for predecessors that fit this action
+                    //todo: add an argumentation link responding to the predecessor
+
+
                     DiscourseUnit predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId);
                     try {
                         Assert.verify(!predecessor.initiator.equals("system"));
@@ -43,6 +43,9 @@ public class AnswerInference extends DialogStateUpdateInference {
                     } catch (Assert.AssertException e){
                         continue;
                     }
+
+
+
 
                     String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
 
@@ -70,5 +73,4 @@ public class AnswerInference extends DialogStateUpdateInference {
 
         return new ImmutablePair<>(resultHypotheses, resultDistribution);
     }
-
 }

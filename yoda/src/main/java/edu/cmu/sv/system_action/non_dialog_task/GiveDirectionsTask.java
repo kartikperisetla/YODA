@@ -1,6 +1,5 @@
 package edu.cmu.sv.system_action.non_dialog_task;
 
-import edu.cmu.sv.semantics.SemanticsModel;
 import org.json.simple.JSONObject;
 
 import java.util.Arrays;
@@ -35,7 +34,7 @@ public class GiveDirectionsTask extends NonDialogTask {
     }
 
     @Override
-    public String execute(SemanticsModel taskSpec) {
+    public void execute() {
         System.out.println("Executing task: create meeting");
         System.out.println(taskSpec);
         String ans = "CreateMeetingTask:"+instanceCounter.toString();

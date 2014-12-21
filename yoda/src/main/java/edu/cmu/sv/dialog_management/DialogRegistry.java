@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables;
 import edu.cmu.sv.ontology.verb.GiveDirections;
 import edu.cmu.sv.system_action.ActionSchema;
 import edu.cmu.sv.system_action.GenericCommandSchema;
+import edu.cmu.sv.system_action.SystemAction;
 import edu.cmu.sv.system_action.dialog_act.*;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.*;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ClarificationDialogAct;
@@ -11,6 +12,7 @@ import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ConfirmValueSug
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestConfirmValue;
 import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestRole;
 import edu.cmu.sv.system_action.non_dialog_task.GiveDirectionsTask;
+import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 
 import java.util.*;
 
@@ -24,12 +26,13 @@ import java.util.*;
 public class DialogRegistry {
     // map from string identifier to dialog act
     public static Map<String, Class <? extends DialogAct>> dialogActNameMap = new HashMap<>();
+    public static Map<String, Class <? extends SystemAction>> actionNameMap = new HashMap<>();
 
     public static Set<Class <? extends ClarificationDialogAct>> clarificationDialogActs = new HashSet<>();
     public static Set<Class <? extends DialogAct>> argumentationDialogActs = new HashSet<>();
     public static Set<Class <? extends DialogAct>> slotFillingDialogActs = new HashSet<>();
-
     public static Set<Class <? extends DialogAct>> discourseUnitDialogActs = new HashSet<>();
+    public static Set<Class< ? extends NonDialogTask>> nonDialogTasks = new HashSet<>();
 
     public static Set<ActionSchema> actionSchemata = new HashSet<>();
 
@@ -47,12 +50,20 @@ public class DialogRegistry {
         discourseUnitDialogActs.add(YNQuestion.class);
         discourseUnitDialogActs.add(Command.class);
 
+        nonDialogTasks.add(GiveDirectionsTask.class);
+
         actionSchemata.add(new GenericCommandSchema(GiveDirections.class, GiveDirectionsTask.class));
 
         for (Class<? extends DialogAct> cls : Iterables.concat(discourseUnitDialogActs, argumentationDialogActs,
                 clarificationDialogActs, Arrays.asList(Fragment.class))) {
             dialogActNameMap.put(cls.getSimpleName(), cls);
         }
+
+        for (Class<? extends SystemAction> cls : Iterables.concat(discourseUnitDialogActs, argumentationDialogActs,
+                clarificationDialogActs, Arrays.asList(Fragment.class), nonDialogTasks)) {
+            actionNameMap.put(cls.getSimpleName(), cls);
+        }
+
 
     }
 

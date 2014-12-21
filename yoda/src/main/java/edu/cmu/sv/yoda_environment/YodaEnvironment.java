@@ -8,6 +8,7 @@ import edu.cmu.sv.dialog_state_tracking.Turn;
 import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
 import edu.cmu.sv.spoken_language_understanding.RegexUnderstander;
 import edu.cmu.sv.spoken_language_understanding.SpokenLanguageUnderstander;
+import edu.cmu.sv.system_action.Executor;
 import edu.cmu.sv.utils.StringDistribution;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -40,6 +41,7 @@ public class YodaEnvironment {
     public Database db;
     public NaturalLanguageGenerator nlg;
     public SpokenLanguageUnderstander slu;
+    public Executor exe;
     public OutputHandler out;
 
     // turn + time stamp of DST input
@@ -62,6 +64,7 @@ public class YodaEnvironment {
         ans.dm = new DialogManager(ans);
         ans.nlg = new NaturalLanguageGenerator(ans);
         ans.slu = new RegexUnderstander(ans);
+        ans.exe = new Executor(ans);
         ans.out = new StandardOutOutputHandler();
         return ans;
     }
