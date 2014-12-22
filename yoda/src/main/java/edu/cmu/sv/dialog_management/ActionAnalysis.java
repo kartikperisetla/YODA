@@ -8,7 +8,9 @@ import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
+import edu.cmu.sv.system_action.ActionSchema;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.YNQuestion;
+import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.json.simple.JSONObject;
 
@@ -23,6 +25,7 @@ import java.util.Set;
 public class ActionAnalysis {
     public Double ynqTruth;
     public Set<String> missingRequiredVerbSlots = new HashSet<>();
+    public Set<NonDialogTask> enumeratedNonDialogTasks = new HashSet<>();
 
     public ActionAnalysis deepCopy(){
         ActionAnalysis ans = new ActionAnalysis();
@@ -33,6 +36,7 @@ public class ActionAnalysis {
 
     public void update(YodaEnvironment yodaEnvironment, DiscourseUnit discourseUnit) {
         missingRequiredVerbSlots.clear();
+        enumeratedNonDialogTasks.clear();
         String dialogActString = (String) discourseUnit.getSpokenByThem().newGetSlotPathFiller("dialogAct");
 
         SemanticsModel groundedMeaning = discourseUnit.getGroundInterpretation();
@@ -53,16 +57,34 @@ public class ActionAnalysis {
 
         if (missingRequiredVerbSlots.size()>0) {
             ynqTruth = null;
-            return;
-        }
-
-        if (dialogActString.equals(YNQuestion.class.getSimpleName())) {
+        } else if (dialogActString.equals(YNQuestion.class.getSimpleName())) {
             if (verbClass.equals(HasProperty.class)) {
                 ynqTruth = ReferenceResolution.descriptionMatch(yodaEnvironment,
                         (JSONObject) groundedMeaning.newGetSlotPathFiller("verb.Agent"),
                         (JSONObject) groundedMeaning.newGetSlotPathFiller("verb.Patient"));
             }
         }
+
+        SemanticsModel resolvedMeaning = discourseUnit.getGroundInterpretation();
+        if (resolvedMeaning!=null) {
+            for (ActionSchema actionSchema : DialogRegistry.actionSchemata) {
+                if (actionSchema.matchSchema(resolvedMeaning)) {
+                    NonDialogTask enumeratedTask = actionSchema.applySchema(resolvedMeaning);
+                    boolean alreadyThere = false;
+                    for (NonDialogTask task : enumeratedNonDialogTasks){
+                        if (enumeratedTask.evaluationMatch(task)) {
+                            alreadyThere = true;
+                            break;
+                        }
+                    }
+                    if (!alreadyThere){
+                        enumeratedNonDialogTasks.add(enumeratedTask);
+                    }
+                }
+            }
+        }
+
+
     }
 
 }

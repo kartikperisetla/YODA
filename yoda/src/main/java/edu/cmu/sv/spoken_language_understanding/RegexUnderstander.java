@@ -81,7 +81,7 @@ public class RegexUnderstander implements SpokenLanguageUnderstander{
             jsonString = "{\"dialogAct\":\"Accept\"}";
             SemanticsModel interpretation = new SemanticsModel(jsonString);
             hypotheses.put("hyp"+hypothesisId, interpretation);
-            hypothesisDistribution.put("hyp"+hypothesisId, 1.0);
+            hypothesisDistribution.put("hyp"+hypothesisId, 2.0);
             hypothesisId++;
         }
 
@@ -91,7 +91,7 @@ public class RegexUnderstander implements SpokenLanguageUnderstander{
             jsonString = "{\"dialogAct\":\"Reject\"}";
             SemanticsModel interpretation = new SemanticsModel(jsonString);
             hypotheses.put("hyp"+hypothesisId, interpretation);
-            hypothesisDistribution.put("hyp"+hypothesisId, 1.0);
+            hypothesisDistribution.put("hyp"+hypothesisId, 2.0);
             hypothesisId++;
         }
 

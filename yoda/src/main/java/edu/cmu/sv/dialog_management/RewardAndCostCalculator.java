@@ -4,8 +4,10 @@ import com.google.common.primitives.Doubles;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.dialog_state_tracking.Utils;
+import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.misc.WebResource;
 import edu.cmu.sv.ontology.role.HasURI;
+import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.ActionSchema;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
@@ -50,28 +52,18 @@ public class RewardAndCostCalculator {
             for (String contextDiscourseUnitId : currentDialogState.getDiscourseUnitHypothesisMap().keySet()){
                 DiscourseUnit contextDiscourseUnit = currentDialogState.getDiscourseUnitHypothesisMap().get(contextDiscourseUnitId);
 
-                SemanticsModel resolvedMeaning = contextDiscourseUnit.getGroundInterpretation();
-                if (resolvedMeaning==null)
-                    continue;
-
-                boolean anyMatches = false;
-                for (ActionSchema actionSchema : DialogRegistry.actionSchemata) {
-                    if (actionSchema.matchSchema(resolvedMeaning)){
-                        NonDialogTask enumeratedTask = actionSchema.applySchema(resolvedMeaning);
-                        if (enumeratedTask.evaluationMatch(task)){
-                            anyMatches = true;
-                        }
-                    }
-                }
-                if (anyMatches) {
-                    probabilityTaskAppropriateInDialogState +=
-                            Utils.discourseUnitContextProbability(currentDialogState, contextDiscourseUnit);
-                }
+                boolean anyMatches = contextDiscourseUnit.actionAnalysis.enumeratedNonDialogTasks.stream().
+                        anyMatch(x -> x.evaluationMatch(task));
+                boolean anyMissingVerbSlots = (contextDiscourseUnit.actionAnalysis.missingRequiredVerbSlots.size() > 0);
+                probabilityTaskAppropriateInDialogState +=
+                        (((!anyMissingVerbSlots) && anyMatches) ?
+                                Utils.discourseUnitContextProbability(currentDialogState, contextDiscourseUnit) :
+                                0);
             }
             probabilityTaskAppropriate += probabilityTaskAppropriateInDialogState * dialogStateDistribution.get(dialogStateHypothesisId);
         }
-
         probabilityTaskAppropriate = Doubles.min(1.0, probabilityTaskAppropriate);
+
         NonDialogTaskPreferences preferences = task.getPreferences();
         return preferences.rewardForCorrectExecution * probabilityTaskAppropriate -
                 preferences.penaltyForIncorrectExecution * (1 - probabilityTaskAppropriate);
