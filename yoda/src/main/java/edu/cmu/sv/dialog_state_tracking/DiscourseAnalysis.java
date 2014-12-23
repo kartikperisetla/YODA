@@ -4,6 +4,7 @@ import edu.cmu.sv.database.dialog_task.ReferenceResolution;
 import edu.cmu.sv.ontology.misc.Requested;
 import edu.cmu.sv.ontology.misc.Suggested;
 import edu.cmu.sv.ontology.role.HasValue;
+import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -28,6 +29,8 @@ public class DiscourseAnalysis {
     public JSONObject suggestedContent;
     public JSONObject groundedSuggestionIndividual;
     public Double descriptionMatch;
+
+    public boolean groundMatch;
 
     public DiscourseAnalysis(DiscourseUnit discourseUnit, YodaEnvironment yodaEnvironment) {
         this.discourseUnit = discourseUnit;
@@ -83,4 +86,13 @@ public class DiscourseAnalysis {
         if (descriptionMatch==null)
             descriptionMatch=0.0;
     }
+
+    public void analyseGround(){
+        if (discourseUnit.groundTruth==null || discourseUnit.groundInterpretation==null) {
+            groundMatch = false;
+            return;
+        }
+        groundMatch = SemanticsModel.contentEqual(discourseUnit.groundInterpretation, discourseUnit.groundTruth);
+    }
+
 }

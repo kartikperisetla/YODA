@@ -1,6 +1,7 @@
 package edu.cmu.sv.semantics;
 
 
+import com.google.common.collect.Iterables;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
@@ -530,8 +531,20 @@ public class SemanticsModel {
 
     public Map<String, SemanticsModel> getChildren(){return null;}
 
-    @Override
+    /*
+    * Return whether the two Semantic models objects contain identical content
+    * */
+    public static boolean contentEqual(SemanticsModel sm1, SemanticsModel sm2){
+        Set<String> internalPaths = sm1.getAllInternalNodePaths();
+        internalPaths.addAll(sm2.getAllInternalNodePaths());
+        for (String path : internalPaths){
+            if (!sm1.newGetSlotPathFiller(path).equals(sm2.newGetSlotPathFiller(path)))
+                return false;
+        }
+        return true;
+    }
 
+    @Override
     public String toString() {
         return "SemanticsModel:\n"+internalRepresentation.toJSONString();
     }

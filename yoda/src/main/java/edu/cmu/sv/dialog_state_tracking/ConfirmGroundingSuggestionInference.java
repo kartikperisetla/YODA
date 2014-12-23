@@ -20,6 +20,7 @@ import java.util.Map;
  * Created by David Cohen on 10/18/14.
  */
 public class ConfirmGroundingSuggestionInference extends DialogStateUpdateInference {
+    static double penaltyForNonGroundedMatch = .1;
     @Override
     public Pair<Map<String, DialogState>, StringDistribution> applyAll(
             YodaEnvironment yodaEnvironment, DialogState currentState, Turn turn, long timeStamp) {
@@ -42,6 +43,7 @@ public class ConfirmGroundingSuggestionInference extends DialogStateUpdateInfere
                             Assert.verify(predecessor.initiator.equals("user"));
                             Assert.verify(duAnalysis.ungroundedByAct(RequestConfirmValue.class));
                             duAnalysis.analyseSuggestions();
+                            duAnalysis.analyseGround();
                         } catch (Assert.AssertException e){
                             continue;
                         }
@@ -54,7 +56,8 @@ public class ConfirmGroundingSuggestionInference extends DialogStateUpdateInfere
 
                         // collect the result
                         resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
-                        Double score = Math.pow(duAnalysis.descriptionMatch, 3) *
+                        Double score = duAnalysis.descriptionMatch *
+                                (duAnalysis.groundMatch ? 1.0 : penaltyForNonGroundedMatch) *
                                 Utils.discourseUnitContextProbability(newDialogState, predecessor);
                         resultDistribution.put(newDialogStateHypothesisID, score);
                     }
