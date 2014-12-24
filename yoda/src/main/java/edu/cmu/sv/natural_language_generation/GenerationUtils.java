@@ -18,7 +18,9 @@ import java.util.stream.IntStream;
  */
 public class GenerationUtils {
 
-    public static Set<String> getPOSForClass(Class<? extends Thing> cls, String partOfSpeech, YodaEnvironment yodaEnvironment){
+    public static class NoLexiconEntryException extends Exception {};
+
+    public static Set<String> getPOSForClass(Class<? extends Thing> cls, String partOfSpeech, YodaEnvironment yodaEnvironment) throws NoLexiconEntryException {
         Set<String> ans = new HashSet<>();
         if (Modifier.isAbstract(cls.getModifiers()))
             return ans;
@@ -34,16 +36,35 @@ public class GenerationUtils {
                     }
                 }
                 if (!(posFound))
-                    throw new Error("requested part of speech is not a member of the LexicalEntry class:"+partOfSpeech);
+                    throw new NoLexiconEntryException();
             }
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
         if (ans.size()<=yodaEnvironment.nlg.grammarPreferences.maxWordForms)
             return ans;
-        return new HashSet<>(Arrays.asList(Arrays.copyOf(NaturalLanguageGenerator.randomData.nextSample(ans, yodaEnvironment.nlg.grammarPreferences.maxWordForms),
-                yodaEnvironment.nlg.grammarPreferences.maxWordForms, String[].class)));
+        return new HashSet<>(Arrays.asList(
+                Arrays.copyOf(
+                        NaturalLanguageGenerator.randomData.nextSample(ans, yodaEnvironment.nlg.grammarPreferences.maxWordForms),
+                        yodaEnvironment.nlg.grammarPreferences.maxWordForms, String[].class)));
     }
+
+
+    public static Set<String> getPOSForClassHierarchy(Class cls, String partOfSpeech, YodaEnvironment yodaEnvironment) throws NoLexiconEntryException {
+        if (! (Thing.class.isAssignableFrom(cls)))
+            throw new NoLexiconEntryException();
+        try {
+            Set<String> ans = getPOSForClass((Class<? extends Thing>)cls, partOfSpeech, yodaEnvironment);
+            if (ans.size()==0){
+                throw new NoLexiconEntryException();
+            }
+            return ans;
+        } catch (NoLexiconEntryException e){
+            return getPOSForClassHierarchy(cls.getSuperclass(), partOfSpeech, yodaEnvironment);
+        }
+    }
+
+
 
     /*
     * Return all combinations of strings and composed semantics objects,

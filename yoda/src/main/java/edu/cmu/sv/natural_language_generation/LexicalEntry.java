@@ -11,6 +11,9 @@ import java.util.Set;
  *
  */
 public class LexicalEntry {
+    // pronouns
+    public Set<String> whPronouns = new HashSet<>();
+
     // nouns
     public Set<String> singularNounForms = new HashSet<>();
     public Set<String> pluralNounForms = new HashSet<>();

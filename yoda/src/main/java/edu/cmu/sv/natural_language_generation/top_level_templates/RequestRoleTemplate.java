@@ -3,6 +3,7 @@ package edu.cmu.sv.natural_language_generation.top_level_templates;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
 import edu.cmu.sv.natural_language_generation.Template;
 import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.misc.Requested;
 import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.ontology.verb.HasProperty;
@@ -31,6 +32,8 @@ public class RequestRoleTemplate implements Template {
         String verbClassString;
         String requestedSlotPath;
         Class<? extends Role> roleClass;
+        Set<String> whStrings = null;
+
         try{
             Assert.verify(constraints.get("dialogAct").equals(RequestRole.class.getSimpleName()));
             Assert.verify(constraints.containsKey("verb"));
@@ -41,9 +44,28 @@ public class RequestRoleTemplate implements Template {
             String[] fillerPath = requestedSlotPath.split("\\.");
             Assert.verify(OntologyRegistry.roleNameMap.containsKey(fillerPath[fillerPath.length - 1]));
             roleClass = OntologyRegistry.roleNameMap.get(fillerPath[fillerPath.length - 1]);
+
+            try {
+                // assume that classesInRange only contains the most general classes possible
+                Set<Class <? extends Thing>> classesInRange = roleClass.newInstance().getRange();
+                for (Class <? extends Thing> cls : classesInRange){
+                    try {
+                        whStrings = GenerationUtils.getPOSForClassHierarchy(cls, "whPronouns", yodaEnvironment);
+                        break;
+                    } catch (GenerationUtils.NoLexiconEntryException e){}
+                }
+
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            Assert.verify(whStrings!=null);
+            Assert.verify(whStrings.size()>0);
+
         } catch (Assert.AssertException e){
             return new HashMap<>();
         }
+
+
 
         //todo: implement the rest
 
