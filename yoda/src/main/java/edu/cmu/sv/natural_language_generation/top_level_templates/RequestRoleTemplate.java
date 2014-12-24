@@ -1,15 +1,14 @@
 package edu.cmu.sv.natural_language_generation.top_level_templates;
 
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
+import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.natural_language_generation.Template;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.misc.Requested;
 import edu.cmu.sv.ontology.role.Role;
-import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestRole;
-import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestRoleGivenRole;
 import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -50,9 +49,9 @@ public class RequestRoleTemplate implements Template {
                 Set<Class <? extends Thing>> classesInRange = roleClass.newInstance().getRange();
                 for (Class <? extends Thing> cls : classesInRange){
                     try {
-                        whStrings = GenerationUtils.getPOSForClassHierarchy(cls, "whPronouns", yodaEnvironment);
+                        whStrings = Lexicon.getPOSForClassHierarchy(cls, "whPronouns", yodaEnvironment);
                         break;
-                    } catch (GenerationUtils.NoLexiconEntryException e){}
+                    } catch (Lexicon.NoLexiconEntryException e){}
                 }
 
             } catch (InstantiationException | IllegalAccessException e) {
@@ -74,7 +73,7 @@ public class RequestRoleTemplate implements Template {
         whChunks.put("what", SemanticsModel.parseJSON("{}"));
 
         Map<String, JSONObject> verbChunks = new HashMap<>();
-        Set<String> verbStrings = GenerationUtils.getPOSForClass(OntologyRegistry.thingNameMap.get(verbClassString),
+        Set<String> verbStrings = Lexicon.getPOSForClass(OntologyRegistry.thingNameMap.get(verbClassString),
                 "presentSingularVerbs", yodaEnvironment);
         for (String verbString : verbStrings) {
             verbChunks.put(verbString, SemanticsModel.parseJSON(constraints.toJSONString()));

@@ -1,6 +1,7 @@
 package edu.cmu.sv.natural_language_generation.top_level_templates;
 
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
+import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.natural_language_generation.Template;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.misc.Requested;
@@ -46,7 +47,7 @@ public class RequestAgentTemplate implements Template {
         whChunks.put("what", SemanticsModel.parseJSON("{}"));
 
         Map<String, JSONObject> verbChunks = new HashMap<>();
-        Set<String> verbStrings = GenerationUtils.getPOSForClass(OntologyRegistry.thingNameMap.get(verbClassString),
+        Set<String> verbStrings = Lexicon.getPOSForClass(OntologyRegistry.thingNameMap.get(verbClassString),
                 "presentSingularVerbs", yodaEnvironment);
         for (String verbString : verbStrings) {
             verbChunks.put(verbString, SemanticsModel.parseJSON(constraints.toJSONString()));

@@ -1,5 +1,6 @@
 package edu.cmu.sv.natural_language_generation.internal_templates;
 
+import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
@@ -52,7 +53,7 @@ public class PPTemplate0 implements Template {
 
         Map<String, JSONObject> prepositionChunks = new HashMap<>();
         Class<? extends Thing> prepositionClass = OntologyRegistry.thingNameMap.get(prepositionClassString);
-        Set<String> ppStrings = GenerationUtils.getPOSForClass(prepositionClass,"relationalPrepositionalPhrases",
+        Set<String> ppStrings = Lexicon.getPOSForClass(prepositionClass, "relationalPrepositionalPhrases",
                 yodaEnvironment);
 
         for (String ppString : ppStrings) {

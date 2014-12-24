@@ -1,7 +1,6 @@
 package edu.cmu.sv.ontology.noun.poi_types;
 
-import edu.cmu.sv.natural_language_generation.LexicalEntry;
-import edu.cmu.sv.ontology.noun.PointOfInterest;
+import edu.cmu.sv.natural_language_generation.Lexicon;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,15 +9,4 @@ import java.util.Set;
  * Created by David Cohen on 10/29/14.
  */
 public class Bar extends Restaurant {
-    static Set<LexicalEntry> lexicalEntries = new HashSet<>();
-    static {
-        LexicalEntry e1 = new LexicalEntry();
-        e1.singularNounForms.add("bar");
-        lexicalEntries.add(e1);
-    }
-
-    @Override
-    public Set<LexicalEntry> getLexicalEntries() {
-        return lexicalEntries;
-    }
 }

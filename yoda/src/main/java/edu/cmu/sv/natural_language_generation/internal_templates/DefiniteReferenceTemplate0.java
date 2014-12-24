@@ -1,5 +1,6 @@
 package edu.cmu.sv.natural_language_generation.internal_templates;
 
+import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.database.Database;
@@ -71,7 +72,7 @@ public class DefiniteReferenceTemplate0 implements Template {
                 collect(Collectors.toList())) {
             if (!OntologyRegistry.thingNameMap.containsKey(clsName))
                 continue;
-            Set<String> singularNounForms = GenerationUtils.getPOSForClass(
+            Set<String> singularNounForms = Lexicon.getPOSForClass(
                     OntologyRegistry.thingNameMap.get(clsName), "singularNounForms", yodaEnvironment);
             for (String singularNounForm : singularNounForms) {
                 clsChunks.put(singularNounForm, SemanticsModel.parseJSON("{\"class\":\"" + clsName + "\"}"));
@@ -101,7 +102,7 @@ public class DefiniteReferenceTemplate0 implements Template {
                                 evaluateQualityDegree(fullArgumentList,
                                         descriptor.getLeft(), adjectiveClass);
                         if (degreeOfMatch > 0.5) {
-                            Set<String> adjStrings = GenerationUtils.getPOSForClass(adjectiveClass, "adjectives", yodaEnvironment);
+                            Set<String> adjStrings = Lexicon.getPOSForClass(adjectiveClass, "adjectives", yodaEnvironment);
                             for (String adjString : adjStrings) {
                                 JSONObject tmp = SemanticsModel.parseJSON("{\"class\":\"" + adjectiveClass.getSimpleName() + "\"}");
                                 SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(),
@@ -164,7 +165,7 @@ public class DefiniteReferenceTemplate0 implements Template {
                                         }
                                     }
 
-                                    Set<String> ppStrings = GenerationUtils.getPOSForClass(prepositionClass, "relationalPrepositionalPhrases", yodaEnvironment);
+                                    Set<String> ppStrings = Lexicon.getPOSForClass(prepositionClass, "relationalPrepositionalPhrases", yodaEnvironment);
                                     for (String ppString : ppStrings) {
                                         JSONObject tmp = SemanticsModel.parseJSON("{\"class\":\"" + prepositionClass.getSimpleName() + "\"}");
                                         SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(),

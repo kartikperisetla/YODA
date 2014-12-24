@@ -1,7 +1,6 @@
 package edu.cmu.sv.ontology.adjective;
 
-import edu.cmu.sv.natural_language_generation.LexicalEntry;
-import edu.cmu.sv.ontology.role.Role;
+import edu.cmu.sv.natural_language_generation.Lexicon;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -11,13 +10,13 @@ import java.util.Set;
  * Created by David Cohen on 11/2/14.
  */
 public class Expensive extends ExpensivenessAdjective {
-    private static LexicalEntry lexicalEntry = new LexicalEntry();
+    private static Lexicon.LexicalEntry lexicalEntry = new Lexicon.LexicalEntry();
     static {
         lexicalEntry.adjectives.add("expensive");
     }
 
     @Override
-    public Set<LexicalEntry> getLexicalEntries() {
+    public Set<Lexicon.LexicalEntry> getLexicalEntries() {
         return new HashSet<>(Arrays.asList(lexicalEntry));
     }
 

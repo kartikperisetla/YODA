@@ -1,7 +1,7 @@
 package edu.cmu.sv.ontology;
 
 
-import edu.cmu.sv.natural_language_generation.LexicalEntry;
+import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.ontology.role.Role;
 
 import java.util.HashSet;
@@ -11,8 +11,6 @@ import java.util.Set;
  * Created by David Cohen on 9/23/14.
  */
 public abstract class Thing {
-    public Set<LexicalEntry> getLexicalEntries(){return new HashSet<>();}
-
     // for a thing to be semantically complete,
     // certain role information may be required
     // particularly, grounded roles and descriptions

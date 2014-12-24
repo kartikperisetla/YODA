@@ -17,55 +17,6 @@ import java.util.stream.IntStream;
  * Created by David Cohen on 10/30/14.
  */
 public class GenerationUtils {
-
-    public static class NoLexiconEntryException extends Exception {};
-
-    public static Set<String> getPOSForClass(Class<? extends Thing> cls, String partOfSpeech, YodaEnvironment yodaEnvironment) throws NoLexiconEntryException {
-        Set<String> ans = new HashSet<>();
-        if (Modifier.isAbstract(cls.getModifiers()))
-            return ans;
-        try {
-            Thing tmp = cls.newInstance();
-            for (LexicalEntry lexicalEntry : tmp.getLexicalEntries()){
-                boolean posFound = false;
-                for (Field field : lexicalEntry.getClass().getDeclaredFields()){
-                    if (field.getName().equals(partOfSpeech)) {
-                        ans.addAll((Collection) field.get(lexicalEntry));
-                        posFound = true;
-                        break;
-                    }
-                }
-                if (!(posFound))
-                    throw new NoLexiconEntryException();
-            }
-        } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        if (ans.size()<=yodaEnvironment.nlg.grammarPreferences.maxWordForms)
-            return ans;
-        return new HashSet<>(Arrays.asList(
-                Arrays.copyOf(
-                        NaturalLanguageGenerator.randomData.nextSample(ans, yodaEnvironment.nlg.grammarPreferences.maxWordForms),
-                        yodaEnvironment.nlg.grammarPreferences.maxWordForms, String[].class)));
-    }
-
-
-    public static Set<String> getPOSForClassHierarchy(Class cls, String partOfSpeech, YodaEnvironment yodaEnvironment) throws NoLexiconEntryException {
-        if (! (Thing.class.isAssignableFrom(cls)))
-            throw new NoLexiconEntryException();
-        try {
-            Set<String> ans = getPOSForClass((Class<? extends Thing>)cls, partOfSpeech, yodaEnvironment);
-            if (ans.size()==0){
-                throw new NoLexiconEntryException();
-            }
-            return ans;
-        } catch (NoLexiconEntryException e){
-            return getPOSForClassHierarchy(cls.getSuperclass(), partOfSpeech, yodaEnvironment);
-        }
-    }
-
-
-
     /*
     * Return all combinations of strings and composed semantics objects,
     * maintaining the order given as input

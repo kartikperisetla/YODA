@@ -1,5 +1,6 @@
 package edu.cmu.sv.natural_language_generation.internal_templates;
 
+import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
@@ -42,7 +43,7 @@ public class AdjTemplate0 implements Template {
 
         Map<String, JSONObject> adjectiveChunks = new HashMap<>();
         Class<? extends Thing> adjectiveClass = OntologyRegistry.thingNameMap.get(adjectiveClassString);
-        Set<String> adjectiveStrings = GenerationUtils.getPOSForClass(adjectiveClass,"adjectives", yodaEnvironment);
+        Set<String> adjectiveStrings = Lexicon.getPOSForClass(adjectiveClass, "adjectives", yodaEnvironment);
 
         for (String ppString : adjectiveStrings) {
             JSONObject tmp = SemanticsModel.parseJSON("{\"class\":\"" + adjectiveClass.getSimpleName() + "\"}");

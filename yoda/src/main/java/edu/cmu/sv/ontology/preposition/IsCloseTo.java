@@ -1,6 +1,6 @@
 package edu.cmu.sv.ontology.preposition;
 
-import edu.cmu.sv.natural_language_generation.LexicalEntry;
+import edu.cmu.sv.natural_language_generation.Lexicon;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -21,9 +21,9 @@ public class IsCloseTo extends DistancePreposition {
         return 2;
     }
 
-    static Set<LexicalEntry> lexicalEntries = new HashSet<>();
+    static Set<Lexicon.LexicalEntry> lexicalEntries = new HashSet<>();
     static {
-        LexicalEntry e1 = new LexicalEntry();
+        Lexicon.LexicalEntry e1 = new Lexicon.LexicalEntry();
         e1.relationalPrepositionalPhrases.add("near to");
         e1.relationalPrepositionalPhrases.add("near");
         e1.relationalPrepositionalPhrases.add("close to");
@@ -31,7 +31,7 @@ public class IsCloseTo extends DistancePreposition {
     }
 
     @Override
-    public Set<LexicalEntry> getLexicalEntries() {
+    public Set<Lexicon.LexicalEntry> getLexicalEntries() {
         return lexicalEntries;
     }
 }
