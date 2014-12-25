@@ -13,16 +13,6 @@ import java.util.Set;
  * Created by David Cohen on 9/21/14.
  */
 public class HasProperty extends Verb {
-    static Lexicon.LexicalEntry lexicalEntry = new Lexicon.LexicalEntry();
-    static {
-        lexicalEntry.presentSingularVerbs.add("is");
-    }
-
-    @Override
-    public Set<Lexicon.LexicalEntry> getLexicalEntries() {
-        return new HashSet<>(Arrays.asList(lexicalEntry));
-    }
-
     @Override
     public Set<Class<? extends Role>> getRequiredGroundedRoles() {
         return new HashSet<>(Arrays.asList(Agent.class));

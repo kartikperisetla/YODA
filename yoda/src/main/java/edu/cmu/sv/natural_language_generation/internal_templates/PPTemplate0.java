@@ -53,8 +53,14 @@ public class PPTemplate0 implements Template {
 
         Map<String, JSONObject> prepositionChunks = new HashMap<>();
         Class<? extends Thing> prepositionClass = OntologyRegistry.thingNameMap.get(prepositionClassString);
-        Set<String> ppStrings = Lexicon.getPOSForClass(prepositionClass, "relationalPrepositionalPhrases",
+        Set<String> ppStrings;
+        try{
+            ppStrings = Lexicon.getPOSForClass(prepositionClass,
+                Lexicon.LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE,
                 yodaEnvironment);
+        } catch (Lexicon.NoLexiconEntryException e) {
+            ppStrings = new HashSet<>();
+        }
 
         for (String ppString : ppStrings) {
             JSONObject tmp = SemanticsModel.parseJSON("{\"class\":\"" + prepositionClass.getSimpleName() + "\"}");

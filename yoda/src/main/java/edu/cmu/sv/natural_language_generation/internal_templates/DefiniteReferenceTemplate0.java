@@ -72,8 +72,13 @@ public class DefiniteReferenceTemplate0 implements Template {
                 collect(Collectors.toList())) {
             if (!OntologyRegistry.thingNameMap.containsKey(clsName))
                 continue;
-            Set<String> singularNounForms = Lexicon.getPOSForClass(
-                    OntologyRegistry.thingNameMap.get(clsName), "singularNounForms", yodaEnvironment);
+            Set<String> singularNounForms;
+            try {
+                singularNounForms = Lexicon.getPOSForClass(OntologyRegistry.thingNameMap.get(clsName),
+                        Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, yodaEnvironment);
+            } catch (Lexicon.NoLexiconEntryException e) {
+                singularNounForms = new HashSet<>();
+            }
             for (String singularNounForm : singularNounForms) {
                 clsChunks.put(singularNounForm, SemanticsModel.parseJSON("{\"class\":\"" + clsName + "\"}"));
             }
@@ -102,7 +107,13 @@ public class DefiniteReferenceTemplate0 implements Template {
                                 evaluateQualityDegree(fullArgumentList,
                                         descriptor.getLeft(), adjectiveClass);
                         if (degreeOfMatch > 0.5) {
-                            Set<String> adjStrings = Lexicon.getPOSForClass(adjectiveClass, "adjectives", yodaEnvironment);
+                            Set<String> adjStrings;
+                            try {
+                                adjStrings = Lexicon.getPOSForClass(adjectiveClass,
+                                        Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, yodaEnvironment);
+                            } catch (Lexicon.NoLexiconEntryException e) {
+                                adjStrings = new HashSet<>();
+                            }
                             for (String adjString : adjStrings) {
                                 JSONObject tmp = SemanticsModel.parseJSON("{\"class\":\"" + adjectiveClass.getSimpleName() + "\"}");
                                 SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(),
@@ -164,8 +175,14 @@ public class DefiniteReferenceTemplate0 implements Template {
                                             childChunks.put(entry.getKey(), entry.getValue());
                                         }
                                     }
-
-                                    Set<String> ppStrings = Lexicon.getPOSForClass(prepositionClass, "relationalPrepositionalPhrases", yodaEnvironment);
+                                    Set<String> ppStrings;
+                                    try{
+                                        ppStrings = Lexicon.getPOSForClass(prepositionClass,
+                                                Lexicon.LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE,
+                                                yodaEnvironment);
+                                    } catch (Lexicon.NoLexiconEntryException e) {
+                                        ppStrings = new HashSet<>();
+                                    }
                                     for (String ppString : ppStrings) {
                                         JSONObject tmp = SemanticsModel.parseJSON("{\"class\":\"" + prepositionClass.getSimpleName() + "\"}");
                                         SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(),

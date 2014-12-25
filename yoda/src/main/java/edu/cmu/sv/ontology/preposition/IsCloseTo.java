@@ -20,18 +20,4 @@ public class IsCloseTo extends DistancePreposition {
     public double getSlope() {
         return 2;
     }
-
-    static Set<Lexicon.LexicalEntry> lexicalEntries = new HashSet<>();
-    static {
-        Lexicon.LexicalEntry e1 = new Lexicon.LexicalEntry();
-        e1.relationalPrepositionalPhrases.add("near to");
-        e1.relationalPrepositionalPhrases.add("near");
-        e1.relationalPrepositionalPhrases.add("close to");
-        lexicalEntries.add(e1);
-    }
-
-    @Override
-    public Set<Lexicon.LexicalEntry> getLexicalEntries() {
-        return lexicalEntries;
-    }
 }

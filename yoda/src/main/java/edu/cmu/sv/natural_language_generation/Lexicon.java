@@ -1,11 +1,16 @@
 package edu.cmu.sv.natural_language_generation;
 
 import edu.cmu.sv.ontology.Thing;
+import edu.cmu.sv.ontology.adjective.Cheap;
+import edu.cmu.sv.ontology.adjective.Expensive;
 import edu.cmu.sv.ontology.noun.Noun;
 import edu.cmu.sv.ontology.noun.Person;
 import edu.cmu.sv.ontology.noun.PointOfInterest;
 import edu.cmu.sv.ontology.noun.Time;
 import edu.cmu.sv.ontology.noun.poi_types.*;
+import edu.cmu.sv.ontology.preposition.IsCloseTo;
+import edu.cmu.sv.ontology.verb.GiveDirections;
+import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 
 import java.lang.reflect.Field;
@@ -165,10 +170,43 @@ public class Lexicon {
     }
 
     //// Lexicon for verbs
+    static {
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.PRESENT_SINGULAR_VERB, "give directions");
+            Lexicon.add(GiveDirections.class, entry);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.PRESENT_SINGULAR_VERB, "is");
+            Lexicon.add(HasProperty.class, entry);
+        }
+    }
 
     //// Lexicon for adjectives
+    static {
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "cheap");
+            Lexicon.add(Cheap.class, entry);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "expensive");
+            Lexicon.add(Expensive.class, entry);
+        }
+    }
 
     //// Lexicon for prepositions
+    static {
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "close to");
+            entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "near to");
+            entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "near");
+            Lexicon.add(IsCloseTo.class, entry);
+        }
+    }
 
     public static Set<LexicalEntry> get(Class<? extends Thing> cls){
         if (lexiconMap.containsKey(cls))
@@ -234,16 +272,6 @@ public class Lexicon {
                 wordMap.put(partOfSpeech, new HashSet<>());
             wordMap.get(partOfSpeech).add(str);
         }
-
-        // verbs
-        public Set<String> presentSingularVerbs = new HashSet<>();
-
-        // adjectives
-        public Set<String> adjectives = new HashSet<>();
-
-        // prepositional phrases
-        public Set<String> relationalPrepositionalPhrases = new HashSet<>();
-
     }
 
 

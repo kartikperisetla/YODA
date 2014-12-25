@@ -41,18 +41,24 @@ public class AdjTemplate0 implements Template {
             return new HashMap<>();
         }
 
-        Map<String, JSONObject> adjectiveChunks = new HashMap<>();
-        Class<? extends Thing> adjectiveClass = OntologyRegistry.thingNameMap.get(adjectiveClassString);
-        Set<String> adjectiveStrings = Lexicon.getPOSForClass(adjectiveClass, "adjectives", yodaEnvironment);
+        try {
+            Map<String, JSONObject> adjectiveChunks = new HashMap<>();
+            Class<? extends Thing> adjectiveClass = OntologyRegistry.thingNameMap.get(adjectiveClassString);
+            Set<String> adjectiveStrings = null;
+            adjectiveStrings = Lexicon.getPOSForClass(adjectiveClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, yodaEnvironment);
 
-        for (String ppString : adjectiveStrings) {
-            JSONObject tmp = SemanticsModel.parseJSON("{\"class\":\"" + adjectiveClass.getSimpleName() + "\"}");
-            SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(), hasQualityRole);
-            adjectiveChunks.put(ppString, tmp);
+            for (String ppString : adjectiveStrings) {
+                JSONObject tmp = SemanticsModel.parseJSON("{\"class\":\"" + adjectiveClass.getSimpleName() + "\"}");
+                SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(), hasQualityRole);
+                adjectiveChunks.put(ppString, tmp);
+            }
+
+            return GenerationUtils.simpleOrderedCombinations(Arrays.asList(adjectiveChunks),
+                    AdjTemplate0::compositionFunction, new HashMap<>(), yodaEnvironment);
+
+        } catch (Lexicon.NoLexiconEntryException e) {
+            return new HashMap<>();
         }
-
-        return GenerationUtils.simpleOrderedCombinations(Arrays.asList(adjectiveChunks),
-                AdjTemplate0::compositionFunction, new HashMap<>(), yodaEnvironment);
     }
 
     private static JSONObject compositionFunction(List<JSONObject> children){

@@ -10,16 +10,6 @@ import java.util.Set;
  * Created by David Cohen on 11/2/14.
  */
 public class Expensive extends ExpensivenessAdjective {
-    private static Lexicon.LexicalEntry lexicalEntry = new Lexicon.LexicalEntry();
-    static {
-        lexicalEntry.adjectives.add("expensive");
-    }
-
-    @Override
-    public Set<Lexicon.LexicalEntry> getLexicalEntries() {
-        return new HashSet<>(Arrays.asList(lexicalEntry));
-    }
-
     @Override
     public double getCenter() {
         return 1;

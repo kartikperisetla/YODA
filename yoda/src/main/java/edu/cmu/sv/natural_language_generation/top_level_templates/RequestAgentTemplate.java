@@ -47,8 +47,13 @@ public class RequestAgentTemplate implements Template {
         whChunks.put("what", SemanticsModel.parseJSON("{}"));
 
         Map<String, JSONObject> verbChunks = new HashMap<>();
-        Set<String> verbStrings = Lexicon.getPOSForClass(OntologyRegistry.thingNameMap.get(verbClassString),
-                "presentSingularVerbs", yodaEnvironment);
+        Set<String> verbStrings;
+        try{
+            verbStrings = Lexicon.getPOSForClass(OntologyRegistry.thingNameMap.get(verbClassString),
+                    Lexicon.LexicalEntry.PART_OF_SPEECH.PRESENT_SINGULAR_VERB, yodaEnvironment);
+        } catch (Lexicon.NoLexiconEntryException e) {
+            verbStrings = new HashSet<>();
+        }
         for (String verbString : verbStrings) {
             verbChunks.put(verbString, SemanticsModel.parseJSON(constraints.toJSONString()));
         }
