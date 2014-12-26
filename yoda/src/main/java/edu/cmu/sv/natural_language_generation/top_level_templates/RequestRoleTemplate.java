@@ -22,6 +22,12 @@ import java.util.*;
  *
  * NLG template for requesting roles
  *
+ * progressive verb + wh ?
+ * exs:
+ * giving directions to where?
+ * is what? (patient role)
+ * what is? (agent role)
+ *
  */
 public class RequestRoleTemplate implements Template {
 
@@ -31,7 +37,7 @@ public class RequestRoleTemplate implements Template {
         String verbClassString;
         String requestedSlotPath;
         Class<? extends Role> roleClass;
-        Set<String> whStrings = null;
+        Set<String> whStrings = new HashSet<>();
 
         try{
             Assert.verify(constraints.get("dialogAct").equals(RequestRole.class.getSimpleName()));
@@ -49,15 +55,13 @@ public class RequestRoleTemplate implements Template {
                 Set<Class <? extends Thing>> classesInRange = roleClass.newInstance().getRange();
                 for (Class <? extends Thing> cls : classesInRange){
                     try {
-                        whStrings = Lexicon.getPOSForClassHierarchy(cls, "whPronouns", yodaEnvironment);
-                        break;
+                        whStrings.addAll(Lexicon.getPOSForClassHierarchy(cls, Lexicon.LexicalEntry.PART_OF_SPEECH.WH_PRONOUN, yodaEnvironment));
                     } catch (Lexicon.NoLexiconEntryException e){}
                 }
 
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
-            Assert.verify(whStrings!=null);
             Assert.verify(whStrings.size()>0);
 
         } catch (Assert.AssertException e){
