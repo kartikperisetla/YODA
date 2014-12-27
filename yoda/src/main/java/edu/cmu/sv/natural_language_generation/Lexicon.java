@@ -9,6 +9,8 @@ import edu.cmu.sv.ontology.noun.PointOfInterest;
 import edu.cmu.sv.ontology.noun.Time;
 import edu.cmu.sv.ontology.noun.poi_types.*;
 import edu.cmu.sv.ontology.preposition.IsCloseTo;
+import edu.cmu.sv.ontology.role.Destination;
+import edu.cmu.sv.ontology.role.Origin;
 import edu.cmu.sv.ontology.verb.GiveDirections;
 import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -208,6 +210,25 @@ public class Lexicon {
         }
     }
 
+    //// Lexicon for roles
+    static {
+        {
+            // directions X, directions to X, directions <...> to X
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, "to");
+            entry.add(LexicalEntry.PART_OF_SPEECH.AS_OBJECT2_PREFIX, "to");
+            Lexicon.add(Destination.class, entry);
+        }
+        {
+            // directions from X, directions <...> from X
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, "from");
+            entry.add(LexicalEntry.PART_OF_SPEECH.AS_OBJECT2_PREFIX, "from");
+            Lexicon.add(Origin.class, entry);
+        }
+    }
+
     public static Set<LexicalEntry> get(Class<? extends Thing> cls){
         if (lexiconMap.containsKey(cls))
             return lexiconMap.get(cls);
@@ -258,7 +279,8 @@ public class Lexicon {
      * used to describe a single concept from the ontology
      */
     public static class LexicalEntry {
-        public enum PART_OF_SPEECH {WH_PRONOUN, SINGULAR_NOUN, PRESENT_SINGULAR_VERB, ADJECTIVE, RELATIONAL_PREPOSITIONAL_PHRASE}
+        public enum PART_OF_SPEECH {WH_PRONOUN, SINGULAR_NOUN, PRESENT_SINGULAR_VERB, ADJECTIVE, RELATIONAL_PREPOSITIONAL_PHRASE,
+        AS_SUBJECT_PREFIX, AS_OBJECT_PREFIX, AS_OBJECT2_PREFIX}
         private Map<PART_OF_SPEECH, Set<String>> wordMap = new HashMap<>();
 
         public Set<String> get(PART_OF_SPEECH partOfSpeech){

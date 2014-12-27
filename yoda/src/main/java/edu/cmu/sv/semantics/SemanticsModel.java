@@ -259,7 +259,6 @@ public class SemanticsModel {
         }
     }
 
-
     public void filterOutLeafSlot(String slot){
         Set<String> internalPaths = getAllInternalNodePaths();
         for (String path: internalPaths){
@@ -513,7 +512,7 @@ public class SemanticsModel {
             return (JSONObject) parser.parse(jsonString);
         } catch (ParseException e) {
             e.printStackTrace();
-            throw new Error("failed to parse json sttring:"+jsonString);
+            throw new Error("failed to parse json string:"+jsonString);
         }
     }
 

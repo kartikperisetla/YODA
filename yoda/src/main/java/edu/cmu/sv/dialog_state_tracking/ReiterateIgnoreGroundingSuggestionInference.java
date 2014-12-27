@@ -22,6 +22,8 @@ import java.util.Map;
  *
  */
 public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpdateInference {
+    static double penaltyForNonGroundedMatch = .1;
+
     @Override
     public Pair<Map<String, DialogState>, StringDistribution> applyAll(
             YodaEnvironment yodaEnvironment, DialogState currentState, Turn turn, long timeStamp) {
@@ -43,6 +45,7 @@ public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpda
                             Assert.verify(predecessor.initiator.equals("user"));
                             Assert.verify(duAnalysis.ungroundedByAct(RequestConfirmValue.class));
                             duAnalysis.analyseSuggestions();
+                            duAnalysis.analyseGround();
                             correctionContent = (JSONObject) hypModel.newGetSlotPathFiller("topic");
                         } catch (Assert.AssertException e){
                             continue;
@@ -67,6 +70,7 @@ public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpda
                             currentDu.actionAnalysis.update(yodaEnvironment, currentDu);
                             resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
                             Double score = groundedHypotheses.getRight().get(groundedDuKey) *
+                                    (duAnalysis.groundMatch ? 1.0 : penaltyForNonGroundedMatch) *
                                     Utils.discourseUnitContextProbability(newDialogState, currentDu);
                             resultDistribution.put(newDialogStateHypothesisID, score);
                         }

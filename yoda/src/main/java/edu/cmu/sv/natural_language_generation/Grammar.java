@@ -56,5 +56,6 @@ public class Grammar {
         grammar1_roots.add(RequestConfirmValueTemplate0.class);
         grammar1_roots.add(ConfirmGroundingSuggestionTemplate0.class);
         grammar1_roots.add(RequestAgentTemplate.class);
+        grammar1_roots.add(RequestRoleTemplate.class);
     }
 }
