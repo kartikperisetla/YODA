@@ -22,6 +22,7 @@ import java.util.Map;
  *
  */
 public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpdateInference {
+    static double penaltyForThisInference = .2; // this inference is not likely
     static double penaltyForNonGroundedMatch = .1;
 
     @Override
@@ -71,10 +72,10 @@ public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpda
                             resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
                             Double score = groundedHypotheses.getRight().get(groundedDuKey) *
                                     (duAnalysis.groundMatch ? 1.0 : penaltyForNonGroundedMatch) *
+                                    penaltyForThisInference *
                                     Utils.discourseUnitContextProbability(newDialogState, currentDu);
                             resultDistribution.put(newDialogStateHypothesisID, score);
                         }
-
                     }
                 }
             }

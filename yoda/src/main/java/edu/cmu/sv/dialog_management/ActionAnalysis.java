@@ -31,6 +31,7 @@ public class ActionAnalysis {
         ActionAnalysis ans = new ActionAnalysis();
         ans.ynqTruth = ynqTruth;
         ans.missingRequiredVerbSlots = new HashSet<>(missingRequiredVerbSlots);
+        ans.enumeratedNonDialogTasks = new HashSet<>(enumeratedNonDialogTasks);
         return ans;
     }
 

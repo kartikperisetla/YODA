@@ -177,21 +177,18 @@ public class DialogManager implements Runnable {
                             keySet()) {
                         DiscourseUnit contextDiscourseUnit = currentDialogState.
                                 getDiscourseUnitHypothesisMap().get(discourseUnitHypothesisId);
-                        SemanticsModel resolvedMeaning = contextDiscourseUnit.getGroundInterpretation();
-                        if (resolvedMeaning==null)
-                            continue;
-                        if (actionSchema.matchSchema(resolvedMeaning)){
-                            NonDialogTask enumeratedTask = actionSchema.applySchema(resolvedMeaning);
+                        for (NonDialogTask localEnumeratedTask : contextDiscourseUnit.actionAnalysis.enumeratedNonDialogTasks){
                             boolean alreadyFound = false;
                             for (NonDialogTask existingTask : enumeratedNonDialogTasks) {
-                                if (enumeratedTask.evaluationMatch(existingTask)) {
+                                if (localEnumeratedTask.evaluationMatch(existingTask)) {
                                     alreadyFound = true;
                                     break;
                                 }
                             }
                             if (!alreadyFound){
-                                enumeratedNonDialogTasks.add(enumeratedTask);
+                                enumeratedNonDialogTasks.add(localEnumeratedTask);
                             }
+
                         }
                     }
                 }
