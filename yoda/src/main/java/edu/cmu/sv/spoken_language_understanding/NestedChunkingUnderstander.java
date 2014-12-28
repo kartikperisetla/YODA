@@ -34,61 +34,136 @@ public class NestedChunkingUnderstander implements SpokenLanguageUnderstander{
     }
 
 
+    public static class PartialUnderstandingState{
+        public JSONObject structure;
+        public Map<String, ChunkingProblem> pathChunkingProblemMap = new HashMap<>();
+
+        public PartialUnderstandingState deepCopy(){
+            PartialUnderstandingState ans = new PartialUnderstandingState();
+            ans.structure = SemanticsModel.parseJSON(structure.toJSONString());
+            pathChunkingProblemMap.keySet().stream().forEach(x -> ans.pathChunkingProblemMap.put(x, pathChunkingProblemMap.get(x)));
+            return ans;
+        }
+
+        public Pair<Map<String, PartialUnderstandingState>, StringDistribution> extendChunk(String pathToChunkingProblem){
+            Map<String, PartialUnderstandingState> updatedUnderstandingStates = new HashMap<>();
+            StringDistribution understandingStateDistribution = new StringDistribution();
+
+            ChunkingProblem currentChunkingProblem = pathChunkingProblemMap.get(pathToChunkingProblem);
+            currentChunkingProblem.runChunker();
+
+            int i=0;
+            for (String chunkingResultKey : currentChunkingProblem.outputDistribution.keySet()){
+                String updatedUnderstandingStateId = "understanding_state_"+i++;
+                PartialUnderstandingState newUnderstandingState = this.deepCopy();
+                for (ChunkingProblem childChunkingProblem : currentChunkingProblem.outputChildChunks.get(chunkingResultKey)) {
+                    String totalPath = (pathToChunkingProblem.equals("")) ?
+                            childChunkingProblem.inputContext :
+                            pathToChunkingProblem + "." + childChunkingProblem.inputContext;
+                    extendStructureWithPath(newUnderstandingState.structure, totalPath);
+                    newUnderstandingState.pathChunkingProblemMap.put(totalPath, childChunkingProblem);
+                }
+                newUnderstandingState.pathChunkingProblemMap.remove(pathToChunkingProblem);
+                updatedUnderstandingStates.put(updatedUnderstandingStateId, newUnderstandingState);
+                understandingStateDistribution.put(updatedUnderstandingStateId, currentChunkingProblem.outputDistribution.get(chunkingResultKey));
+            }
+
+
+            return new ImmutablePair<>(updatedUnderstandingStates, understandingStateDistribution);
+        }
+
+        static void extendStructureWithPath(JSONObject inputObject, String path){
+            SemanticsModel tmp = new SemanticsModel(inputObject);
+            String[] roles = path.split("\\.");
+            String fillerPath = "";
+            String previousPath = fillerPath;
+            for (int i = 0; i < roles.length; i++) {
+                fillerPath += roles[i];
+                if (tmp.newGetSlotPathFiller(fillerPath)==null){
+                    ((JSONObject) tmp.newGetSlotPathFiller(previousPath)).put(roles[i], new JSONObject());
+                }
+                previousPath = fillerPath;
+            }
+        }
+
+    }
+
     public static class ChunkingProblem{
+        // this cache doesn't permit fast lookup, but we expect <100 chunking problems per utterance, so iterating through should be fine
+        public static Set<ChunkingProblem> cache = new HashSet<>();
+
         public String inputString;
-        public List<String> inputContextFeatures;
-        public List<String> inputTokens;
-        public Map<String, List<String>> outputLabels;
+        public String inputContext;
+        public Map<String, Set<ChunkingProblem>> outputChildChunks;
         public StringDistribution outputDistribution;
 
-        public ChunkingProblem(String inputString, List<String> inputContextFeatures){
+
+        public ChunkingProblem(String inputString, String inputContext){
             this.inputString = inputString;
-            this.inputContextFeatures = inputContextFeatures;
+            this.inputContext = inputContext;
         }
 
         // todo: implement
         public void runChunker(){
             // check cache
+            for (ChunkingProblem cachedProblem : cache){}
             // tokenize
             // create features
             // call external chunking program
             // read results
+            // interpret as new chunking problems
             // cache results
         }
 
-        // todo: implement
-        public Set<ChunkingProblem> nestedChunkingProblems(){
-            Set<ChunkingProblem> ans = new HashSet<>();
-            // read through output labels and select chunks
-            // create and collect new chunking problems with this.inputContextFeatures appended with the new chunking info
-            // verify that none of the nested chunks are the same as this chunk?
-            // verify that the nested chunks are either smaller, or a HasName?
-            return ans;
+        public void assembleJSON(){
+            JSONObject root = new JSONObject();
+            for (String chunkingHypothesisKey : outputDistribution.keySet()){
+
+            }
         }
 
     }
 
-    public Pair<Map<String, JSONObject>, StringDistribution> Understand(String utterance){
+    public Pair<Map<String, JSONObject>, StringDistribution> understand(String utterance){
         Map<String, JSONObject> outputStructures = new HashMap<>();
         StringDistribution outputStructureDistribution = new StringDistribution();
 
-        JSONObject root = SemanticsModel.parseJSON("{}");
 
-        // perform nested chunking
-        Set<ChunkingProblem> activeChunks = new HashSet<>();
-        activeChunks.add(new ChunkingProblem(utterance, Arrays.asList("")));
-        while (!activeChunks.isEmpty()){
-            ChunkingProblem currentProblem = new LinkedList<>(activeChunks).get(0);
-            activeChunks.remove(currentProblem);
-            currentProblem.runChunker();
-            activeChunks.addAll(currentProblem.nestedChunkingProblems());
+        // recursively build structure while chunking
+        StringDistribution partialStructureDistribution = new StringDistribution();
+        Map<String, PartialUnderstandingState> partialStructures = new HashMap<>();
+        PartialUnderstandingState root = new PartialUnderstandingState();
+        root.structure = new JSONObject();
+        root.pathChunkingProblemMap.put("", new ChunkingProblem(utterance, ""));
+        partialStructureDistribution.put("initial", 1.0);
+        partialStructures.put("initial", root);
+        int partialHypothesisNameIndex=0;
+        while (true){
+            String currentPartialStructureKey = null;
+            for (String key : partialStructures.keySet()){
+                if (partialStructures.get(key).pathChunkingProblemMap.size()>0) {
+                    currentPartialStructureKey = key;
+                    break;
+                }
+            }
+            if (currentPartialStructureKey==null)
+                break;
+            double currentWeight = partialStructureDistribution.get(currentPartialStructureKey);
+            PartialUnderstandingState currentUnderstandingState = partialStructures.get(currentPartialStructureKey);
+            partialStructureDistribution.remove(currentPartialStructureKey);
+            partialStructures.remove(currentPartialStructureKey);
+
+            String childRelativePath = new LinkedList<>(currentUnderstandingState.pathChunkingProblemMap.keySet()).get(0);
+            Pair<Map<String, PartialUnderstandingState>, StringDistribution> extensions = currentUnderstandingState.extendChunk(childRelativePath);
+            for (String extendedPartialStateKey : extensions.getLeft().keySet()){
+                String updatedUnderstandingStateId = "understanding_state_"+partialHypothesisNameIndex++;
+                partialStructures.put(updatedUnderstandingStateId, extensions.getLeft().get(extendedPartialStateKey));
+                partialStructureDistribution.put(updatedUnderstandingStateId, currentWeight * extensions.getRight().get(extendedPartialStateKey));
+            }
         }
 
         //todo: implement
-        // assemble chunks into JSON Objects with attached inputString and inputContextFeatures
-
-        //todo: implement
-        // perform bottom-up classification
+        // perform classification at every node
 
         return new ImmutablePair<>(outputStructures, outputStructureDistribution);
     }
