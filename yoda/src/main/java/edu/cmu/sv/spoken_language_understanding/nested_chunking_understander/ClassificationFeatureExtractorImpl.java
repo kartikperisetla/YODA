@@ -1,6 +1,5 @@
-package edu.cmu.sv.spoken_language_understanding;
+package edu.cmu.sv.spoken_language_understanding.nested_chunking_understander;
 
-import com.google.common.collect.Iterables;
 import org.json.simple.JSONObject;
 
 import java.util.*;
@@ -12,11 +11,12 @@ public class ClassificationFeatureExtractorImpl implements ClassificationFeature
     static Map<String, Integer> featurePositionMap = new HashMap<>();
 
     @Override
-    public List<Double> generateFeatures(String inputString, JSONObject surroundingStructure, String contextPathInStructure) {
+    public List<Double> generateFeatures(NestedChunkingUnderstander.NodeClassificationProblem classificationProblem) {
+
         Set<String> featuresPresent = new HashSet<>();
 
         //// collect features present
-        String[] tmp = inputString.split(" ");
+        String[] tmp = classificationProblem.stringForAnalysis.split(" ");
         List<String> tokens = new LinkedList<>(Arrays.asList(tmp));
 
         // collect unigram features
@@ -33,7 +33,7 @@ public class ClassificationFeatureExtractorImpl implements ClassificationFeature
         }
 
         // collect context features
-        String[] fillerPath = contextPathInStructure.split("\\.");
+        String[] fillerPath = classificationProblem.contextPathInStructure.split("\\.");
         for (int i = 0; i < fillerPath.length; i++) {
             featuresPresent.add("NodeContext: " + (fillerPath.length - i) + ", " + fillerPath[i]);
         }

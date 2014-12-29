@@ -1,4 +1,4 @@
-package edu.cmu.sv.spoken_language_understanding;
+package edu.cmu.sv.spoken_language_understanding.nested_chunking_understander;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;

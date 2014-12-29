@@ -6,6 +6,7 @@ import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.ontology.misc.WebResource;
+import edu.cmu.sv.spoken_language_understanding.Tokenizer;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -529,6 +530,30 @@ public class SemanticsModel {
     }
 
     public Map<String, SemanticsModel> getChildren(){return null;}
+
+    public static String extractChunk(JSONObject structure, String inputString, String slotPath){
+        List<String> tokens = Tokenizer.tokenize(inputString);
+        String currentString = inputString;
+        if (structure.containsKey("chunk-start")){
+            List<String> tokensInChunk = new LinkedList<>();
+            for (int i = (Integer)structure.get("chunk-start"); i < (Integer)structure.get("chunk-end"); i++) {
+                tokensInChunk.add(tokens.get(i));
+            }
+            currentString = String.join(" ", tokensInChunk);
+        }
+
+        if (slotPath.equals("")){
+            return currentString;
+        }
+
+        String[] fillerPath = slotPath.split("\\.");
+        String thisFiller = fillerPath[0];
+        List<String> remainingFillers = new LinkedList<>(Arrays.asList(fillerPath));
+        remainingFillers.remove(0);
+        String remainingSlotPath = String.join(".", remainingFillers);
+        return extractChunk((JSONObject)structure.get(thisFiller), currentString, remainingSlotPath);
+    }
+
 
     /*
     * Return whether the two Semantic models objects contain identical content
