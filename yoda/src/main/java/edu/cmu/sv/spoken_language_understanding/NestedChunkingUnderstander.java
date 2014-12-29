@@ -1,6 +1,7 @@
 package edu.cmu.sv.spoken_language_understanding;
 
 import edu.cmu.sv.semantics.SemanticsModel;
+import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -9,9 +10,11 @@ import org.json.simple.JSONObject;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
+import java.util.stream.Collectors;
 
 /**
  * Created by David Cohen on 12/27/14.
@@ -37,6 +40,7 @@ public class NestedChunkingUnderstander implements SpokenLanguageUnderstander{
     public static class PartialUnderstandingState{
         public JSONObject structure;
         public Map<String, ChunkingProblem> pathChunkingProblemMap = new HashMap<>();
+        public Set<String> remainingClassificationProblemNodes = new HashSet<>();
 
         public PartialUnderstandingState deepCopy(){
             PartialUnderstandingState ans = new PartialUnderstandingState();
@@ -72,6 +76,38 @@ public class NestedChunkingUnderstander implements SpokenLanguageUnderstander{
             return new ImmutablePair<>(updatedUnderstandingStates, understandingStateDistribution);
         }
 
+        public Pair<Map<String, PartialUnderstandingState>, StringDistribution> classifyAtPath(String pathToClassificationProblem){
+            Map<String, PartialUnderstandingState> updatedUnderstandingStates = new HashMap<>();
+            StringDistribution understandingStateDistribution = new StringDistribution();
+
+            NodeClassificationProblem currentClassificationProblem = new NodeClassificationProblem();
+            currentClassificationProblem.extractFeatures(structure, pathToClassificationProblem);
+            currentClassificationProblem.runClassifier();
+
+            int i=0;
+            for (String classificationResultKey : currentClassificationProblem.outputDistribution.keySet()){
+                String updatedUnderstandingStateId = "understanding_state_"+i++;
+                PartialUnderstandingState newUnderstandingState = this.deepCopy();
+                for (String slotString : currentClassificationProblem.outputRolesAndFillers.get(classificationResultKey).keySet()) {
+                    SemanticsModel tmpSemanticsModel = new SemanticsModel(newUnderstandingState.structure);
+                    Object filler = currentClassificationProblem.outputRolesAndFillers.get(classificationResultKey).get(slotString);
+                    if (filler instanceof JSONObject){
+                        ((JSONObject)tmpSemanticsModel.newGetSlotPathFiller(pathToClassificationProblem)).
+                                put(slotString, SemanticsModel.parseJSON(((JSONObject) filler).toJSONString()));
+                    } else if (filler instanceof String) {
+                        ((JSONObject)tmpSemanticsModel.newGetSlotPathFiller(pathToClassificationProblem)).
+                                put(slotString, filler);
+                    } else {
+                        throw new Error("nonsense classification results");
+                    }
+                }
+                newUnderstandingState.remainingClassificationProblemNodes.remove(pathToClassificationProblem);
+                updatedUnderstandingStates.put(updatedUnderstandingStateId, newUnderstandingState);
+                understandingStateDistribution.put(updatedUnderstandingStateId, currentClassificationProblem.outputDistribution.get(classificationResultKey));
+            }
+            return new ImmutablePair<>(updatedUnderstandingStates, understandingStateDistribution);
+        }
+
         static void extendStructureWithPath(JSONObject inputObject, String path){
             SemanticsModel tmp = new SemanticsModel(inputObject);
             String[] roles = path.split("\\.");
@@ -84,6 +120,31 @@ public class NestedChunkingUnderstander implements SpokenLanguageUnderstander{
                 }
                 previousPath = fillerPath;
             }
+        }
+
+    }
+
+    public static class NodeClassificationProblem{
+        public static Set<NodeClassificationProblem> cache = new HashSet<>();
+        public List<String> inputFeatures;
+        Map<String, Map<String, Object>> outputRolesAndFillers;
+        StringDistribution outputDistribution;
+
+        public void extractFeatures(JSONObject inputStructure, String problemPath){
+
+        }
+
+        public void runClassifier(){
+            Map<String, Map<String, Object>> ans = new HashMap<>();
+            StringDistribution outputDistr = new StringDistribution();
+            // extract features
+            // check cache
+            // call external classification program
+            // read results
+            // interpret as new roles / values for answer map
+            // cache results
+            outputRolesAndFillers = ans;
+            outputDistribution = outputDistr;
         }
 
     }
@@ -125,10 +186,6 @@ public class NestedChunkingUnderstander implements SpokenLanguageUnderstander{
     }
 
     public Pair<Map<String, JSONObject>, StringDistribution> understand(String utterance){
-        Map<String, JSONObject> outputStructures = new HashMap<>();
-        StringDistribution outputStructureDistribution = new StringDistribution();
-
-
         // recursively build structure while chunking
         StringDistribution partialStructureDistribution = new StringDistribution();
         Map<String, PartialUnderstandingState> partialStructures = new HashMap<>();
@@ -139,6 +196,7 @@ public class NestedChunkingUnderstander implements SpokenLanguageUnderstander{
         partialStructures.put("initial", root);
         int partialHypothesisNameIndex=0;
         while (true){
+            // select a partial structure with a remaining chunking problem
             String currentPartialStructureKey = null;
             for (String key : partialStructures.keySet()){
                 if (partialStructures.get(key).pathChunkingProblemMap.size()>0) {
@@ -153,8 +211,8 @@ public class NestedChunkingUnderstander implements SpokenLanguageUnderstander{
             partialStructureDistribution.remove(currentPartialStructureKey);
             partialStructures.remove(currentPartialStructureKey);
 
-            String childRelativePath = new LinkedList<>(currentUnderstandingState.pathChunkingProblemMap.keySet()).get(0);
-            Pair<Map<String, PartialUnderstandingState>, StringDistribution> extensions = currentUnderstandingState.extendChunk(childRelativePath);
+            String childAbsolutePath = new LinkedList<>(currentUnderstandingState.pathChunkingProblemMap.keySet()).get(0);
+            Pair<Map<String, PartialUnderstandingState>, StringDistribution> extensions = currentUnderstandingState.extendChunk(childAbsolutePath);
             for (String extendedPartialStateKey : extensions.getLeft().keySet()){
                 String updatedUnderstandingStateId = "understanding_state_"+partialHypothesisNameIndex++;
                 partialStructures.put(updatedUnderstandingStateId, extensions.getLeft().get(extendedPartialStateKey));
@@ -162,10 +220,45 @@ public class NestedChunkingUnderstander implements SpokenLanguageUnderstander{
             }
         }
 
-        //todo: implement
-        // perform classification at every node
+        // todo: prune
 
-        return new ImmutablePair<>(outputStructures, outputStructureDistribution);
+        // initialize remainingClassificationPaths
+        partialStructures.values().stream().forEach(x -> x.remainingClassificationProblemNodes = new SemanticsModel(x.structure).getAllInternalNodePaths());
+
+        // perform classification at every node
+        while (true){
+            // select a partial structure with a remaining classification problem
+            String currentPartialStructureKey = null;
+            for (String key : partialStructures.keySet()){
+                if (partialStructures.get(key).remainingClassificationProblemNodes.size()>0) {
+                    currentPartialStructureKey = key;
+                    break;
+                }
+            }
+            if (currentPartialStructureKey==null)
+                break;
+            double currentWeight = partialStructureDistribution.get(currentPartialStructureKey);
+            PartialUnderstandingState currentUnderstandingState = partialStructures.get(currentPartialStructureKey);
+            partialStructureDistribution.remove(currentPartialStructureKey);
+            partialStructures.remove(currentPartialStructureKey);
+
+            // perform classification problems bottom-up
+            // do this by selecting the longest path string ... kinda dumb, but it works
+            int maxPathStringLength = currentUnderstandingState.remainingClassificationProblemNodes.stream().
+                    map(x -> x.length()).max(Integer::compare).orElseGet(() -> 0);
+            String classificationProblemPath = currentUnderstandingState.remainingClassificationProblemNodes.stream().
+                    filter(x -> x.length()==maxPathStringLength).collect(Collectors.toList()).get(0);
+            Pair<Map<String, PartialUnderstandingState>, StringDistribution> extensions = currentUnderstandingState.classifyAtPath(classificationProblemPath);
+            for (String extendedPartialStateKey : extensions.getLeft().keySet()){
+                String updatedUnderstandingStateId = "understanding_state_"+partialHypothesisNameIndex++;
+                partialStructures.put(updatedUnderstandingStateId, extensions.getLeft().get(extendedPartialStateKey));
+                partialStructureDistribution.put(updatedUnderstandingStateId, currentWeight * extensions.getRight().get(extendedPartialStateKey));
+            }
+        }
+
+        Map<String, JSONObject> outputStructures = new HashMap<>();
+        partialStructures.entrySet().stream().forEach(x -> outputStructures.put(x.getKey(), x.getValue().structure));
+        return new ImmutablePair<>(outputStructures, partialStructureDistribution);
     }
 
 
