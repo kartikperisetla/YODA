@@ -34,3 +34,11 @@ SLF4J: Defaulting to no-operation (NOP) logger implementation
 SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
 
 But you can ignore them and proceed to type your utterances into the command line.
+
+
+
+
+
+Installing Theano:
+follow directions for your operating system on Theano website.
+For recent Ubuntu, http://deeplearning.net/software/theano/install_ubuntu.html#install-ubuntu
