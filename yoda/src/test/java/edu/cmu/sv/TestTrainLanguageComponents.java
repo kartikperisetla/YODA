@@ -1,5 +1,6 @@
 package edu.cmu.sv;
 
+import com.google.common.collect.*;
 import edu.cmu.sv.natural_language_generation.CorpusGeneration;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.spoken_language_understanding.Tokenizer;
@@ -11,6 +12,8 @@ import org.json.simple.JSONObject;
 import org.junit.Test;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Created by David Cohen on 10/29/14.
@@ -21,20 +24,28 @@ public class TestTrainLanguageComponents {
 
     @Test
     public void Test(){
+        Multiset<String> featureCounter = HashMultiset.create();
         Set<String> vocabulary = new HashSet<>();
         Map<String, List<Object>> classificationVariablesAndRanges = new HashMap<>();
+        MultiClassifier classifier = new MultiClassifierImpl();
+
 
         Set<NodeMultiClassificationProblem> multiClassificationProblems = new HashSet<>();
+        System.out.println("generating corpus");
         Map<String, SemanticsModel> corpus = CorpusGeneration.generateCorpus();
 
+        System.out.println("collecting features and training samples");
         for (String utterance : corpus.keySet()){
             List<String> tokens = Tokenizer.tokenize(utterance);
             vocabulary.addAll(tokens);
 
             SemanticsModel semanticsModel = corpus.get(utterance);
-            for (String slotPath : semanticsModel.getAllInternalNodePaths()) {
+
+            for (String slotPath : Iterables.concat(semanticsModel.getAllInternalNodePaths(), Arrays.asList(""))) {
                 NodeMultiClassificationProblem multiClassificationProblem =
                         new NodeMultiClassificationProblem(utterance, semanticsModel.getInternalRepresentation(), slotPath);
+                featureCounter.addAll(classifier.extractFeatures(multiClassificationProblem));
+
                 Map<String, Object> classificationResults = new HashMap<>();
                 JSONObject groundTruthContent = (JSONObject) semanticsModel.newGetSlotPathFiller(slotPath);
                 for (Object key : groundTruthContent.keySet()){
@@ -58,8 +69,22 @@ public class TestTrainLanguageComponents {
             }
         }
 
+        System.out.println("feature counter's size:" + featureCounter.size());
+        for (String feature : featureCounter.elementSet()){
+            System.out.println("feature:    "+feature+", count:    "+featureCounter.count(feature));
+        }
 
-        MultiClassifier classifier = new MultiClassifierImpl();
+        List<String> retainedFeatures = featureCounter.elementSet().stream().
+                filter(x -> featureCounter.count(x) > 1).collect(Collectors.toList());
+        Map<String, Integer> featurePositionMap = new HashMap<>();
+        for (int i = 0; i < retainedFeatures.size(); i++) {
+            featurePositionMap.put(retainedFeatures.get(i), i);
+        }
+        classifier = new MultiClassifierImpl(featurePositionMap, classificationVariablesAndRanges);
 
+        System.out.println("is red rock expensive:");
+        NodeMultiClassificationProblem problem = new NodeMultiClassificationProblem("is red rock expensive", SemanticsModel.parseJSON("{}"), "");
+        System.out.println(classifier.extractFeatures(problem));
+        System.out.println(classifier.packTestSample(problem));
     }
 }

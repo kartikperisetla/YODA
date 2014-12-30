@@ -536,7 +536,18 @@ public class SemanticsModel {
         String currentString = inputString;
         if (structure.containsKey("chunk-start")){
             List<String> tokensInChunk = new LinkedList<>();
-            for (int i = (Integer)structure.get("chunk-start"); i < (Integer)structure.get("chunk-end"); i++) {
+            Integer start;
+            Integer end;
+            if (structure.get("chunk-start") instanceof Long){
+                start = (int) (long) structure.get("chunk-start");
+            } else
+                start = (Integer)structure.get("chunk-start");
+            if (structure.get("chunk-end") instanceof Long){
+                end = (int) (long) structure.get("chunk-end");
+            } else
+                end = (Integer) structure.get("chunk-end");
+            
+            for (Integer i = start; i < end; i++) {
                 tokensInChunk.add(tokens.get(i));
             }
             currentString = String.join(" ", tokensInChunk);

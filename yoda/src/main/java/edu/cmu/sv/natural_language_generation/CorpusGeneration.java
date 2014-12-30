@@ -39,7 +39,12 @@ public class CorpusGeneration {
 
         Grammar.GrammarPreferences corpusPreferences = new Grammar.GrammarPreferences(.01, .2, 5, 2, 5, 5, 2, new HashMap<>());
 
+
+        int numPOIs = 0;
         for (String uri : yodaEnvironment.db.runQuerySelectX(poiSelectionQuery)) {
+            numPOIs ++;
+            if (numPOIs > 10)
+                break;
 
             // Generate YNQ for HasProperty where a PP is the property
             String YNQBaseString = "{\"dialogAct\":\"" + YNQuestion.class.getSimpleName() +
