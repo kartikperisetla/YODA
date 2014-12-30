@@ -2,7 +2,6 @@ package edu.cmu.sv.spoken_language_understanding.nested_chunking_understander;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.json.simple.JSONObject;
 
 import java.util.*;
 
@@ -13,11 +12,11 @@ public class ChunkingFeatureExtractorImpl implements ChunkingFeatureExtractor{
     static Map<String, Integer> contextFeaturePositionMap = new HashMap<>();
 
     @Override
-    public Pair<List<Double>, List<List<String>>> generateFeatures(String inputString, JSONObject surroundingStructure, String contextPathInStructure) {
+    public Pair<List<Double>, List<List<String>>> generateFeatures(ChunkingProblem chunkingProblem) {
 
         //// collect context features
         Set<String> featuresPresent = new HashSet();
-        String[] fillerPath = contextPathInStructure.split("\\.");
+        String[] fillerPath = chunkingProblem.contextPathInStructure.split("\\.");
         for (int i = 0; i < fillerPath.length; i++) {
             featuresPresent.add("NodeContext: " + (fillerPath.length - i) + ", " + fillerPath[i]);
         }
@@ -38,7 +37,7 @@ public class ChunkingFeatureExtractorImpl implements ChunkingFeatureExtractor{
 
         //// collect token feature vectors
         List<List<String>> tokenFeatures = new LinkedList<>();
-        String[] tokens = inputString.split(" ");
+        String[] tokens = chunkingProblem.stringForAnalysis.split(" ");
         for (int i = 0; i < tokens.length; i++) {
             // the word is the only feature
             tokenFeatures.add(new LinkedList<>(Arrays.asList(tokens[i])));

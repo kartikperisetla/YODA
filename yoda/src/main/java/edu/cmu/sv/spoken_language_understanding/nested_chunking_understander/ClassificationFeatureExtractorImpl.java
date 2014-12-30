@@ -1,7 +1,5 @@
 package edu.cmu.sv.spoken_language_understanding.nested_chunking_understander;
 
-import org.json.simple.JSONObject;
-
 import java.util.*;
 
 /**
@@ -11,7 +9,7 @@ public class ClassificationFeatureExtractorImpl implements ClassificationFeature
     static Map<String, Integer> featurePositionMap = new HashMap<>();
 
     @Override
-    public List<Double> generateFeatures(NestedChunkingUnderstander.NodeClassificationProblem classificationProblem) {
+    public List<Double> generateFeatures(NodeMultiClassificationProblem classificationProblem) {
 
         Set<String> featuresPresent = new HashSet<>();
 

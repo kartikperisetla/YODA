@@ -76,7 +76,7 @@ public class NestedChunkingUnderstander implements SpokenLanguageUnderstander {
             Map<String, PartialUnderstandingState> updatedUnderstandingStates = new HashMap<>();
             StringDistribution understandingStateDistribution = new StringDistribution();
 
-            NodeClassificationProblem currentClassificationProblem = new NodeClassificationProblem(fullUtterance, structure, pathToClassificationProblem);
+            NodeMultiClassificationProblem currentClassificationProblem = new NodeMultiClassificationProblem(fullUtterance, structure, pathToClassificationProblem);
             currentClassificationProblem.runClassifier();
 
             int i=0;
@@ -117,56 +117,6 @@ public class NestedChunkingUnderstander implements SpokenLanguageUnderstander {
             }
         }
 
-    }
-
-    public static class NodeClassificationProblem{
-        Map<String, Map<String, Object>> outputRolesAndFillers;
-        StringDistribution outputDistribution;
-        JSONObject surroundingStructure;
-        String contextPathInStructure;
-        String stringForAnalysis;
-
-        public NodeClassificationProblem(String fullUtteranceText, JSONObject surroundingStructure, String contextPathInStructure) {
-            this.surroundingStructure = surroundingStructure;
-            this.contextPathInStructure = contextPathInStructure;
-            stringForAnalysis = SemanticsModel.extractChunk(surroundingStructure, fullUtteranceText, contextPathInStructure);
-        }
-
-        public void runClassifier(){
-            Map<String, Map<String, Object>> ans = new HashMap<>();
-            StringDistribution outputDistr = new StringDistribution();
-            // extract features
-            // check cache
-            // call external classification program
-            // read results
-            // interpret as new roles / values for answer map
-            // cache results
-            outputRolesAndFillers = ans;
-            outputDistribution = outputDistr;
-        }
-    }
-
-    public static class ChunkingProblem{
-        public Map<String, Set<ChunkingProblem>> outputChildChunkingProblems;
-        public StringDistribution outputDistribution;
-        JSONObject surroundingStructure;
-        String contextPathInStructure;
-        String stringForAnalysis;
-
-        public ChunkingProblem(String fullUtteranceText, JSONObject surroundingStructure, String contextPathInStructure) {
-            this.surroundingStructure = surroundingStructure;
-            this.contextPathInStructure = contextPathInStructure;
-            stringForAnalysis = SemanticsModel.extractChunk(surroundingStructure, fullUtteranceText, contextPathInStructure);
-        }
-
-        public void runChunker(){
-            // create features
-            // check cache
-            // call external chunking program
-            // read results
-            // interpret as new chunking problems
-            // cache results
-        }
     }
 
     public Pair<Map<String, JSONObject>, StringDistribution> understand(String utterance){

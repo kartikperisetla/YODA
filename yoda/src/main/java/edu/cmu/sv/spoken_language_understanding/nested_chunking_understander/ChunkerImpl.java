@@ -1,7 +1,6 @@
 package edu.cmu.sv.spoken_language_understanding.nested_chunking_understander;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.json.simple.JSONObject;
 
 import java.util.List;
 
@@ -16,7 +15,7 @@ public class ChunkerImpl implements Chunker {
     }
 
     @Override
-    public void chunk(NestedChunkingUnderstander.ChunkingProblem chunkingProblem) {
+    public void chunk(ChunkingProblem chunkingProblem) {
         Pair<List<Double>, List<List<String>>> features = featureExtractor.generateFeatures(chunkingProblem);
 
         //todo: pack features as raw input for theano model
