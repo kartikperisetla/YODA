@@ -6,9 +6,9 @@ import theano.tensor as T
 
 
 class MultiClassifier:
-    classifiers = dict()  # map variable -> LogisticRegressionModel for that variable
 
     def __init__(self, n_features, classifier_ranges):
+        self.classifiers = dict()
         self.n_features = n_features
         self.classifier_ranges = classifier_ranges
         for key in self.classifier_ranges.keys():
@@ -25,5 +25,6 @@ class MultiClassifier:
                                          (x_validate, y_validate)))
 
     def classify(self, features):
+        print "classifier keys:", self.classifiers.keys()
         return {x: self.classifiers[x].classify(features) for x in self.classifiers.keys()}
 

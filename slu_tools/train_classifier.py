@@ -3,6 +3,7 @@ import sys
 import getopt
 import MultiClassifier
 import random as r
+import cPickle
 
 # what fraction of the given data set should be used as validation? (approximate, sampling is random)
 validation_fraction = .2
@@ -13,12 +14,12 @@ model_file = ''
 try:
     opts, args = getopt.getopt(sys.argv[1:], "ht:m:", ["train=", "model="])
 except getopt.GetoptError:
-    print 'test.py -t <train> -m <model>'
+    print 'train_classifier.py -t <train> -m <model>'
     sys.exit(2)
 
 for opt, arg in opts:
     if opt == '-h':
-        print 'test.py -t <train> -m <model>'
+        print 'train_classifier.py -t <train> -m <model>'
         sys.exit()
     elif opt in ("-t", "--train"):
         training_corpus = arg
@@ -56,6 +57,8 @@ for line in f:
             classifier_ranges[i] = 0
         classifier_ranges[i] = max(classifier_ranges[i], val+1)
 
+f.close()
+
 print "n_features:", n_features
 print "n_classifiers:", n_classifiers
 print "classifier ranges:", classifier_ranges
@@ -68,3 +71,7 @@ print "Starting training:"
 multi_classifier.train(training_samples, validation_samples)
 print "Done training multi-classifier."
 
+print "saving model file"
+f = open(model_file, 'wb')
+cPickle.dump(multi_classifier, f, protocol=cPickle.HIGHEST_PROTOCOL)
+f.close()
