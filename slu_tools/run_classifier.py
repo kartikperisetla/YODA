@@ -19,15 +19,13 @@ for opt, arg in opts:
     elif opt in ("-m", "--model"):
         model_file = arg
 
-print model_file
-
-print "loading multi-classifier object from pickle"
-
 f = open(model_file, 'rb')
 multi_classifier = pickle.load(f)
 f.close()
 
-print multi_classifier.__dict__
+
+sys.stdout.write("ready...\n")
+sys.stdout.flush()
 
 while True:
     line = sys.stdin.readline()

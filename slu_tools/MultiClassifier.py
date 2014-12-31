@@ -25,6 +25,6 @@ class MultiClassifier:
                                          (x_validate, y_validate)))
 
     def classify(self, features):
-        print "classifier keys:", self.classifiers.keys()
-        return {x: self.classifiers[x].classify(features) for x in self.classifiers.keys()}
+        # print "classifier keys:", self.classifiers.keys()
+        return {x: self.classifiers[x].classify(features).tolist() for x in self.classifiers.keys()}
 

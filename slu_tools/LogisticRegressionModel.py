@@ -25,7 +25,7 @@ class LogisticRegressionModel(object):
             ),
             name='W',
             borrow=True
-        ) 
+        )
 
         # initialize the biases b as a vector of n_out 0s
         self.b = theano.shared(
