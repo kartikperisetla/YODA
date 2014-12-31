@@ -48,8 +48,10 @@ public class MultiClassifierImpl implements MultiClassifier {
         String ans = packTestSample(classificationProblem);
         List<Integer> output = new LinkedList<>();
         for (String variable : outputInterpretation.keySet().stream().sorted().collect(Collectors.toList())){
-            output.add(outputInterpretation.get(variable).
-                    indexOf(classificationProblem.outputRolesAndFillers.get("ground_truth").get(variable)));
+            Object valueForVariable = classificationProblem.outputRolesAndFillers.get("ground_truth").get(variable);
+            if (valueForVariable==null)
+                valueForVariable = NOT_CLASSIFIED;
+            output.add(outputInterpretation.get(variable).indexOf(valueForVariable));
         }
         ans += " -> ";
         ans += "[" + String.join(", ", output.stream().map(Object::toString).collect(Collectors.toList())) + "]";

@@ -10,3 +10,4 @@
 *.idea
 yoda/target
 *YODA_corpus.txt
+*classifier_training_file.txt

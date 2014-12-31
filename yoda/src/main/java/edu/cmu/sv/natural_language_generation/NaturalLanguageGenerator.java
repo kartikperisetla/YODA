@@ -1,9 +1,7 @@
 package edu.cmu.sv.natural_language_generation;
 
-import edu.cmu.sv.dialog_state_tracking.Turn;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.semantics.SemanticsModel;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.math3.random.RandomData;
 import org.apache.commons.math3.random.RandomDataImpl;
 import org.json.simple.JSONObject;

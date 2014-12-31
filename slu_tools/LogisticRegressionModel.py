@@ -3,6 +3,7 @@ import time
 import numpy
 
 import theano
+# theano.config.exception_verbosity = 'high'
 import theano.tensor as T
 
 learning_rate = 0.13
@@ -54,20 +55,11 @@ class LogisticRegressionModel(object):
         # compute number of minibatches for training, validation and testing
         n_train_batches = train_set_x.get_value(borrow=True).shape[0] / batch_size
         n_valid_batches = valid_set_x.get_value(borrow=True).shape[0] / batch_size
-        # n_train_batches = train_set_x.shape[0] / batch_size
-        # n_valid_batches = valid_set_x.shape[0] / batch_size
-
 
         # negative log likelihood of the data set
         cost = -T.mean(T.log(self.p_y_given_x)[T.arange(self.y.shape[0]), self.y])
 
         index = T.lscalar()  # index to a [mini]batch
-
-        print "valid_set_x.shape:", valid_set_x.shape
-        print "index:", index
-        print "batch size:", batch_size
-        print "index*batch size", index*batch_size
-        print valid_set_x[0: 1]
 
         validate_model = theano.function(
             inputs=[index],
@@ -104,8 +96,7 @@ class LogisticRegressionModel(object):
         patience = 5000  # look as this many examples regardless
         patience_increase = 2  # wait this much longer when a new best is
         # found
-        improvement_threshold = 0.995  # a relative improvement of this much is
-        # considered significant
+        improvement_threshold = 0.995  # a relative improvement of this much is considered significant
         validation_frequency = min(n_train_batches, patience / 2)
         # go through this many
         # minibatche before checking the network
@@ -118,7 +109,7 @@ class LogisticRegressionModel(object):
         done_looping = False
         epoch = 0
         while (epoch < n_epochs) and (not done_looping):
-            epoch = epoch + 1
+            epoch += 1
             for minibatch_index in xrange(n_train_batches):
 
                 minibatch_avg_cost = train_model(minibatch_index)
@@ -127,8 +118,7 @@ class LogisticRegressionModel(object):
 
                 if (iter + 1) % validation_frequency == 0:
                     # compute zero-one loss on validation set
-                    validation_losses = [validate_model(i)
-                                         for i in xrange(n_valid_batches)]
+                    validation_losses = [validate_model(i) for i in xrange(n_valid_batches)]
                     this_validation_loss = numpy.mean(validation_losses)
 
                     print(
