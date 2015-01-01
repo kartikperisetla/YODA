@@ -29,7 +29,7 @@ public class TestTrainLanguageComponents {
     public void Test() throws FileNotFoundException, UnsupportedEncodingException {
         Multiset<String> featureCounter = HashMultiset.create();
         Set<String> vocabulary = new HashSet<>();
-        HashMap<String, LinkedList<Serializable>> classificationVariablesAndRanges = new HashMap<>();
+        HashMap<String, LinkedList<String>> classificationVariablesAndRanges = new HashMap<>();
 
         Set<NodeMultiClassificationProblem> multiClassificationProblems = new HashSet<>();
         System.out.println("generating corpus");
@@ -60,7 +60,7 @@ public class TestTrainLanguageComponents {
                     if (!classificationVariablesAndRanges.containsKey(key))
                         classificationVariablesAndRanges.put(key, new LinkedList<>(Arrays.asList(MultiClassifier.NOT_CLASSIFIED)));
                     if (!classificationVariablesAndRanges.get(key).contains(classificationResults.get(key)))
-                        classificationVariablesAndRanges.get(key).add((Serializable)classificationResults.get(key));
+                        classificationVariablesAndRanges.get(key).add((String)classificationResults.get(key));
                 }
 
                 multiClassificationProblem.outputDistribution = new StringDistribution();

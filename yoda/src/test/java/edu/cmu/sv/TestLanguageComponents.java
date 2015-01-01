@@ -19,13 +19,16 @@ public class TestLanguageComponents {
     public void Test() throws FileNotFoundException, UnsupportedEncodingException {
         MultiClassifier.loadPreferences();
         MultiClassifier classifier = new MultiClassifier();
-        System.out.println("is red rock expensive:");
-        NodeMultiClassificationProblem problem = new NodeMultiClassificationProblem("is red rock expensive", SemanticsModel.parseJSON("{}"), "");
-        System.out.println("classifying problem...");
-        classifier.classify(problem);
-        classifier.classify(problem);
-        classifier.classify(problem);
-        classifier.classify(problem);
 
+        classifyDialogAct(classifier, "is red rock expensive");
+        classifyDialogAct(classifier, "where is red rock");
+        classifyDialogAct(classifier, "the church on castro street");
+        classifyDialogAct(classifier, "give me directions");
+    }
+
+    public void classifyDialogAct(MultiClassifier classifier, String utterance){
+            System.out.println(utterance);
+            NodeMultiClassificationProblem problem = new NodeMultiClassificationProblem(utterance, SemanticsModel.parseJSON("{}"), "");
+            classifier.classify(problem);
     }
 }

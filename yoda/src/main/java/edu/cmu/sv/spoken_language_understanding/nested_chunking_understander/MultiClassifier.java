@@ -1,9 +1,12 @@
 package edu.cmu.sv.spoken_language_understanding.nested_chunking_understander;
 
+import com.google.common.primitives.Doubles;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.*;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -17,7 +20,7 @@ public class MultiClassifier {
     public static final String NOT_CLASSIFIED = "~~<<< VARIABLE HAS NO VALUE IN CONTEXT >>>~~";
 
     static HashMap<String, Integer> featurePositionMap = new HashMap<>();
-    static HashMap<String, LinkedList<Serializable>> outputInterpretation;
+    static HashMap<String, LinkedList<String>> outputInterpretation;
 
     Process theanoSubProcess;
     InputStreamReader stdoutInputStreamReader;
@@ -51,7 +54,7 @@ public class MultiClassifier {
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
             List<Object> preferences = (List<Object>) objectInputStream.readObject();
             featurePositionMap = (HashMap<String, Integer>) preferences.get(0);
-            outputInterpretation = (HashMap<String, LinkedList<Serializable>>) preferences.get(1);
+            outputInterpretation = (HashMap<String, LinkedList<String>>) preferences.get(1);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -65,7 +68,8 @@ public class MultiClassifier {
     public static void trainTheanoModel(){
         ProcessBuilder processBuilder =
                 new ProcessBuilder("../slu_tools/train_classifier.py", "-t", classifierTrainingFile, "-m", classifierModelFile);
-        processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
+        processBuilder.inheritIO(); // (so we can see theano's training progress)
+//        processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
         try {
             Process p = processBuilder.start();
             System.out.println("exit status:" + p.waitFor());
@@ -85,6 +89,32 @@ public class MultiClassifier {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append(stdoutBufferedReader.readLine());
             System.out.println("string returned from subprocess:" + stringBuilder.toString());
+
+            Map<String, Object> outputRolesAndFillers = new HashMap<>();
+
+            // parse response from theano
+            Pattern multiResultPattern= Pattern.compile("\\{(\\d+: \\[\\[.+\\]\\], )*(\\d+: \\[\\[.+\\]\\])\\}");
+            Matcher m = multiResultPattern.matcher(stringBuilder.toString());
+            if (! m.matches())
+                throw new Error("Error: can't parse classification program's response");
+
+            for (int i = 1; i <= m.groupCount(); i++) {
+                String individualResultString = m.group(i);
+                Pattern individualResultPattern = Pattern.compile("(\\d+): \\[\\[(.+)\\]\\](, |)");
+                Matcher m2 = individualResultPattern.matcher(individualResultString);
+                if (! m2.matches())
+                    throw new Error("Error: can't parse classification program's response");
+                String classNumber = m2.group(1);
+                String classLabel = outputInterpretation.keySet().stream().sorted().collect(Collectors.toList()).get(Integer.parseInt(classNumber));
+                List<Double> values = Arrays.asList(m2.group(2).split(", ")).
+                        stream().map(Double::parseDouble).collect(Collectors.toList());
+                int maxIndex = values.indexOf(values.stream().max(Doubles::compare).orElse(-1.0));
+                outputRolesAndFillers.put(
+                        classLabel,
+                        outputInterpretation.get(classLabel).get(maxIndex));
+            }
+            System.out.println(outputRolesAndFillers);
+
 
         } catch (IOException e) {
             e.printStackTrace();
