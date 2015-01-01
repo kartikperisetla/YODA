@@ -4,15 +4,15 @@ import numpy
 import random
 import RecurrentNeuralNetworkModel as RNN
 
-settings = {'lr': 0.0627142536696559,
+settings = {'lr': .0627142536696559,
             'verbose': 1,
             'decay': False,  # decay on the learning rate if improvement stops
-            'win': 7,  # number of words in the context window
+            'win': 3,  # number of words in the context window
             'bs': 9,  # number of backprop through time steps
-            'nhidden': 100,  # number of hidden units
+            'nhidden': 3,  # number of hidden units
             'seed': 345,
-            'emb_dimension': 100,  # dimension of word embedding
-            'nepochs': 50}
+            'emb_dimension': 3,  # dimension of word embedding
+            'n_epochs': 500}
 
 
 # data set of noun phrase tagging
@@ -22,6 +22,10 @@ data_set = [("are the people going to school", [0, 1, 1, 0, 0, 1]),
     ("the school yard is full of people", [1,1,1,0,0,0,1]),
     ("where in the world are they", [1,0,1,1,0,1]),
     ("they are people", [1,0,1]),
+    ("i want to uh go people watching", [1,0,0,0,0,0,0]),
+    ("uh talk to them", [0,0,0,1]),
+    ("uh i can hear you", [0,1,0,0,1]),
+    ("i want to uh school you", [1,0,0,0,0,1]),
     ("i want to go people watching", [1,0,0,0,0,0]),
     ("talk to them", [0,0,1]),
     ("i can hear you", [1,0,0,1]),
@@ -31,7 +35,9 @@ data_set = [("are the people going to school", [0, 1, 1, 0, 0, 1]),
     ("around the world people think you are watching", [0,1,1,1,0,1,0,0]),
     ("the school is not open", [1,1,0,0,0]),
     ("you hear that the good school is open", [1,0,0,1,1,1,0,0]),
-    ("i hear that you are people watching at the school", [1,0,0,1,0,0,0,0,1,1])]
+    ("i hear that you are people watching at the school", [1,0,0,1,0,0,0,0,1,1]),
+    ("is the uh school open", [0,1,1,1,0]),
+    ("world wide people say the school is uh good", [0,0,1,0,1,1,0,0,0])]
 
 import collections as C
 counter = C.Counter()
@@ -57,7 +63,7 @@ def get_index(word):
 
 data_set = [([get_index(j) for j in data_set[i][0].split()] , data_set[i][1]) for i in range(len(data_set))]
 
-n_train = 10
+n_train = 14
 x_train = [sample[0] for sample in data_set[0:n_train]]
 x_validate = [sample[0] for sample in data_set[n_train:]]
 y_train = [sample[1] for sample in data_set[0:n_train]]
@@ -75,5 +81,14 @@ rnn = RNN.RecurrentNeuralNetworkModel(nh=settings['nhidden'],
                                       de=settings['emb_dimension'],
                                       cs=settings['win'])
 
-rnn.train(train_set, valid_set, settings)
+rnn.train((x_train, y_train), (x_validate, y_validate), settings)
+
+def tag_utterance(utterance):
+    return rnn.predict([get_index(w) for w in utterance.split()], settings)
+
+for utterance in ["school is out", "is school out", "is the carnegie mellon school open"]:
+    print utterance
+    print tag_utterance(utterance)
+
+
 
