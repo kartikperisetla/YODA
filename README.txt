@@ -25,6 +25,9 @@ Running current code:
 This project is structured as a maven project which is supported by all the major IDEs by importing the yoda/yoda/pom.xml file .
 It requires the Java 8 language level and SDK.
 
+To build, go to yoda/yoda/ and run:
+> mvn compile
+
 To run the CommandLineYodaSystem program, go to /yoda/yoda/ and run:
 > mvn exec:java
 

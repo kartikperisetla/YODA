@@ -7,7 +7,7 @@ import java.io.InputStreamReader;
 /**
  * Created by David Cohen on 11/21/14.
  *
- * Implement this interface to create a YODA dialog system
+ * Command line interface to yoda dialog system
  *
  */
 public class CommandLineYodaSystem {

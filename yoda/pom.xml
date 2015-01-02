@@ -23,7 +23,8 @@
        <artifactId>exec-maven-plugin</artifactId>
        <version>1.1</version>
        <configuration>
-           <mainClass>edu.cmu.sv.yoda_environment.CommandLineYodaSystem</mainClass>
+           <!--<mainClass>edu.cmu.sv.yoda_environment.CommandLineYodaSystem</mainClass>-->
+           <mainClass>edu.cmu.sv.yoda_environment.SubprocessYodaSystem</mainClass>
        </configuration>
       </plugin>
     </plugins>

@@ -8,7 +8,9 @@ import edu.cmu.sv.dialog_state_tracking.Turn;
 import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
 import edu.cmu.sv.spoken_language_understanding.RegexUnderstander;
 import edu.cmu.sv.spoken_language_understanding.SpokenLanguageUnderstander;
+import edu.cmu.sv.system_action.CommandLineExecutor;
 import edu.cmu.sv.system_action.Executor;
+import edu.cmu.sv.system_action.JsonExecutor;
 import edu.cmu.sv.utils.StringDistribution;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -49,7 +51,6 @@ public class YodaEnvironment {
     // DM input
     public BlockingQueue<Pair<Map<String, DialogState>, StringDistribution>> DmInputQueue = new LinkedBlockingDeque<>();
 
-
     public static YodaEnvironment dstTestingEnvironment(){
         YodaEnvironment ans = new YodaEnvironment();
         ans.dst = new DialogStateTracker(ans);
@@ -64,8 +65,20 @@ public class YodaEnvironment {
         ans.dm = new DialogManager(ans);
         ans.nlg = new NaturalLanguageGenerator(ans);
         ans.slu = new RegexUnderstander(ans);
-        ans.exe = new Executor(ans);
-        ans.out = new StandardOutOutputHandler();
+        ans.exe = new CommandLineExecutor(ans);
+        ans.out = new FlushingStandardOutOutputHandler();
+        return ans;
+    }
+
+    public static YodaEnvironment subProcessDialogEnvironment(){
+        YodaEnvironment ans = new YodaEnvironment();
+        ans.dst = new DialogStateTracker(ans);
+        ans.db = new Database(ans);
+        ans.dm = new DialogManager(ans);
+        ans.nlg = new NaturalLanguageGenerator(ans);
+        ans.slu = new RegexUnderstander(ans);
+        ans.exe = new JsonExecutor(ans);
+        ans.out = new FlushingStandardOutOutputHandler();
         return ans;
     }
 
