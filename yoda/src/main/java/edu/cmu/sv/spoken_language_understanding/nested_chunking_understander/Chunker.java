@@ -3,8 +3,11 @@ package edu.cmu.sv.spoken_language_understanding.nested_chunking_understander;
 import edu.cmu.sv.spoken_language_understanding.Tokenizer;
 import edu.cmu.sv.utils.StringDistribution;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -12,65 +15,102 @@ import java.util.stream.Collectors;
  * Created by David Cohen on 12/29/14.
  */
 public class Chunker {
+    public static final String chunkerModelFile = "src/resources/corpora/chunker.model";
+    public static final String chunkerTrainingFile = "src/resources/corpora/chunker_training_file.txt";
+    public static final String serializedChunkerPreferencesFile = "src/resources/models_and_serialized_objects/serialized_chunker_preferences.srl";
+
     public static final String NO_LABEL = "~~<<< TOKEN HAS NO LABEL >>>~~";
 
+    static LinkedList<String> contextFeatures = new LinkedList<>();
+    static LinkedList<LinkedList<String>> tokenFeatures = new LinkedList<>();
+    static LinkedList<String> outputLabels = new LinkedList<>();
 
-    static Map<String, Integer> contextFeaturePositionMap = new HashMap<>();
-    static List<String> vocabulary = new LinkedList<>();
-    static List<String> outputLabels = new LinkedList<>();
 
-    public Pair<List<Double>, List<List<Double>>> generateFeatures(ChunkingProblem chunkingProblem) {
+    public static void loadPreferences(){
+        try {
+            FileInputStream fileInputStream = new FileInputStream(serializedChunkerPreferencesFile);
+            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+            List<Object> preferences = (List<Object>) objectInputStream.readObject();
+            contextFeatures = (LinkedList<String>) preferences.get(0);
+            tokenFeatures = (LinkedList<LinkedList<String>>) preferences.get(1);
+            outputLabels = (LinkedList<String>) preferences.get(2);
 
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Set<String> extractContextFeatures(ChunkingProblem chunkingProblem){
         //// collect context features
         Set<String> featuresPresent = new HashSet();
         String[] fillerPath = chunkingProblem.contextPathInStructure.split("\\.");
         for (int i = 0; i < fillerPath.length; i++) {
             featuresPresent.add("NodeContext: " + (fillerPath.length - i) + ", " + fillerPath[i]);
         }
-
-        //// assemble context feature vector
-        List<Double> contextFeatures = new LinkedList<>();
-        for (int i = 0; i < contextFeaturePositionMap.size(); i++) {
-            for (String presentFeature : featuresPresent) {
-                if (contextFeaturePositionMap.containsKey(presentFeature) && contextFeaturePositionMap.get(presentFeature).equals(i)){
-                    contextFeatures.add(1.0);
-                } else if (!contextFeaturePositionMap.containsKey(presentFeature)) {
-                    System.out.println("WARNING: present feature not in model: "+presentFeature);
-                } else {
-                    contextFeatures.add(0.0);
-                }
-            }
-        }
-
-        //// collect sequential feature vectors
-        List<List<Double>> sequenceFeatures = new LinkedList<>();
-        List<String> tokens = Tokenizer.tokenize(chunkingProblem.stringForAnalysis);
-        for (int i = 0; i < tokens.size(); i++) {
-            List<Double> tokenFeatures = new LinkedList<>();
-            tokenFeatures.add((double)vocabulary.indexOf(tokens.get(i)));
-            // the word is the only feature
-            sequenceFeatures.add(tokenFeatures);
-        }
-
-        return new ImmutablePair<>(contextFeatures, sequenceFeatures);
+        return featuresPresent;
     }
 
-    public String packTestSample(ChunkingProblem chunkingProblem){
-        Pair<List<Double>, List<List<Double>>> features = generateFeatures(chunkingProblem);
+    public static List<Double> contextFeatureVector(Set<String> contextFeaturesPresent){
+        //// assemble context feature vectors
+        List<Double> ans= new LinkedList<>();
+        for (int i = 0; i < contextFeatures.size(); i++) {
+            if (contextFeaturesPresent.contains(contextFeatures.get(i)))
+                ans.add(1.0);
+            else
+                ans.add(0.0);
+        }
+        contextFeaturesPresent.removeAll(contextFeatures);
+        if (contextFeaturesPresent.size()>0)
+            System.out.println("WARNING: present context feature(s) not in model: "+contextFeaturesPresent);
+        return ans;
+    }
+
+    public static List<List<String>> extractSequenceFeatures(ChunkingProblem chunkingProblem){
+        //// collect sequential feature vectors
+        List<List<String>> sequenceFeatures = new LinkedList<>();
+        List<String> tokens = Tokenizer.tokenize(chunkingProblem.stringForAnalysis);
+        for (int i = 0; i < tokens.size(); i++) {
+            List<String> tokenFeatures = new LinkedList<>();
+            // the word itself is the only feature
+            tokenFeatures.add(tokens.get(i));
+            sequenceFeatures.add(tokenFeatures);
+        }
+        return sequenceFeatures;
+    }
+
+    public static List<List<Double>> sequenceFeatureVectors(List<List<String>> sequenceFeaturesPresent){
+        List<List<Double>> featureVectors = new LinkedList<>();
+        for (List<String> tokenFeatures : sequenceFeaturesPresent){
+            List<Double> tokenFeatureVector = new LinkedList<>();
+            for (int i = 0; i < tokenFeatures.size(); i++) {
+                tokenFeatureVector.add((double) Chunker.tokenFeatures.get(i).indexOf(tokenFeatures.get(i)));
+            }
+            featureVectors.add(tokenFeatureVector);
+        }
+        return featureVectors;
+    }
+
+    public static String packTestSample(ChunkingProblem chunkingProblem){
+        List<Double> contextFeatureVector = contextFeatureVector(extractContextFeatures(chunkingProblem));
+        List<List<Double>> sequenceFeatureVectors = sequenceFeatureVectors(extractSequenceFeatures(chunkingProblem));
         String ans = "";
         // context features
-        ans += "[" + features.getLeft().stream().map(Object::toString).collect(Collectors.toList()) + "] : ";
+        ans += "[" + contextFeatureVector.stream().map(Object::toString).collect(Collectors.toList()) + "] : ";
 
         // sequence features
         List<String> packedTokenStrings = new LinkedList<>();
-        for (List<Double> tokenFeatureList : features.getRight()){
+        for (List<Double> tokenFeatureList : sequenceFeatureVectors){
             packedTokenStrings.add("[" + String.join(", ", tokenFeatureList.stream().map(Object::toString).collect(Collectors.toList())) + "]");
         }
         ans += "[" + String.join(", ", packedTokenStrings) + "]";
         return ans;
     }
 
-    public String packTrainingSample(ChunkingProblem chunkingProblem){
+    public static String packTrainingSample(ChunkingProblem chunkingProblem){
         String ans = packTestSample(chunkingProblem) + " -> ";
 
         List<Integer> taggingOutput = new LinkedList<>();
@@ -94,7 +134,7 @@ public class Chunker {
             }
 
             if (!outputLabels.contains(label))
-                throw new Error("output label not in output interpretation! Unable to pack this training sample");
+                throw new Error("output label not in output interpretation! Unable to pack this training sample:"+label);
             taggingOutput.add(outputLabels.indexOf(label));
         }
 

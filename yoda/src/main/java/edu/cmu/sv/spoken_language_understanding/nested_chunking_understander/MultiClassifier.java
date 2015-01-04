@@ -26,7 +26,6 @@ public class MultiClassifier {
     InputStreamReader stdoutInputStreamReader;
     BufferedReader stdoutBufferedReader;
 
-
     public MultiClassifier(){
         ProcessBuilder processBuilder =
                 new ProcessBuilder("../slu_tools/run_classifier.py", "-m", classifierModelFile);
@@ -190,7 +189,5 @@ public class MultiClassifier {
         }
         return features;
     }
-
-
 
 }

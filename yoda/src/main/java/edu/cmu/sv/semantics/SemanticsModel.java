@@ -7,6 +7,8 @@ import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.ontology.misc.WebResource;
 import edu.cmu.sv.spoken_language_understanding.Tokenizer;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -565,6 +567,24 @@ public class SemanticsModel {
         return extractChunk((JSONObject)structure.get(thisFiller), currentString, remainingSlotPath);
     }
 
+
+    public static Pair<Integer, Integer> getChunkingIndices(JSONObject sourceObject) {
+        if (sourceObject.containsKey("chunk-start")) {
+
+            Integer start;
+            if (sourceObject.get("chunk-start") instanceof Long) {
+                start = (int) (long) sourceObject.get("chunk-start");
+            } else
+                start = (Integer) sourceObject.get("chunk-start");
+            Integer end;
+            if (sourceObject.get("chunk-end") instanceof Long) {
+                end = (int) (long) sourceObject.get("chunk-end");
+            } else
+                end = (Integer) sourceObject.get("chunk-end");
+            return new ImmutablePair<>(start, end);
+        }
+        return null;
+    }
 
     /*
     * Return whether the two Semantic models objects contain identical content
