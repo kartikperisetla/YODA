@@ -2,6 +2,7 @@ package edu.cmu.sv.spoken_language_understanding.nested_chunking_understander;
 
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.StringDistribution;
+import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
 import java.util.Map;
@@ -16,10 +17,14 @@ public class ChunkingProblem {
     JSONObject surroundingStructure;
     String contextPathInStructure;
     String stringForAnalysis;
+    String fullUtterance;
+    Pair<Integer, Integer> chunkingIndices;
 
-    public ChunkingProblem(String fullUtteranceText, JSONObject surroundingStructure, String contextPathInStructure) {
+    public ChunkingProblem(String fullUtteranceText, JSONObject surroundingStructure, String contextPathInStructure, Pair<Integer, Integer> chunkingIndices) {
         this.surroundingStructure = surroundingStructure;
         this.contextPathInStructure = contextPathInStructure;
+        this.chunkingIndices = chunkingIndices;
+        this.fullUtterance = fullUtteranceText;
         stringForAnalysis = SemanticsModel.extractChunk(surroundingStructure, fullUtteranceText, contextPathInStructure);
     }
 

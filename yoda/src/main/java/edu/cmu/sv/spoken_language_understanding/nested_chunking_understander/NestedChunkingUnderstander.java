@@ -60,7 +60,7 @@ public class NestedChunkingUnderstander implements SpokenLanguageUnderstander {
                 String updatedUnderstandingStateId = "understanding_state_"+i++;
                 PartialUnderstandingState newUnderstandingState = this.deepCopy();
                 for (ChunkingProblem childChunkingProblem : currentChunkingProblem.outputChildChunkingProblems.get(chunkingResultKey)) {
-                    extendStructureWithPath(newUnderstandingState.structure, childChunkingProblem.contextPathInStructure);
+                    extendStructureWithChildChunk(newUnderstandingState.structure, childChunkingProblem.contextPathInStructure, childChunkingProblem.chunkingIndices);
                     newUnderstandingState.pathChunkingProblemMap.put(childChunkingProblem.contextPathInStructure, childChunkingProblem);
                 }
                 newUnderstandingState.pathChunkingProblemMap.remove(pathToChunkingProblem);
@@ -103,7 +103,7 @@ public class NestedChunkingUnderstander implements SpokenLanguageUnderstander {
             return new ImmutablePair<>(updatedUnderstandingStates, understandingStateDistribution);
         }
 
-        static void extendStructureWithPath(JSONObject inputObject, String path){
+        static void extendStructureWithChildChunk(JSONObject inputObject, String path, Pair<Integer, Integer> chunkingIndices){
             SemanticsModel tmp = new SemanticsModel(inputObject);
             String[] roles = path.split("\\.");
             String fillerPath = "";
@@ -115,6 +115,10 @@ public class NestedChunkingUnderstander implements SpokenLanguageUnderstander {
                 }
                 previousPath = fillerPath;
             }
+
+            JSONObject childNode = (JSONObject) tmp.newGetSlotPathFiller(path);
+            childNode.put("chunk-start", chunkingIndices.getLeft());
+            childNode.put("chunk-end", chunkingIndices.getRight());
         }
 
     }
@@ -125,7 +129,7 @@ public class NestedChunkingUnderstander implements SpokenLanguageUnderstander {
         Map<String, PartialUnderstandingState> partialStructures = new HashMap<>();
         PartialUnderstandingState root = new PartialUnderstandingState();
         root.structure = new JSONObject();
-        root.pathChunkingProblemMap.put("", new ChunkingProblem(utterance, SemanticsModel.parseJSON("{}"), ""));
+        root.pathChunkingProblemMap.put("", new ChunkingProblem(utterance, SemanticsModel.parseJSON("{}"), "", null));
         partialStructureDistribution.put("initial", 1.0);
         partialStructures.put("initial", root);
         int partialHypothesisNameIndex=0;
