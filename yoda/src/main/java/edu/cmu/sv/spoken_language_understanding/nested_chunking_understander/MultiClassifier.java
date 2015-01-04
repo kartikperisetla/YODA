@@ -77,7 +77,6 @@ public class MultiClassifier {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
     }
 
     public void classify(NodeMultiClassificationProblem classificationProblem) {

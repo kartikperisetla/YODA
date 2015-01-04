@@ -20,6 +20,7 @@ public class Chunker {
     public static final String serializedChunkerPreferencesFile = "src/resources/models_and_serialized_objects/serialized_chunker_preferences.srl";
 
     public static final String NO_LABEL = "~~<<< TOKEN HAS NO LABEL >>>~~";
+    public static final String UNK = "~~<<< UNK TOKEN>>>~~";
 
     static LinkedList<String> contextFeatures = new LinkedList<>();
     static LinkedList<LinkedList<String>> tokenFeatures = new LinkedList<>();
@@ -40,6 +41,21 @@ public class Chunker {
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void trainTheanoModel(){
+        ProcessBuilder processBuilder =
+                new ProcessBuilder("../slu_tools/train_chunker.py", "-t", chunkerTrainingFile, "-m", chunkerModelFile);
+        processBuilder.inheritIO(); // (so we can see theano's training progress)
+//        processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
+        try {
+            Process p = processBuilder.start();
+            System.out.println("exit status:" + p.waitFor());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -87,7 +103,10 @@ public class Chunker {
         for (List<String> tokenFeatures : sequenceFeaturesPresent){
             List<Double> tokenFeatureVector = new LinkedList<>();
             for (int i = 0; i < tokenFeatures.size(); i++) {
-                tokenFeatureVector.add((double) Chunker.tokenFeatures.get(i).indexOf(tokenFeatures.get(i)));
+                if (Chunker.tokenFeatures.get(i).contains(tokenFeatures.get(i)))
+                    tokenFeatureVector.add((double) Chunker.tokenFeatures.get(i).indexOf(tokenFeatures.get(i)));
+                else
+                    tokenFeatureVector.add((double) Chunker.tokenFeatures.get(i).indexOf(UNK));
             }
             featureVectors.add(tokenFeatureVector);
         }
@@ -99,7 +118,7 @@ public class Chunker {
         List<List<Double>> sequenceFeatureVectors = sequenceFeatureVectors(extractSequenceFeatures(chunkingProblem));
         String ans = "";
         // context features
-        ans += "[" + contextFeatureVector.stream().map(Object::toString).collect(Collectors.toList()) + "] : ";
+        ans += "[" + String.join(", ",contextFeatureVector.stream().map(Object::toString).collect(Collectors.toList())) + "] : ";
 
         // sequence features
         List<String> packedTokenStrings = new LinkedList<>();

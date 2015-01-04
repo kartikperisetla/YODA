@@ -162,6 +162,7 @@ public class TestTrainLanguageComponents {
             for (Multiset<String> counter : tokenFeatureCounter) {
                 LinkedList retainedFeatures = new LinkedList(counter.elementSet().stream().
                         filter(x -> counter.count(x) > 1).collect(Collectors.toList()));
+                retainedFeatures.add(0, Chunker.UNK);
                 tokenFeatures.add(retainedFeatures);
             }
             // retain all context features and output labels
@@ -187,6 +188,14 @@ public class TestTrainLanguageComponents {
             }
             writer.close();
         }
+
+        // train model
+        System.out.println("training theano chunker model ...");
+        Chunker.trainTheanoModel();
+        System.out.println("done training chunker model.");
+
+
+
         System.exit(0);
 
         //// write out multi-classifier preferences and training file
