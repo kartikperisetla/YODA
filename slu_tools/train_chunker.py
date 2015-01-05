@@ -1,7 +1,6 @@
 #!/usr/bin/env python 
 import sys
 import getopt
-import MultiClassifier
 import random as r
 import cPickle
 
