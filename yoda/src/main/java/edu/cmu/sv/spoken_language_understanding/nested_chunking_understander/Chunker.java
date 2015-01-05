@@ -22,9 +22,9 @@ public class Chunker {
     public static final String NO_LABEL = "~~<<< TOKEN HAS NO LABEL >>>~~";
     public static final String UNK = "~~<<< UNK TOKEN>>>~~";
 
-    static LinkedList<String> contextFeatures = new LinkedList<>();
-    static LinkedList<LinkedList<String>> tokenFeatures = new LinkedList<>();
-    static LinkedList<String> outputLabels = new LinkedList<>();
+    static LinkedList<String> contextFeatureKey = new LinkedList<>();
+    static LinkedList<String> tokenFeatureKey = new LinkedList<>();
+    static LinkedList<String> outputLabelKey = new LinkedList<>();
 
 
     public static void loadPreferences(){
@@ -32,9 +32,9 @@ public class Chunker {
             FileInputStream fileInputStream = new FileInputStream(serializedChunkerPreferencesFile);
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
             List<Object> preferences = (List<Object>) objectInputStream.readObject();
-            contextFeatures = (LinkedList<String>) preferences.get(0);
-            tokenFeatures = (LinkedList<LinkedList<String>>) preferences.get(1);
-            outputLabels = (LinkedList<String>) preferences.get(2);
+            contextFeatureKey = (LinkedList<String>) preferences.get(0);
+            tokenFeatureKey = (LinkedList<String>) preferences.get(1);
+            outputLabelKey = (LinkedList<String>) preferences.get(2);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -73,13 +73,13 @@ public class Chunker {
     public static List<Double> contextFeatureVector(Set<String> contextFeaturesPresent){
         //// assemble context feature vectors
         List<Double> ans= new LinkedList<>();
-        for (int i = 0; i < contextFeatures.size(); i++) {
-            if (contextFeaturesPresent.contains(contextFeatures.get(i)))
+        for (int i = 0; i < contextFeatureKey.size(); i++) {
+            if (contextFeaturesPresent.contains(contextFeatureKey.get(i)))
                 ans.add(1.0);
             else
                 ans.add(0.0);
         }
-        contextFeaturesPresent.removeAll(contextFeatures);
+        contextFeaturesPresent.removeAll(contextFeatureKey);
         if (contextFeaturesPresent.size()>0)
             System.out.println("WARNING: present context feature(s) not in model: "+contextFeaturesPresent);
         return ans;
@@ -99,18 +99,21 @@ public class Chunker {
     }
 
     public static List<List<Double>> sequenceFeatureVectors(List<List<String>> sequenceFeaturesPresent){
-        List<List<Double>> featureVectors = new LinkedList<>();
+        List<List<Double>> sequenceFeatureVectors = new LinkedList<>();
         for (List<String> tokenFeatures : sequenceFeaturesPresent){
             List<Double> tokenFeatureVector = new LinkedList<>();
-            for (int i = 0; i < tokenFeatures.size(); i++) {
-                if (Chunker.tokenFeatures.get(i).contains(tokenFeatures.get(i)))
-                    tokenFeatureVector.add((double) Chunker.tokenFeatures.get(i).indexOf(tokenFeatures.get(i)));
+            String wordFeature = tokenFeatures.get(0);
+            if (!tokenFeatureKey.contains(wordFeature))
+                wordFeature = UNK;
+            for (int i = 0; i < tokenFeatureKey.size(); i++) {
+                if (tokenFeatureKey.get(i).equals(wordFeature))
+                    tokenFeatureVector.add(1.0);
                 else
-                    tokenFeatureVector.add((double) Chunker.tokenFeatures.get(i).indexOf(UNK));
+                    tokenFeatureVector.add(0.0);
             }
-            featureVectors.add(tokenFeatureVector);
+            sequenceFeatureVectors.add(tokenFeatureVector);
         }
-        return featureVectors;
+        return sequenceFeatureVectors;
     }
 
     public static String packTestSample(ChunkingProblem chunkingProblem){
@@ -152,9 +155,9 @@ public class Chunker {
                     label = childLabel + "-I";
             }
 
-            if (!outputLabels.contains(label))
+            if (!outputLabelKey.contains(label))
                 throw new Error("output label not in output interpretation! Unable to pack this training sample:"+label);
-            taggingOutput.add(outputLabels.indexOf(label));
+            taggingOutput.add(outputLabelKey.indexOf(label));
         }
 
         ans += "[" + String.join(", ", taggingOutput.stream().map(Object::toString).collect(Collectors.toList())) + "]";
@@ -168,7 +171,7 @@ public class Chunker {
         List<Integer> taggingResult = new LinkedList<>();
         //todo: read generated result to tagging result
 
-        List<String> labelledResult = taggingResult.stream().map(x -> outputLabels.get(x)).collect(Collectors.toList());
+        List<String> labelledResult = taggingResult.stream().map(x -> outputLabelKey.get(x)).collect(Collectors.toList());
 
         Set<ChunkingProblem> childChunkingProblems = new HashSet<>();
         ChunkingProblem activeChild = null;

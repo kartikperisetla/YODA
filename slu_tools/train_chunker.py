@@ -2,6 +2,7 @@
 import sys
 import getopt
 import random as r
+import RecurrentNeuralNetworkModel2
 import cPickle
 
 # what fraction of the given data set should be used as validation? (approximate, sampling is random)
@@ -32,8 +33,8 @@ print model_file, training_corpus
 print "loading training data set"
 
 n_context_features = None
+n_token_features = None
 n_output_labels = 0
-sequence_feature_ranges = dict()
 training_samples = []
 validation_samples = []
 
@@ -46,27 +47,44 @@ for line in f:
     outputs = eval(outputs)
 
     if r.random() < validation_fraction:
-        validation_samples.append([context_features, sequence_feature_vectors, outputs])
+        validation_samples.append([[context_features, sequence_feature_vectors], outputs])
     else:
-        training_samples.append([context_features, sequence_feature_vectors, outputs])
+        training_samples.append([[context_features, sequence_feature_vectors], outputs])
 
     if n_context_features is None:
         n_context_features = len(context_features)
+    if n_token_features is None:
+        n_token_features = len(sequence_feature_vectors[0])
     for output in outputs:
         n_output_labels = max(n_output_labels, output+1)
     for token_feature_vector in sequence_feature_vectors:
-        for i in range(len(token_feature_vector)):
-            if i not in sequence_feature_ranges:
-                sequence_feature_ranges[i] = 0
-            sequence_feature_ranges[i] = max(sequence_feature_ranges[i], token_feature_vector[i]+1)
+        n_output_labels = max(n_output_labels, output+1)
 
 f.close()
 
 print "number of context features:", n_context_features
-print "ranges of sequence features:", sequence_feature_ranges
+print "number of token features:", n_token_features
 print "number of output labels:", n_output_labels
 print "number of samples in training set:", len(training_samples)
 print "number of samples in validation set:", len(validation_samples)
+sys.stdout.flush()
+
+print "creating RNN2 model..."
+rnn = RecurrentNeuralNetworkModel2.RecurrentNeuralNetworkModel2(
+    n_context_features,
+    n_token_features,
+    50,
+    n_output_labels,
+    5)
+
+
+print "training RNN2 model..."
+settings = {'lr': .0627142536696559,
+            'verbose': 1,
+            'decay': False,  # decay on the learning rate if improvement stops
+            'seed': 345,
+            'n_epochs': 500}
+rnn.train(zip(*training_samples), zip(*validation_samples), settings)
 
 # print "Creating multi-classifier"
 # multi_classifier = MultiClassifier.MultiClassifier(n_features, classifier_ranges)

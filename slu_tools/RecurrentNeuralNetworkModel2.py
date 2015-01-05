@@ -1,40 +1,32 @@
-# Copied from https://github.com/mesnilgr/is13 : elman.py : Jan 1, 2015
+# Initially copied from https://github.com/mesnilgr/is13 : elman.py : Jan 1, 2015
 
 import theano
 import numpy
 import time
 import sys
 import random
-import subprocess
 from theano import tensor as T
 from collections import OrderedDict
 
 
 class RecurrentNeuralNetworkModel2(object):
-    def __init__(self, dx, dc, nh, nc, cs):
-        """
-        dx :: dimension of input feature vector per token
-        dc :: dimension of the context feature vector
-        nh :: dimension of the hidden layer
-        nc :: number of classes
-        cs :: word window context size
-        """
-        self.cs = cs
+    def __init__(self, context_feature_size, token_feature_size, hidden_layer_size, n_output_classes, context_window_size):
+        self.context_window_size = context_window_size
 
         # parameters of the model
-        self.Wx = theano.shared(0.2 * numpy.random.uniform(-1.0, 1.0, (dx * cs + dc, nh)).astype(theano.config.floatX))
-        self.Wh = theano.shared(0.2 * numpy.random.uniform(-1.0, 1.0, (nh, nh)).astype(theano.config.floatX))
-        self.W = theano.shared(0.2 * numpy.random.uniform(-1.0, 1.0, (nh, nc)).astype(theano.config.floatX))
-        self.bh = theano.shared(numpy.zeros(nh, dtype=theano.config.floatX))
-        self.b = theano.shared(numpy.zeros(nc, dtype=theano.config.floatX))
-        self.h0 = theano.shared(numpy.zeros(nh, dtype=theano.config.floatX))
+        self.Wx = theano.shared(0.2 * numpy.random.uniform(-1.0, 1.0, (token_feature_size * context_window_size + context_feature_size, hidden_layer_size)).astype(theano.config.floatX))
+        self.Wh = theano.shared(0.2 * numpy.random.uniform(-1.0, 1.0, (hidden_layer_size, hidden_layer_size)).astype(theano.config.floatX))
+        self.W = theano.shared(0.2 * numpy.random.uniform(-1.0, 1.0, (hidden_layer_size, n_output_classes)).astype(theano.config.floatX))
+        self.bh = theano.shared(numpy.zeros(hidden_layer_size, dtype=theano.config.floatX))
+        self.b = theano.shared(numpy.zeros(n_output_classes, dtype=theano.config.floatX))
+        self.h0 = theano.shared(numpy.zeros(hidden_layer_size, dtype=theano.config.floatX))
 
         # bundle
         self.params = [self.Wx, self.Wh, self.W, self.bh, self.b, self.h0]
         self.names = ['Wx', 'Wh', 'W', 'bh', 'b', 'h0']
 
         # x is the token features from the window
-        x = T.dmatrix('x')
+        x = T.imatrix('x')
         y = T.iscalar('y')
 
         def recurrence(x_t, h_tm1):
@@ -45,7 +37,7 @@ class RecurrentNeuralNetworkModel2(object):
         [h, s], _ = theano.scan(fn=recurrence, sequences=x, outputs_info=[self.h0, None], n_steps=x.shape[0])
         p_y_given_x_lastword = s[-1, 0, :]
         p_y_given_x_sentence = s[:, 0, :]
-        y_pred = T.argmax(p_y_given_x_sentence, axis=1)
+        y_prediction = T.argmax(p_y_given_x_sentence, axis=1)
 
         # cost and gradients and learning rate
         learning_rate = T.scalar('lr')
@@ -54,14 +46,23 @@ class RecurrentNeuralNetworkModel2(object):
         updates = OrderedDict(( p, p - learning_rate * g ) for p, g in zip(self.params, gradients))
 
         # theano functions
-        self.classify = theano.function(inputs=[x], outputs=y_pred)
+        self.classify = theano.function(inputs=[x], outputs=y_prediction)
         self.sentence_train = theano.function(inputs=[x, y, learning_rate],
                                               outputs=nll,
                                               updates=updates)
 
+    def feature_vector_sequence(self, context_features, token_features):
+        """
+        Generate the RNN input from token features and context features
+        """
+        x = [context_features + windowed_token_feature_vector
+             for windowed_token_feature_vector in context_window(token_features, self.context_window_size)]
+        return x
+
     def predict(self, token_features, context_features):
-        x = context_window(token_features, self.cs) + context_features
-        return self.classify(numpy.asarray(x).astype('int32'))
+        return self.classify(numpy.asarray(
+            self.feature_vector_sequence(token_features, context_features)).
+                             astype('int32'))
 
     def train(self, train_set, valid_set, settings):
         # train with early stopping on validation set
@@ -74,24 +75,28 @@ class RecurrentNeuralNetworkModel2(object):
         best_accuracy = -1
         settings['current_learning_rate'] = settings['lr']
         for e in xrange(settings['n_epochs']):
-            # shuffle
-            shuffle([x_train, y_train], settings['seed'])
+            print "starting epoch:", e
             settings['current_epoch'] = e
             tic = time.time()
-            for i in xrange(n_training_sentences):
-                context_words = context_window(x_train[i], settings['win'])
-                words = map(lambda x: numpy.asarray(x).astype('int32'), mini_batch(context_words, settings['bs']))
+            for i in random.sample(range(n_training_sentences), n_training_sentences):
+                print x_train[i]
+                utterance_features = numpy.asarray(self.feature_vector_sequence(x_train[i][0], x_train[i][1])).astype('int32')
                 labels = y_train[i]
-                for word_batch, label_last_word in zip(words, labels):
-                    self.sentence_train(word_batch, label_last_word, settings['current_learning_rate'])
-                if settings['verbose']:
-                    print '[learning] epoch %i >> %2.2f%%' % (
-                        e, (i + 1) * 100. / n_training_sentences), 'completed in %.2f (sec) <<\r' % (time.time() - tic),
-                    sys.stdout.flush()
+
+                print "utterance features shape:", utterance_features.shape
+                print "labels:", y_train[i]
+                sys.stdout.flush()
+
+                for token_input_feature, token_output_label in zip(utterance_features, labels):
+                    self.sentence_train(token_input_feature, token_output_label, settings['current_learning_rate'])
+            # if settings['verbose']:
+            #     print '[learning] epoch %i >> %2.2f%%' % (
+            #         e, (i + 1) * 100. / n_training_sentences), 'completed in %.2f (sec) <<\r' % (time.time() - tic),
+            #     sys.stdout.flush()
 
             # evaluation
-            predictions_valid = [self.classify(numpy.asarray(context_window(x, settings['win'])).astype('int32'))
-                                 for x in x_validate]
+            predictions_valid = [self.classify(numpy.asarray(self.feature_vector_sequence(token_features, context_features)).astype('int32'))
+                                 for [token_features, context_features] in x_validate]
 
             validation_accuracy = numpy.mean(
                 [evaluate_tagging(predictions_valid[k], y_validate[k]) for k in range(len(predictions_valid))])
@@ -137,7 +142,7 @@ def shuffle(lol, seed):
 
 def mini_batch(l, bs):
     """
-    l :: list of word idxs
+    l :: list of items
     return a list of minibatches of indexes
     which size is equal to bs
     border cases are treated as follow:

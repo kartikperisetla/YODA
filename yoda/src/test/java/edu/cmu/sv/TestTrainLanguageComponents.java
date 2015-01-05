@@ -3,7 +3,6 @@ package edu.cmu.sv;
 import com.google.common.collect.*;
 import edu.cmu.sv.natural_language_generation.CorpusGeneration;
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.spoken_language_understanding.Tokenizer;
 import edu.cmu.sv.spoken_language_understanding.nested_chunking_understander.Chunker;
 import edu.cmu.sv.spoken_language_understanding.nested_chunking_understander.ChunkingProblem;
 import edu.cmu.sv.spoken_language_understanding.nested_chunking_understander.MultiClassifier;
@@ -29,7 +28,7 @@ public class TestTrainLanguageComponents {
     @Test
     public void Test() throws FileNotFoundException, UnsupportedEncodingException {
         Multiset<String> featureCounter = HashMultiset.create();
-        List<Multiset<String>> tokenFeatureCounter = new LinkedList<>();
+        Multiset<String> vocabularyCounter = HashMultiset.create();
         LinkedList<String> chunkingOutputLabels = new LinkedList<>(Arrays.asList(Chunker.NO_LABEL));
         LinkedList<String> chunkingContextFeatures = new LinkedList<>();
         HashMap<String, LinkedList<String>> classificationVariablesAndRanges = new HashMap<>();
@@ -85,13 +84,8 @@ public class TestTrainLanguageComponents {
                             chunkingIndices);
 
                     List<List<String>> sequenceFeatures = Chunker.extractSequenceFeatures(chunkingProblem);
-                    for (List<String> tokenFeatures : sequenceFeatures) {
-                        for (int j = 0; j < tokenFeatures.size(); j++) {
-                            if (tokenFeatureCounter.size() < j + 1)
-                                tokenFeatureCounter.add(HashMultiset.create());
-                            tokenFeatureCounter.get(j).add(tokenFeatures.get(j));
-                        }
-                    }
+                    sequenceFeatures.forEach(vocabularyCounter::addAll);
+
                     Chunker.extractContextFeatures(chunkingProblem).stream().
                             filter(contextFeature -> !chunkingContextFeatures.contains(contextFeature)).
                             forEach(chunkingContextFeatures::add);
@@ -158,13 +152,10 @@ public class TestTrainLanguageComponents {
         //// write out chunker preferences and training file
         {
             // select chunking features from those that were seen
-            LinkedList<LinkedList<String>> tokenFeatures = new LinkedList<>();
-            for (Multiset<String> counter : tokenFeatureCounter) {
-                LinkedList retainedFeatures = new LinkedList(counter.elementSet().stream().
-                        filter(x -> counter.count(x) > 1).collect(Collectors.toList()));
-                retainedFeatures.add(0, Chunker.UNK);
-                tokenFeatures.add(retainedFeatures);
-            }
+            LinkedList<String> retainedVocabulary = new LinkedList(vocabularyCounter.elementSet().stream().
+                    filter(x -> vocabularyCounter.count(x) > 1).collect(Collectors.toList()));
+            retainedVocabulary.add(0, Chunker.UNK);
+
             // retain all context features and output labels
 
             // write out chunking preferences
@@ -172,7 +163,7 @@ public class TestTrainLanguageComponents {
                 ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(Chunker.serializedChunkerPreferencesFile));
                 out.writeObject(new ArrayList<>(Arrays.asList(
                         chunkingContextFeatures,
-                        (Serializable) tokenFeatures,
+                        retainedVocabulary,
                         chunkingOutputLabels)));
                 out.close();
             } catch (IOException e) {
