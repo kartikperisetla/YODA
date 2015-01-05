@@ -73,7 +73,7 @@ print "creating RNN2 model..."
 rnn = RecurrentNeuralNetworkModel2.RecurrentNeuralNetworkModel2(
     n_context_features,
     n_token_features,
-    50,
+    30,
     n_output_labels,
     5)
 
@@ -83,7 +83,7 @@ settings = {'lr': .0627142536696559,
             'verbose': 1,
             'decay': False,  # decay on the learning rate if improvement stops
             'seed': 345,
-            'n_epochs': 500}
+            'n_epochs': 30}
 rnn.train(zip(*training_samples), zip(*validation_samples), settings)
 
 # print "Creating multi-classifier"
