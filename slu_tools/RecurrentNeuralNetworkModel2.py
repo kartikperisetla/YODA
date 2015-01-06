@@ -51,7 +51,8 @@ class RecurrentNeuralNetworkModel2(object):
 
         # cost and gradients and learning rate
         learning_rate = T.scalar('lr')
-        nll = -T.mean(T.log(p_y_given_x_last_word)[y])
+        nll = -T.mean(T.log(p_y_given_x_sentence)
+                               [T.arange(x.shape[0]), y])
         gradients = T.grad(nll, self.params)
         updates = OrderedDict((p, p - learning_rate * g) for p, g in zip(self.params, gradients))
 
