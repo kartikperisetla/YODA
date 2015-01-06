@@ -43,7 +43,7 @@ public class CorpusGeneration {
         int numPOIs = 0;
         for (String uri : yodaEnvironment.db.runQuerySelectX(poiSelectionQuery)) {
             numPOIs ++;
-            if (numPOIs > 30)
+            if (numPOIs > 100)
                 break;
 
             // Generate YNQ for HasProperty where a PP is the property
@@ -59,7 +59,7 @@ public class CorpusGeneration {
                     if (Preposition.class.isAssignableFrom(absoluteQualityDegreeClass)) {
                         // get 3 example URIs
                         Object[] childURIs = yodaEnvironment.nlg.randomData.nextSample(yodaEnvironment.db.runQuerySelectX(poiSelectionQuery), 3);
-                        for (int i = 0; i < 3; i++) {
+                        for (int i = 0; i < 1; i++) {
 
                             SemanticsModel ex0 = new SemanticsModel(YNQBaseString);
                             ex0.extendAndOverwriteAtPoint("verb." + Agent.class.getSimpleName(),
@@ -104,7 +104,7 @@ public class CorpusGeneration {
                     if (Preposition.class.isAssignableFrom(absoluteQualityDegreeClass)) {
                         // get 3 example URIs
                         Object[] childURIs = yodaEnvironment.nlg.randomData.nextSample(yodaEnvironment.db.runQuerySelectX(poiSelectionQuery), 3);
-                        for (int i = 0; i < 3; i++) {
+                        for (int i = 0; i < 1; i++) {
 
                             SemanticsModel ex0 = new SemanticsModel(WHQBaseString);
                             ex0.extendAndOverwriteAtPoint("verb." + Agent.class.getSimpleName(),
@@ -145,4 +145,12 @@ public class CorpusGeneration {
         }
         return ans;
     }
+
+    public static Map<String, SemanticsModel> generateCorpus2(){
+        // create a yoda environment
+        // iterate through system actions
+        // generate best for that action
+        return null;
+    }
+
 }

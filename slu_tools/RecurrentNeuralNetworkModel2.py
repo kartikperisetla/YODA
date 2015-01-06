@@ -17,35 +17,38 @@ class RecurrentNeuralNetworkModel2(object):
 
         # parameters of the model
         self.Wx = theano.shared(0.2 * numpy.random.uniform(-1.0, 1.0, (
-            token_feature_size * context_window_size + context_feature_size, hidden_layer_size)).astype(
+            token_feature_size * context_window_size, hidden_layer_size)).astype(
             theano.config.floatX))
         self.Wh = theano.shared(
             0.2 * numpy.random.uniform(-1.0, 1.0, (hidden_layer_size, hidden_layer_size)).astype(theano.config.floatX))
         self.W = theano.shared(
             0.2 * numpy.random.uniform(-1.0, 1.0, (hidden_layer_size, n_output_classes)).astype(theano.config.floatX))
+        self.Wc = theano.shared(
+            0.2 * numpy.random.uniform(-1.0, 1.0, (context_feature_size, n_output_classes)).astype(theano.config.floatX))
         self.bh = theano.shared(numpy.zeros(hidden_layer_size, dtype=theano.config.floatX))
         self.b = theano.shared(numpy.zeros(n_output_classes, dtype=theano.config.floatX))
         self.h0 = theano.shared(numpy.zeros(hidden_layer_size, dtype=theano.config.floatX))
 
         # bundle
-        self.params = [self.Wx, self.Wh, self.W, self.bh, self.b, self.h0]
-        self.names = ['Wx', 'Wh', 'W', 'bh', 'b', 'h0']
+        self.params = [self.Wx, self.Wh, self.W, self.Wc, self.bh, self.b, self.h0]
+        self.names = ['Wx', 'Wh', 'W', 'Wc', 'bh', 'b', 'h0']
 
         # x is the token features from the window
         x = T.matrix('x', dtype=theano.config.floatX)
         y = T.ivector('y')
+        cx = T.vector('cx', dtype=theano.config.floatX)
 
-        def recurrence(x_t, h_tm1):
+        def recurrence(x_t, h_tm1, sentence_cx):
             h_t = T.nnet.sigmoid(T.dot(x_t, self.Wx) + T.dot(h_tm1, self.Wh) + self.bh)
-            s_t = T.nnet.softmax(T.dot(h_t, self.W) + self.b)
+            s_t = T.nnet.softmax(T.dot(sentence_cx, self.Wc) + T.dot(h_t, self.W) + self.b)
             return [h_t, s_t]
 
         [hidden_state, output_state], updates_dont_care = theano.scan(fn=recurrence,
                                                                       sequences=x,
+                                                                      non_sequences=cx,
                                                                       outputs_info=[self.h0, None],
                                                                       n_steps=x.shape[0])
 
-        p_y_given_x_last_word = output_state[-1, 0, :]
         p_y_given_x_sentence = output_state[:, 0, :]
         y_prediction = T.argmax(p_y_given_x_sentence, axis=1)
 
@@ -57,21 +60,23 @@ class RecurrentNeuralNetworkModel2(object):
         updates = OrderedDict((p, p - learning_rate * g) for p, g in zip(self.params, gradients))
 
         # theano functions
-        self.classify = theano.function(inputs=[x], outputs=y_prediction)
-        self.sentence_train = theano.function(inputs=[x, y, learning_rate],
+        self.classify = theano.function(inputs=[cx, x], outputs=y_prediction)
+        self.sentence_train = theano.function(inputs=[cx, x, y, learning_rate],
                                               outputs=nll,
                                               updates=updates)
 
-    def feature_vector_sequence(self, context_features, token_features):
+    def sentence_features(self, context_features, token_features):
         """
         Generate the RNN input from token features and context features
         """
-        x = [context_features + windowed_token_feature_vector
-             for windowed_token_feature_vector in context_window(token_features, self.context_window_size)]
-        return numpy.asarray(x).astype(dtype=theano.config.floatX)
+        # context_appended_features = [context_features + windowed_token_feature_vector
+        #      for windowed_token_feature_vector in context_window(token_features, self.context_window_size)]
+        # return numpy.asarray(context_appended_features).astype(dtype=theano.config.floatX)
+        return [numpy.asarray(context_features, dtype=theano.config.floatX),
+                numpy.asarray(context_window(token_features, self.context_window_size), dtype=theano.config.floatX)]
 
     def predict(self, context_features, token_features):
-        return self.classify(self.feature_vector_sequence(context_features, token_features))
+        return self.classify(*self.sentence_features(context_features, token_features))
 
     def train(self, train_set, valid_set, settings):
         # train with early stopping on validation set
@@ -91,16 +96,16 @@ class RecurrentNeuralNetworkModel2(object):
             nll = 0
             for i in random.sample(range(n_training_sentences), n_training_sentences):
                 # print x_train[i]
-                utterance_features = self.feature_vector_sequence(x_train[i][0], x_train[i][1])
+                utterance_features = self.sentence_features(x_train[i][0], x_train[i][1])
                 labels = y_train[i]
 
                 # print "utterance features shape:", utterance_features.shape
                 # print "labels:", y_train[i]
                 # sys.stdout.flush()
-                nll += self.sentence_train(utterance_features, labels, settings['current_learning_rate'])
+                nll += self.sentence_train(utterance_features[0], utterance_features[1], labels, settings['current_learning_rate'])
 
             print "training set nll:", nll
-            predictions_valid = [self.classify(self.feature_vector_sequence(token_features, context_features))
+            predictions_valid = [self.classify(*self.sentence_features(token_features, context_features))
                                  for [token_features, context_features] in x_validate]
 
             validation_accuracy = numpy.mean(

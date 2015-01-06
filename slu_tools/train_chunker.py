@@ -75,7 +75,7 @@ rnn = RecurrentNeuralNetworkModel2.RecurrentNeuralNetworkModel2(
     n_token_features,
     30,
     n_output_labels,
-    3)
+    9)
 
 # 'lr': .0627142536696559,
 for learning_rate in [.04]:  # [.01, .02, .03, .04, .05, .08, .1, .2]:
