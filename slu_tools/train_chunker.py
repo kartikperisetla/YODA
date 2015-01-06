@@ -83,16 +83,8 @@ settings = {'lr': .0627142536696559,
             'verbose': 1,
             'decay': False,  # decay on the learning rate if improvement stops
             'seed': 345,
-            'n_epochs': 30}
-rnn.train(zip(*training_samples), zip(*validation_samples), settings)
+            'n_epochs': 30,
+            'outfile': model_file}
 
-# print "Creating multi-classifier"
-# multi_classifier = MultiClassifier.MultiClassifier(n_features, classifier_ranges)
-# print "Starting training:"
-# multi_classifier.train(training_samples, validation_samples)
-# print "Done training multi-classifier."
-#
-# print "saving model file"
-# f = open(model_file, 'wb')
-# cPickle.dump(multi_classifier, f, protocol=cPickle.HIGHEST_PROTOCOL)
-# f.close()
+# file saves at best points throughout training
+rnn.train(zip(*training_samples), zip(*validation_samples), settings)

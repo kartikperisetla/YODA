@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
  * Created by David Cohen on 12/29/14.
  */
 public class Chunker {
-    public static final String chunkerModelFile = "src/resources/corpora/chunker.model";
     public static final String chunkerTrainingFile = "src/resources/corpora/chunker_training_file.txt";
     public static final String serializedChunkerPreferencesFile = "src/resources/models_and_serialized_objects/serialized_chunker_preferences.srl";
+    public static final String chunkerModelFile = "src/resources/models_and_serialized_objects/chunker.model";
 
     public static final String NO_LABEL = "~~<<< TOKEN HAS NO LABEL >>>~~";
     public static final String UNK = "~~<<< UNK TOKEN>>>~~";

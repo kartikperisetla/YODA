@@ -5,6 +5,7 @@ import numpy
 import time
 import sys
 import random
+import cPickle
 from theano import tensor as T
 from collections import OrderedDict
 
@@ -113,6 +114,9 @@ class RecurrentNeuralNetworkModel2(object):
                 if settings['verbose']:
                     print 'NEW BEST: epoch', e, 'validation accuracy', validation_accuracy
                 settings['best_epoch'] = e
+                f = open(settings['outfile'], 'wb')
+                cPickle.dump(self, f, protocol=cPickle.HIGHEST_PROTOCOL)
+                f.close()
 
             # learning rate decay if no improvement in 10 epochs
             if settings['decay'] and abs(settings['best_epoch'] - settings['current_epoch']) >= 10:
