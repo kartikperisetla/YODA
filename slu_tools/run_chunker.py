@@ -14,7 +14,7 @@ except getopt.GetoptError:
 
 for opt, arg in opts:
     if opt == '-h':
-        print 'test.py -m <model>'
+        print 'run_chunker.py -m <model>'
         sys.exit()
     elif opt in ("-m", "--model"):
         model_file = arg

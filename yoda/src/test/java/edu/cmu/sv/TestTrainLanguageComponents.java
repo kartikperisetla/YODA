@@ -197,7 +197,7 @@ public class TestTrainLanguageComponents {
 
 
 
-        System.exit(0);
+//        System.exit(0);
 
         //// write out multi-classifier preferences and training file
         {

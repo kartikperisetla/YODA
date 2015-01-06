@@ -19,21 +19,21 @@ import java.util.stream.Collectors;
 public class TestLanguageComponents {
     @Test
     public void Test() throws FileNotFoundException, UnsupportedEncodingException {
-//        MultiClassifier.loadPreferences();
-//        MultiClassifier classifier = new MultiClassifier();
-//
-//        classifyDialogAct(classifier, "is red rock expensive");
-//        classifyDialogAct(classifier, "where is red rock");
-//        classifyDialogAct(classifier, "the church on castro street");
-//        classifyDialogAct(classifier, "give me directions");
-
-
+        MultiClassifier.loadPreferences();
+        MultiClassifier classifier = new MultiClassifier();
         Chunker.loadPreferences();
         Chunker chunker = new Chunker();
+
+        classifyDialogAct(classifier, "is red rock expensive");
+        classifyDialogAct(classifier, "where is red rock");
 
         chunkUtterance(chunker, "is Starbucks expensive");
         chunkUtterance(chunker, "is the restaurant near to hollywood");
         chunkUtterance(chunker, "the church near mcdonalds");
+
+        classifyDialogAct(classifier, "the church on castro street");
+        classifyDialogAct(classifier, "give me directions");
+
         chunkUtterance(chunker, "give me directions");
         chunkUtterance(chunker, "how close to red rock is moffett field");
         chunkUtterance(chunker, "how close is red rock to moffett field");

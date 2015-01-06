@@ -22,29 +22,9 @@ public class MultiClassifier {
     static HashMap<String, Integer> featurePositionMap = new HashMap<>();
     static HashMap<String, LinkedList<String>> outputInterpretation;
 
-    Process theanoSubProcess;
-    InputStreamReader stdoutInputStreamReader;
-    BufferedReader stdoutBufferedReader;
-
-    public MultiClassifier(){
-        ProcessBuilder processBuilder =
-                new ProcessBuilder("../slu_tools/run_classifier.py", "-m", classifierModelFile);
-        processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
-
-        try {
-            System.out.println("launching theano...");
-            theanoSubProcess = processBuilder.start();
-            stdoutInputStreamReader = new InputStreamReader(theanoSubProcess.getInputStream());
-            stdoutBufferedReader = new BufferedReader(stdoutInputStreamReader);
-
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(stdoutBufferedReader.readLine());
-            System.out.println("theano message:" + stringBuilder.toString());
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+    public MultiClassifier() {
+        if (!ExternalModelManager.running)
+            ExternalModelManager.startTheano();
     }
 
     public static void loadPreferences(){
@@ -80,45 +60,33 @@ public class MultiClassifier {
     }
 
     public void classify(NodeMultiClassificationProblem classificationProblem) {
-        String theanoString = packTestSample(classificationProblem)+"\n";
-        try {
-            theanoSubProcess.getOutputStream().write(theanoString.getBytes());
-            theanoSubProcess.getOutputStream().flush();
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(stdoutBufferedReader.readLine());
-            System.out.println("string returned from subprocess:" + stringBuilder.toString());
+        String theanoString = packTestSample(classificationProblem) + "\n";
+        String result = ExternalModelManager.runModel("multiclassifier%" + theanoString);
 
-            Map<String, Object> outputRolesAndFillers = new HashMap<>();
+        Map<String, Object> outputRolesAndFillers = new HashMap<>();
 
-            // parse response from theano
-            Pattern multiResultPattern= Pattern.compile("\\{(\\d+: \\[\\[.+\\]\\], )*(\\d+: \\[\\[.+\\]\\])\\}");
-            Matcher m = multiResultPattern.matcher(stringBuilder.toString());
-            if (! m.matches())
+        // parse response from theano
+        Pattern multiResultPattern = Pattern.compile("\\{(\\d+: \\[\\[.+\\]\\], )*(\\d+: \\[\\[.+\\]\\])\\}");
+        Matcher m = multiResultPattern.matcher(result);
+        if (!m.matches())
+            throw new Error("Error: can't parse classification program's response");
+
+        for (int i = 1; i <= m.groupCount(); i++) {
+            String individualResultString = m.group(i);
+            Pattern individualResultPattern = Pattern.compile("(\\d+): \\[\\[(.+)\\]\\](, |)");
+            Matcher m2 = individualResultPattern.matcher(individualResultString);
+            if (!m2.matches())
                 throw new Error("Error: can't parse classification program's response");
-
-            for (int i = 1; i <= m.groupCount(); i++) {
-                String individualResultString = m.group(i);
-                Pattern individualResultPattern = Pattern.compile("(\\d+): \\[\\[(.+)\\]\\](, |)");
-                Matcher m2 = individualResultPattern.matcher(individualResultString);
-                if (! m2.matches())
-                    throw new Error("Error: can't parse classification program's response");
-                String classNumber = m2.group(1);
-                String classLabel = outputInterpretation.keySet().stream().sorted().collect(Collectors.toList()).get(Integer.parseInt(classNumber));
-                List<Double> values = Arrays.asList(m2.group(2).split(", ")).
-                        stream().map(Double::parseDouble).collect(Collectors.toList());
-                int maxIndex = values.indexOf(values.stream().max(Doubles::compare).orElse(-1.0));
-                outputRolesAndFillers.put(
-                        classLabel,
-                        outputInterpretation.get(classLabel).get(maxIndex));
-            }
-            System.out.println(outputRolesAndFillers);
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
+            String classNumber = m2.group(1);
+            String classLabel = outputInterpretation.keySet().stream().sorted().collect(Collectors.toList()).get(Integer.parseInt(classNumber));
+            List<Double> values = Arrays.asList(m2.group(2).split(", ")).
+                    stream().map(Double::parseDouble).collect(Collectors.toList());
+            int maxIndex = values.indexOf(values.stream().max(Doubles::compare).orElse(-1.0));
+            outputRolesAndFillers.put(
+                    classLabel,
+                    outputInterpretation.get(classLabel).get(maxIndex));
         }
-        //todo: parse generated result
-
+        System.out.println(outputRolesAndFillers);
     }
 
     public static String packTestSample(NodeMultiClassificationProblem classificationProblem){
