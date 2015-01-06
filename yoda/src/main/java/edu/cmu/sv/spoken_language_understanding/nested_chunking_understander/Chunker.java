@@ -4,11 +4,10 @@ import edu.cmu.sv.spoken_language_understanding.Tokenizer;
 import edu.cmu.sv.utils.StringDistribution;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -26,6 +25,30 @@ public class Chunker {
     static LinkedList<String> tokenFeatureKey = new LinkedList<>();
     static LinkedList<String> outputLabelKey = new LinkedList<>();
 
+    Process theanoSubProcess;
+    InputStreamReader stdoutInputStreamReader;
+    BufferedReader stdoutBufferedReader;
+
+    public Chunker(){
+        ProcessBuilder processBuilder =
+                new ProcessBuilder("../slu_tools/run_chunker.py", "-m", chunkerModelFile);
+        processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
+
+        try {
+            System.out.println("launching theano...");
+            theanoSubProcess = processBuilder.start();
+            stdoutInputStreamReader = new InputStreamReader(theanoSubProcess.getInputStream());
+            stdoutBufferedReader = new BufferedReader(stdoutInputStreamReader);
+
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(stdoutBufferedReader.readLine());
+            System.out.println("theano message:" + stringBuilder.toString());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 
     public static void loadPreferences(){
         try {
@@ -64,7 +87,7 @@ public class Chunker {
         //// collect context features
         Set<String> featuresPresent = new HashSet();
         String[] fillerPath = chunkingProblem.contextPathInStructure.split("\\.");
-        for (int i = 0; i < fillerPath.length; i++) {
+        for (int i = Integer.max(fillerPath.length - 2, 0); i < fillerPath.length; i++) {
             featuresPresent.add("NodeContext: " + (fillerPath.length - i) + ", " + fillerPath[i]);
         }
         return featuresPresent;
@@ -167,52 +190,72 @@ public class Chunker {
     public void chunk(ChunkingProblem chunkingProblem) {
         String theanoString = packTestSample(chunkingProblem)+"\n";
 
-        //todo: run model given input
-        List<Integer> taggingResult = new LinkedList<>();
-        //todo: read generated result to tagging result
 
-        List<String> labelledResult = taggingResult.stream().map(x -> outputLabelKey.get(x)).collect(Collectors.toList());
+        try {
+//            System.out.println("writing packed test sample:" + theanoString);
+            theanoSubProcess.getOutputStream().write(theanoString.getBytes());
+            theanoSubProcess.getOutputStream().flush();
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(stdoutBufferedReader.readLine());
+            System.out.println("string returned from subprocess:" + stringBuilder.toString());
 
-        Set<ChunkingProblem> childChunkingProblems = new HashSet<>();
-        ChunkingProblem activeChild = null;
-        Integer currentStartingIndex = null;
-        String currentChunkLabel = null;
-        for (int i = 0; i < labelledResult.size(); i++) {
-            if (labelledResult.get(i).equals(NO_LABEL)){
-                if (activeChild!=null){
-                    activeChild.chunkingIndices = new ImmutablePair<>(currentStartingIndex, i-1);
-                    activeChild = null;
-                }
-            } else {
-                String chunkLabel = labelledResult.get(i).substring(0, labelledResult.get(i).length()-2);
-                if (labelledResult.get(i).endsWith("-B") ||
-                        (labelledResult.get(i).endsWith("-I") && (activeChild==null || !chunkLabel.equals(currentChunkLabel)))) {
+            Pattern itemInListPattern = Pattern.compile("\\d+(, )?");
+            Matcher m = itemInListPattern.matcher(stringBuilder.toString());
+//            if (! m.matches())
+//                throw new Error("Error: can't parse classification program's response");
+            List<Integer> taggingResult = new LinkedList<>();
+            while (m.find()){
+                String grp = m.group();
+                taggingResult.add(Integer.parseInt(grp.replace(",", "").replace(" ", "")));
+            }
+
+            List<String> labelledResult = taggingResult.stream().map(x -> outputLabelKey.get(x)).collect(Collectors.toList());
+            System.out.println("labelled result:" + labelledResult);
+
+            Set<ChunkingProblem> childChunkingProblems = new HashSet<>();
+            ChunkingProblem activeChild = null;
+            Integer currentStartingIndex = null;
+            String currentChunkLabel = null;
+            for (int i = 0; i < labelledResult.size(); i++) {
+                if (labelledResult.get(i).equals(NO_LABEL)) {
                     if (activeChild != null) {
                         activeChild.chunkingIndices = new ImmutablePair<>(currentStartingIndex, i - 1);
+                        activeChild = null;
                     }
-                    currentStartingIndex = i;
-                    String childContextPath = chunkLabel;
-                    if (!chunkingProblem.contextPathInStructure.equals(""))
-                        childContextPath = chunkingProblem.contextPathInStructure + "." + childContextPath;
-                    activeChild = new ChunkingProblem(
-                            chunkingProblem.fullUtterance,
-                            chunkingProblem.surroundingStructure,
-                            childContextPath,
-                            new ImmutablePair<>(0, 0));
-                    childChunkingProblems.add(activeChild);
+                } else {
+                    String chunkLabel = labelledResult.get(i).substring(0, labelledResult.get(i).length() - 2);
+                    if (labelledResult.get(i).endsWith("-B") ||
+                            (labelledResult.get(i).endsWith("-I") && (activeChild == null || !chunkLabel.equals(currentChunkLabel)))) {
+                        if (activeChild != null) {
+                            activeChild.chunkingIndices = new ImmutablePair<>(currentStartingIndex, i - 1);
+                        }
+                        currentStartingIndex = i;
+                        String childContextPath = chunkLabel;
+                        if (!chunkingProblem.contextPathInStructure.equals(""))
+                            childContextPath = chunkingProblem.contextPathInStructure + "." + childContextPath;
+                        activeChild = new ChunkingProblem(
+                                chunkingProblem.fullUtterance,
+                                null,
+                                childContextPath,
+                                new ImmutablePair<>(0, 0));
+                        childChunkingProblems.add(activeChild);
+                    }
+                    currentChunkLabel = chunkLabel;
                 }
-                currentChunkLabel = chunkLabel;
             }
-        }
-        if (activeChild!=null)
-            activeChild.chunkingIndices = new ImmutablePair<>(currentStartingIndex, labelledResult.size()-1);
+            if (activeChild != null)
+                activeChild.chunkingIndices = new ImmutablePair<>(currentStartingIndex, labelledResult.size() - 1);
 
-        String hypothesisID = "chunkingHyp0";
-        StringDistribution outputDistribution = new StringDistribution();
-        outputDistribution.put(hypothesisID, 1.0);
-        Map<String, Set<ChunkingProblem>> outputChildChunkingProblems = new HashMap<>();
-        outputChildChunkingProblems.put(hypothesisID, childChunkingProblems);
-        chunkingProblem.outputDistribution = outputDistribution;
-        chunkingProblem.outputChildChunkingProblems = outputChildChunkingProblems;
+            String hypothesisID = "chunkingHyp0";
+            StringDistribution outputDistribution = new StringDistribution();
+            outputDistribution.put(hypothesisID, 1.0);
+            Map<String, Set<ChunkingProblem>> outputChildChunkingProblems = new HashMap<>();
+            outputChildChunkingProblems.put(hypothesisID, childChunkingProblems);
+            chunkingProblem.outputDistribution = outputDistribution;
+            chunkingProblem.outputChildChunkingProblems = outputChildChunkingProblems;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

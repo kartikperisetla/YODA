@@ -56,9 +56,9 @@ for line in f:
     if n_token_features is None:
         n_token_features = len(sequence_feature_vectors[0])
     for output in outputs:
-        n_output_labels = max(n_output_labels, output+1)
+        n_output_labels = max(n_output_labels, output + 1)
     for token_feature_vector in sequence_feature_vectors:
-        n_output_labels = max(n_output_labels, output+1)
+        n_output_labels = max(n_output_labels, output + 1)
 
 f.close()
 
@@ -73,18 +73,19 @@ print "creating RNN2 model..."
 rnn = RecurrentNeuralNetworkModel2.RecurrentNeuralNetworkModel2(
     n_context_features,
     n_token_features,
-    30,
+    50,
     n_output_labels,
-    5)
+    3)
 
+# 'lr': .0627142536696559,
+for learning_rate in [.05]:  # [.01, .02, .03, .04, .05, .08, .1, .2]:
+    print "training RNN2 model, learning rate:", learning_rate
+    settings = {'lr': learning_rate,
+                'verbose': 1,
+                'decay': False,  # decay on the learning rate if improvement stops
+                'seed': 345,
+                'n_epochs': 30,
+                'outfile': model_file}
 
-print "training RNN2 model..."
-settings = {'lr': .0627142536696559,
-            'verbose': 1,
-            'decay': False,  # decay on the learning rate if improvement stops
-            'seed': 345,
-            'n_epochs': 30,
-            'outfile': model_file}
-
-# file saves at best points throughout training
-rnn.train(zip(*training_samples), zip(*validation_samples), settings)
+    # file saves at best points throughout training
+    rnn.train(zip(*training_samples), zip(*validation_samples), settings)

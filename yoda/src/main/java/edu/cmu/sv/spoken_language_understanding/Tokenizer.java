@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class Tokenizer {
     public static List<String> tokenize(String inputString){
-        String[] tmp = inputString.split(" ");
+        String[] tmp = inputString.toLowerCase().split(" ");
         return new LinkedList<>(Arrays.asList(tmp));
     }
 }

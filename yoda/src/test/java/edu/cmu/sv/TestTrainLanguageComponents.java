@@ -153,7 +153,7 @@ public class TestTrainLanguageComponents {
         {
             // select chunking features from those that were seen
             LinkedList<String> retainedVocabulary = new LinkedList(vocabularyCounter.elementSet().stream().
-                    filter(x -> vocabularyCounter.count(x) > 1).collect(Collectors.toList()));
+                    filter(x -> vocabularyCounter.count(x) > 45).collect(Collectors.toList()));
             retainedVocabulary.add(0, Chunker.UNK);
 
             // retain all context features and output labels

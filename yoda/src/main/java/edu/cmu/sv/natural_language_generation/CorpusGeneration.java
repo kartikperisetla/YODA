@@ -43,7 +43,7 @@ public class CorpusGeneration {
         int numPOIs = 0;
         for (String uri : yodaEnvironment.db.runQuerySelectX(poiSelectionQuery)) {
             numPOIs ++;
-            if (numPOIs > 10)
+            if (numPOIs > 30)
                 break;
 
             // Generate YNQ for HasProperty where a PP is the property

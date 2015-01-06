@@ -20,12 +20,19 @@ public class ChunkingProblem {
     String fullUtterance;
     Pair<Integer, Integer> chunkingIndices;
 
+    /*
+    * How ChunkingProblem gets initialized in different situations:
+    *
+    * Parsing a result:
+    *  - set surroundingStructure <- null
+    * */
     public ChunkingProblem(String fullUtteranceText, JSONObject surroundingStructure, String contextPathInStructure, Pair<Integer, Integer> chunkingIndices) {
         this.surroundingStructure = surroundingStructure;
         this.contextPathInStructure = contextPathInStructure;
         this.chunkingIndices = chunkingIndices;
         this.fullUtterance = fullUtteranceText;
-        stringForAnalysis = SemanticsModel.extractChunk(surroundingStructure, fullUtteranceText, contextPathInStructure);
+        if (this.surroundingStructure!=null)
+            stringForAnalysis = SemanticsModel.extractChunk(surroundingStructure, fullUtteranceText, contextPathInStructure);
     }
 
     public void runChunker(){

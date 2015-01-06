@@ -7,7 +7,7 @@ import sys
 import random
 import cPickle
 from theano import tensor as T
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 
 
 class RecurrentNeuralNetworkModel2(object):
@@ -87,6 +87,7 @@ class RecurrentNeuralNetworkModel2(object):
             sys.stdout.flush()
             settings['current_epoch'] = e
             tic = time.time()
+            nll = 0
             for i in random.sample(range(n_training_sentences), n_training_sentences):
                 # print x_train[i]
                 utterance_features = self.feature_vector_sequence(x_train[i][0], x_train[i][1])
@@ -95,14 +96,9 @@ class RecurrentNeuralNetworkModel2(object):
                 # print "utterance features shape:", utterance_features.shape
                 # print "labels:", y_train[i]
                 # sys.stdout.flush()
-                self.sentence_train(utterance_features, labels, settings['current_learning_rate'])
+                nll += self.sentence_train(utterance_features, labels, settings['current_learning_rate'])
 
-            # if settings['verbose']:
-            # print '[learning] epoch %i >> %2.2f%%' % (
-            # e, (i + 1) * 100. / n_training_sentences), 'completed in %.2f (sec) <<\r' % (time.time() - tic),
-            #     sys.stdout.flush()
-
-            # evaluation
+            print "training set nll:", nll
             predictions_valid = [self.classify(self.feature_vector_sequence(token_features, context_features))
                                  for [token_features, context_features] in x_validate]
 
@@ -112,15 +108,15 @@ class RecurrentNeuralNetworkModel2(object):
             if validation_accuracy > best_accuracy:
                 best_accuracy = validation_accuracy
                 if settings['verbose']:
-                    print 'NEW BEST: epoch', e, 'validation accuracy', validation_accuracy
+                    print 'NEW BEST: epoch', e, 'validation performance (mean precision)', validation_accuracy
                 settings['best_epoch'] = e
                 f = open(settings['outfile'], 'wb')
                 cPickle.dump(self, f, protocol=cPickle.HIGHEST_PROTOCOL)
                 f.close()
 
             # learning rate decay if no improvement in 10 epochs
-            if settings['decay'] and abs(settings['best_epoch'] - settings['current_epoch']) >= 10:
-                settings['current_learning_rate'] *= 0.99
+            if settings['decay'] and abs(settings['best_epoch'] - settings['current_epoch']) >= 5:
+                settings['current_learning_rate'] *= 0.5
             if settings['current_learning_rate'] < 1e-5:
                 break
 
@@ -131,12 +127,18 @@ def evaluate_tagging(predictions, ground_truth):
     """
     :param predictions: list of predicted tokens (must be same length as ground_truth)
     :param ground_truth: list of correct tokens
-    :return: fraction of predicted tags which are correct
+    :return: mean tag precision
     """
     # print "evaluating tagging:"
     # print ground_truth
     # print predictions
-    return 1.0 * len([i for i in xrange(len(ground_truth)) if ground_truth[i] == predictions[i]]) / len(ground_truth)
+    num_truth = defaultdict(lambda: 0)
+    num_correct = defaultdict(lambda: 0)
+    for i in range(len(ground_truth)):
+        num_truth[ground_truth[i]] += 1
+        if predictions[i] == ground_truth[i]:
+            num_correct[i] += 1
+    return numpy.mean([1.0*num_correct[i] / num_truth[i] for i in num_truth.keys()])
 
 
 def shuffle(lol, seed):
