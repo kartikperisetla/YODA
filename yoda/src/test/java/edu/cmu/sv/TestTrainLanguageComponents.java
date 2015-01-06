@@ -39,6 +39,15 @@ public class TestTrainLanguageComponents {
         Map<String, SemanticsModel> corpus = CorpusGeneration.generateCorpus();
 
         System.out.println("collecting features and training samples");
+
+//        for (String utterance : corpus.keySet()){
+//            System.out.println(utterance);
+//            System.out.println(corpus.get(utterance).getInternalRepresentation().toJSONString());
+//            System.out.println("---");
+//        }
+//        System.exit(0);
+
+
         for (String utterance : corpus.keySet()) {
 
             SemanticsModel semanticsModel = corpus.get(utterance);
@@ -182,6 +191,7 @@ public class TestTrainLanguageComponents {
 
         // train model
         System.out.println("training theano chunker model ...");
+        System.out.println("labels:" + Chunker.outputLabelKey);
         Chunker.trainTheanoModel();
         System.out.println("done training chunker model.");
 

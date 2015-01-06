@@ -23,7 +23,7 @@ public class Chunker {
 
     static LinkedList<String> contextFeatureKey = new LinkedList<>();
     static LinkedList<String> tokenFeatureKey = new LinkedList<>();
-    static LinkedList<String> outputLabelKey = new LinkedList<>();
+    public static LinkedList<String> outputLabelKey = new LinkedList<>();
 
     Process theanoSubProcess;
     InputStreamReader stdoutInputStreamReader;

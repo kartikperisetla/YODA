@@ -73,7 +73,7 @@ print "creating RNN2 model..."
 rnn = RecurrentNeuralNetworkModel2.RecurrentNeuralNetworkModel2(
     n_context_features,
     n_token_features,
-    30,
+    75,
     n_output_labels,
     9)
 
@@ -84,7 +84,7 @@ for learning_rate in [.04]:  # [.01, .02, .03, .04, .05, .08, .1, .2]:
                 'verbose': 1,
                 'decay': False,  # decay on the learning rate if improvement stops
                 'seed': 345,
-                'n_epochs': 50,
+                'n_epochs': 30,
                 'outfile': model_file}
 
     # file saves at best points throughout training

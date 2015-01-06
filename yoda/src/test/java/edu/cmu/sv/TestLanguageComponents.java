@@ -32,9 +32,12 @@ public class TestLanguageComponents {
         Chunker chunker = new Chunker();
 
         chunkUtterance(chunker, "is Starbucks expensive");
-        chunkUtterance(chunker, "is the restaurant next to hollywood");
+        chunkUtterance(chunker, "is the restaurant near to hollywood");
         chunkUtterance(chunker, "the church near mcdonalds");
         chunkUtterance(chunker, "give me directions");
+        chunkUtterance(chunker, "how close to red rock is moffett field");
+        chunkUtterance(chunker, "how close is red rock to moffett field");
+        chunkUtterance(chunker, "the school");
 
     }
 

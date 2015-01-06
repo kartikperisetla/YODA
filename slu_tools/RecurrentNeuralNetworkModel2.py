@@ -7,7 +7,7 @@ import sys
 import random
 import cPickle
 from theano import tensor as T
-from collections import OrderedDict, defaultdict
+from collections import OrderedDict, defaultdict, Counter
 
 
 class RecurrentNeuralNetworkModel2(object):
@@ -89,8 +89,8 @@ class RecurrentNeuralNetworkModel2(object):
         best_accuracy = -1
         settings['current_learning_rate'] = settings['lr']
         for e in xrange(settings['n_epochs']):
-            print "starting epoch:", e
-            sys.stdout.flush()
+            # print "starting epoch:", e
+            # sys.stdout.flush()
             settings['current_epoch'] = e
             tic = time.time()
             nll = 0
@@ -104,17 +104,34 @@ class RecurrentNeuralNetworkModel2(object):
                 # sys.stdout.flush()
                 nll += self.sentence_train(utterance_features[0], utterance_features[1], labels, settings['current_learning_rate'])
 
-            print "training set nll:", nll
+            print "epoch:", e, "training set nll:", nll
+            sys.stdout.flush()
             predictions_valid = [self.classify(*self.sentence_features(token_features, context_features))
                                  for [token_features, context_features] in x_validate]
 
-            validation_accuracy = numpy.mean(
-                [evaluate_tagging(predictions_valid[k], y_validate[k]) for k in range(len(predictions_valid))])
+            num_truth = Counter()
+            num_correct = Counter()
+            mean_tag_precisions = []
+            for k in range(len(predictions_valid)):
+                mtp, nt, nc = evaluate_tagging(predictions_valid[k], y_validate[k])
+                num_truth.update(nt)
+                num_correct.update(nc)
+                mean_tag_precisions.append(mtp)
+
+            # validation_accuracy = numpy.mean(mean_tag_precisions)
+            validation_accuracy = numpy.mean([1.0*num_correct[label] / num_truth[label] for label in num_truth.keys()])
 
             if validation_accuracy > best_accuracy:
+
                 best_accuracy = validation_accuracy
                 if settings['verbose']:
-                    print 'NEW BEST: epoch', e, 'validation performance (mean precision)', validation_accuracy
+                    print 'NEW BEST: epoch', e
+                print "validation precision breakdown. Mean:", validation_accuracy
+                for key in num_truth.keys():
+                    print key, "(", num_correct[key], "/", num_truth[key], ")", 1.0*num_correct[key] / num_truth[key]
+                sys.stdout.flush()
+
+
                 settings['best_epoch'] = e
                 f = open(settings['outfile'], 'wb')
                 cPickle.dump(self, f, protocol=cPickle.HIGHEST_PROTOCOL)
@@ -133,18 +150,16 @@ def evaluate_tagging(predictions, ground_truth):
     """
     :param predictions: list of predicted tokens (must be same length as ground_truth)
     :param ground_truth: list of correct tokens
-    :return: mean tag precision
+    :return: (mean tag precision, num_truth, num_correct)
     """
     # print "evaluating tagging:"
     # print ground_truth
     # print predictions
-    num_truth = defaultdict(lambda: 0)
-    num_correct = defaultdict(lambda: 0)
-    for i in range(len(ground_truth)):
-        num_truth[ground_truth[i]] += 1
-        if predictions[i] == ground_truth[i]:
-            num_correct[i] += 1
-    return numpy.mean([1.0*num_correct[i] / num_truth[i] for i in num_truth.keys()])
+    num_truth = Counter()
+    num_correct = Counter()
+    num_truth.update(ground_truth)
+    num_correct.update([predictions[i] for i in range(len(ground_truth)) if predictions[i] == ground_truth[i]])
+    return numpy.mean([1.0*num_correct[i] / num_truth[i] for i in num_truth.keys()]), num_truth, num_correct
 
 
 def shuffle(lol, seed):
