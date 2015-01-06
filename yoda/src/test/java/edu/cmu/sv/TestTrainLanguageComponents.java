@@ -108,7 +108,7 @@ public class TestTrainLanguageComponents {
                         Pair<String, JSONObject> child = it.next();
                         it.remove();
                         if (child.getValue().containsKey("chunk-start")) {
-                            if (!chunkingOutputLabels.contains(child.getLeft())) {
+                            if (!chunkingOutputLabels.contains(child.getLeft() + "-B")) {
                                 chunkingOutputLabels.add(child.getLeft() + "-B");
                                 chunkingOutputLabels.add(child.getLeft() + "-I");
                             }
