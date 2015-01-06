@@ -69,8 +69,8 @@ class RecurrentNeuralNetworkModel2(object):
              for windowed_token_feature_vector in context_window(token_features, self.context_window_size)]
         return numpy.asarray(x).astype(dtype=theano.config.floatX)
 
-    def predict(self, token_features, context_features):
-        return self.classify(self.feature_vector_sequence(token_features, context_features))
+    def predict(self, context_features, token_features):
+        return self.classify(self.feature_vector_sequence(context_features, token_features))
 
     def train(self, train_set, valid_set, settings):
         # train with early stopping on validation set
