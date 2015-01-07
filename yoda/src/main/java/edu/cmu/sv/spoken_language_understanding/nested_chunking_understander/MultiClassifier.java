@@ -67,15 +67,13 @@ public class MultiClassifier {
         Map<String, Object> outputRolesAndFillers = new HashMap<>();
 
         // parse response from theano
-        Pattern multiResultPattern = Pattern.compile("\\{(\\d+: \\[\\[.+\\]\\], )*(\\d+: \\[\\[.+\\]\\])\\}");
+        Pattern multiResultPattern = Pattern.compile("\\d+: \\[\\[.+?\\]\\]");
         Matcher m = multiResultPattern.matcher(result);
-        if (!m.matches())
-            throw new Error("Error: can't parse classification program's response");
 
         Double score = 1.0;
-        for (int i = 1; i <= m.groupCount(); i++) {
-            String individualResultString = m.group(i);
-            Pattern individualResultPattern = Pattern.compile("(\\d+): \\[\\[(.+)\\]\\](, |)");
+        while (m.find()) {
+            String individualResultString = m.group();
+            Pattern individualResultPattern = Pattern.compile("(\\d+): \\[\\[(.+)\\]\\]");
             Matcher m2 = individualResultPattern.matcher(individualResultString);
             if (!m2.matches())
                 throw new Error("Error: can't parse classification program's response");

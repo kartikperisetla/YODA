@@ -1,5 +1,9 @@
 package edu.cmu.sv.spoken_language_understanding.nested_chunking_understander;
 
+import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.role.HasName;
+import edu.cmu.sv.ontology.role.HasURI;
+import edu.cmu.sv.ontology.role.has_quality_subroles.HasQualityRole;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.spoken_language_understanding.SpokenLanguageUnderstander;
 import edu.cmu.sv.utils.StringDistribution;
@@ -74,7 +78,7 @@ public class NestedChunkingUnderstander implements SpokenLanguageUnderstander {
                 String updatedUnderstandingStateId = "understanding_state_"+i++;
                 PartialUnderstandingState newUnderstandingState = this.deepCopy();
                 for (ChunkingProblem childChunkingProblem : currentChunkingProblem.outputChildChunkingProblems.get(chunkingResultKey)) {
-                    extendStructureWithChildChunk(newUnderstandingState.structure, childChunkingProblem.contextPathInStructure, childChunkingProblem.chunkingIndices);
+                    extendStructureWithChildChunk(newUnderstandingState.structure, childChunkingProblem.contextPathInStructure, childChunkingProblem.chunkingIndices, childChunkingProblem.fullUtterance);
                     newUnderstandingState.pathChunkingProblemMap.put(childChunkingProblem.contextPathInStructure, childChunkingProblem);
                 }
                 newUnderstandingState.pathChunkingProblemMap.remove(pathToChunkingProblem);
@@ -99,7 +103,13 @@ public class NestedChunkingUnderstander implements SpokenLanguageUnderstander {
                 PartialUnderstandingState newUnderstandingState = this.deepCopy();
                 for (String slotString : currentClassificationProblem.outputRolesAndFillers.get(classificationResultKey).keySet()) {
                     SemanticsModel tmpSemanticsModel = new SemanticsModel(newUnderstandingState.structure);
+
                     Object filler = currentClassificationProblem.outputRolesAndFillers.get(classificationResultKey).get(slotString);
+                    if (OntologyRegistry.thingNameMap.containsKey(slotString) &&
+                            HasQualityRole.class.isAssignableFrom(OntologyRegistry.thingNameMap.get(slotString))){
+                        filler = SemanticsModel.parseJSON("{\"class\":\""+filler+"\"}");
+                    }
+
                     if (filler instanceof JSONObject){
                         ((JSONObject)tmpSemanticsModel.newGetSlotPathFiller(pathToClassificationProblem)).
                                 put(slotString, SemanticsModel.parseJSON(((JSONObject) filler).toJSONString()));
@@ -117,7 +127,7 @@ public class NestedChunkingUnderstander implements SpokenLanguageUnderstander {
             return new ImmutablePair<>(updatedUnderstandingStates, understandingStateDistribution);
         }
 
-        public static void extendStructureWithChildChunk(JSONObject inputObject, String path, Pair<Integer, Integer> chunkingIndices){
+        public static void extendStructureWithChildChunk(JSONObject inputObject, String path, Pair<Integer, Integer> chunkingIndices, String fullUtterance){
             SemanticsModel tmp = new SemanticsModel(inputObject);
             String[] roles = path.split("\\.");
             String fillerPath = "";
@@ -133,8 +143,15 @@ public class NestedChunkingUnderstander implements SpokenLanguageUnderstander {
             JSONObject childNode = (JSONObject) tmp.newGetSlotPathFiller(path);
             childNode.put("chunk-start", chunkingIndices.getLeft());
             childNode.put("chunk-end", chunkingIndices.getRight());
-        }
 
+            // if we are adding a named entity, extract it and add it to the database, insert HasURI at childNode
+            if (roles[roles.length-1].equals(HasName.class.getSimpleName())){
+                String namedEntity = SemanticsModel.extractChunk(tmp.getInternalRepresentation(), fullUtterance, path);
+                String uri = yodaEnvironment.db.insertValue(namedEntity);
+                System.out.println("adding a named entity to structure:" + namedEntity + ", uri:"+uri);
+                childNode.put(HasURI.class.getSimpleName(), uri);
+            }
+        }
     }
 
     public static Pair<Map<String, JSONObject>, StringDistribution> understand(String utterance){

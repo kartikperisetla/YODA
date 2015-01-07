@@ -551,7 +551,7 @@ public class SemanticsModel {
             } else
                 end = (Integer) structure.get("chunk-end");
             
-            for (Integer i = start; i < end; i++) {
+            for (Integer i = start; i <= end; i++) {
                 tokensInChunk.add(tokens.get(i));
             }
             currentString = String.join(" ", tokensInChunk);
