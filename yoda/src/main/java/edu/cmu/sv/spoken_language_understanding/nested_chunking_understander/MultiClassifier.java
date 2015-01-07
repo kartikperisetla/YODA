@@ -1,6 +1,7 @@
 package edu.cmu.sv.spoken_language_understanding.nested_chunking_understander;
 
 import com.google.common.primitives.Doubles;
+import edu.cmu.sv.utils.StringDistribution;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.*;
@@ -71,6 +72,7 @@ public class MultiClassifier {
         if (!m.matches())
             throw new Error("Error: can't parse classification program's response");
 
+        Double score = 1.0;
         for (int i = 1; i <= m.groupCount(); i++) {
             String individualResultString = m.group(i);
             Pattern individualResultPattern = Pattern.compile("(\\d+): \\[\\[(.+)\\]\\](, |)");
@@ -81,11 +83,22 @@ public class MultiClassifier {
             String classLabel = outputInterpretation.keySet().stream().sorted().collect(Collectors.toList()).get(Integer.parseInt(classNumber));
             List<Double> values = Arrays.asList(m2.group(2).split(", ")).
                     stream().map(Double::parseDouble).collect(Collectors.toList());
-            int maxIndex = values.indexOf(values.stream().max(Doubles::compare).orElse(-1.0));
-            outputRolesAndFillers.put(
-                    classLabel,
-                    outputInterpretation.get(classLabel).get(maxIndex));
+            double maxScore = values.stream().max(Doubles::compare).orElse(0.0);
+            int maxIndex = values.indexOf(maxScore);
+            String label = outputInterpretation.get(classLabel).get(maxIndex);
+            if (!label.equals(NOT_CLASSIFIED)) {
+                outputRolesAndFillers.put(
+                        classLabel,
+                        outputInterpretation.get(classLabel).get(maxIndex));
+            }
+            score *= maxScore;
         }
+
+        StringDistribution outputDistribution = new StringDistribution();
+        outputDistribution.put("hyp1", score);
+        classificationProblem.outputDistribution = outputDistribution;
+        classificationProblem.outputRolesAndFillers = new HashMap<>();
+        classificationProblem.outputRolesAndFillers.put("hyp1", outputRolesAndFillers);
         System.out.println(outputRolesAndFillers);
     }
 

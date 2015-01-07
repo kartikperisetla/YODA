@@ -16,7 +16,6 @@ public class ChunkingProblem {
     public StringDistribution outputDistribution;
     JSONObject surroundingStructure;
     String contextPathInStructure;
-    String stringForAnalysis;
     String fullUtterance;
     Pair<Integer, Integer> chunkingIndices;
 
@@ -31,16 +30,9 @@ public class ChunkingProblem {
         this.contextPathInStructure = contextPathInStructure;
         this.chunkingIndices = chunkingIndices;
         this.fullUtterance = fullUtteranceText;
-        if (this.surroundingStructure!=null)
-            stringForAnalysis = SemanticsModel.extractChunk(surroundingStructure, fullUtteranceText, contextPathInStructure);
     }
 
-    public void runChunker(){
-        // create features
-        // check cache
-        // call external chunking program
-        // read results
-        // interpret as new chunking problems
-        // cache results
+    public String stringForAnalysis(){
+        return SemanticsModel.extractChunk(surroundingStructure, fullUtterance, contextPathInStructure);
     }
 }

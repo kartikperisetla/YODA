@@ -1,10 +1,8 @@
 package edu.cmu.sv;
 
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.spoken_language_understanding.nested_chunking_understander.Chunker;
-import edu.cmu.sv.spoken_language_understanding.nested_chunking_understander.ChunkingProblem;
-import edu.cmu.sv.spoken_language_understanding.nested_chunking_understander.MultiClassifier;
-import edu.cmu.sv.spoken_language_understanding.nested_chunking_understander.NodeMultiClassificationProblem;
+import edu.cmu.sv.spoken_language_understanding.nested_chunking_understander.*;
+import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.junit.Test;
 
 import java.io.*;
@@ -19,6 +17,16 @@ import java.util.stream.Collectors;
 public class TestLanguageComponents {
     @Test
     public void Test() throws FileNotFoundException, UnsupportedEncodingException {
+        YodaEnvironment yodaEnvironment = YodaEnvironment.dialogTestingEnvironment();
+        NestedChunkingUnderstander.start(yodaEnvironment);
+        System.out.println("understanding the utterance: is red rock expensive");
+        NestedChunkingUnderstander.understand("is red rock expensive");
+
+//        testIndividualComponents();
+    }
+
+
+    public void testIndividualComponents(){
         MultiClassifier.loadPreferences();
         MultiClassifier classifier = new MultiClassifier();
         Chunker.loadPreferences();
@@ -38,7 +46,6 @@ public class TestLanguageComponents {
         chunkUtterance(chunker, "how close to red rock is moffett field");
         chunkUtterance(chunker, "how close is red rock to moffett field");
         chunkUtterance(chunker, "the school");
-
     }
 
     public void classifyDialogAct(MultiClassifier classifier, String utterance){

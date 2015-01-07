@@ -448,7 +448,9 @@ public class SemanticsModel {
     * Return all the slot paths that point to JSONObjects
     * */
     public Set<String> getAllInternalNodePaths(){
-        return getAllInternalNodePathsHelper(internalRepresentation);
+        Set<String> ans = getAllInternalNodePathsHelper(internalRepresentation);
+        ans.add("");
+        return ans;
     }
 
     /*

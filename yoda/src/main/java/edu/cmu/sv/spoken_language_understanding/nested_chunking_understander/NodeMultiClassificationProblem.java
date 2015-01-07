@@ -22,17 +22,4 @@ public class NodeMultiClassificationProblem {
         this.contextPathInStructure = contextPathInStructure;
         stringForAnalysis = SemanticsModel.extractChunk(surroundingStructure, fullUtteranceText, contextPathInStructure);
     }
-
-    public void runClassifier(){
-        Map<String, Map<String, Object>> ans = new HashMap<>();
-        StringDistribution outputDistr = new StringDistribution();
-        // extract features
-        // check cache
-        // call external classification program
-        // read results
-        // interpret as new roles / values for answer map
-        // cache results
-        outputRolesAndFillers = ans;
-        outputDistribution = outputDistr;
-    }
 }

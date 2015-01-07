@@ -1,8 +1,10 @@
 package edu.cmu.sv.spoken_language_understanding.nested_chunking_understander;
 
+import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.spoken_language_understanding.Tokenizer;
 import edu.cmu.sv.utils.StringDistribution;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.json.simple.JSONObject;
 
 import java.io.*;
 import java.util.*;
@@ -91,7 +93,7 @@ public class Chunker {
     public static List<List<String>> extractSequenceFeatures(ChunkingProblem chunkingProblem){
         //// collect sequential feature vectors
         List<List<String>> sequenceFeatures = new LinkedList<>();
-        List<String> tokens = Tokenizer.tokenize(chunkingProblem.stringForAnalysis);
+        List<String> tokens = Tokenizer.tokenize(chunkingProblem.stringForAnalysis());
         for (int i = 0; i < tokens.size(); i++) {
             List<String> tokenFeatures = new LinkedList<>();
             // the word itself is the only feature
@@ -139,7 +141,7 @@ public class Chunker {
         String ans = packTestSample(chunkingProblem) + " -> ";
 
         List<Integer> taggingOutput = new LinkedList<>();
-        List<String> tokens = Tokenizer.tokenize(chunkingProblem.stringForAnalysis);
+        List<String> tokens = Tokenizer.tokenize(chunkingProblem.stringForAnalysis());
         for (int i = 0; i < tokens.size(); i++) {
             String label = NO_LABEL;
             for (ChunkingProblem childProblem : chunkingProblem.outputChildChunkingProblems.get("ground_truth")){
@@ -193,6 +195,8 @@ public class Chunker {
             if (labelledResult.get(i).equals(NO_LABEL)) {
                 if (activeChild != null) {
                     activeChild.chunkingIndices = new ImmutablePair<>(currentStartingIndex, i - 1);
+                    SemanticsModel.putAtPath(activeChild.surroundingStructure, activeChild.contextPathInStructure+".chunk-start", activeChild.chunkingIndices.getLeft());
+                    SemanticsModel.putAtPath(activeChild.surroundingStructure, activeChild.contextPathInStructure+".chunk-end", activeChild.chunkingIndices.getRight());
                     activeChild = null;
                 }
             } else {
@@ -201,14 +205,30 @@ public class Chunker {
                         (labelledResult.get(i).endsWith("-I") && (activeChild == null || !chunkLabel.equals(currentChunkLabel)))) {
                     if (activeChild != null) {
                         activeChild.chunkingIndices = new ImmutablePair<>(currentStartingIndex, i - 1);
+                        SemanticsModel.putAtPath(activeChild.surroundingStructure, activeChild.contextPathInStructure+".chunk-start", activeChild.chunkingIndices.getLeft());
+                        SemanticsModel.putAtPath(activeChild.surroundingStructure, activeChild.contextPathInStructure+".chunk-end", activeChild.chunkingIndices.getRight());
                     }
                     currentStartingIndex = i;
+
+                    // create the surrounding JSON structure for the child
+                    SemanticsModel childSurroundingStructure = new SemanticsModel(chunkingProblem.surroundingStructure.toJSONString());
+                    JSONObject currentNode = (JSONObject) childSurroundingStructure.newGetSlotPathFiller(chunkingProblem.contextPathInStructure);
+                    String[] slots = chunkLabel.split("\\.");
+                    for (int j = 0; j < slots.length; j++) {
+                        String slot = slots[j];
+                        currentNode.put(slot, SemanticsModel.parseJSON("{}"));
+                        currentNode = (JSONObject) currentNode.get(slot);
+                    }
+
+                    // create the child context path
                     String childContextPath = chunkLabel;
                     if (!chunkingProblem.contextPathInStructure.equals(""))
                         childContextPath = chunkingProblem.contextPathInStructure + "." + childContextPath;
+
+
                     activeChild = new ChunkingProblem(
                             chunkingProblem.fullUtterance,
-                            null,
+                            childSurroundingStructure.getInternalRepresentation(),
                             childContextPath,
                             new ImmutablePair<>(0, 0));
                     childChunkingProblems.add(activeChild);
@@ -216,8 +236,11 @@ public class Chunker {
                 currentChunkLabel = chunkLabel;
             }
         }
-        if (activeChild != null)
+        if (activeChild != null) {
             activeChild.chunkingIndices = new ImmutablePair<>(currentStartingIndex, labelledResult.size() - 1);
+            SemanticsModel.putAtPath(activeChild.surroundingStructure, activeChild.contextPathInStructure + ".chunk-start", activeChild.chunkingIndices.getLeft());
+            SemanticsModel.putAtPath(activeChild.surroundingStructure, activeChild.contextPathInStructure + ".chunk-end", activeChild.chunkingIndices.getRight());
+        }
 
         String hypothesisID = "chunkingHyp0";
         StringDistribution outputDistribution = new StringDistribution();
