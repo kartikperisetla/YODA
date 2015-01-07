@@ -230,7 +230,7 @@ public class NestedChunkingUnderstander implements SpokenLanguageUnderstander {
         }
 
         System.out.println("understanding results:");
-        partialStructures.values().forEach(x -> System.out.println(x.structure.toJSONString()));
+        partialStructures.keySet().forEach(x -> System.out.println(partialStructureDistribution.get(x) + ", " + partialStructures.get(x).structure.toJSONString()));
 
         Map<String, JSONObject> outputStructures = new HashMap<>();
         partialStructures.entrySet().stream().forEach(x -> outputStructures.put(x.getKey(), x.getValue().structure));
