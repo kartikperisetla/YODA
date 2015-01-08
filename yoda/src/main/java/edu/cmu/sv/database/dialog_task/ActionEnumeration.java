@@ -12,28 +12,17 @@ import java.util.*;
  * Created by David Cohen on 12/6/14.
  */
 public class ActionEnumeration {
+    public static enum FOCUS_CONSTRAINT {IN_FOCUS, IN_KB}
 
     //todo: also look for classes in context
-    public static Set<Map<String, Object>> getPossibleBindings(DialogAct dialogAct,
-                                                         YodaEnvironment yodaEnvironment){
 
-//        Set<String> individualsInContext = new HashSet<>();
-//        if (contextDiscourseUnitHypothesis.getGroundTruth()!=null) {
-//            Set<String> paths = contextDiscourseUnitHypothesis.getGroundTruth().
-//                    findAllPathsToClass(WebResource.class.getSimpleName());
-//            for (String path : paths){
-//                individualsInContext.add((String)contextDiscourseUnitHypothesis.getGroundTruth().
-//                        newGetSlotPathFiller(path+"."+ HasURI.class.getSimpleName()));
-//            }
-//        }
-//        if (contextDiscourseUnitHypothesis.getGroundInterpretation()!=null) {
-//            Set<String> paths = contextDiscourseUnitHypothesis.getGroundInterpretation().
-//                    findAllPathsToClass(WebResource.class.getSimpleName());
-//            for (String path : paths){
-//                individualsInContext.add((String)contextDiscourseUnitHypothesis.getGroundInterpretation().
-//                        newGetSlotPathFiller(path+"."+ HasURI.class.getSimpleName()));
-//            }
-//        }
+    /*
+    * focusConstraint parameter
+    *
+    * */
+    public static Set<Map<String, Object>> getPossibleBindings(DialogAct dialogAct,
+                                                         YodaEnvironment yodaEnvironment,
+                                                         FOCUS_CONSTRAINT focusConstraint){
 
         if (dialogAct.getIndividualParameters().size()==0){
             Set<Map<String, Object>> ans = new HashSet<>();
@@ -47,7 +36,8 @@ public class ActionEnumeration {
         for (String parameter : dialogAct.getIndividualParameters().keySet()) {
             variableEnumerationString += "?" + parameter + " ";
             classConstraintString += "?" + parameter + " rdf:type base:" + dialogAct.getIndividualParameters().get(parameter).getSimpleName() + " .\n";
-            focusConstraintString += "?" + parameter + " rdf:type dst:InFocus .\n";
+            if (focusConstraint==FOCUS_CONSTRAINT.IN_FOCUS)
+                focusConstraintString += "?" + parameter + " rdf:type dst:InFocus .\n";
         }
         String queryString = Database.prefixes + "SELECT DISTINCT "+variableEnumerationString+"WHERE {\n";
         queryString += focusConstraintString;

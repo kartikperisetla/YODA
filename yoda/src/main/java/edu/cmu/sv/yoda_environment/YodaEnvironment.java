@@ -82,4 +82,11 @@ public class YodaEnvironment {
         return ans;
     }
 
+    public static YodaEnvironment minimalLanguageProcessingEnvironment(){
+        YodaEnvironment ans = new YodaEnvironment();
+        ans.db = new Database(ans);
+        ans.nlg = new NaturalLanguageGenerator(ans);
+        return ans;
+    }
+
 }

@@ -1,5 +1,9 @@
 package edu.cmu.sv.natural_language_generation;
 
+import com.google.common.collect.Iterables;
+import edu.cmu.sv.database.dialog_task.ActionEnumeration;
+import edu.cmu.sv.dialog_management.DialogRegistry;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.ThingWithRoles;
 import edu.cmu.sv.ontology.adjective.Adjective;
@@ -12,6 +16,7 @@ import edu.cmu.sv.ontology.role.Patient;
 import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.semantics.SemanticsModel;
+import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.WHQuestion;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.YNQuestion;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -146,11 +151,31 @@ public class CorpusGeneration {
         return ans;
     }
 
-    public static Map<String, SemanticsModel> generateCorpus2(){
-        // create a yoda environment
-        // iterate through system actions
-        // generate best for that action
-        return null;
+    public static Map<String, SemanticsModel> generateCorpus2() {
+        Map<String, SemanticsModel> ans = new HashMap<>();
+        YodaEnvironment yodaEnvironment = YodaEnvironment.minimalLanguageProcessingEnvironment();
+
+        try {
+            // iterate through system actions
+            for (Class<? extends DialogAct> dialogActClass : Iterables.concat(DialogRegistry.argumentationDialogActs,
+                    DialogRegistry.clarificationDialogActs)) {
+                DialogAct dialogActInstance = dialogActClass.newInstance();
+                Set<Map<String, Object>> possibleBindings = ActionEnumeration.
+                        getPossibleBindings(dialogActInstance, yodaEnvironment, ActionEnumeration.FOCUS_CONSTRAINT.IN_KB);
+                for (Map<String, Object> binding : possibleBindings) {
+                    DialogAct newDialogActInstance = dialogActClass.newInstance();
+                    newDialogActInstance.bindVariables(binding);
+                    Map<String, SemanticsModel> generatedEntries = yodaEnvironment.nlg.generateAll(
+                            newDialogActInstance.getNlgCommand(), yodaEnvironment, Grammar.DEFAULT_GRAMMAR_PREFERENCES);
+                    ans.putAll(generatedEntries);
+//                    System.out.println(generatedEntry.getKey());
+                }
+            }
+        } catch (IllegalAccessException | InstantiationException e) {
+            e.printStackTrace();
+            System.exit(0);
+        }
+        return ans;
     }
 
 }

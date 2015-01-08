@@ -83,7 +83,7 @@ public class DialogManager implements Runnable {
                 for (Class<? extends DialogAct> dialogActClass : DialogRegistry.argumentationDialogActs) {
                     DialogAct dialogActInstance = dialogActClass.newInstance();
                     Set<Map<String, Object>> possibleBindings = ActionEnumeration.
-                            getPossibleBindings(dialogActInstance, yodaEnvironment);
+                            getPossibleBindings(dialogActInstance, yodaEnvironment, ActionEnumeration.FOCUS_CONSTRAINT.IN_FOCUS);
                     for (Map<String, Object> binding : possibleBindings) {
                         for (String discourseUnitHypothesisId : currentDialogState.getDiscourseUnitHypothesisMap().
                                 keySet()) {
@@ -159,7 +159,7 @@ public class DialogManager implements Runnable {
             for (Class<? extends ClarificationDialogAct> dialogActClass : DialogRegistry.clarificationDialogActs) {
                 ClarificationDialogAct dialogActInstance = dialogActClass.newInstance();
                 Set<Map<String, Object>> possibleBindings = ActionEnumeration.
-                        getPossibleBindings(dialogActInstance, yodaEnvironment);
+                        getPossibleBindings(dialogActInstance, yodaEnvironment, ActionEnumeration.FOCUS_CONSTRAINT.IN_FOCUS);
                 for (Map<String, Object> binding : possibleBindings) {
                     ClarificationDialogAct newDialogActInstance = dialogActClass.newInstance();
                     newDialogActInstance.bindVariables(binding);
