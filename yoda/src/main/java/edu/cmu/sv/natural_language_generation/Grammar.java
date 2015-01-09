@@ -15,6 +15,7 @@ import java.util.Set;
 public class Grammar {
 
     public static GrammarPreferences DEFAULT_GRAMMAR_PREFERENCES = new Grammar.GrammarPreferences(.01, .2, 5, 2, 5, 5, 2, new HashMap<>());
+    public static GrammarPreferences CORPUS_GENERATION_PREFERENCES = new Grammar.GrammarPreferences(.1, .2, 5, 3, 5, 5, 2, new HashMap<>());
 
     public static class GrammarPreferences{
         public double pExpandPrepositionalPhrase;

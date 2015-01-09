@@ -41,8 +41,7 @@ public class CorpusGeneration {
                 "SELECT ?x WHERE { ?x rdf:type base:PointOfInterest . \n }";
 
 
-        Grammar.GrammarPreferences corpusPreferences = new Grammar.GrammarPreferences(.01, .2, 5, 2, 5, 5, 2, new HashMap<>());
-
+        Grammar.GrammarPreferences corpusPreferences = Grammar.CORPUS_GENERATION_PREFERENCES;
 
         int numPOIs = 0;
         for (String uri : yodaEnvironment.db.runQuerySelectX(poiSelectionQuery)) {

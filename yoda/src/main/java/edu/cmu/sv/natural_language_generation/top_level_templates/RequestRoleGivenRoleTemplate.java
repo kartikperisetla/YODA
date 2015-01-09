@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
  */
 public class RequestRoleGivenRoleTemplate implements Template {
 
+    // TODO: this is not completely implemented
     @Override
     public Map<String, JSONObject> generateAll(JSONObject constraints, YodaEnvironment yodaEnvironment, int remainingDepth) {
         Map<String, JSONObject> ans = new HashMap<>();
@@ -134,9 +135,9 @@ public class RequestRoleGivenRoleTemplate implements Template {
                     orderedChunks.add(requestedPrefixChunks);
                     orderedChunks.add(whChunks);
                 }
-
-                ans.putAll(GenerationUtils.simpleOrderedCombinations(Arrays.asList(verbChunks, rolePrefixChunks, whChunks),
-                        RequestRoleGivenRoleTemplate::compositionFunction, childNodeChunks, yodaEnvironment));
+//
+//                ans.putAll(GenerationUtils.simpleOrderedCombinations(Arrays.asList(verbChunks, rolePrefixChunks, whChunks),
+//                        RequestRoleGivenRoleTemplate::compositionFunction, childNodeChunks, yodaEnvironment));
 
 
             } catch (Lexicon.NoLexiconEntryException | InstantiationException | IllegalAccessException e) {
