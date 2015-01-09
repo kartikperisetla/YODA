@@ -33,12 +33,12 @@ import java.util.*;
 /**
  * Created by David Cohen on 10/29/14.
  */
-public class TestGenerateCorpus {
+public class GenerateCorpus {
 
     @Test
     public void Test() throws FileNotFoundException, UnsupportedEncodingException {
         System.out.println("generating corpus...");
-        Map<String, SemanticsModel> corpus = CorpusGeneration.generateCorpus2();
+        Set<Map.Entry<String, SemanticsModel>> corpus = CorpusGeneration.generateCorpus2();
         System.out.println("corpus size:"+corpus.size());
 
 

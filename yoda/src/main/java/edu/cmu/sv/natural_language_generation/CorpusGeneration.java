@@ -23,6 +23,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -149,41 +150,57 @@ public class CorpusGeneration {
         return ans;
     }
 
-    public static Map<String, SemanticsModel> generateCorpus2() {
-        Map<String, SemanticsModel> ans = new HashMap<>();
+    public static Set<Map.Entry<String, SemanticsModel>> generateCorpus2() {
+        Set<Map.Entry<String, SemanticsModel>> ans = new HashSet<>();
         YodaEnvironment yodaEnvironment = YodaEnvironment.minimalLanguageProcessingEnvironment();
 
         try {
             // iterate through system actions
-//            for (Class<? extends DialogAct> dialogActClass : Iterables.concat(DialogRegistry.argumentationDialogActs,
-//                    DialogRegistry.clarificationDialogActs)) {
-//                DialogAct dialogActInstance = dialogActClass.newInstance();
-//                Set<Map<String, Object>> possibleBindings = ActionEnumeration.
-//                        getPossibleIndividualBindings(dialogActInstance, yodaEnvironment, ActionEnumeration.FOCUS_CONSTRAINT.IN_KB);
-//                for (Map<String, Object> binding : possibleBindings) {
-//                    DialogAct newDialogActInstance = dialogActClass.newInstance();
-//                    newDialogActInstance.bindVariables(binding);
-//                    Map<String, SemanticsModel> generatedEntries = yodaEnvironment.nlg.generateAll(
-//                            newDialogActInstance.getNlgCommand(), yodaEnvironment, Grammar.DEFAULT_GRAMMAR_PREFERENCES);
-//                    ans.putAll(generatedEntries);
-//                }
-//            }
+            System.out.println("generating clarification dialog acts");
+            for (Class<? extends DialogAct> dialogActClass : DialogRegistry.clarificationDialogActs) {
+                DialogAct dialogActInstance = dialogActClass.newInstance();
+                Set<Map<String, Object>> possibleBindings = ActionEnumeration.
+                        getPossibleIndividualBindings(dialogActInstance, yodaEnvironment, ActionEnumeration.FOCUS_CONSTRAINT.IN_KB);
+                for (Map<String, Object> binding : possibleBindings) {
+                    DialogAct newDialogActInstance = dialogActClass.newInstance();
+                    newDialogActInstance.bindVariables(binding);
+                    Map<String, SemanticsModel> generatedEntries = yodaEnvironment.nlg.generateAll(
+                            newDialogActInstance.getNlgCommand(), yodaEnvironment, Grammar.DEFAULT_GRAMMAR_PREFERENCES);
+                    ans.addAll(generatedEntries.entrySet());
+//                    generatedEntries.keySet().forEach(x -> System.out.println(x + ", " + generatedEntries.get(x)));
+                }
+            }
 
+            System.out.println("generating slot-filling dialog acts");
             for (Class<? extends DialogAct> dialogActClass : DialogRegistry.slotFillingDialogActs){
                 DialogAct dialogActInstance = dialogActClass.newInstance();
                 Set<Map<String, Object>> possibleBindings = ActionEnumeration.getPossibleNonIndividualBindings(dialogActInstance, null);
                 for (Map<String, Object> binding : possibleBindings) {
-                    System.out.println("dialogAct:"+dialogActClass+", binding:"+binding);
+//                    System.out.println("dialogAct:"+dialogActClass+", binding:"+binding);
                     DialogAct newDialogActInstance = dialogActClass.newInstance();
                     newDialogActInstance.bindVariables(binding);
-                    System.out.println(newDialogActInstance.getNlgCommand());
+//                    System.out.println(newDialogActInstance.getNlgCommand());
                     Map<String, SemanticsModel> generatedEntries = yodaEnvironment.nlg.generateAll(
                             newDialogActInstance.getNlgCommand(), yodaEnvironment, Grammar.DEFAULT_GRAMMAR_PREFERENCES);
-                    ans.putAll(generatedEntries);
-                    generatedEntries.keySet().forEach(System.out::println);
+                    ans.addAll(generatedEntries.entrySet());
+//                    generatedEntries.keySet().forEach(System.out::println);
                 }
-
             }
+
+            System.out.println("generating argumentation dialog acts");
+            for (Class<? extends DialogAct> dialogActClass : DialogRegistry.argumentationDialogActs) {
+                DialogAct dialogActInstance = dialogActClass.newInstance();
+//                System.out.println("dialogAct:" + dialogActClass);
+                DialogAct newDialogActInstance = dialogActClass.newInstance();
+//                System.out.println(newDialogActInstance.getNlgCommand());
+                Map<String, SemanticsModel> generatedEntries = yodaEnvironment.nlg.generateAll(
+                        newDialogActInstance.getNlgCommand(), yodaEnvironment, Grammar.DEFAULT_GRAMMAR_PREFERENCES);
+                for (int i = 0; i < 30; i++) {
+                    ans.addAll(generatedEntries.entrySet());
+                }
+//                generatedEntries.keySet().forEach(System.out::println);
+            }
+
 
         } catch (IllegalAccessException | InstantiationException e) {
             e.printStackTrace();

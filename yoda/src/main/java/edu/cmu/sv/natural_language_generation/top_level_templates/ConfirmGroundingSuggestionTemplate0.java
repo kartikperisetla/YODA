@@ -2,6 +2,7 @@ package edu.cmu.sv.natural_language_generation.top_level_templates;
 
 import edu.cmu.sv.natural_language_generation.Template;
 import edu.cmu.sv.semantics.SemanticsModel;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Accept;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ConfirmValueSuggestion;
 import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -23,8 +24,10 @@ public class ConfirmGroundingSuggestionTemplate0 implements Template {
         } catch (Assert.AssertException e){
             return new HashMap<>();
         }
+        JSONObject newConstraints = SemanticsModel.parseJSON(constraints.toJSONString());
+        newConstraints.put("dialogAct", Accept.class.getSimpleName());
         Map<String, JSONObject> ans = new HashMap<>();
-        ans.put("Yes", SemanticsModel.parseJSON(constraints.toJSONString()));
+        ans.put("Yes", SemanticsModel.parseJSON(newConstraints.toJSONString()));
         return ans;
     }
 }

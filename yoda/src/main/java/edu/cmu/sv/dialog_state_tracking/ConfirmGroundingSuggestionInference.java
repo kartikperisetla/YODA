@@ -68,8 +68,8 @@ public class ConfirmGroundingSuggestionInference extends DialogStateUpdateInfere
             }
         } else { // if turn.speaker.equals("system")
             SemanticsModel hypModel = turn.systemUtterance;
-            String dialogAct = hypModel.getSlotPathFiller("dialogAct");
-
+            SemanticsModel groundTruthSystemIntent = turn.groundedSystemMeaning;
+            String dialogAct = (String) groundTruthSystemIntent.newGetSlotPathFiller("dialogAct");
 //            if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(ConfirmValueSuggestion.class)) {
 //
 //                for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {

@@ -73,27 +73,25 @@ public class GenerationUtils {
     *
     * */
     public static void addChunkIndices(JSONObject composedContent,
-                                             List<String> stringChunks,
-                                             Pair<Integer, Integer> selectedChunks,
-                                             String pathToChild){
+                                       List<String> stringChunks,
+                                       Pair<Integer, Integer> selectedChunk,
+                                       String pathToChild){
 
 //        System.out.println("GenerationUtils.addChunkIndices stringChunks:"+stringChunks + ", selectedChunks:"+selectedChunks);
 //        System.out.println(composedContent);
 //        System.out.println(pathToChild);
         Integer startingIndex = 0;
-        for (int i = 0; i < selectedChunks.getKey(); i++) {
+        for (int i = 0; i < selectedChunk.getKey(); i++) {
             if (!(stringChunks.get(i).trim().equals("")))
-                startingIndex += stringChunks.get(i).split(" ").length;
+                startingIndex += stringChunks.get(i).trim().split(" ").length;
         }
         Integer endingIndex = startingIndex - 1;
-        for (int i = selectedChunks.getKey(); i <= selectedChunks.getValue(); i++) {
+        for (int i = selectedChunk.getKey(); i <= selectedChunk.getValue(); i++) {
             if (!(stringChunks.get(i).trim().equals("")))
-                endingIndex += stringChunks.get(i).split(" ").length;
+                endingIndex += stringChunks.get(i).trim().split(" ").length;
         }
         JSONObject tmp = (JSONObject) new SemanticsModel(composedContent).newGetSlotPathFiller(pathToChild);
         tmp.put("chunk-start", startingIndex);
         tmp.put("chunk-end", endingIndex);
     }
-
-
 }
