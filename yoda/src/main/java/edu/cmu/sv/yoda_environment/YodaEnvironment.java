@@ -30,7 +30,13 @@ import java.util.logging.Logger;
  */
 public class YodaEnvironment {
     // remove console logging from the root log handler
+    public static boolean mongoLoggingActive = true;
     static{
+        if (mongoLoggingActive)
+            MongoLogHandler.start();
+
+
+        // don't log all handlers to stdout
         Logger rootLogger = Logger.getLogger("");
         Handler[] handlers = rootLogger.getHandlers();
         if (handlers[0] instanceof ConsoleHandler) {

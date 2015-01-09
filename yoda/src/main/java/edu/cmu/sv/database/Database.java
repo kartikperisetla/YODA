@@ -1,6 +1,7 @@
 package edu.cmu.sv.database;
 
 
+import edu.cmu.sv.yoda_environment.MongoLogHandler;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
@@ -39,17 +40,23 @@ import java.util.stream.Collectors;
  */
 public class Database {
     private static Logger logger = Logger.getLogger("yoda.database.Database");
-    private static FileHandler fh;
     static {
         try {
-            fh = new FileHandler("Database.log");
-            fh.setFormatter(new SimpleFormatter());
+            if (YodaEnvironment.mongoLoggingActive){
+                MongoLogHandler handler = new MongoLogHandler();
+                logger.addHandler(handler);
+            } else {
+                FileHandler fh;
+                fh = new FileHandler("Database.log");
+                fh.setFormatter(new SimpleFormatter());
+                logger.addHandler(fh);
+            }
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(0);
         }
-        logger.addHandler(fh);
     }
+
     public YodaEnvironment yodaEnvironment;
 //    Repository repository;
     // a counter used to create new URIs

@@ -3,8 +3,10 @@ package edu.cmu.sv.spoken_language_understanding;
 import edu.cmu.sv.dialog_state_tracking.Turn;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.StringDistribution;
+import edu.cmu.sv.yoda_environment.MongoLogHandler;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.json.simple.JSONObject;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -16,6 +18,7 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Created by David Cohen on 11/21/14.
@@ -25,22 +28,29 @@ import java.util.regex.Pattern;
  */
 public class RegexUnderstander implements SpokenLanguageUnderstander{
     private static Logger logger = Logger.getLogger("yoda.spoken_language_understanding.RegexUnderstander");
-    private static FileHandler fh;
     static {
         try {
-            fh = new FileHandler("RegexUnderstander.log");
-            fh.setFormatter(new SimpleFormatter());
+            if (YodaEnvironment.mongoLoggingActive){
+                MongoLogHandler handler = new MongoLogHandler();
+                logger.addHandler(handler);
+            } else {
+                FileHandler fh;
+                fh = new FileHandler("RegexUnderstander.log");
+                fh.setFormatter(new SimpleFormatter());
+                logger.addHandler(fh);
+            }
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(0);
         }
-        logger.addHandler(fh);
     }
 
 
     @Override
     public void process1BestAsr(String asrResult) {
-        logger.info("input asr result:"+asrResult);
+        JSONObject inputRecord = MongoLogHandler.createEventRecord("asr_input_event");
+        inputRecord.put("asr_result", asrResult);
+        logger.info(inputRecord.toJSONString());
         if (asrResult.length()==0)
             return;
 
@@ -148,8 +158,15 @@ public class RegexUnderstander implements SpokenLanguageUnderstander{
         Turn newTurn = new Turn("user", null, null, hypotheses, hypothesisDistribution);
         Calendar calendar = Calendar.getInstance();
         yodaEnvironment.DstInputQueue.add(new ImmutablePair<>(newTurn, calendar.getTimeInMillis()));
-        logger.info("hypothesis distribution:" + hypothesisDistribution);
-        logger.info("hypotheses:"+hypotheses);
+
+//        Map<String, JSONObject>
+        JSONObject outputRecord = MongoLogHandler.createEventRecord("slu_output_record");
+        outputRecord.put("hypothesis_distribution", hypothesisDistribution.getInternalDistribution());
+//        outputRecord.put("hypotheses", hypotheses.keySet().forEach();
+        logger.info(outputRecord.toJSONString());
+
+//        logger.info("hypothesis distribution:" + hypothesisDistribution);
+//        logger.info("hypotheses:"+hypotheses);
     }
 
     @Override

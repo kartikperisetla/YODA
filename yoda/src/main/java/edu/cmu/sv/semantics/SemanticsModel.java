@@ -15,6 +15,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 
+import java.io.IOException;
 import java.lang.Object;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -516,8 +517,8 @@ public class SemanticsModel {
         try {
             return (JSONObject) parser.parse(jsonString);
         } catch (ParseException e) {
-            e.printStackTrace();
-            throw new Error("failed to parse json string:"+jsonString);
+//            e.printStackTrace();
+            throw new Error("failed to parse json string:" + e.getMessage() + "\ninput string:"+jsonString);
         }
     }
 
