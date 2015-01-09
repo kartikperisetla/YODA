@@ -5,17 +5,21 @@ import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.ThingWithRoles;
+import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.ActionSchema;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ClarificationDialogAct;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.utils.Combination;
 import edu.cmu.sv.utils.StringDistribution;
+import edu.cmu.sv.yoda_environment.MongoLogHandler;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.system_action.SystemAction;
 import edu.cmu.sv.system_action.dialog_act.*;
 
 import edu.cmu.sv.utils.HypothesisSetManagement;
 import org.apache.commons.lang3.tuple.Pair;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import java.io.IOException;
 import java.util.*;
@@ -33,17 +37,23 @@ import java.util.stream.Collectors;
  */
 public class DialogManager implements Runnable {
     private static Logger logger = Logger.getLogger("yoda.dialog_management.DialogManager");
-    private static FileHandler fh;
     static {
         try {
-            fh = new FileHandler("DialogManager.log");
-            fh.setFormatter(new SimpleFormatter());
+            if (YodaEnvironment.mongoLoggingActive){
+                MongoLogHandler handler = new MongoLogHandler();
+                logger.addHandler(handler);
+            } else {
+                FileHandler fh;
+                fh = new FileHandler("DialogManager.log");
+                fh.setFormatter(new SimpleFormatter());
+                logger.addHandler(fh);
+            }
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(0);
         }
-        logger.addHandler(fh);
     }
+
 
     YodaEnvironment yodaEnvironment;
     StringDistribution dialogStateDistribution = new StringDistribution();
@@ -205,7 +215,34 @@ public class DialogManager implements Runnable {
                     dialogStateDistribution = DmInput.getRight();
                 }
                 List<Pair<SystemAction, Double>> rankedActions = enumerateAndScorePossibleActions();
-                logger.info("Ranked actions: " + rankedActions.toString());
+
+                // generate log record
+                JSONObject record = MongoLogHandler.createEventRecord("evaluated_actions");
+                JSONArray evaluatedActions = new JSONArray();
+                for (int i = 0; i < rankedActions.size(); i++) {
+                    Pair<SystemAction, Double> action = rankedActions.get(i);
+                    JSONObject JSONAction = SemanticsModel.parseJSON("{}");
+                    JSONAction.put("score", action.getRight());
+                    if (action.getLeft()==null) {
+                        JSONAction.put("class", "null");
+                        continue;
+                    }
+                    JSONAction.put("class", action.getLeft().getClass().getSimpleName());
+                    if (NonDialogTask.class.isAssignableFrom(action.getLeft().getClass())){
+                        JSONAction.put("task_type", NonDialogTask.class.getSimpleName());
+                        JSONAction.put("task_spec", ((NonDialogTask) action.getLeft()).getTaskSpec());
+                    } else if (DialogAct.class.isAssignableFrom(action.getLeft().getClass())){
+                        JSONAction.put("task_type", DialogAct.class.getSimpleName());
+                        JSONAction.put("bound_individuals", new JSONObject(((DialogAct) action.getLeft()).getBoundIndividuals()));
+                        JSONAction.put("bound_classes", new JSONObject(((DialogAct) action.getLeft()).getBoundClasses()));
+                        JSONAction.put("bound_paths", new JSONObject(((DialogAct) action.getLeft()).getBoundPaths()));
+                        JSONAction.put("bound_descriptions", new JSONObject(((DialogAct) action.getLeft()).getBoundDescriptions()));
+                    }
+                    evaluatedActions.add(JSONAction);
+                }
+                record.put("actions", evaluatedActions);
+                logger.info(record.toJSONString());
+
                 SystemAction selectedAction = rankedActions.get(0).getKey();
                 if (selectedAction!=null) {
                     yodaEnvironment.exe.execute(selectedAction);

@@ -1,11 +1,14 @@
 package edu.cmu.sv.dialog_state_tracking;
 
+import edu.cmu.sv.yoda_environment.MongoLogHandler;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.HypothesisSetManagement;
 import edu.cmu.sv.utils.StringDistribution;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import java.io.IOException;
 import java.util.*;
@@ -22,13 +25,19 @@ public class DialogStateTracker implements Runnable {
     private static FileHandler fh;
     static {
         try {
-            fh = new FileHandler("DialogStateTracker.log");
-            fh.setFormatter(new SimpleFormatter());
+            if (YodaEnvironment.mongoLoggingActive){
+                MongoLogHandler handler = new MongoLogHandler();
+                logger.addHandler(handler);
+            } else {
+                FileHandler fh;
+                fh = new FileHandler("DialogStateTracker.log");
+                fh.setFormatter(new SimpleFormatter());
+                logger.addHandler(fh);
+            }
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(0);
         }
-        logger.addHandler(fh);
     }
 
 
@@ -61,7 +70,10 @@ public class DialogStateTracker implements Runnable {
 
     private void updateDialogState(Turn turn, long timeStamp){
         try {
-            logger.info("New turn:\n"+turn);
+            JSONObject turnStartRecord = MongoLogHandler.createEventRecord("dst_turn_input");
+            turnStartRecord.put("speaker", turn.speaker);
+            logger.info(turnStartRecord.toJSONString());
+
             // validate input
             if (turn.hypotheses != null) {
                 for (SemanticsModel sm : turn.hypotheses.values()) {
@@ -99,10 +111,48 @@ public class DialogStateTracker implements Runnable {
             hypothesisDistribution.normalize();
 
             String topHyp = hypothesisDistribution.getTopHypothesis();
-            logger.info("dst loop, number of active hypotheses:" + hypothesisMap.size());
-            logger.info("dialog state distribution:"+hypothesisDistribution);
-            logger.info("top dialog state hypothesis: (p=" + hypothesisDistribution.get(topHyp) + ")");
-            logger.info(hypothesisMap.get(topHyp).toString());
+
+            // generate log record
+            JSONObject loopCompleteRecord = MongoLogHandler.createEventRecord("dst_loop_complete");
+            loopCompleteRecord.put("n_hypotheses", hypothesisMap.size());
+            loopCompleteRecord.put("hypothesis_distribution", new JSONObject(hypothesisDistribution.getInternalDistribution()));
+
+            JSONObject dialogStateHypothesesJSON = new JSONObject();
+            for (String key : hypothesisMap.keySet()){
+                DialogState hypothesisState = hypothesisMap.get(key);
+                JSONObject dialogStateHypothesisJSON = new JSONObject();
+
+                JSONObject discourseUnitsJSON = new JSONObject();
+                Map<String, DiscourseUnit> discourseUnitMap = hypothesisState.getDiscourseUnitHypothesisMap();
+                for (String duKey : discourseUnitMap.keySet()){
+                    DiscourseUnit discourseUnit = discourseUnitMap.get(duKey);
+                    JSONObject discourseUnitJSON = new JSONObject();
+                    discourseUnitJSON.put("initiator", discourseUnit.getInitiator());
+                    if (discourseUnit.getSpokenByThem()!=null) {
+                        discourseUnitJSON.put("spoken_by_them", discourseUnit.getSpokenByThem().getInternalRepresentation());
+                        discourseUnitJSON.put("ground_interpretation", discourseUnit.getGroundInterpretation().getInternalRepresentation());
+                    }
+                    if (discourseUnit.getSpokenByMe()!=null) {
+                        discourseUnitJSON.put("spoken_by_me", discourseUnit.getSpokenByMe().getInternalRepresentation());
+                        discourseUnitJSON.put("ground_truth", discourseUnit.getGroundTruth().getInternalRepresentation());
+                    }
+                    discourseUnitsJSON.put(duKey, discourseUnitJSON);
+                }
+
+                JSONArray argumentationLinks = new JSONArray();
+                for (DialogState.ArgumentationLink link : hypothesisState.argumentationLinks){
+                    JSONObject argumentationLinkJSON = new JSONObject();
+                    argumentationLinkJSON.put("predecessor", link.getPredecessor());
+                    argumentationLinkJSON.put("successor", link.getSuccessor());
+                    argumentationLinks.add(argumentationLinkJSON);
+                }
+
+                    dialogStateHypothesisJSON.put("discourse_units", discourseUnitsJSON);
+                dialogStateHypothesisJSON.put("argumentation_links", argumentationLinks);
+                dialogStateHypothesesJSON.put(key, dialogStateHypothesisJSON);
+            }
+            loopCompleteRecord.put("hypotheses", dialogStateHypothesesJSON);
+            logger.info(loopCompleteRecord.toJSONString());
 
             yodaEnvironment.DmInputQueue.add(new ImmutablePair<>(hypothesisMap, hypothesisDistribution));
 

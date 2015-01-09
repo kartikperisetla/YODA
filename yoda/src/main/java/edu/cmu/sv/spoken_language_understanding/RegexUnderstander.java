@@ -159,10 +159,11 @@ public class RegexUnderstander implements SpokenLanguageUnderstander{
         Calendar calendar = Calendar.getInstance();
         yodaEnvironment.DstInputQueue.add(new ImmutablePair<>(newTurn, calendar.getTimeInMillis()));
 
-//        Map<String, JSONObject>
+        Map<String, JSONObject> JSONHypotheses = new HashMap<>();
+        hypotheses.keySet().forEach(x -> JSONHypotheses.put(x, hypotheses.get(x).getInternalRepresentation()));
         JSONObject outputRecord = MongoLogHandler.createEventRecord("slu_output_record");
         outputRecord.put("hypothesis_distribution", hypothesisDistribution.getInternalDistribution());
-//        outputRecord.put("hypotheses", hypotheses.keySet().forEach();
+        outputRecord.put("hypotheses", new JSONObject(JSONHypotheses));
         logger.info(outputRecord.toJSONString());
 
 //        logger.info("hypothesis distribution:" + hypothesisDistribution);
