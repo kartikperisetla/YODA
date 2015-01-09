@@ -3,10 +3,8 @@ package edu.cmu.sv.dialog_management;
 import edu.cmu.sv.database.dialog_task.ActionEnumeration;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
-import edu.cmu.sv.natural_language_generation.Grammar;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.ThingWithRoles;
-import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.ActionSchema;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ClarificationDialogAct;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
@@ -83,7 +81,7 @@ public class DialogManager implements Runnable {
                 for (Class<? extends DialogAct> dialogActClass : DialogRegistry.argumentationDialogActs) {
                     DialogAct dialogActInstance = dialogActClass.newInstance();
                     Set<Map<String, Object>> possibleBindings = ActionEnumeration.
-                            getPossibleBindings(dialogActInstance, yodaEnvironment, ActionEnumeration.FOCUS_CONSTRAINT.IN_FOCUS);
+                            getPossibleIndividualBindings(dialogActInstance, yodaEnvironment, ActionEnumeration.FOCUS_CONSTRAINT.IN_FOCUS);
                     for (Map<String, Object> binding : possibleBindings) {
                         for (String discourseUnitHypothesisId : currentDialogState.getDiscourseUnitHypothesisMap().
                                 keySet()) {
@@ -106,51 +104,15 @@ public class DialogManager implements Runnable {
                             keySet()) {
                         DiscourseUnit contextDiscourseUnit = currentDialogState.
                                 getDiscourseUnitHypothesisMap().get(discourseUnitHypothesisId);
-
-                        Class<? extends ThingWithRoles> verbClass =
-                                (Class<? extends ThingWithRoles>)
-                                OntologyRegistry.thingNameMap.get(
-                                        (String) contextDiscourseUnit.getFromInitiator("verb.class"));
-                        if (verbClass==null)
-                            continue;
-
-                        Map<String, Set<Object>> possibleBindingsPerVariable = new HashMap<>();
-                        if (dialogActInstance.getPathParameters().containsKey("given_role_path")) {
-                            possibleBindingsPerVariable.put("given_role_path",
-                                    OntologyRegistry.roleClasses.stream().
-                                            filter(x -> OntologyRegistry.inDomain(x, verbClass)).
-                                            map(x -> "verb." + x.getSimpleName()).
-                                            collect(Collectors.toSet()));
-                        }
-                        if (dialogActInstance.getPathParameters().containsKey("requested_role_path")){
-                            possibleBindingsPerVariable.put("requested_role_path",
-                                    OntologyRegistry.roleClasses.stream().
-                                            filter(x -> OntologyRegistry.inDomain(x, verbClass)).
-                                            map(x -> "verb." + x.getSimpleName()).
-                                            collect(Collectors.toSet()));
-                        }
-                        possibleBindingsPerVariable.put("verb_class", new HashSet<>(Arrays.asList(verbClass.getSimpleName())));
-
-//                        System.out.println("DM: possibleBindingsPerVariable:\n"+possibleBindingsPerVariable);
-
-
-                        Set<Map<String, Object>> possibleBindings = Combination.possibleBindings(possibleBindingsPerVariable);
-                        for (Map<String, Object> binding : possibleBindings){
-                            if (binding.containsKey("given_role_path")){
-                                Object givenRoleDescription = contextDiscourseUnit.getFromInitiator(
-                                        (String) binding.get("given_role_path"));
-                                if (givenRoleDescription==null)
-                                    continue;
-                                // add description parameter that corresponds to the path parameter
-                                if(dialogActInstance.getDescriptionParameters().containsKey("given_role_description")) {
-                                    binding.put("given_role_description", givenRoleDescription);
-                                }
-                            }
+//                        ActionEnumeration.getPossibleNonIndividualBindings(dialogActInstance, contextDiscourseUnit).forEach(System.out::println);
+                        for (Map<String, Object> binding : ActionEnumeration.getPossibleNonIndividualBindings(
+                                dialogActInstance, contextDiscourseUnit)){
                             DialogAct newDialogActInstance = dialogActClass.newInstance();
                             newDialogActInstance.bindVariables(binding);
                             Double currentReward = newDialogActInstance.reward(currentDialogState, contextDiscourseUnit);
                             accumulateReward(actionExpectedReward, newDialogActInstance, currentReward);
                         }
+
                     }
                 }
             }
@@ -159,7 +121,7 @@ public class DialogManager implements Runnable {
             for (Class<? extends ClarificationDialogAct> dialogActClass : DialogRegistry.clarificationDialogActs) {
                 ClarificationDialogAct dialogActInstance = dialogActClass.newInstance();
                 Set<Map<String, Object>> possibleBindings = ActionEnumeration.
-                        getPossibleBindings(dialogActInstance, yodaEnvironment, ActionEnumeration.FOCUS_CONSTRAINT.IN_FOCUS);
+                        getPossibleIndividualBindings(dialogActInstance, yodaEnvironment, ActionEnumeration.FOCUS_CONSTRAINT.IN_FOCUS);
                 for (Map<String, Object> binding : possibleBindings) {
                     ClarificationDialogAct newDialogActInstance = dialogActClass.newInstance();
                     newDialogActInstance.bindVariables(binding);
