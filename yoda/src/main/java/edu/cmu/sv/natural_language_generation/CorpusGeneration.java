@@ -1,6 +1,5 @@
 package edu.cmu.sv.natural_language_generation;
 
-import com.google.common.collect.Iterables;
 import edu.cmu.sv.database.dialog_task.ActionEnumeration;
 import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.ontology.OntologyRegistry;
@@ -22,10 +21,8 @@ import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by David Cohen on 12/30/14.
@@ -150,8 +147,9 @@ public class CorpusGeneration {
         return ans;
     }
 
-    public static Set<Map.Entry<String, SemanticsModel>> generateCorpus2() {
-        Set<Map.Entry<String, SemanticsModel>> ans = new HashSet<>();
+    public static List<Map.Entry<String, SemanticsModel>> generateCorpus2() {
+        int maxBindingsPerDialogActClass = 100;
+        List<Map.Entry<String, SemanticsModel>> ans = new LinkedList<>();
         YodaEnvironment yodaEnvironment = YodaEnvironment.minimalLanguageProcessingEnvironment();
 
         try {
@@ -159,8 +157,16 @@ public class CorpusGeneration {
             System.out.println("generating clarification dialog acts");
             for (Class<? extends DialogAct> dialogActClass : DialogRegistry.clarificationDialogActs) {
                 DialogAct dialogActInstance = dialogActClass.newInstance();
-                Set<Map<String, Object>> possibleBindings = ActionEnumeration.
-                        getPossibleIndividualBindings(dialogActInstance, yodaEnvironment, ActionEnumeration.FOCUS_CONSTRAINT.IN_KB);
+
+                Set<Map<String, Object>> returnedBindings = ActionEnumeration.getPossibleIndividualBindings(
+                        dialogActInstance, yodaEnvironment, ActionEnumeration.FOCUS_CONSTRAINT.IN_KB);
+                Set<Map<String, Object>> possibleBindings = returnedBindings;
+                if (returnedBindings.size() > maxBindingsPerDialogActClass) {
+                    possibleBindings = new HashSet<>(Arrays.asList(
+                            NaturalLanguageGenerator.randomData.nextSample(
+                                    possibleBindings, maxBindingsPerDialogActClass)).stream().map(x -> (Map<String, Object>)x).
+                            collect(Collectors.toList()));
+                }
                 for (Map<String, Object> binding : possibleBindings) {
                     DialogAct newDialogActInstance = dialogActClass.newInstance();
                     newDialogActInstance.bindVariables(binding);
@@ -195,10 +201,9 @@ public class CorpusGeneration {
 //                System.out.println(newDialogActInstance.getNlgCommand());
                 Map<String, SemanticsModel> generatedEntries = yodaEnvironment.nlg.generateAll(
                         newDialogActInstance.getNlgCommand(), yodaEnvironment, Grammar.DEFAULT_GRAMMAR_PREFERENCES);
-                for (int i = 0; i < 30; i++) {
+                for (int i = 0; i < 11; i++) {
                     ans.addAll(generatedEntries.entrySet());
                 }
-//                generatedEntries.keySet().forEach(System.out::println);
             }
 
 
@@ -206,7 +211,7 @@ public class CorpusGeneration {
             e.printStackTrace();
             System.exit(0);
         }
-        return ans;
+        return ans.stream().filter(x -> !x.getKey().equals("NLG currently can't generate an utterance for this meaning")).collect(Collectors.toList());
     }
 
 }

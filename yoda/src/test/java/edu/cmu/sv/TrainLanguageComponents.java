@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  * Generate an artificial corpus and use it to train language components (SLU / LM)
  */
 public class TrainLanguageComponents {
-
+    public static int inVocabCutoff = 10;
 
     @Test
     public void Test() throws FileNotFoundException, UnsupportedEncodingException {
@@ -39,7 +39,7 @@ public class TrainLanguageComponents {
         Set<NodeMultiClassificationProblem> multiClassificationProblems = new HashSet<>();
         System.out.println("generating corpus");
 //        Map<String, SemanticsModel> corpus = CorpusGeneration.generateCorpus();
-        Set<Map.Entry<String, SemanticsModel>> corpus = CorpusGeneration.generateCorpus2();
+        List<Map.Entry<String, SemanticsModel>> corpus = CorpusGeneration.generateCorpus2();
         System.out.println("corpus size:" + corpus.size());
 
         System.out.println("collecting features and training samples");
@@ -178,7 +178,7 @@ public class TrainLanguageComponents {
         {
             // select chunking features from those that were seen
             LinkedList<String> retainedVocabulary = new LinkedList(vocabularyCounter.elementSet().stream().
-                    filter(x -> vocabularyCounter.count(x) > 45).collect(Collectors.toList()));
+                    filter(x -> vocabularyCounter.count(x) > inVocabCutoff).collect(Collectors.toList()));
             retainedVocabulary.add(0, Chunker.UNK);
 
             // retain all context features and output labels
@@ -231,7 +231,6 @@ public class TrainLanguageComponents {
             for (int i = 0; i < retainedFeatures.size(); i++) {
                 featurePositionMap.put(retainedFeatures.get(i), i);
             }
-
 
             // write out classification preferences
             try {

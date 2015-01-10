@@ -2,6 +2,7 @@ package edu.cmu.sv.database.dialog_task;
 
 import edu.cmu.sv.database.Database;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
+import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.ThingWithRoles;
@@ -75,6 +76,7 @@ public class ActionEnumeration {
 
     public static Set<Object> getPossibleGivenDescriptions(DiscourseUnit contextDiscourseUnit,
                                                            String path){
+        int maxResponses = 5;
         Set<Object> ans = new HashSet<>();
         if (contextDiscourseUnit!=null){
             if (contextDiscourseUnit.getFromInitiator(path)!=null)
@@ -94,7 +96,9 @@ public class ActionEnumeration {
                 }
             }
         }
-//        System.out.println("getPossibleGivenDescriptions result:"+ans);
+        if (ans.size() > maxResponses){
+            return new HashSet<>(Arrays.asList(NaturalLanguageGenerator.randomData.nextSample(ans, maxResponses)));
+        }
         return ans;
     }
 

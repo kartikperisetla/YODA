@@ -38,9 +38,9 @@ public class GenerateCorpus {
     @Test
     public void Test() throws FileNotFoundException, UnsupportedEncodingException {
         System.out.println("generating corpus...");
-        Set<Map.Entry<String, SemanticsModel>> corpus = CorpusGeneration.generateCorpus2();
+        List<Map.Entry<String, SemanticsModel>> corpus = CorpusGeneration.generateCorpus2();
         System.out.println("corpus size:"+corpus.size());
-
+        corpus.forEach(x -> System.out.print("---\n"+x.getKey()+"\n"+x.getValue().getInternalRepresentation().toJSONString()+"\n"));
 
     }
 }
