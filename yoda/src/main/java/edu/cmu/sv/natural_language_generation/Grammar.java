@@ -3,6 +3,7 @@ package edu.cmu.sv.natural_language_generation;
 
 import edu.cmu.sv.natural_language_generation.internal_templates.*;
 import edu.cmu.sv.natural_language_generation.top_level_templates.*;
+import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestFixMisunderstanding;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,5 +59,6 @@ public class Grammar {
         grammar1_roots.add(ConfirmGroundingSuggestionTemplate0.class);
 //        grammar1_roots.add(RequestAgentTemplate.class);
         grammar1_roots.add(RequestRoleTemplate.class);
+        grammar1_roots.add(RequestFixMisunderstandingTemplate0.class);
     }
 }

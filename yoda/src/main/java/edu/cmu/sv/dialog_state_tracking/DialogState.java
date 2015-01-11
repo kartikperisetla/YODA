@@ -12,6 +12,7 @@ public class DialogState {
     Map<String, DiscourseUnit> discourseUnitHypothesisMap = new HashMap<>();
     Set<ArgumentationLink> argumentationLinks = new HashSet<>();
     long discourseUnitCounter = 0;
+    int misunderstandingCounter = 0;
 
     public static class ArgumentationLink{
         public ArgumentationLink(String predecessor, String successor) {
@@ -55,6 +56,7 @@ public class DialogState {
             ans.discourseUnitHypothesisMap.put(key, discourseUnitHypothesisMap.get(key).deepCopy());
         }
         ans.discourseUnitCounter = discourseUnitCounter;
+        ans.misunderstandingCounter = misunderstandingCounter;
         return ans;
     }
 

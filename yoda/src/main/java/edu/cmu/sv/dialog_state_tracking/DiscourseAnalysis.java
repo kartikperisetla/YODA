@@ -51,7 +51,12 @@ public class DiscourseAnalysis {
         }
     }
 
+    public void analyseValidity() throws Assert.AssertException {
+        Assert.verify(discourseUnit.getFromInitiator("verb") != null);
+    }
+
     public void analyseSlotFilling() throws Assert.AssertException {
+        analyseValidity();
         if (discourseUnit.initiator.equals("user")){
             Assert.verify(discourseUnit.spokenByMe!=null);
             Assert.verify(discourseUnit.groundTruth != null);
@@ -62,6 +67,7 @@ public class DiscourseAnalysis {
     }
 
     public void analyseSuggestions() throws Assert.AssertException {
+        analyseValidity();
         if (discourseUnit.initiator.equals("user")) {
             Set<String> suggestionPaths = discourseUnit.getSpokenByMe().
                     findAllPathsToClass(Suggested.class.getSimpleName());
@@ -87,7 +93,8 @@ public class DiscourseAnalysis {
             descriptionMatch=0.0;
     }
 
-    public void analyseGround(){
+    public void analyseGround() throws Assert.AssertException {
+        analyseValidity();
         if (discourseUnit.groundTruth==null || discourseUnit.groundInterpretation==null) {
             groundMatch = false;
             return;

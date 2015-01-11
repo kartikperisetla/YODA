@@ -40,6 +40,8 @@ public class RequestSlotInference extends DialogStateUpdateInference {
                     JSONObject givenContent;
                     try {
                         Assert.verify(!predecessor.initiator.equals("system"));
+                        DiscourseAnalysis analysis = new DiscourseAnalysis(predecessor, yodaEnvironment);
+                        analysis.analyseValidity();
                         JSONObject verbObject = (JSONObject) hypModel.newGetSlotPathFiller("verb");
                         Set<String> requestPaths = hypModel.findAllPathsToClass(Requested.class.getSimpleName());
                         Assert.verify(requestPaths.size() == 1);

@@ -10,6 +10,7 @@ import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.*;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ClarificationDialogAct;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ConfirmValueSuggestion;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestConfirmValue;
+import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestFixMisunderstanding;
 import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestRole;
 import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestRoleGivenRole;
 import edu.cmu.sv.system_action.non_dialog_task.GiveDirectionsTask;
@@ -44,6 +45,8 @@ public class DialogRegistry {
         argumentationDialogActs.add(Accept.class);
         argumentationDialogActs.add(Reject.class);
         argumentationDialogActs.add(DontKnow.class);
+        // this is not really an argumentation dialog act, but its reward is scored like one
+        argumentationDialogActs.add(RequestFixMisunderstanding.class);
 
         slotFillingDialogActs.add(RequestRoleGivenRole.class);
         slotFillingDialogActs.add(RequestRole.class);

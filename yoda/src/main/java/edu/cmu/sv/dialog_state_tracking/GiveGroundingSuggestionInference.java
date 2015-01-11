@@ -14,7 +14,6 @@ import org.json.simple.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by David Cohen on 10/17/14.
@@ -80,6 +79,8 @@ public class GiveGroundingSuggestionInference extends DialogStateUpdateInference
                     DiscourseUnit predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId);
                     try{
                         Assert.verify(!predecessor.initiator.equals("system"));
+                        DiscourseAnalysis analysis = new DiscourseAnalysis(predecessor, yodaEnvironment);
+                        analysis.analyseValidity();
 //                        Set<String> suggestionPaths = predecessor.getSpokenByThem().findAllPathsToClass(Suggested.class.getSimpleName());
 //                        Assert.verify(suggestionPaths.size()==0);
                     } catch (Assert.AssertException e){

@@ -187,6 +187,8 @@ public class SemanticsModel {
         } catch (ParseException e) {
             e.printStackTrace();
             throw new Error("failed to create a json object from an existing json object"+internalRepresentation);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new Error("failed to create a json object from an existing json object due to an index error"+internalRepresentation);
         }
         return ans;
     }
@@ -517,7 +519,7 @@ public class SemanticsModel {
         try {
             return (JSONObject) parser.parse(jsonString);
         } catch (ParseException e) {
-//            e.printStackTrace();
+            e.printStackTrace();
             throw new Error("failed to parse json string:" + e.getMessage() + "\ninput string:"+jsonString);
         }
     }
