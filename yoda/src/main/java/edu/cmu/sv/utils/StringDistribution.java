@@ -91,6 +91,16 @@ public class StringDistribution{
         }
     }
 
+    public double information(){
+        double ans = 0.0;
+        for (String key : internalDistribution.keySet()){
+            if (internalDistribution.get(key)<=0.0001)
+                continue;
+            ans -= internalDistribution.get(key)*Math.log(internalDistribution.get(key))/Math.log(2.0);
+        }
+        return ans;
+    }
+
     public Collection<String> keySet() {return internalDistribution.keySet();}
     public Collection<Double> values(){
         return internalDistribution.values();

@@ -38,8 +38,12 @@ public class ReferenceResolution {
     /*
     * return a distribution over URI's that this JSONObject may refer to
     * */
-    public static StringDistribution resolveReference(YodaEnvironment yodaEnvironment, JSONObject reference){
+    public static StringDistribution resolveReference(YodaEnvironment yodaEnvironment,
+                                                      JSONObject reference,
+                                                      boolean requireReferentInFocus){
         String queryString = Database.prefixes + "SELECT DISTINCT ?x0 ?score0 WHERE {\n";
+        if (requireReferentInFocus)
+            queryString += "?x0 rdf:type dst:InFocus .\n";
         queryString += referenceResolutionHelper(reference, 0).getKey();
         queryString += "} \nORDER BY DESC(?score0) \nLIMIT 10";
 
@@ -83,7 +87,8 @@ public class ReferenceResolution {
     * Return a partial query string and an updated tmpVarIndex for the reference JSONObject
     * tmpVarIndex is used so that temporary variables within the query don't have naming conflicts
     * */
-    private static Pair<String, Integer> referenceResolutionHelper(JSONObject reference, Integer tmpVarIndex){
+    private static Pair<String, Integer> referenceResolutionHelper(JSONObject reference,
+                                                                   Integer tmpVarIndex){
         try {
             int referenceIndex = tmpVarIndex;
             tmpVarIndex ++;
@@ -303,7 +308,8 @@ public class ReferenceResolution {
             for (String slotPathToResolve : slotPathsToResolve) {
                 referenceMarginals.put(slotPathToResolve,
                         ReferenceResolution.resolveReference(yodaEnvironment,
-                                (JSONObject) targetDiscourseUnit.getSpokenByThem().newGetSlotPathFiller(slotPathToResolve)));
+                                (JSONObject) targetDiscourseUnit.getSpokenByThem().newGetSlotPathFiller(slotPathToResolve),
+                                false));
             }
             Pair<StringDistribution, Map<String, Map<String, String>>> referenceJoint =
                     HypothesisSetManagement.getJointFromMarginals(referenceMarginals, 10);

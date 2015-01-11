@@ -1,12 +1,11 @@
 package edu.cmu.sv.natural_language_generation.internal_templates;
 
-import edu.cmu.sv.natural_language_generation.Lexicon;
+import edu.cmu.sv.database.dialog_task.ReferenceResolution;
+import edu.cmu.sv.natural_language_generation.*;
 import edu.cmu.sv.utils.Assert;
+import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.database.Database;
-import edu.cmu.sv.natural_language_generation.GenerationUtils;
-import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
-import edu.cmu.sv.natural_language_generation.Template;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.ThingWithRoles;
@@ -214,7 +213,29 @@ public class DefiniteReferenceTemplate0 implements Template {
                 DefiniteReferenceTemplate0::compositionFunction, new HashMap<>(), yodaEnvironment).entrySet()){
             ans.put(entry.getKey(), entry.getValue());
         }
-        return ans;
+
+        Map<String, JSONObject> newAns = new HashMap<>();
+
+        // only select references that are discriminative within the current dialog context focus
+        for (String reference : ans.keySet()) {
+            SemanticsModel filteredModel = new SemanticsModel(ans.get(reference).toJSONString());
+            filteredModel.filterOutLeafSlot("chunk-start");
+            filteredModel.filterOutLeafSlot("chunk-end");
+//            System.out.println("reference:"+reference+", model:"+filteredModel.getInternalRepresentation());
+            StringDistribution referenceAmbiguity = ReferenceResolution.resolveReference(
+                    yodaEnvironment, filteredModel.getInternalRepresentation(), true);
+//            System.out.println("information:"+referenceAmbiguity.information() + ", distribution:"+referenceAmbiguity);
+            if (!referenceAmbiguity.containsKey(entityURI)){
+//                System.out.println("the intended reference doesn't even appear as a top 10 referent in the discourse context");
+            } else {
+                if (referenceAmbiguity.information() < yodaEnvironment.nlg.grammarPreferences.referenceAmbiguityThreshold &&
+                        referenceAmbiguity.getTopHypothesis().equals(entityURI)) {
+                    newAns.put(reference, ans.get(reference));
+//                    System.out.println("this reference is acceptable");
+                }
+            }
+        }
+        return newAns;
     }
 
     private static JSONObject compositionFunction(List<JSONObject> children){

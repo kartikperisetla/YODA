@@ -57,7 +57,7 @@ public class TestResolveReferences {
         SemanticsModel.wrap(reference, Noun.class.getSimpleName(), HasName.class.getSimpleName());
         System.out.println(reference.toJSONString());
 
-        StringDistribution possibleReferences = ReferenceResolution.resolveReference(yodaEnvironment, reference);
+        StringDistribution possibleReferences = ReferenceResolution.resolveReference(yodaEnvironment, reference, false);
         for (String possibleReference : possibleReferences.keySet()){
             String labelQuery = "SELECT ?x WHERE { <"+possibleReference+"> rdfs:label ?x}";
             System.out.println("--- Possible Referent: --- (score = "+possibleReferences.get(possibleReference)+")");
@@ -73,7 +73,7 @@ public class TestResolveReferences {
         SemanticsModel.wrap(reference, Cafe.class.getSimpleName(), HasDistance.class.getSimpleName());
         System.out.println(reference.toJSONString());
 
-        possibleReferences = ReferenceResolution.resolveReference(yodaEnvironment, reference);
+        possibleReferences = ReferenceResolution.resolveReference(yodaEnvironment, reference, false);
         for (String possibleReference : possibleReferences.keySet()){
             String labelQuery = "SELECT ?x WHERE { <"+possibleReference+"> rdfs:label ?x}";
             System.out.println("--- Possible Referent: --- (score = "+possibleReferences.get(possibleReference)+")");
