@@ -86,7 +86,7 @@ class RecurrentNeuralNetworkModel2(object):
 
         n_training_sentences = len(x_train)
 
-        best_accuracy = -1
+        best_validation_score = -1
         settings['current_learning_rate'] = settings['lr']
         for e in xrange(settings['n_epochs']):
             # print "starting epoch:", e
@@ -111,22 +111,22 @@ class RecurrentNeuralNetworkModel2(object):
 
             num_truth = Counter()
             num_correct = Counter()
-            mean_tag_precisions = []
+            mean_tag_recalls = []
             for k in range(len(predictions_valid)):
-                mtp, nt, nc = evaluate_tagging(predictions_valid[k], y_validate[k])
+                mtr, nt, nc = evaluate_tagging(predictions_valid[k], y_validate[k])
                 num_truth.update(nt)
                 num_correct.update(nc)
-                mean_tag_precisions.append(mtp)
+                mean_tag_recalls.append(mtr)
 
-            # validation_accuracy = numpy.mean(mean_tag_precisions)
-            validation_accuracy = numpy.mean([1.0*num_correct[label] / num_truth[label] for label in num_truth.keys()])
+            # validation_score = numpy.mean(mean_tag_recalls)
+            validation_score = numpy.mean([1.0*num_correct[label] / num_truth[label] for label in num_truth.keys()])
 
-            if validation_accuracy > best_accuracy:
+            if validation_score > best_validation_score:
 
-                best_accuracy = validation_accuracy
+                best_validation_score = validation_score
                 if settings['verbose']:
                     print 'NEW BEST: epoch', e
-                print "validation precision breakdown. Mean:", validation_accuracy
+                print "validation recall breakdown. Mean:", validation_score
                 for key in num_truth.keys():
                     print key, "(", num_correct[key], "/", num_truth[key], ")", 1.0*num_correct[key] / num_truth[key]
                 sys.stdout.flush()
@@ -143,14 +143,14 @@ class RecurrentNeuralNetworkModel2(object):
             if settings['current_learning_rate'] < 1e-5:
                 break
 
-        print 'BEST RESULT: epoch', e, 'validation accuracy', best_accuracy
+        print 'BEST RESULT: epoch', e, 'validation accuracy', best_validation_score
 
 
 def evaluate_tagging(predictions, ground_truth):
     """
     :param predictions: list of predicted tokens (must be same length as ground_truth)
     :param ground_truth: list of correct tokens
-    :return: (mean tag precision, num_truth, num_correct)
+    :return: (mean tag recall, num_truth, num_correct)
     """
     # print "evaluating tagging:"
     # print ground_truth

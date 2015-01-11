@@ -1,6 +1,8 @@
 package edu.cmu.sv;
 
 import com.google.common.collect.*;
+import com.sun.xml.internal.ws.api.server.WSEndpoint;
+import com.sun.xml.internal.ws.transport.http.HttpAdapterList;
 import edu.cmu.sv.natural_language_generation.CorpusGeneration;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.role.has_quality_subroles.HasQualityRole;
@@ -38,8 +40,12 @@ public class TrainLanguageComponents {
         Set<ChunkingProblem> chunkingProblems = new HashSet<>();
         Set<NodeMultiClassificationProblem> multiClassificationProblems = new HashSet<>();
         System.out.println("generating corpus");
-//        Map<String, SemanticsModel> corpus = CorpusGeneration.generateCorpus();
-        List<Map.Entry<String, SemanticsModel>> corpus = CorpusGeneration.generateCorpus2();
+        List<Map.Entry<String, SemanticsModel>> corpus = new LinkedList<>();
+//        corpus = CorpusGeneration.generateCorpus2();
+
+        Map<String, SemanticsModel> oldCorpus = CorpusGeneration.generateCorpus();
+        oldCorpus.keySet().forEach(x -> corpus.add(new AbstractMap.SimpleEntry<String, SemanticsModel>(x, oldCorpus.get(x))));
+
         System.out.println("corpus size:" + corpus.size());
 
         System.out.println("collecting features and training samples");
