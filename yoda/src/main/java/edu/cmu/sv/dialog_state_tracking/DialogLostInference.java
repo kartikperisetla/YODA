@@ -12,12 +12,12 @@ import java.util.Map;
 /**
  * Created by David Cohen on 9/19/14.
  *
- * Infers the dialog state after misunderstanding a user turn
+ * Infers that the system is completely confused about what is going on in the dialog
  *
  */
-public class MisunderstoodTurnInference extends DialogStateUpdateInference {
-    public static final double probabilityUserTurnMisunderstood = .08;
-    public static final String duString = "Misunderstood";
+public class DialogLostInference extends DialogStateUpdateInference {
+    public static final double maxLostProbability = .9;
+    public static final String duString = "Lost";
 
     @Override
     public Pair<Map<String, DialogState>, StringDistribution> applyAll(
@@ -27,6 +27,8 @@ public class MisunderstoodTurnInference extends DialogStateUpdateInference {
         Map<String, DialogState> resultHypotheses = new HashMap<>();
 
         if (turn.speaker.equals("user")) {
+            // empty dialog state except for Lost DU
+            DialogState newDialogState = new DialogState();
             DiscourseUnit newDUHypothesis = new DiscourseUnit();
             SemanticsModel newSpokenByThemHypothesis = new SemanticsModel("{\"dialogAct\":\""+duString+"\"}");
             newDUHypothesis.timeOfLastActByThem = timeStamp;
@@ -34,14 +36,10 @@ public class MisunderstoodTurnInference extends DialogStateUpdateInference {
             newDUHypothesis.groundInterpretation = newSpokenByThemHypothesis;
             newDUHypothesis.initiator = turn.speaker;
             String newDialogStateHypothesisID = "dialog_state_hyp_0";
-            DialogState newDialogState = currentState.deepCopy();
             newDialogState.discourseUnitCounter += 1;
             newDialogState.getDiscourseUnitHypothesisMap().
                     put("du_" + newDialogState.discourseUnitCounter, newDUHypothesis);
-
-//            newDUHypothesis.actionAnalysis.update(yodaEnvironment, newDUHypothesis);
-            newDialogState.misunderstandingCounter ++;
-            resultDistribution.put(newDialogStateHypothesisID, probabilityUserTurnMisunderstood);
+            resultDistribution.put(newDialogStateHypothesisID, maxLostProbability * (1.0 - Math.exp(-1*currentState.misunderstandingCounter)));
             resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
         }
         return new ImmutablePair<>(resultHypotheses, resultDistribution);

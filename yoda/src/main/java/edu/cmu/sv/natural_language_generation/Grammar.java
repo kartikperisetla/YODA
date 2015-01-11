@@ -60,5 +60,6 @@ public class Grammar {
 //        grammar1_roots.add(RequestAgentTemplate.class);
         grammar1_roots.add(RequestRoleTemplate.class);
         grammar1_roots.add(RequestFixMisunderstandingTemplate0.class);
+        grammar1_roots.add(NotifyDialogLostTemplate0.class);
     }
 }

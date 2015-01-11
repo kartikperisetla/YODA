@@ -45,8 +45,9 @@ public class DialogRegistry {
         argumentationDialogActs.add(Accept.class);
         argumentationDialogActs.add(Reject.class);
         argumentationDialogActs.add(DontKnow.class);
-        // this is not really an argumentation dialog act, but its reward is scored like one
+        // these are not really argumentation dialog acts, but reward is scored like one
         argumentationDialogActs.add(RequestFixMisunderstanding.class);
+        argumentationDialogActs.add(InformDialogLost.class);
 
         slotFillingDialogActs.add(RequestRoleGivenRole.class);
         slotFillingDialogActs.add(RequestRole.class);

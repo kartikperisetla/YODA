@@ -1,16 +1,9 @@
 package edu.cmu.sv.dialog_management;
 
 import com.google.common.primitives.Doubles;
-import edu.cmu.sv.dialog_state_tracking.DialogState;
-import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
-import edu.cmu.sv.dialog_state_tracking.MisunderstoodTurnInference;
-import edu.cmu.sv.dialog_state_tracking.Utils;
-import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.dialog_state_tracking.*;
 import edu.cmu.sv.ontology.misc.WebResource;
 import edu.cmu.sv.ontology.role.HasURI;
-import edu.cmu.sv.ontology.verb.Verb;
-import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.system_action.ActionSchema;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Accept;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.DontKnow;
@@ -45,6 +38,11 @@ public class RewardAndCostCalculator {
     public static Double rewardForRequestFixMisunderstanding(DialogState dialogState, DiscourseUnit discourseUnit){
         return 1.0 * Utils.discourseUnitContextProbability(dialogState, discourseUnit) *
                 ((discourseUnit.getFromInitiator("dialogAct")).equals(MisunderstoodTurnInference.duString) ? 1 : -1);
+    }
+
+    public static Double rewardForDialogLost(DialogState dialogState, DiscourseUnit discourseUnit){
+        return 1.0 * Utils.discourseUnitContextProbability(dialogState, discourseUnit) *
+                ((discourseUnit.getFromInitiator("dialogAct")).equals(DialogLostInference.duString) ? 1 : -1);
     }
 
     public static Double nonDialogTaskReward(NonDialogTask task,

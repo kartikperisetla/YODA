@@ -119,7 +119,8 @@ public class DialogManager implements Runnable {
                                 dialogActInstance, contextDiscourseUnit)){
                             DialogAct newDialogActInstance = dialogActClass.newInstance();
                             newDialogActInstance.bindVariables(binding);
-                            Double currentReward = newDialogActInstance.reward(currentDialogState, contextDiscourseUnit);
+                            Double currentReward = newDialogActInstance.reward(currentDialogState, contextDiscourseUnit) *
+                                    dialogStateDistribution.get(dialogStateHypothesisId);
                             accumulateReward(actionExpectedReward, newDialogActInstance, currentReward);
                         }
 
