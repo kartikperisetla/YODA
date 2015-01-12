@@ -149,6 +149,7 @@ public class OntologyRegistry {
         addToNameMap(thingNameMap, prepositionClasses);
         addToNameMap(thingNameMap, roleClasses);
         addToNameMap(thingNameMap, miscClasses);
+        addToNameMap(thingNameMap, qualityClasses);
 
         // register qualities for class
         for (Class<? extends TransientQuality> qualityClass : qualityClasses){
