@@ -60,6 +60,9 @@ public class DiscourseAnalysis {
         if (discourseUnit.initiator.equals("user")){
             Assert.verify(discourseUnit.spokenByMe!=null);
             Assert.verify(discourseUnit.groundTruth != null);
+            Set<String> suggestionPaths = discourseUnit.getSpokenByMe().
+                    findAllPathsToClass(Suggested.class.getSimpleName());
+            Assert.verify(suggestionPaths.size() == 0);
             Set<String> requestPaths = discourseUnit.spokenByMe.findAllPathsToClass(Requested.class.getSimpleName());
             Assert.verify(requestPaths.size()==1);
             requestPath = new LinkedList<>(requestPaths).get(0);

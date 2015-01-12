@@ -393,7 +393,7 @@ public class Database {
     }
 
 
-    public double evaluateQualityDegree(List<String> entityURIs, Class<? extends Role> hasQualityRoleClass,
+    public Double evaluateQualityDegree(List<String> entityURIs, Class<? extends Role> hasQualityRoleClass,
                                         Class<? extends ThingWithRoles> degreeClass){
         try {
             double center;
@@ -420,6 +420,7 @@ public class Database {
                     qualityClass.newInstance().getQualityCalculatorSPARQLQuery().apply(params) +
                     "BIND(base:LinearFuzzyMap("+center+", "+slope+", ?transient_quality) AS ?fuzzy_mapped_quality)}";
             log(queryString);
+//            System.out.println("evaluate quality degree query:\n" + queryString);
             TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
             TupleQueryResult result = query.evaluate();
             Double ans = null;

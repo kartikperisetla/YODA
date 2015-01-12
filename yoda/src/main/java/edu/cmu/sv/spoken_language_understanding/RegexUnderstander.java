@@ -60,13 +60,12 @@ public class RegexUnderstander implements SpokenLanguageUnderstander{
 
         String jsonString = "{}";
 
-        Pattern howExpensivePattern = Pattern.compile("how (cheap|expensive)( is| are| )(.+)");
+        Pattern howExpensivePattern = Pattern.compile("how (cheap|expensive)( is | are | )(.+)");
         Matcher m = howExpensivePattern.matcher(asrResult);
         if (m.matches()) {
-            String PoiName = m.group(2);
-            System.out.println(PoiName);
+            String PoiName = m.group(3);
             String uri = yodaEnvironment.db.insertValue(PoiName);
-            jsonString = "{\"dialogAct\":\"WHQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\""+uri+"\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"},\"Patient\":{\"class\":\"UnknownThingWithRoles\",\"HasExpensiveness\":{\"class\":\"Expensive\"}},\"class\":\"HasProperty\"}}";
+            jsonString = "{\"dialogAct\":\"WHQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\""+uri+"\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"},\"Patient\":{\"class\":\"Requested\",\"HasValue\":{\"class\":\"Expensiveness\"}},\"class\":\"HasProperty\"}}";
             SemanticsModel interpretation = new SemanticsModel(jsonString);
             hypotheses.put("hyp"+hypothesisId, interpretation);
             hypothesisDistribution.put("hyp"+hypothesisId, 1.0);

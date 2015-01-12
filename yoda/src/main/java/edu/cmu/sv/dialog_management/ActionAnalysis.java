@@ -3,8 +3,12 @@ package edu.cmu.sv.dialog_management;
 import com.google.common.collect.Iterables;
 import edu.cmu.sv.database.dialog_task.ReferenceResolution;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
+import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
+import edu.cmu.sv.ontology.ThingWithRoles;
+import edu.cmu.sv.ontology.adjective.Adjective;
+import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.ontology.quality.TransientQuality;
 import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.ontology.verb.HasProperty;
@@ -14,13 +18,12 @@ import edu.cmu.sv.system_action.ActionSchema;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.WHQuestion;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.YNQuestion;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
+import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
+import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
 * Created by David Cohen on 12/17/14.
@@ -76,18 +79,43 @@ public class ActionAnalysis {
             responseStatement = new HashMap<>();
         } else if (dialogActString.equals(WHQuestion.class.getSimpleName())) {
             if (verbClass.equals(HasProperty.class)) {
-                responseStatement.put("verb.Agent", groundedMeaning.newGetSlotPathFiller("verb.Agent"));
-                Class<? extends Thing> requestedQuality = OntologyRegistry.thingNameMap.get(
-                        (String) groundedMeaning.newGetSlotPathFiller("verb.Patient.HasValue.class"));
-//                groundedMeaning.findAllPathsToClass()
+//                System.out.println("grounded meaning:\n"+groundedMeaning.getInternalRepresentation().toJSONString());
+                String entityURI = (String) groundedMeaning.newGetSlotPathFiller("verb.Agent.HasURI");
+                responseStatement.put("verb.Agent", SemanticsModel.parseJSON(OntologyRegistry.WebResourceWrap(entityURI)));
+                Class<? extends TransientQuality> requestedQualityClass = (Class<? extends TransientQuality>)
+                        OntologyRegistry.thingNameMap.get(
+                                (String) groundedMeaning.newGetSlotPathFiller("verb.Patient.HasValue.class"));
 
+                List<Class<? extends Thing>> qualityArguments = OntologyRegistry.qualityArguments(requestedQualityClass);
+                if (qualityArguments.size() != 0)
+                    throw new Error("the requested quality isn't an adjective");
 
-                responseStatement.put("verb.Patient", groundedMeaning.newGetSlotPathFiller("verb.Agent"));
+                // iterate through every possible binding for the quality arguments
+                List<String> fullArgumentList = Arrays.asList(entityURI);
 
+                boolean dontKnow = false;
+                StringDistribution adjectiveScores = new StringDistribution();
+                Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> descriptor =
+                        OntologyRegistry.qualityDescriptors(requestedQualityClass);
+                for (Class<? extends ThingWithRoles> adjectiveClass : descriptor.getRight()) {
+                    Double degreeOfMatch = yodaEnvironment.db.
+                            evaluateQualityDegree(fullArgumentList,
+                                    descriptor.getLeft(), adjectiveClass);
+                    if (degreeOfMatch==null){
+                        dontKnow = true;
+                        responseStatement.put("verb.Patient", SemanticsModel.parseJSON("{\"class\":\""+UnknownThingWithRoles.class.getSimpleName()+"\"}"));
+                    } else {
+                        adjectiveScores.put(adjectiveClass.getSimpleName(), degreeOfMatch);
+                    }
+                }
 
-                ynqTruth = ReferenceResolution.descriptionMatch(yodaEnvironment,
-                        (JSONObject) groundedMeaning.newGetSlotPathFiller("verb.Agent"),
-                        (JSONObject) groundedMeaning.newGetSlotPathFiller("verb.Patient"));
+                if (!dontKnow) {
+                    Class<? extends Thing> adjectiveClass = OntologyRegistry.thingNameMap.get(adjectiveScores.getTopHypothesis());
+                    JSONObject description = SemanticsModel.parseJSON("{\"class\":\"" + adjectiveClass.getSimpleName() + "\"}");
+                    SemanticsModel.wrap(description, UnknownThingWithRoles.class.getSimpleName(),
+                            descriptor.getLeft().getSimpleName());
+                    responseStatement.put("verb.Patient", description);
+                }
             }
         }
 

@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by David Cohen on 10/31/14.
  */
-public abstract class TransientQuality {
+public abstract class TransientQuality extends Thing{
    /*
     * Return a query fragment that binds the transient quality to ?transient_quality
     * (based on some non-transient information)
