@@ -4,14 +4,14 @@ import com.google.common.primitives.Doubles;
 import edu.cmu.sv.dialog_state_tracking.*;
 import edu.cmu.sv.ontology.misc.WebResource;
 import edu.cmu.sv.ontology.role.HasURI;
+import edu.cmu.sv.ontology.verb.HasProperty;
+import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Accept;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.DontKnow;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Reject;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.YNQuestion;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.*;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTaskPreferences;
 import edu.cmu.sv.utils.StringDistribution;
+import org.json.simple.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -109,7 +109,8 @@ public class RewardAndCostCalculator {
             predecessorDialogAct = (String) predecessor.getSpokenByThem().newGetSlotPathFiller("dialogAct");
         else
             predecessorDialogAct = (String) predecessor.getSpokenByMe().newGetSlotPathFiller("dialogAct");
-        return predecessorDialogAct.equals(YNQuestion.class.getSimpleName());
+        return predecessorDialogAct.equals(YNQuestion.class.getSimpleName()) ||
+                predecessorDialogAct.equals(WHQuestion.class.getSimpleName());
     }
 
     /*
@@ -134,6 +135,30 @@ public class RewardAndCostCalculator {
         return rewardForCorrectDialogTaskExecution *probabilityCorrectAnswer - penaltyForIncorrectDialogTaskExecution *(1-probabilityCorrectAnswer);
     }
 
+    public static Double discourseIndependentStatementReward(DialogAct dialogAct, DiscourseUnit discourseUnit){
+        double probabilityAppropriateInContext;
+        if (discourseUnit.actionAnalysis.responseStatement.isEmpty())
+            probabilityAppropriateInContext = 0.0;
+        else if (discourseUnit.actionAnalysis.responseStatement.get("dialogAct").equals(DontKnow.class.getSimpleName())
+                && dialogAct instanceof DontKnow)
+            probabilityAppropriateInContext = 1.0;
+        else if (discourseUnit.actionAnalysis.responseStatement.get("dialogAct").equals(DontKnow.class.getSimpleName())
+                || dialogAct instanceof DontKnow)
+            probabilityAppropriateInContext = 0.0;
+        else if (discourseUnit.actionAnalysis.responseStatement.get("dialogAct").equals(Statement.class.getSimpleName())
+                && dialogAct.getBoundIndividuals().get("topic_individual").equals(
+                ((JSONObject)discourseUnit.actionAnalysis.responseStatement.get("verb.Agent")).get("HasURI"))
+                && dialogAct.getBoundClasses().get("verb_class").equals(HasProperty.class.getSimpleName())
+                && SemanticsModel.contentEqual(
+                new SemanticsModel((JSONObject)dialogAct.getBoundDescriptions().get("asserted_role_description")),
+                new SemanticsModel((JSONObject)discourseUnit.actionAnalysis.responseStatement.get("verb.Patient")))){
+            probabilityAppropriateInContext = 1.0;
+        } else
+            probabilityAppropriateInContext = 0.0;
+        return rewardForCorrectDialogTaskExecution *probabilityAppropriateInContext -
+                penaltyForIncorrectDialogTaskExecution *(1-probabilityAppropriateInContext);
+
+    }
 
 
     /*

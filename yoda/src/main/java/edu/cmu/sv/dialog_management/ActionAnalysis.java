@@ -15,6 +15,8 @@ import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.ActionSchema;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.DontKnow;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Statement;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.WHQuestion;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.YNQuestion;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
@@ -81,7 +83,6 @@ public class ActionAnalysis {
             if (verbClass.equals(HasProperty.class)) {
 //                System.out.println("grounded meaning:\n"+groundedMeaning.getInternalRepresentation().toJSONString());
                 String entityURI = (String) groundedMeaning.newGetSlotPathFiller("verb.Agent.HasURI");
-                responseStatement.put("verb.Agent", SemanticsModel.parseJSON(OntologyRegistry.WebResourceWrap(entityURI)));
                 Class<? extends TransientQuality> requestedQualityClass = (Class<? extends TransientQuality>)
                         OntologyRegistry.thingNameMap.get(
                                 (String) groundedMeaning.newGetSlotPathFiller("verb.Patient.HasValue.class"));
@@ -103,7 +104,7 @@ public class ActionAnalysis {
                                     descriptor.getLeft(), adjectiveClass);
                     if (degreeOfMatch==null){
                         dontKnow = true;
-                        responseStatement.put("verb.Patient", SemanticsModel.parseJSON("{\"class\":\""+UnknownThingWithRoles.class.getSimpleName()+"\"}"));
+                        responseStatement.put("dialogAct", DontKnow.class.getSimpleName());
                     } else {
                         adjectiveScores.put(adjectiveClass.getSimpleName(), degreeOfMatch);
                     }
@@ -114,6 +115,8 @@ public class ActionAnalysis {
                     JSONObject description = SemanticsModel.parseJSON("{\"class\":\"" + adjectiveClass.getSimpleName() + "\"}");
                     SemanticsModel.wrap(description, UnknownThingWithRoles.class.getSimpleName(),
                             descriptor.getLeft().getSimpleName());
+                    responseStatement.put("dialogAct", Statement.class.getSimpleName());
+                    responseStatement.put("verb.Agent", SemanticsModel.parseJSON(OntologyRegistry.WebResourceWrap(entityURI)));
                     responseStatement.put("verb.Patient", description);
                 }
             }

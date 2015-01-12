@@ -5,8 +5,10 @@ import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.ThingWithRoles;
+import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.ActionSchema;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Statement;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ClarificationDialogAct;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.utils.Combination;
@@ -104,6 +106,32 @@ public class DialogManager implements Runnable {
                                     dialogStateDistribution.get(dialogStateHypothesisId);
                             accumulateReward(actionExpectedReward, newDialogActInstance, currentReward);
                         }
+                    }
+                }
+
+
+                // actions that are enumerated from action analysis:
+                for (String discourseUnitHypothesisId : currentDialogState.getDiscourseUnitHypothesisMap().
+                        keySet()) {
+                    DiscourseUnit contextDiscourseUnit = currentDialogState.
+                            getDiscourseUnitHypothesisMap().get(discourseUnitHypothesisId);
+                    if (contextDiscourseUnit.actionAnalysis.responseStatement.isEmpty())
+                        continue;
+                    if (contextDiscourseUnit.actionAnalysis.responseStatement.get("dialogAct").equals(Statement.class.getSimpleName())){
+                        Statement s = new Statement();
+                        Map<String, Object> bindings = new HashMap<>();
+                        bindings.put("verb_class", HasProperty.class.getSimpleName());
+                        bindings.put("topic_individual",
+                                ((JSONObject) contextDiscourseUnit.actionAnalysis.responseStatement.get("verb.Agent")).get("HasURI"));
+                        bindings.put("asserted_role_description",
+                                ((JSONObject) contextDiscourseUnit.actionAnalysis.responseStatement.get("verb.Patient")));
+                        s.bindVariables(bindings);
+                        Double currentReward = s.reward(
+                                currentDialogState, contextDiscourseUnit) *
+                                dialogStateDistribution.get(dialogStateHypothesisId);
+                        accumulateReward(actionExpectedReward, s, currentReward);
+                    } else { // contextDiscourseUnit.actionAnalysis.responseStatement.get("dialogAct").equals(DontKnow.class.getSimpleName())){
+                        // todo: make sure DontKnow hasn't already been enumerated before re-enumerating
                     }
                 }
 

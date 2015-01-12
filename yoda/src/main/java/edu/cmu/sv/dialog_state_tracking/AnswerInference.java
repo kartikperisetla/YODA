@@ -32,14 +32,14 @@ public class AnswerInference extends DialogStateUpdateInference {
 
         } else { // if turn.speaker.equals("system")
             String dialogAct = turn.systemUtterance.getSlotPathFiller("dialogAct");
-            if (Arrays.asList(Accept.class.getSimpleName(), Reject.class.getSimpleName(), DontKnow.class.getSimpleName()).
+            if (Arrays.asList(Accept.class.getSimpleName(), Reject.class.getSimpleName(), DontKnow.class.getSimpleName(), Statement.class.getSimpleName()).
                     contains(dialogAct)) {
                 for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
                     DiscourseUnit predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId);
                     try {
                         Assert.verify(!predecessor.initiator.equals("system"));
                         String predecessorDialogAct = predecessor.spokenByThem.getSlotPathFiller("dialogAct");
-                        Assert.verify(Arrays.asList(YNQuestion.class.getSimpleName()).contains(predecessorDialogAct));
+                        Assert.verify(Arrays.asList(WHQuestion.class.getSimpleName(), YNQuestion.class.getSimpleName()).contains(predecessorDialogAct));
                     } catch (Assert.AssertException e){
                         continue;
                     }
