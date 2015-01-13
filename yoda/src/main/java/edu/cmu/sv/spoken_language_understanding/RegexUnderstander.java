@@ -85,7 +85,7 @@ public class RegexUnderstander implements SpokenLanguageUnderstander{
         }
 
         {
-            Pattern howExpensivePattern2 = Pattern.compile("(how much is|what is)( the|)( price range| expensiveness| cost| price)( of | for | to |)(.+)");
+            Pattern howExpensivePattern2 = Pattern.compile("(how much is|what is|what|how much|)( the |)(price range|expensiveness|cost|price)( of | for | to |)(.+)");
             Matcher mA = howExpensivePattern2.matcher(asrResult);
             if (mA.matches()) {
                 String PoiName = mA.group(5);
@@ -199,7 +199,7 @@ public class RegexUnderstander implements SpokenLanguageUnderstander{
         Matcher m8 = giveDirectionsToXPattern.matcher(asrResult);
         if (m8.matches()) {
             String PoiName = m8.group(3);
-            System.out.println(PoiName);
+//            System.out.println(PoiName);
             String uri = yodaEnvironment.db.insertValue(PoiName);
             jsonString = "{\"dialogAct\":\"Command\",\"verb\":{\"class\":\"GiveDirections\", \"Destination\":{\"HasName\":{\"HasURI\":\""+uri+"\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"}}}";
             SemanticsModel interpretation = new SemanticsModel(jsonString);
