@@ -170,7 +170,7 @@ public class RegexUnderstander implements SpokenLanguageUnderstander{
 
         {
             // "give me directions"
-            Pattern giveDirectionsPattern = Pattern.compile("(please |could you |i want )(give |)(me |)(directions|navigation|direct|navigate)( please|)");
+            Pattern giveDirectionsPattern = Pattern.compile("(please |could you |i want |give me |)(directions|navigation|direct|navigate)( please|)");
             Matcher m7 = giveDirectionsPattern.matcher(asrResult);
             if (m7.matches()) {
                 jsonString = "{\"dialogAct\":\"Command\",\"verb\":{\"class\":\"GiveDirections\"}}";
@@ -183,7 +183,7 @@ public class RegexUnderstander implements SpokenLanguageUnderstander{
 
         {
             // "give me directions"
-            Pattern giveDirectionsPattern = Pattern.compile("(take me |show me directions |how do i get |how do i go |navigate me |navigate |navigation )(to |toward |towards |)");
+            Pattern giveDirectionsPattern = Pattern.compile("(take me |show me directions |how do i get |how do i go |navigate me |navigate |navigation )");
             Matcher m7 = giveDirectionsPattern.matcher(asrResult);
             if (m7.matches()) {
                 jsonString = "{\"dialogAct\":\"Command\",\"verb\":{\"class\":\"GiveDirections\"}}";

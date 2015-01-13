@@ -516,11 +516,18 @@ public class SemanticsModel {
     }
 
     public static JSONObject parseJSON(String jsonString){
+        Object result = null;
         try {
-            return (JSONObject) parser.parse(jsonString);
-        } catch (ParseException e) {
+            try {
+                result = parser.parse(jsonString);
+            } catch (ParseException e) {
+                e.printStackTrace();
+                throw new Error("failed to parse json string: input string:" + jsonString);
+            }
+            return (JSONObject) result;
+        } catch (ClassCastException e) {
             e.printStackTrace();
-            throw new Error("failed to parse json string: input string:"+jsonString);
+            throw new Error("failed to caste string to JSON, parsing returned a string: input string:"+jsonString + "\nresult:" + result);
         }
     }
 
