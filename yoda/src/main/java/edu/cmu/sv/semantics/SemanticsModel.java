@@ -520,7 +520,7 @@ public class SemanticsModel {
             return (JSONObject) parser.parse(jsonString);
         } catch (ParseException e) {
             e.printStackTrace();
-            throw new Error("failed to parse json string:" + e.getMessage() + "\ninput string:"+jsonString);
+            throw new Error("failed to parse json string: input string:"+jsonString);
         }
     }
 

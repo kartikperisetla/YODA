@@ -51,8 +51,10 @@ public class RegexUnderstander implements SpokenLanguageUnderstander{
         JSONObject inputRecord = MongoLogHandler.createEventRecord("asr_input_event");
         inputRecord.put("asr_result", asrResult);
         logger.info(inputRecord.toJSONString());
-        if (asrResult.length()==0)
+        if (asrResult.length() <= 2) {
+            System.out.println("here");
             return;
+        }
 
         Map<String, SemanticsModel> hypotheses = new HashMap<>();
         StringDistribution hypothesisDistribution = new StringDistribution();
@@ -60,45 +62,77 @@ public class RegexUnderstander implements SpokenLanguageUnderstander{
 
         String jsonString = "{}";
 
-        Pattern howExpensivePattern = Pattern.compile("how (cheap|expensive|pricey)( is | are | )(.+)");
+        Pattern howExpensivePattern = Pattern.compile("how (costly|cheap|expensive|pricey)( is | are | )(.+)");
         Matcher m = howExpensivePattern.matcher(asrResult);
         if (m.matches()) {
             String PoiName = m.group(3);
             String uri = yodaEnvironment.db.insertValue(PoiName);
-            jsonString = "{\"dialogAct\":\"WHQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\""+uri+"\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"},\"Patient\":{\"class\":\"Requested\",\"HasValue\":{\"class\":\"Expensiveness\"}},\"class\":\"HasProperty\"}}";
+            jsonString = "{\"dialogAct\":\"WHQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\"" + uri + "\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"},\"Patient\":{\"class\":\"Requested\",\"HasValue\":{\"class\":\"Expensiveness\"}},\"class\":\"HasProperty\"}}";
             SemanticsModel interpretation = new SemanticsModel(jsonString);
-            hypotheses.put("hyp"+hypothesisId, interpretation);
-            hypothesisDistribution.put("hyp"+hypothesisId, 1.0);
+            hypotheses.put("hyp" + hypothesisId, interpretation);
+            hypothesisDistribution.put("hyp" + hypothesisId, 1.0);
             hypothesisId++;
         }
 
-        Pattern howExpensivePattern2 = Pattern.compile("(how much|what)( is | are | does | do |)(.+)( price range| expensiveness| cost| price)");
-        Matcher mA = howExpensivePattern2.matcher(asrResult);
-        if (mA.matches()) {
-            String PoiName = mA.group(3);
-            System.out.println(PoiName);
-            String uri = yodaEnvironment.db.insertValue(PoiName);
-            jsonString = "{\"dialogAct\":\"WHQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\""+uri+"\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"},\"Patient\":{\"class\":\"Requested\",\"HasValue\":{\"class\":\"Expensiveness\"}},\"class\":\"HasProperty\"}}";
-            SemanticsModel interpretation = new SemanticsModel(jsonString);
-            hypotheses.put("hyp"+hypothesisId, interpretation);
-            hypothesisDistribution.put("hyp"+hypothesisId, 1.0);
-            hypothesisId++;
+        {
+            Pattern howExpensivePattern2 = Pattern.compile("(how much|what)( is | are | does | do |)(.+)( price range| expensiveness| cost| price)");
+            Matcher mA = howExpensivePattern2.matcher(asrResult);
+            if (mA.matches()) {
+                String PoiName = mA.group(3);
+                System.out.println(PoiName);
+                String uri = yodaEnvironment.db.insertValue(PoiName);
+                jsonString = "{\"dialogAct\":\"WHQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\"" + uri + "\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"},\"Patient\":{\"class\":\"Requested\",\"HasValue\":{\"class\":\"Expensiveness\"}},\"class\":\"HasProperty\"}}";
+                SemanticsModel interpretation = new SemanticsModel(jsonString);
+                hypotheses.put("hyp" + hypothesisId, interpretation);
+                hypothesisDistribution.put("hyp" + hypothesisId, 1.0);
+                hypothesisId++;
+            }
         }
 
-
-        Pattern isExpensivePattern = Pattern.compile("(is |are )(the |)?(.+)(expensive)");
-        Matcher m2 = isExpensivePattern.matcher(asrResult);
-        if (m2.matches()) {
-            String PoiName = m2.group(3);
-            String uri = yodaEnvironment.db.insertValue(PoiName);
-            jsonString = "{\"dialogAct\":\"YNQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\""+uri+"\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"},\"Patient\":{\"class\":\"UnknownThingWithRoles\",\"HasExpensiveness\":{\"class\":\"Expensive\"}},\"class\":\"HasProperty\"}}";
-            SemanticsModel interpretation = new SemanticsModel(jsonString);
-            hypotheses.put("hyp"+hypothesisId, interpretation);
-            hypothesisDistribution.put("hyp"+hypothesisId, 1.0);
-            hypothesisId++;
+        {
+            Pattern howExpensivePattern2 = Pattern.compile("(how much is|what is)( the|)( price range| expensiveness| cost| price)( of |)(.+)");
+            Matcher mA = howExpensivePattern2.matcher(asrResult);
+            if (mA.matches()) {
+                String PoiName = mA.group(5);
+                System.out.println(PoiName);
+                String uri = yodaEnvironment.db.insertValue(PoiName);
+                jsonString = "{\"dialogAct\":\"WHQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\"" + uri + "\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"},\"Patient\":{\"class\":\"Requested\",\"HasValue\":{\"class\":\"Expensiveness\"}},\"class\":\"HasProperty\"}}";
+                SemanticsModel interpretation = new SemanticsModel(jsonString);
+                hypotheses.put("hyp" + hypothesisId, interpretation);
+                hypothesisDistribution.put("hyp" + hypothesisId, 1.0);
+                hypothesisId++;
+            }
         }
 
-        Pattern acceptPattern = Pattern.compile("yes");
+        {
+            Pattern isExpensivePattern = Pattern.compile("(is |are )(the |)?(.+)(expensive|costly|pricey)");
+            Matcher m2 = isExpensivePattern.matcher(asrResult);
+            if (m2.matches()) {
+                String PoiName = m2.group(3);
+                String uri = yodaEnvironment.db.insertValue(PoiName);
+                jsonString = "{\"dialogAct\":\"YNQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\"" + uri + "\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"},\"Patient\":{\"class\":\"UnknownThingWithRoles\",\"HasExpensiveness\":{\"class\":\"Expensive\"}},\"class\":\"HasProperty\"}}";
+                SemanticsModel interpretation = new SemanticsModel(jsonString);
+                hypotheses.put("hyp" + hypothesisId, interpretation);
+                hypothesisDistribution.put("hyp" + hypothesisId, 1.0);
+                hypothesisId++;
+            }
+        }
+
+        {
+            Pattern isCheapPattern = Pattern.compile("(is |are )(the |)?(.+)(cheap|inexpensive|affordable)");
+            Matcher m2 = isCheapPattern.matcher(asrResult);
+            if (m2.matches()) {
+                String PoiName = m2.group(3);
+                String uri = yodaEnvironment.db.insertValue(PoiName);
+                jsonString = "{\"dialogAct\":\"YNQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\"" + uri + "\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"},\"Patient\":{\"class\":\"UnknownThingWithRoles\",\"HasExpensiveness\":{\"class\":\"Expensive\"}},\"class\":\"HasProperty\"}}";
+                SemanticsModel interpretation = new SemanticsModel(jsonString);
+                hypotheses.put("hyp" + hypothesisId, interpretation);
+                hypothesisDistribution.put("hyp" + hypothesisId, 1.0);
+                hypothesisId++;
+            }
+        }
+
+        Pattern acceptPattern = Pattern.compile("(yes|yeah|yep|right|correct|yup|yes sir).*");
         Matcher m3 = acceptPattern.matcher(asrResult);
         if (m3.matches()) {
             jsonString = "{\"dialogAct\":\"Accept\"}";
@@ -108,7 +142,7 @@ public class RegexUnderstander implements SpokenLanguageUnderstander{
             hypothesisId++;
         }
 
-        Pattern rejectPattern = Pattern.compile("no");
+        Pattern rejectPattern = Pattern.compile("no|nope|negative|i don't think so|wrong|not .*");
         Matcher m4 = rejectPattern.matcher(asrResult);
         if (m4.matches()) {
             jsonString = "{\"dialogAct\":\"Reject\"}";

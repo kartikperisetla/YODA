@@ -22,8 +22,9 @@ public class CommandLineYodaSystem {
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         String s;
         // An empty line or Ctrl-Z terminates the program
-        while ((s = in.readLine()) != null && s.length() != 0)
-            yodaEnvironment.slu.process1BestAsr(s);
+        while ((s = in.readLine()) != null)
+            if (s.length() !=0)
+                yodaEnvironment.slu.process1BestAsr(s);
     }
 
 }

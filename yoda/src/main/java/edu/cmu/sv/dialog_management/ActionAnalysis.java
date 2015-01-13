@@ -119,12 +119,16 @@ public class ActionAnalysis {
 
                 if (!dontKnow) {
                     Class<? extends Thing> adjectiveClass = OntologyRegistry.thingNameMap.get(adjectiveScores.getTopHypothesis());
-                    JSONObject description = SemanticsModel.parseJSON("{\"class\":\"" + adjectiveClass.getSimpleName() + "\"}");
-                    SemanticsModel.wrap(description, UnknownThingWithRoles.class.getSimpleName(),
-                            descriptor.getLeft().getSimpleName());
-                    responseStatement.put("dialogAct", Statement.class.getSimpleName());
-                    responseStatement.put("verb.Agent", SemanticsModel.parseJSON(OntologyRegistry.WebResourceWrap(entityURI)));
-                    responseStatement.put("verb.Patient", description);
+                    if (adjectiveClass==null){
+                        responseStatement.put("dialogAct", DontKnow.class.getSimpleName());
+                    } else {
+                        JSONObject description = SemanticsModel.parseJSON("{\"class\":\"" + adjectiveClass.getSimpleName() + "\"}");
+                        SemanticsModel.wrap(description, UnknownThingWithRoles.class.getSimpleName(),
+                                descriptor.getLeft().getSimpleName());
+                        responseStatement.put("dialogAct", Statement.class.getSimpleName());
+                        responseStatement.put("verb.Agent", SemanticsModel.parseJSON(OntologyRegistry.WebResourceWrap(entityURI)));
+                        responseStatement.put("verb.Patient", description);
+                    }
                 }
 //                System.out.println("response statement:\n"+responseStatement);
             }
