@@ -8,6 +8,7 @@ import edu.cmu.sv.ontology.ThingWithRoles;
 import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.ActionSchema;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.DontKnow;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Statement;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ClarificationDialogAct;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
@@ -104,6 +105,8 @@ public class DialogManager implements Runnable {
                             Double currentReward = newDialogActInstance.reward(
                                     currentDialogState, contextDiscourseUnit) *
                                     dialogStateDistribution.get(dialogStateHypothesisId);
+//                            if (newDialogActInstance instanceof DontKnow)
+//                                System.out.println("enumerated act:"+newDialogActInstance+"\nreward:"+currentReward);
                             accumulateReward(actionExpectedReward, newDialogActInstance, currentReward);
                         }
                     }
@@ -126,9 +129,10 @@ public class DialogManager implements Runnable {
                         bindings.put("asserted_role_description",
                                 ((JSONObject) contextDiscourseUnit.actionAnalysis.responseStatement.get("verb.Patient")));
                         s.bindVariables(bindings);
-                        Double currentReward = s.reward(
-                                currentDialogState, contextDiscourseUnit) *
+//                        System.out.println("enumerated a statement:"+s);
+                        Double currentReward = s.reward(currentDialogState, contextDiscourseUnit) *
                                 dialogStateDistribution.get(dialogStateHypothesisId);
+//                        System.out.println("reward: "+currentReward);
                         accumulateReward(actionExpectedReward, s, currentReward);
                     } else { // contextDiscourseUnit.actionAnalysis.responseStatement.get("dialogAct").equals(DontKnow.class.getSimpleName())){
                         // todo: make sure DontKnow hasn't already been enumerated before re-enumerating

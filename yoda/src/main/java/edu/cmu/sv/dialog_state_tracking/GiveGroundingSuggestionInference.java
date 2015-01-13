@@ -81,6 +81,7 @@ public class GiveGroundingSuggestionInference extends DialogStateUpdateInference
                         Assert.verify(!predecessor.initiator.equals("system"));
                         DiscourseAnalysis analysis = new DiscourseAnalysis(predecessor, yodaEnvironment);
                         analysis.analyseValidity();
+                        Assert.verify(!analysis.ungrounded());
 //                        Set<String> suggestionPaths = predecessor.getSpokenByThem().findAllPathsToClass(Suggested.class.getSimpleName());
 //                        Assert.verify(suggestionPaths.size()==0);
                     } catch (Assert.AssertException e){

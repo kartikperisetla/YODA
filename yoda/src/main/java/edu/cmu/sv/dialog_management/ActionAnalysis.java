@@ -43,6 +43,12 @@ public class ActionAnalysis {
         ans.ynqTruth = ynqTruth;
         ans.missingRequiredVerbSlots = new HashSet<>(missingRequiredVerbSlots);
         ans.enumeratedNonDialogTasks = new HashSet<>(enumeratedNonDialogTasks);
+        ans.responseStatement = new HashMap<>();
+        for (String key : responseStatement.keySet()){
+            if (responseStatement.get(key) instanceof JSONObject)
+                ans.responseStatement.put(key, SemanticsModel.parseJSON(((JSONObject)responseStatement.get(key)).toJSONString()));
+            ans.responseStatement.put(key, responseStatement.get(key));
+        }
         return ans;
     }
 
@@ -77,9 +83,10 @@ public class ActionAnalysis {
             }
         }
 
-        if (missingRequiredVerbSlots.size()>0) {
-            responseStatement = new HashMap<>();
-        } else if (dialogActString.equals(WHQuestion.class.getSimpleName())) {
+        responseStatement = new HashMap<>();
+//        System.out.println("ActionAnalysis: missingRequiredVerbSlots.size():"+missingRequiredVerbSlots.size());
+//        System.out.println("ActionAnalysis: dialog act string:"+dialogActString);
+        if (missingRequiredVerbSlots.size()==0 && dialogActString.equals(WHQuestion.class.getSimpleName())) {
             if (verbClass.equals(HasProperty.class)) {
 //                System.out.println("grounded meaning:\n"+groundedMeaning.getInternalRepresentation().toJSONString());
                 String entityURI = (String) groundedMeaning.newGetSlotPathFiller("verb.Agent.HasURI");
@@ -119,9 +126,9 @@ public class ActionAnalysis {
                     responseStatement.put("verb.Agent", SemanticsModel.parseJSON(OntologyRegistry.WebResourceWrap(entityURI)));
                     responseStatement.put("verb.Patient", description);
                 }
+//                System.out.println("response statement:\n"+responseStatement);
             }
         }
-
 
         SemanticsModel resolvedMeaning = discourseUnit.getGroundInterpretation();
         if (resolvedMeaning!=null) {

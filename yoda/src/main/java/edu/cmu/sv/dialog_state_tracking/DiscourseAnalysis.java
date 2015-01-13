@@ -51,6 +51,14 @@ public class DiscourseAnalysis {
         }
     }
 
+    public boolean ungrounded(){
+        if (discourseUnit.initiator.equals("user")){
+            return !(discourseUnit.spokenByMe == null && discourseUnit.groundTruth == null);
+        } else { //discourseUnitHypothesis.initiator.equals("system")
+            return !(discourseUnit.spokenByThem == null && discourseUnit.groundInterpretation == null);
+        }
+    }
+
     public void analyseValidity() throws Assert.AssertException {
         Assert.verify(discourseUnit.getFromInitiator("verb") != null);
     }
@@ -96,7 +104,7 @@ public class DiscourseAnalysis {
             descriptionMatch=0.0;
     }
 
-    public void analyseGround() throws Assert.AssertException {
+    public void analyseCommonGround() throws Assert.AssertException {
         analyseValidity();
         if (discourseUnit.groundTruth==null || discourseUnit.groundInterpretation==null) {
             groundMatch = false;

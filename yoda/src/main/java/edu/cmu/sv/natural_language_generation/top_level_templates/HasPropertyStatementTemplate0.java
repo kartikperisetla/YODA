@@ -73,7 +73,7 @@ public class HasPropertyStatementTemplate0 implements Template {
         JSONObject toBe = children.get(1);
         JSONObject patient = children.get(2);
 
-        SemanticsModel ans = new SemanticsModel("{\"dialogAct\":\""+YNQuestion.class.getSimpleName()+
+        SemanticsModel ans = new SemanticsModel("{\"dialogAct\":\""+Statement.class.getSimpleName()+
                 "\", \"verb\": {\"class\":\""+
                 HasProperty.class.getSimpleName()+"\", \""+
                 Agent.class.getSimpleName()+"\":"+empty+", \""+

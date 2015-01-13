@@ -42,7 +42,7 @@ public class RejectGroundingSuggestionInference extends DialogStateUpdateInferen
                             Assert.verify(predecessor.initiator.equals("user"));
                             Assert.verify(duAnalysis.ungroundedByAct(RequestConfirmValue.class));
                             duAnalysis.analyseSuggestions();
-                            duAnalysis.analyseGround();
+                            duAnalysis.analyseCommonGround();
                         } catch (Assert.AssertException e){
                             continue;
                         }

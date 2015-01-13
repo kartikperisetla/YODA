@@ -46,7 +46,7 @@ public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpda
                             Assert.verify(predecessor.initiator.equals("user"));
                             Assert.verify(duAnalysis.ungroundedByAct(RequestConfirmValue.class));
                             duAnalysis.analyseSuggestions();
-                            duAnalysis.analyseGround();
+                            duAnalysis.analyseCommonGround();
                             correctionContent = (JSONObject) hypModel.newGetSlotPathFiller("topic");
                         } catch (Assert.AssertException e){
                             continue;

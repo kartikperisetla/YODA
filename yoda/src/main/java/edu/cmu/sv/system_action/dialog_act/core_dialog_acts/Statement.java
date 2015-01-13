@@ -53,7 +53,7 @@ public class Statement extends DialogAct {
         String topicString = OntologyRegistry.WebResourceWrap((String) this.getBoundIndividuals().get("topic_individual"));
         ((JSONObject)ans.newGetSlotPathFiller("verb")).put("Agent", SemanticsModel.parseJSON(topicString));
         ((JSONObject)ans.newGetSlotPathFiller("verb")).put("Patient",
-                SemanticsModel.parseJSON((String) this.getBoundDescriptions().get("asserted_role_description")));
+                SemanticsModel.parseJSON(((JSONObject)this.getBoundDescriptions().get("asserted_role_description")).toJSONString()));
         return ans;
     }
 

@@ -129,23 +129,26 @@ public class RewardAndCostCalculator {
                 probabilityCorrectAnswer = 1 - predecessorDiscourseUnit.actionAnalysis.ynqTruth;
         } else if (dialogAct instanceof DontKnow) {
             if (predecessorDiscourseUnit.actionAnalysis.ynqTruth==null &&
-                    predecessorDiscourseUnit.actionAnalysis.missingRequiredVerbSlots.size()==0)
+                    predecessorDiscourseUnit.actionAnalysis.responseStatement.isEmpty() &&
+                    predecessorDiscourseUnit.actionAnalysis.missingRequiredVerbSlots.isEmpty()) {
                 probabilityCorrectAnswer = 1.0;
+//                System.out.println("discourse unit where DontKnow's action analysis is just right:\n"+predecessorDiscourseUnit);
+            }
         }
         return rewardForCorrectDialogTaskExecution *probabilityCorrectAnswer - penaltyForIncorrectDialogTaskExecution *(1-probabilityCorrectAnswer);
     }
 
-    public static Double discourseIndependentStatementReward(DialogAct dialogAct, DiscourseUnit discourseUnit){
-        double probabilityAppropriateInContext;
-        if (discourseUnit.actionAnalysis.responseStatement.isEmpty())
+    public static Double discourseIndependentStatementReward(DialogAct dialogAct, DiscourseUnit discourseUnit) {
+        double probabilityAppropriateInContext = 0.0;
+        if (discourseUnit.actionAnalysis.responseStatement.isEmpty()) {
             probabilityAppropriateInContext = 0.0;
-        else if (discourseUnit.actionAnalysis.responseStatement.get("dialogAct").equals(DontKnow.class.getSimpleName())
-                && dialogAct instanceof DontKnow)
+        } else if (discourseUnit.actionAnalysis.responseStatement.get("dialogAct").equals(DontKnow.class.getSimpleName())
+                && dialogAct instanceof DontKnow) {
             probabilityAppropriateInContext = 1.0;
-        else if (discourseUnit.actionAnalysis.responseStatement.get("dialogAct").equals(DontKnow.class.getSimpleName())
-                || dialogAct instanceof DontKnow)
+        } else if (discourseUnit.actionAnalysis.responseStatement.get("dialogAct").equals(DontKnow.class.getSimpleName())
+                || dialogAct instanceof DontKnow) {
             probabilityAppropriateInContext = 0.0;
-        else if (discourseUnit.actionAnalysis.responseStatement.get("dialogAct").equals(Statement.class.getSimpleName())
+        } else if (discourseUnit.actionAnalysis.responseStatement.get("dialogAct").equals(Statement.class.getSimpleName())
                 && dialogAct.getBoundIndividuals().get("topic_individual").equals(
                 ((JSONObject)discourseUnit.actionAnalysis.responseStatement.get("verb.Agent")).get("HasURI"))
                 && dialogAct.getBoundClasses().get("verb_class").equals(HasProperty.class.getSimpleName())
@@ -153,8 +156,7 @@ public class RewardAndCostCalculator {
                 new SemanticsModel((JSONObject)dialogAct.getBoundDescriptions().get("asserted_role_description")),
                 new SemanticsModel((JSONObject)discourseUnit.actionAnalysis.responseStatement.get("verb.Patient")))){
             probabilityAppropriateInContext = 1.0;
-        } else
-            probabilityAppropriateInContext = 0.0;
+        }
         return rewardForCorrectDialogTaskExecution *probabilityAppropriateInContext -
                 penaltyForIncorrectDialogTaskExecution *(1-probabilityAppropriateInContext);
 
