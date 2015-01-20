@@ -113,15 +113,17 @@ public class ActionEnumeration {
         if (contextDiscourseUnit!=null)
             verbConstraint = (String) contextDiscourseUnit.getFromInitiator("verb.class");
 
-        Set<Class<? extends Verb>> verbClassSet;
-        if (enumerationType.equals(ENUMERATION_TYPE.SAMPLED)){
-            verbClassSet = Combination.randomSubset(OntologyRegistry.verbClasses, maxOntologyBindings);
-        } else {
-            verbClassSet = OntologyRegistry.verbClasses;
-        }
+//        Set<Class<? extends Verb>> verbClassSet;
+//        if (enumerationType.equals(ENUMERATION_TYPE.SAMPLED)){
+//            verbClassSet = Combination.randomSubset(OntologyRegistry.verbClasses, maxOntologyBindings);
+//        } else {
+//            verbClassSet = OntologyRegistry.verbClasses;
+//        }
 
-        for (Class<? extends Verb> verbClass : verbClassSet) {
+        for (Class<? extends Verb> verbClass : OntologyRegistry.verbClasses) {
             if (verbConstraint != null && !OntologyRegistry.thingNameMap.get(verbConstraint).equals(verbClass))
+                continue;
+            if (verbClass==Verb.class)
                 continue;
             Map<String, Set<Object>> possibleBindingsPerVariable = new HashMap<>();
             possibleBindingsPerVariable.put("verb_class", new HashSet<>(Arrays.asList(verbClass.getSimpleName())));
