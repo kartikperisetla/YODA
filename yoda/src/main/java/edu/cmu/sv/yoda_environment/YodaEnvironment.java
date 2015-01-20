@@ -1,6 +1,7 @@
 package edu.cmu.sv.yoda_environment;
 
 import edu.cmu.sv.database.Database;
+import edu.cmu.sv.database.dialog_task.ActionEnumeration;
 import edu.cmu.sv.dialog_management.DialogManager;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DialogStateTracker;
@@ -66,6 +67,8 @@ public class YodaEnvironment {
     }
 
     public static YodaEnvironment dialogTestingEnvironment(){
+        ActionEnumeration.enumerationType = ActionEnumeration.ENUMERATION_TYPE.EXHAUSTIVE;
+        ActionEnumeration.focusConstraint = ActionEnumeration.FOCUS_CONSTRAINT.IN_FOCUS;
         YodaEnvironment ans = new YodaEnvironment();
         ans.dst = new DialogStateTracker(ans);
         ans.db = new Database(ans);
@@ -78,6 +81,8 @@ public class YodaEnvironment {
     }
 
     public static YodaEnvironment subProcessDialogEnvironment(){
+        ActionEnumeration.enumerationType = ActionEnumeration.ENUMERATION_TYPE.EXHAUSTIVE;
+        ActionEnumeration.focusConstraint = ActionEnumeration.FOCUS_CONSTRAINT.IN_FOCUS;
         YodaEnvironment ans = new YodaEnvironment();
         ans.dst = new DialogStateTracker(ans);
         ans.db = new Database(ans);
@@ -89,7 +94,9 @@ public class YodaEnvironment {
         return ans;
     }
 
-    public static YodaEnvironment minimalLanguageProcessingEnvironment(){
+    public static YodaEnvironment languageComponentTrainingEnvironment(){
+        ActionEnumeration.enumerationType = ActionEnumeration.ENUMERATION_TYPE.SAMPLED;
+        ActionEnumeration.focusConstraint = ActionEnumeration.FOCUS_CONSTRAINT.IN_KB;
         YodaEnvironment ans = new YodaEnvironment();
         ans.db = new Database(ans);
         ans.nlg = new NaturalLanguageGenerator(ans);

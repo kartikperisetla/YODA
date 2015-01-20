@@ -17,6 +17,7 @@ import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.WHQuestion;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.YNQuestion;
+import edu.cmu.sv.utils.Combination;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
@@ -59,14 +60,13 @@ public class CorpusGeneration {
                 for (Class<? extends ThingWithRoles> absoluteQualityDegreeClass : qualityDescriptor.getRight()) {
                     if (Preposition.class.isAssignableFrom(absoluteQualityDegreeClass)) {
                         // get 3 example URIs
-                        Object[] childURIs = yodaEnvironment.nlg.randomData.nextSample(yodaEnvironment.db.runQuerySelectX(poiSelectionQuery), 3);
-                        for (int i = 0; i < 1; i++) {
-
+                        Set<String> childURIs = Combination.randomSubset(yodaEnvironment.db.runQuerySelectX(poiSelectionQuery), 3);
+                        for (String childURI : childURIs) {
                             SemanticsModel ex0 = new SemanticsModel(YNQBaseString);
                             ex0.extendAndOverwriteAtPoint("verb." + Agent.class.getSimpleName(),
                                     new SemanticsModel(OntologyRegistry.WebResourceWrap(uri)));
 
-                            JSONObject tmp = SemanticsModel.parseJSON(OntologyRegistry.WebResourceWrap((String) childURIs[i]));
+                            JSONObject tmp = SemanticsModel.parseJSON(OntologyRegistry.WebResourceWrap(childURI));
                             SemanticsModel.wrap(tmp, absoluteQualityDegreeClass.getSimpleName(), InRelationTo.class.getSimpleName());
                             SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(),
                                     qualityDescriptor.getLeft().getSimpleName());
@@ -104,16 +104,15 @@ public class CorpusGeneration {
                 for (Class<? extends ThingWithRoles> absoluteQualityDegreeClass : qualityDescriptor.getRight()) {
                     if (Preposition.class.isAssignableFrom(absoluteQualityDegreeClass)) {
                         // get 3 example URIs
-                        Object[] childURIs = yodaEnvironment.nlg.randomData.nextSample(yodaEnvironment.db.runQuerySelectX(poiSelectionQuery), 3);
-                        for (int i = 0; i < 1; i++) {
+                        Set<String> childURIs = Combination.randomSubset(yodaEnvironment.db.runQuerySelectX(poiSelectionQuery), 3);
+                        for (String childURI : childURIs) {
 
                             SemanticsModel ex0 = new SemanticsModel(WHQBaseString);
                             ex0.extendAndOverwriteAtPoint("verb." + Agent.class.getSimpleName(),
                                     new SemanticsModel(OntologyRegistry.WebResourceWrap(uri)));
 
-                            JSONObject tmp = SemanticsModel.parseJSON(OntologyRegistry.WebResourceWrap((String) childURIs[i]));
+                            JSONObject tmp = SemanticsModel.parseJSON(OntologyRegistry.WebResourceWrap(childURI));
                             SemanticsModel.wrap(tmp, absoluteQualityDegreeClass.getSimpleName(), InRelationTo.class.getSimpleName());
-//                        SemanticsModel.wrap(tmp, Requested.class.getSimpleName(), HasValue.class.getSimpleName());
                             SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(),
                                     qualityDescriptor.getLeft().getSimpleName());
                             ex0.extendAndOverwriteAtPoint("verb." + Patient.class.getSimpleName(),
@@ -127,7 +126,6 @@ public class CorpusGeneration {
                                 new SemanticsModel(OntologyRegistry.WebResourceWrap(uri)));
 
                         JSONObject tmp = SemanticsModel.parseJSON("{\"class\":\"" + absoluteQualityDegreeClass.getSimpleName() + "\"}");
-//                    SemanticsModel.wrap(tmp, Requested.class.getSimpleName(), HasValue.class.getSimpleName());
                         SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(),
                                 qualityDescriptor.getLeft().getSimpleName());
                         ex0.extendAndOverwriteAtPoint("verb." + Patient.class.getSimpleName(),
@@ -148,39 +146,31 @@ public class CorpusGeneration {
     }
 
     public static List<Map.Entry<String, SemanticsModel>> generateCorpus2() {
-        int maxBindingsPerDialogActClass = 100;
         List<Map.Entry<String, SemanticsModel>> ans = new LinkedList<>();
-        YodaEnvironment yodaEnvironment = YodaEnvironment.minimalLanguageProcessingEnvironment();
+        YodaEnvironment yodaEnvironment = YodaEnvironment.languageComponentTrainingEnvironment();
 
         try {
-            // iterate through system actions
-            System.out.println("generating clarification dialog acts");
-            for (Class<? extends DialogAct> dialogActClass : DialogRegistry.clarificationDialogActs) {
-                DialogAct dialogActInstance = dialogActClass.newInstance();
-
-                Set<Map<String, Object>> returnedBindings = ActionEnumeration.getPossibleIndividualBindings(
-                        dialogActInstance, yodaEnvironment, ActionEnumeration.FOCUS_CONSTRAINT.IN_KB);
-                Set<Map<String, Object>> possibleBindings = returnedBindings;
-                if (returnedBindings.size() > maxBindingsPerDialogActClass) {
-                    possibleBindings = new HashSet<>(Arrays.asList(
-                            NaturalLanguageGenerator.randomData.nextSample(
-                                    possibleBindings, maxBindingsPerDialogActClass)).stream().map(x -> (Map<String, Object>)x).
-                            collect(Collectors.toList()));
-                }
-                for (Map<String, Object> binding : possibleBindings) {
-                    DialogAct newDialogActInstance = dialogActClass.newInstance();
-                    newDialogActInstance.bindVariables(binding);
-                    Map<String, SemanticsModel> generatedEntries = yodaEnvironment.nlg.generateAll(
-                            newDialogActInstance.getNlgCommand(), yodaEnvironment, Grammar.DEFAULT_GRAMMAR_PREFERENCES);
-                    ans.addAll(generatedEntries.entrySet());
-//                    generatedEntries.keySet().forEach(x -> System.out.println(x + ", " + generatedEntries.get(x)));
-                }
-            }
+//            // iterate through system actions
+//            System.out.println("generating clarification dialog acts");
+//            for (Class<? extends DialogAct> dialogActClass : DialogRegistry.clarificationDialogActs) {
+//                DialogAct dialogActInstance = dialogActClass.newInstance();
+//                for (Map<String, Object> binding : ActionEnumeration.getPossibleIndividualBindings(
+//                        dialogActInstance, yodaEnvironment)) {
+//                    DialogAct newDialogActInstance = dialogActClass.newInstance();
+//                    newDialogActInstance.bindVariables(binding);
+//                    Map<String, SemanticsModel> generatedEntries = yodaEnvironment.nlg.generateAll(
+//                            newDialogActInstance.getNlgCommand(), yodaEnvironment, Grammar.DEFAULT_GRAMMAR_PREFERENCES);
+//                    ans.addAll(generatedEntries.entrySet());
+////                    generatedEntries.keySet().forEach(x -> System.out.println(x + ", " + generatedEntries.get(x)));
+//                }
+//            }
 
             System.out.println("generating slot-filling dialog acts");
             for (Class<? extends DialogAct> dialogActClass : DialogRegistry.slotFillingDialogActs){
+                System.out.println("dialog act class:"+dialogActClass);
                 DialogAct dialogActInstance = dialogActClass.newInstance();
                 Set<Map<String, Object>> possibleBindings = ActionEnumeration.getPossibleNonIndividualBindings(dialogActInstance, null);
+                System.out.println("number of possible bindings:"+possibleBindings.size());
                 for (Map<String, Object> binding : possibleBindings) {
 //                    System.out.println("dialogAct:"+dialogActClass+", binding:"+binding);
                     DialogAct newDialogActInstance = dialogActClass.newInstance();
@@ -193,18 +183,18 @@ public class CorpusGeneration {
                 }
             }
 
-            System.out.println("generating argumentation dialog acts");
-            for (Class<? extends DialogAct> dialogActClass : DialogRegistry.argumentationDialogActs) {
-                DialogAct dialogActInstance = dialogActClass.newInstance();
-//                System.out.println("dialogAct:" + dialogActClass);
-                DialogAct newDialogActInstance = dialogActClass.newInstance();
-//                System.out.println(newDialogActInstance.getNlgCommand());
-                Map<String, SemanticsModel> generatedEntries = yodaEnvironment.nlg.generateAll(
-                        newDialogActInstance.getNlgCommand(), yodaEnvironment, Grammar.DEFAULT_GRAMMAR_PREFERENCES);
-                for (int i = 0; i < 11; i++) {
-                    ans.addAll(generatedEntries.entrySet());
-                }
-            }
+//            System.out.println("generating argumentation dialog acts");
+//            for (Class<? extends DialogAct> dialogActClass : DialogRegistry.argumentationDialogActs) {
+//                DialogAct dialogActInstance = dialogActClass.newInstance();
+////                System.out.println("dialogAct:" + dialogActClass);
+//                DialogAct newDialogActInstance = dialogActClass.newInstance();
+////                System.out.println(newDialogActInstance.getNlgCommand());
+//                Map<String, SemanticsModel> generatedEntries = yodaEnvironment.nlg.generateAll(
+//                        newDialogActInstance.getNlgCommand(), yodaEnvironment, Grammar.DEFAULT_GRAMMAR_PREFERENCES);
+//                for (int i = 0; i < 11; i++) {
+//                    ans.addAll(generatedEntries.entrySet());
+//                }
+//            }
 
 
         } catch (IllegalAccessException | InstantiationException e) {

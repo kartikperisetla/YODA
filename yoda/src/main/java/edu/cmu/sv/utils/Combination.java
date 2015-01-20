@@ -1,11 +1,31 @@
 package edu.cmu.sv.utils;
 
+import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
+import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.verb.Verb;
+import org.apache.commons.math3.random.RandomData;
+import org.apache.commons.math3.random.RandomDataImpl;
+
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by David Cohen on 9/2/14.
  */
 public class Combination {
+
+    static RandomData randomData = new RandomDataImpl();
+
+    public static <T> Set<T> randomSubset(Collection<T> items, int k){
+        if (items.size() > k){
+            return Arrays.asList(NaturalLanguageGenerator.randomData.nextSample(
+                    items, k)).stream().
+                    map(x -> (T)x).
+                    collect(Collectors.toSet());
+        }
+        else
+            return new HashSet<>(items);
+    }
 
     public static <T> Set<List<T>> combinations(Set<T> items){
         Set<List<T>> ans = new HashSet<>();

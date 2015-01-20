@@ -50,6 +50,7 @@ public class Grammar {
         grammar1.add(DefiniteReferenceTemplate0.class);
         grammar1.add(PPTemplate0.class);
         grammar1.add(AdjTemplate0.class);
+        grammar1.add(NounClassTemplate.class);
         grammar1_roots.add(FragmentTemplate0.class);
         grammar1_roots.add(CommandTemplate0.class);
         grammar1_roots.add(HasPropertyYNQTemplate0.class);
@@ -62,6 +63,7 @@ public class Grammar {
         grammar1_roots.add(ConfirmGroundingSuggestionTemplate0.class);
 //        grammar1_roots.add(RequestAgentTemplate.class);
         grammar1_roots.add(RequestRoleTemplate.class);
+        grammar1_roots.add(RequestRoleGivenRoleTemplate.class);
         grammar1_roots.add(RequestFixMisunderstandingTemplate0.class);
         grammar1_roots.add(NotifyDialogLostTemplate0.class);
     }

@@ -51,16 +51,9 @@ public class GenerationUtils {
 
             ans.put(combinedString, combinedMeaning);
         }
-        if (ans.size()<=yodaEnvironment.nlg.grammarPreferences.maxCombinations)
-            return ans;
-
+        Set<String> ansKeySet = Combination.randomSubset(ans.keySet(), yodaEnvironment.nlg.grammarPreferences.maxCombinations);
         Map<String, JSONObject> newAns = new HashMap<>();
-        Arrays.asList(Arrays.copyOf(
-                NaturalLanguageGenerator.randomData.nextSample(ans.entrySet(),
-                        yodaEnvironment.nlg.grammarPreferences.maxCombinations),
-                yodaEnvironment.nlg.grammarPreferences.maxCombinations, Map.Entry[].class)).
-                stream().
-                forEach(x -> newAns.put((String)x.getKey(), (JSONObject)x.getValue()));
+        ansKeySet.stream().forEach(x -> newAns.put(x, ans.get(x)));
         return newAns;
     }
 

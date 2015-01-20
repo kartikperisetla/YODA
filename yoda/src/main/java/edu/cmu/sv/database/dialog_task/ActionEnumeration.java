@@ -24,11 +24,17 @@ import java.util.stream.Collectors;
  * Created by David Cohen on 12/6/14.
  */
 public class ActionEnumeration {
+    public static int maxOntologyBindings = 2;
+    public static int maxIndividualBindings = 10;
+
     public static enum FOCUS_CONSTRAINT {IN_FOCUS, IN_KB}
+    public static enum ENUMERATION_TYPE {EXHAUSTIVE, SAMPLED}
+
+    public static FOCUS_CONSTRAINT focusConstraint;
+    public static ENUMERATION_TYPE enumerationType;
 
     public static Set<Map<String, Object>> getPossibleIndividualBindings(DialogAct dialogAct,
-                                                                         YodaEnvironment yodaEnvironment,
-                                                                         FOCUS_CONSTRAINT focusConstraint){
+                                                                         YodaEnvironment yodaEnvironment){
 
         if (dialogAct.getIndividualParameters().size()==0){
             Set<Map<String, Object>> ans = new HashSet<>();
@@ -49,6 +55,8 @@ public class ActionEnumeration {
         queryString += focusConstraintString;
         queryString += classConstraintString;
         queryString += "}";
+        if (enumerationType.equals(ENUMERATION_TYPE.SAMPLED))
+            queryString += " LIMIT "+maxIndividualBindings;
         yodaEnvironment.db.log(queryString);
         Database.getLogger().info("Action enumeration query:\n"+queryString);
 
@@ -76,7 +84,6 @@ public class ActionEnumeration {
 
     public static Set<Object> getPossibleGivenDescriptions(DiscourseUnit contextDiscourseUnit,
                                                            String path){
-        int maxResponses = 5;
         Set<Object> ans = new HashSet<>();
         if (contextDiscourseUnit!=null){
             if (contextDiscourseUnit.getFromInitiator(path)!=null)
@@ -96,10 +103,7 @@ public class ActionEnumeration {
                 }
             }
         }
-        if (ans.size() > maxResponses){
-            return new HashSet<>(Arrays.asList(NaturalLanguageGenerator.randomData.nextSample(ans, maxResponses)));
-        }
-        return ans;
+        return Combination.randomSubset(ans, maxOntologyBindings);
     }
 
     public static Set<Map<String, Object>> getPossibleNonIndividualBindings(DialogAct dialogAct,
@@ -109,7 +113,14 @@ public class ActionEnumeration {
         if (contextDiscourseUnit!=null)
             verbConstraint = (String) contextDiscourseUnit.getFromInitiator("verb.class");
 
-        for (Class<? extends Verb> verbClass : OntologyRegistry.verbClasses) {
+        Set<Class<? extends Verb>> verbClassSet;
+        if (enumerationType.equals(ENUMERATION_TYPE.SAMPLED)){
+            verbClassSet = Combination.randomSubset(OntologyRegistry.verbClasses, maxOntologyBindings);
+        } else {
+            verbClassSet = OntologyRegistry.verbClasses;
+        }
+
+        for (Class<? extends Verb> verbClass : verbClassSet) {
             if (verbConstraint != null && !OntologyRegistry.thingNameMap.get(verbConstraint).equals(verbClass))
                 continue;
             Map<String, Set<Object>> possibleBindingsPerVariable = new HashMap<>();

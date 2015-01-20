@@ -13,6 +13,7 @@ import edu.cmu.sv.ontology.role.Destination;
 import edu.cmu.sv.ontology.role.Origin;
 import edu.cmu.sv.ontology.verb.GiveDirections;
 import edu.cmu.sv.ontology.verb.HasProperty;
+import edu.cmu.sv.utils.Combination;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 
 import java.lang.reflect.Field;
@@ -250,12 +251,8 @@ public class Lexicon {
         }
         if (ans.size()==0)
             throw new NoLexiconEntryException();
-        if (ans.size()<=yodaEnvironment.nlg.grammarPreferences.maxWordForms)
-            return ans;
-        return new HashSet<>(Arrays.asList(
-                Arrays.copyOf(
-                        NaturalLanguageGenerator.randomData.nextSample(ans, yodaEnvironment.nlg.grammarPreferences.maxWordForms),
-                        yodaEnvironment.nlg.grammarPreferences.maxWordForms, String[].class)));
+
+        return Combination.randomSubset(ans, yodaEnvironment.nlg.grammarPreferences.maxWordForms);
     }
 
     public static Set<String> getPOSForClassHierarchy(Class cls,

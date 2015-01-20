@@ -64,11 +64,9 @@ public class RequestRoleGivenRoleTemplate implements Template {
             verbRoles.remove("class");
             verbRoles.remove(fillerSequence[fillerSequence.length - 1]);
             givenSlotPath = "verb."+verbRoles.get(0);
-            givenDescription = (JSONObject) constraints.get(verbRoles.get(0));
+            givenDescription = (JSONObject) new SemanticsModel(constraints).newGetSlotPathFiller(givenSlotPath);
             Assert.verify(OntologyRegistry.roleNameMap.containsKey(verbRoles.get(0)));
             givenRoleClass = OntologyRegistry.roleNameMap.get(verbRoles.get(0));
-
-
         } catch (Assert.AssertException e){
             return new HashMap<>();
         }
@@ -121,65 +119,102 @@ public class RequestRoleGivenRoleTemplate implements Template {
                 Map<String, JSONObject> givenPrefixChunks = givenPrefixStrings.stream().
                         collect(Collectors.toMap(x->x, x->SemanticsModel.parseJSON("{}")));
                 Map<String, JSONObject> givenChunks = yodaEnvironment.nlg.generateAll(givenDescription, yodaEnvironment, remainingDepth-1);
+                System.out.println(givenDescription.toJSONString());
+                System.out.println(givenChunks);
 
                 Map<String, JSONObject> verbChunks = verbStrings.stream().
                         collect(Collectors.toMap(x->x, (x -> SemanticsModel.parseJSON(constraints.toJSONString()))));
 
                 Map<String, Pair<Integer, Integer>> childNodeChunks = new HashMap<>();
-
                 List<Map<String, JSONObject>> orderedChunks = new LinkedList<>();
-                if (rolePartOfSpeechPair.getLeft().equals("subject")){
+
+//                rolePartsOfSpeech.add(new ImmutablePair<>("subject", "obj1"));
+//                rolePartsOfSpeech.add(new ImmutablePair<>("obj1", "obj2"));
+//                rolePartsOfSpeech.add(new ImmutablePair<>("obj2", "obj1"));
+//                rolePartsOfSpeech.add(new ImmutablePair<>("obj1", "subject"));
+
+                if (rolePartOfSpeechPair.getLeft().equals("subject")) {
                     orderedChunks.add(givenPrefixChunks);
                     orderedChunks.add(givenChunks);
-                    childNodeChunks.put(requestedSlotPath, new ImmutablePair<>(orderedChunks.size()-1, orderedChunks.size()-1));
+                    childNodeChunks.put(requestedSlotPath, new ImmutablePair<>(orderedChunks.size() - 1, orderedChunks.size() - 1));
                     orderedChunks.add(requestedPrefixChunks);
                     orderedChunks.add(whChunks);
+                    System.out.println(rolePartOfSpeechPair);
+                    System.out.println("ordered chunks:\n" + orderedChunks);
+                } else if (rolePartOfSpeechPair.getLeft().equals("obj1") && rolePartOfSpeechPair.getRight().equals("obj2")) {
+                    orderedChunks.add(givenPrefixChunks);
+                    orderedChunks.add(givenChunks);
+                    childNodeChunks.put(requestedSlotPath, new ImmutablePair<>(orderedChunks.size() - 1, orderedChunks.size() - 1));
+                    orderedChunks.add(requestedPrefixChunks);
+                    orderedChunks.add(whChunks);
+                    System.out.println(rolePartOfSpeechPair);
+                    System.out.println("ordered chunks:\n" + orderedChunks);
+                } else if (rolePartOfSpeechPair.getLeft().equals("obj1") && rolePartOfSpeechPair.getRight().equals("subj")) {
+                    orderedChunks.add(givenPrefixChunks);
+                    orderedChunks.add(givenChunks);
+                    childNodeChunks.put(requestedSlotPath, new ImmutablePair<>(orderedChunks.size() - 1, orderedChunks.size() - 1));
+                    orderedChunks.add(requestedPrefixChunks);
+                    orderedChunks.add(whChunks);
+                    System.out.println(rolePartOfSpeechPair);
+                    System.out.println("ordered chunks:\n" + orderedChunks);
+                } else if (rolePartOfSpeechPair.getLeft().equals("obj2") && rolePartOfSpeechPair.getRight().equals("obj1")) {
+                    orderedChunks.add(givenPrefixChunks);
+                    orderedChunks.add(givenChunks);
+                    childNodeChunks.put(requestedSlotPath, new ImmutablePair<>(orderedChunks.size() - 1, orderedChunks.size() - 1));
+                    orderedChunks.add(requestedPrefixChunks);
+                    orderedChunks.add(whChunks);
+                    System.out.println(rolePartOfSpeechPair);
+                    System.out.println("ordered chunks:\n" + orderedChunks);
+                } else {
+                    continue;
                 }
+
+
+
+
+                ans.putAll(GenerationUtils.simpleOrderedCombinations(orderedChunks,
+                        RequestRoleGivenRoleTemplate::compositionFunction, childNodeChunks, yodaEnvironment));
+
+
+            } catch (Lexicon.NoLexiconEntryException | InstantiationException | IllegalAccessException e) {}
+        }
+        return ans;
+
 //
-//                ans.putAll(GenerationUtils.simpleOrderedCombinations(Arrays.asList(verbChunks, rolePrefixChunks, whChunks),
-//                        RequestRoleGivenRoleTemplate::compositionFunction, childNodeChunks, yodaEnvironment));
-
-
-            } catch (Lexicon.NoLexiconEntryException | InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-        Set<String> rolePrefixStrings = new HashSet<>();
-        Set<String> whStrings = new HashSet<>();
-        Set<String> verbStrings = new HashSet<>();
-        try {
-            // assume that classesInRange only contains the most general classes possible
-            Set<Class <? extends Thing>> classesInRange = requestedRoleClass.newInstance().getRange();
-            for (Class <? extends Thing> cls : classesInRange){
-                try {
-                    whStrings.addAll(Lexicon.getPOSForClassHierarchy(cls, Lexicon.LexicalEntry.PART_OF_SPEECH.WH_PRONOUN, yodaEnvironment));
-                } catch(Lexicon.NoLexiconEntryException e){}
-                // just because one of the classes in range has no lexical info doesn't mean the template is broken
-            }
-
-            rolePrefixStrings = Lexicon.getPOSForClass(requestedRoleClass,
-                    Lexicon.LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, yodaEnvironment);
-
-            verbStrings = Lexicon.getPOSForClass(OntologyRegistry.thingNameMap.get(verbClassString),
-                    Lexicon.LexicalEntry.PART_OF_SPEECH.PRESENT_SINGULAR_VERB, yodaEnvironment);
-
-        } catch (InstantiationException | IllegalAccessException | Lexicon.NoLexiconEntryException e) {
-//            e.printStackTrace();
-        }
-
-        Map<String, JSONObject> whChunks = whStrings.stream().
-                collect(Collectors.toMap(x->x, x->SemanticsModel.parseJSON("{}")));
-        Map<String, JSONObject> rolePrefixChunks = rolePrefixStrings.stream().
-                collect(Collectors.toMap(x->x, x->SemanticsModel.parseJSON("{}")));
-        Map<String, JSONObject> verbChunks = verbStrings.stream().
-                collect(Collectors.toMap(x->x, (x -> SemanticsModel.parseJSON(constraints.toJSONString()))));
-
-        Map<String, Pair<Integer, Integer>> childNodeChunks = new HashMap<>();
-        childNodeChunks.put(requestedSlotPath, new ImmutablePair<>(2,2));
-        return GenerationUtils.simpleOrderedCombinations(Arrays.asList(verbChunks, rolePrefixChunks, whChunks),
-                RequestRoleGivenRoleTemplate::compositionFunction, childNodeChunks, yodaEnvironment);
+//        Set<String> rolePrefixStrings = new HashSet<>();
+//        Set<String> whStrings = new HashSet<>();
+//        Set<String> verbStrings = new HashSet<>();
+//        try {
+//            // assume that classesInRange only contains the most general classes possible
+//            Set<Class <? extends Thing>> classesInRange = requestedRoleClass.newInstance().getRange();
+//            for (Class <? extends Thing> cls : classesInRange){
+//                try {
+//                    whStrings.addAll(Lexicon.getPOSForClassHierarchy(cls, Lexicon.LexicalEntry.PART_OF_SPEECH.WH_PRONOUN, yodaEnvironment));
+//                } catch(Lexicon.NoLexiconEntryException e){}
+//                // just because one of the classes in range has no lexical info doesn't mean the template is broken
+//            }
+//
+//            rolePrefixStrings = Lexicon.getPOSForClass(requestedRoleClass,
+//                    Lexicon.LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, yodaEnvironment);
+//
+//            verbStrings = Lexicon.getPOSForClass(OntologyRegistry.thingNameMap.get(verbClassString),
+//                    Lexicon.LexicalEntry.PART_OF_SPEECH.PRESENT_SINGULAR_VERB, yodaEnvironment);
+//
+//        } catch (InstantiationException | IllegalAccessException | Lexicon.NoLexiconEntryException e) {
+////            e.printStackTrace();
+//        }
+//
+//        Map<String, JSONObject> whChunks = whStrings.stream().
+//                collect(Collectors.toMap(x->x, x->SemanticsModel.parseJSON("{}")));
+//        Map<String, JSONObject> rolePrefixChunks = rolePrefixStrings.stream().
+//                collect(Collectors.toMap(x->x, x->SemanticsModel.parseJSON("{}")));
+//        Map<String, JSONObject> verbChunks = verbStrings.stream().
+//                collect(Collectors.toMap(x->x, (x -> SemanticsModel.parseJSON(constraints.toJSONString()))));
+//
+//        Map<String, Pair<Integer, Integer>> childNodeChunks = new HashMap<>();
+//        childNodeChunks.put(requestedSlotPath, new ImmutablePair<>(2,2));
+//        return GenerationUtils.simpleOrderedCombinations(Arrays.asList(verbChunks, rolePrefixChunks, whChunks),
+//                RequestRoleGivenRoleTemplate::compositionFunction, childNodeChunks, yodaEnvironment);
     }
 
     private static JSONObject compositionFunction(List<JSONObject> children) {
