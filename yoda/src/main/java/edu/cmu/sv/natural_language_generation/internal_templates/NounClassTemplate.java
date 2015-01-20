@@ -5,16 +5,10 @@ import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.natural_language_generation.Template;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
-import edu.cmu.sv.ontology.ThingWithRoles;
-import edu.cmu.sv.ontology.misc.WebResource;
 import edu.cmu.sv.ontology.noun.Noun;
-import edu.cmu.sv.ontology.role.HasName;
-import edu.cmu.sv.ontology.role.HasURI;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
 import java.util.*;

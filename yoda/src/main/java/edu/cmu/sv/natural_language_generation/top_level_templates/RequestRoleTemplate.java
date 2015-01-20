@@ -68,7 +68,7 @@ public class RequestRoleTemplate implements Template {
                     Lexicon.LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, yodaEnvironment);
 
             verbStrings = Lexicon.getPOSForClass(OntologyRegistry.thingNameMap.get(verbClassString),
-                    Lexicon.LexicalEntry.PART_OF_SPEECH.PRESENT_SINGULAR_VERB, yodaEnvironment);
+                    Lexicon.LexicalEntry.PART_OF_SPEECH.S1_VERB, yodaEnvironment);
 
         } catch (InstantiationException | IllegalAccessException | Lexicon.NoLexiconEntryException e) {
 //            e.printStackTrace();

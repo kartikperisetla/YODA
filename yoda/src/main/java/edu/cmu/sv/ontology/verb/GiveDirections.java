@@ -1,6 +1,6 @@
 package edu.cmu.sv.ontology.verb;
 
-import edu.cmu.sv.natural_language_generation.Lexicon;
+import edu.cmu.sv.ontology.role.Agent;
 import edu.cmu.sv.ontology.role.Destination;
 import edu.cmu.sv.ontology.role.Role;
 
@@ -14,6 +14,7 @@ public class GiveDirections extends Verb {
     static Set<Class <? extends Role>> requiredGroundedRoles = new HashSet<>();
     static {
         requiredGroundedRoles.add(Destination.class);
+        requiredGroundedRoles.add(Agent.class);
     }
 
 

@@ -9,16 +9,19 @@ import edu.cmu.sv.ontology.noun.PointOfInterest;
 import edu.cmu.sv.ontology.noun.Time;
 import edu.cmu.sv.ontology.noun.poi_types.*;
 import edu.cmu.sv.ontology.preposition.IsCloseTo;
+import edu.cmu.sv.ontology.role.Agent;
 import edu.cmu.sv.ontology.role.Destination;
 import edu.cmu.sv.ontology.role.Origin;
+import edu.cmu.sv.ontology.role.Patient;
 import edu.cmu.sv.ontology.verb.GiveDirections;
 import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.utils.Combination;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by David Cohen on 12/24/14.
@@ -37,6 +40,9 @@ public class Lexicon {
         {
             LexicalEntry entry = new LexicalEntry();
             entry.add(LexicalEntry.PART_OF_SPEECH.WH_PRONOUN, "who");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "person");
+            entry.add(LexicalEntry.PART_OF_SPEECH.S1_PRONOUN, "I");
+            entry.add(LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, "they");
             Lexicon.add(Person.class, entry);
         }
         {
@@ -176,12 +182,13 @@ public class Lexicon {
     static {
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.PRESENT_SINGULAR_VERB, "give directions");
+            entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "give directions");
+            entry.add(LexicalEntry.PART_OF_SPEECH.PRESENT_PROGRESSIVE_VERB, "giving directions");
             Lexicon.add(GiveDirections.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.PRESENT_SINGULAR_VERB, "is");
+            entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "is");
             Lexicon.add(HasProperty.class, entry);
         }
     }
@@ -228,6 +235,19 @@ public class Lexicon {
             entry.add(LexicalEntry.PART_OF_SPEECH.AS_OBJECT2_PREFIX, "from");
             Lexicon.add(Origin.class, entry);
         }
+        {
+            // directions from X, directions <...> from X
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.AS_SUBJECT_PREFIX, "");
+            Lexicon.add(Agent.class, entry);
+        }
+        {
+            // directions from X, directions <...> from X
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, "");
+            Lexicon.add(Patient.class, entry);
+        }
+
     }
 
     public static Set<LexicalEntry> get(Class<? extends Thing> cls){
@@ -276,7 +296,11 @@ public class Lexicon {
      * used to describe a single concept from the ontology
      */
     public static class LexicalEntry {
-        public enum PART_OF_SPEECH {WH_PRONOUN, SINGULAR_NOUN, PRESENT_SINGULAR_VERB, ADJECTIVE, RELATIONAL_PREPOSITIONAL_PHRASE,
+        public enum PART_OF_SPEECH {
+            WH_PRONOUN, S1_PRONOUN, S3_PRONOUN,
+            SINGULAR_NOUN,
+            S1_VERB, S3_VERB, PRESENT_PROGRESSIVE_VERB,
+            ADJECTIVE, RELATIONAL_PREPOSITIONAL_PHRASE,
         AS_SUBJECT_PREFIX, AS_OBJECT_PREFIX, AS_OBJECT2_PREFIX}
         private Map<PART_OF_SPEECH, Set<String>> wordMap = new HashMap<>();
 

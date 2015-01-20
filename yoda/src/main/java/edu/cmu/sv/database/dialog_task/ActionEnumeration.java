@@ -2,10 +2,8 @@ package edu.cmu.sv.database.dialog_task;
 
 import edu.cmu.sv.database.Database;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
-import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
-import edu.cmu.sv.ontology.ThingWithRoles;
 import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;

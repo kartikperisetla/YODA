@@ -1,16 +1,14 @@
 package edu.cmu.sv.natural_language_generation;
 
-import edu.cmu.sv.yoda_environment.YodaEnvironment;
-import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.Combination;
+import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -32,18 +30,16 @@ public class GenerationUtils {
         IntStream.range(0, chunks.size()).forEach(x -> possibleBindingsInput.put(x, chunks.get(x).entrySet()));
 
         for (Map<Integer, Map.Entry<String, JSONObject>> binding : Combination.possibleBindings(possibleBindingsInput)){
-            String combinedString = "";
             List<String> subStrings = new LinkedList<>();
             List<JSONObject> subContents = new LinkedList<>();
             for (int i = 0; i < chunks.size(); i++) {
-                if (!(binding.get(i).getKey().trim().equals(""))) {
-                    if (i!=0)
-                        combinedString += " ";
-                    combinedString += binding.get(i).getKey().trim();
-                }
                 subStrings.add(binding.get(i).getKey());
                 subContents.add(binding.get(i).getValue());
             }
+            String combinedString = String.join(" ", subStrings.stream().
+                    map(String::trim).
+                    filter(x -> x.length()>0).
+                    collect(Collectors.toList()));
             JSONObject combinedMeaning = compositionFunction.apply(subContents);
             for (String childRole : childNodeChunks.keySet()){
                 addChunkIndices(combinedMeaning, subStrings, childNodeChunks.get(childRole), childRole);

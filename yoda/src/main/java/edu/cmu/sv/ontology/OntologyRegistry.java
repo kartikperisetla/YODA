@@ -1,25 +1,24 @@
 package edu.cmu.sv.ontology;
 
-import edu.cmu.sv.ontology.adjective.*;
+import edu.cmu.sv.ontology.adjective.Adjective;
+import edu.cmu.sv.ontology.adjective.Cheap;
+import edu.cmu.sv.ontology.adjective.Expensive;
 import edu.cmu.sv.ontology.misc.*;
-import edu.cmu.sv.ontology.noun.Noun;
+import edu.cmu.sv.ontology.noun.*;
 import edu.cmu.sv.ontology.noun.poi_types.*;
-import edu.cmu.sv.ontology.preposition.DistancePreposition;
 import edu.cmu.sv.ontology.preposition.IsCloseTo;
 import edu.cmu.sv.ontology.preposition.Preposition;
+import edu.cmu.sv.ontology.quality.TransientQuality;
 import edu.cmu.sv.ontology.quality.binary_quality.Distance;
 import edu.cmu.sv.ontology.quality.unary_quality.Expensiveness;
-import edu.cmu.sv.ontology.quality.TransientQuality;
 import edu.cmu.sv.ontology.role.*;
 import edu.cmu.sv.ontology.role.has_quality_subroles.HasDistance;
 import edu.cmu.sv.ontology.role.has_quality_subroles.HasExpensiveness;
 import edu.cmu.sv.ontology.role.has_quality_subroles.HasQualityRole;
 import edu.cmu.sv.ontology.verb.*;
-import edu.cmu.sv.ontology.noun.*;
 import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import sun.security.krb5.internal.crypto.Des;
 
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -86,7 +85,6 @@ public class OntologyRegistry {
         roleClasses.add(Role.class);
         roleClasses.add(Agent.class);
         roleClasses.add(Patient.class);
-        roleClasses.add(Theme.class);
         roleClasses.add(HasAtTime.class);
         roleClasses.add(HasHour.class);
         roleClasses.add(HasName.class);
