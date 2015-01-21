@@ -278,7 +278,7 @@ public class OntologyRegistry {
         }
     }
 
-    public static String WebResourceWrap(String URI){
+    public static String webResourceWrap(String URI){
         String ans = "{\"class\": \""+ WebResource.class.getSimpleName()+"\", \""+
                 HasURI.class.getSimpleName()+"\":\""+URI+"\"}";
         return ans;

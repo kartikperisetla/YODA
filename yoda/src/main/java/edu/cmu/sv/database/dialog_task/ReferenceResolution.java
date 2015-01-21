@@ -322,7 +322,7 @@ public class ReferenceResolution {
                 // add new bindings
                 for (String slotPathVariable : assignment.keySet()){
                     SemanticsModel.overwrite((JSONObject) groundedModel.newGetSlotPathFiller(slotPathVariable),
-                            SemanticsModel.parseJSON(OntologyRegistry.WebResourceWrap(assignment.get(slotPathVariable))));
+                            SemanticsModel.parseJSON(OntologyRegistry.webResourceWrap(assignment.get(slotPathVariable))));
                 }
                 // include previously grounded paths
                 for (String path : alreadyGroundedPaths){

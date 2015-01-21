@@ -36,7 +36,7 @@ public class NounClassTemplate implements Template {
         Set<String> singularNounForms;
         try {
             singularNounForms = Lexicon.getPOSForClassHierarchy(nounClass,
-                    Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, yodaEnvironment);
+                    Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, yodaEnvironment.nlg.grammarPreferences);
         } catch (Lexicon.NoLexiconEntryException e) {
             singularNounForms = new HashSet<>();
         }

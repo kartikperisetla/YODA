@@ -53,7 +53,7 @@ public class TestResolveReferences {
 
         // simple named entity reference resolution
         String sluNamedEntityChunkURI = yodaEnvironment.db.insertValue("red rock");
-        JSONObject reference = SemanticsModel.parseJSON(OntologyRegistry.WebResourceWrap(sluNamedEntityChunkURI));
+        JSONObject reference = SemanticsModel.parseJSON(OntologyRegistry.webResourceWrap(sluNamedEntityChunkURI));
         SemanticsModel.wrap(reference, Noun.class.getSimpleName(), HasName.class.getSimpleName());
         System.out.println(reference.toJSONString());
 
@@ -67,7 +67,7 @@ public class TestResolveReferences {
 
         // description with a nested PP reference resolution
         sluNamedEntityChunkURI = yodaEnvironment.db.insertValue("tied house");
-        reference = SemanticsModel.parseJSON(OntologyRegistry.WebResourceWrap(sluNamedEntityChunkURI));
+        reference = SemanticsModel.parseJSON(OntologyRegistry.webResourceWrap(sluNamedEntityChunkURI));
         SemanticsModel.wrap(reference, Noun.class.getSimpleName(), HasName.class.getSimpleName());
         SemanticsModel.wrap(reference, IsCloseTo.class.getSimpleName(), InRelationTo.class.getSimpleName());
         SemanticsModel.wrap(reference, Cafe.class.getSimpleName(), HasDistance.class.getSimpleName());

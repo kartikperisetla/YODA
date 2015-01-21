@@ -17,7 +17,6 @@ import edu.cmu.sv.ontology.role.Patient;
 import edu.cmu.sv.ontology.verb.GiveDirections;
 import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.utils.Combination;
-import edu.cmu.sv.yoda_environment.YodaEnvironment;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -283,7 +282,7 @@ public class Lexicon {
 
     public static Set<String> getPOSForClass(Class<? extends Thing> cls,
                                              LexicalEntry.PART_OF_SPEECH partOfSpeech,
-                                             YodaEnvironment yodaEnvironment) throws NoLexiconEntryException {
+                                             Grammar.GrammarPreferences grammarPreferences) throws NoLexiconEntryException {
         Set<String> ans = new HashSet<>();
         for (LexicalEntry lexicalEntry : Lexicon.get(cls)) {
             ans.addAll(lexicalEntry.get(partOfSpeech));
@@ -291,22 +290,22 @@ public class Lexicon {
         if (ans.size()==0)
             throw new NoLexiconEntryException();
 
-        return Combination.randomSubset(ans, yodaEnvironment.nlg.grammarPreferences.maxWordForms);
+        return Combination.randomSubset(ans, grammarPreferences.maxWordForms);
     }
 
     public static Set<String> getPOSForClassHierarchy(Class cls,
                                                       LexicalEntry.PART_OF_SPEECH partOfSpeech,
-                                                      YodaEnvironment yodaEnvironment) throws NoLexiconEntryException {
+                                                      Grammar.GrammarPreferences grammarPreferences) throws NoLexiconEntryException {
         if (! (Thing.class.isAssignableFrom(cls)))
             throw new NoLexiconEntryException();
         try {
-            Set<String> ans = getPOSForClass((Class<? extends Thing>)cls, partOfSpeech, yodaEnvironment);
+            Set<String> ans = getPOSForClass((Class<? extends Thing>)cls, partOfSpeech, grammarPreferences);
             if (ans.size()==0){
                 throw new NoLexiconEntryException();
             }
             return ans;
         } catch (NoLexiconEntryException e){
-            return getPOSForClassHierarchy(cls.getSuperclass(), partOfSpeech, yodaEnvironment);
+            return getPOSForClassHierarchy(cls.getSuperclass(), partOfSpeech, grammarPreferences);
         }
     }
 

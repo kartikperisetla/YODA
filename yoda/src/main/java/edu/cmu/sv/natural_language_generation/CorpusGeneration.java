@@ -64,9 +64,9 @@ public class CorpusGeneration {
                         for (String childURI : childURIs) {
                             SemanticsModel ex0 = new SemanticsModel(YNQBaseString);
                             ex0.extendAndOverwriteAtPoint("verb." + Agent.class.getSimpleName(),
-                                    new SemanticsModel(OntologyRegistry.WebResourceWrap(uri)));
+                                    new SemanticsModel(OntologyRegistry.webResourceWrap(uri)));
 
-                            JSONObject tmp = SemanticsModel.parseJSON(OntologyRegistry.WebResourceWrap(childURI));
+                            JSONObject tmp = SemanticsModel.parseJSON(OntologyRegistry.webResourceWrap(childURI));
                             SemanticsModel.wrap(tmp, absoluteQualityDegreeClass.getSimpleName(), InRelationTo.class.getSimpleName());
                             SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(),
                                     qualityDescriptor.getLeft().getSimpleName());
@@ -78,7 +78,7 @@ public class CorpusGeneration {
                     } else if (Adjective.class.isAssignableFrom(absoluteQualityDegreeClass)) {
                         SemanticsModel ex0 = new SemanticsModel(YNQBaseString);
                         ex0.extendAndOverwriteAtPoint("verb." + Agent.class.getSimpleName(),
-                                new SemanticsModel(OntologyRegistry.WebResourceWrap(uri)));
+                                new SemanticsModel(OntologyRegistry.webResourceWrap(uri)));
 
                         JSONObject tmp = SemanticsModel.parseJSON("{\"class\":\"" + absoluteQualityDegreeClass.getSimpleName() + "\"}");
                         SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(),
@@ -109,9 +109,9 @@ public class CorpusGeneration {
 
                             SemanticsModel ex0 = new SemanticsModel(WHQBaseString);
                             ex0.extendAndOverwriteAtPoint("verb." + Agent.class.getSimpleName(),
-                                    new SemanticsModel(OntologyRegistry.WebResourceWrap(uri)));
+                                    new SemanticsModel(OntologyRegistry.webResourceWrap(uri)));
 
-                            JSONObject tmp = SemanticsModel.parseJSON(OntologyRegistry.WebResourceWrap(childURI));
+                            JSONObject tmp = SemanticsModel.parseJSON(OntologyRegistry.webResourceWrap(childURI));
                             SemanticsModel.wrap(tmp, absoluteQualityDegreeClass.getSimpleName(), InRelationTo.class.getSimpleName());
                             SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(),
                                     qualityDescriptor.getLeft().getSimpleName());
@@ -123,7 +123,7 @@ public class CorpusGeneration {
                     } else if (Adjective.class.isAssignableFrom(absoluteQualityDegreeClass)) {
                         SemanticsModel ex0 = new SemanticsModel(WHQBaseString);
                         ex0.extendAndOverwriteAtPoint("verb." + Agent.class.getSimpleName(),
-                                new SemanticsModel(OntologyRegistry.WebResourceWrap(uri)));
+                                new SemanticsModel(OntologyRegistry.webResourceWrap(uri)));
 
                         JSONObject tmp = SemanticsModel.parseJSON("{\"class\":\"" + absoluteQualityDegreeClass.getSimpleName() + "\"}");
                         SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(),
@@ -139,7 +139,7 @@ public class CorpusGeneration {
 
 
             SemanticsModel ex1 = new SemanticsModel("{\"dialogAct\": \"Fragment\", \"topic\": " +
-                    OntologyRegistry.WebResourceWrap(uri) + "}");
+                    OntologyRegistry.webResourceWrap(uri) + "}");
             ans.putAll(yodaEnvironment.nlg.generateAll(ex1, yodaEnvironment, corpusPreferences));
         }
         return ans;

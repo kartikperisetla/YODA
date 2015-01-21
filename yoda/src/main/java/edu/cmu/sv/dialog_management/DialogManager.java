@@ -3,23 +3,18 @@ package edu.cmu.sv.dialog_management;
 import edu.cmu.sv.database.dialog_task.ActionEnumeration;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
-import edu.cmu.sv.ontology.OntologyRegistry;
-import edu.cmu.sv.ontology.ThingWithRoles;
 import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.ActionSchema;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.DontKnow;
+import edu.cmu.sv.system_action.SystemAction;
+import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Statement;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ClarificationDialogAct;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
-import edu.cmu.sv.utils.Combination;
+import edu.cmu.sv.utils.HypothesisSetManagement;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.MongoLogHandler;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
-import edu.cmu.sv.system_action.SystemAction;
-import edu.cmu.sv.system_action.dialog_act.*;
-
-import edu.cmu.sv.utils.HypothesisSetManagement;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -27,8 +22,9 @@ import org.json.simple.JSONObject;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.*;
-import java.util.stream.Collectors;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 /**
  * Created by David Cohen on 9/2/14.

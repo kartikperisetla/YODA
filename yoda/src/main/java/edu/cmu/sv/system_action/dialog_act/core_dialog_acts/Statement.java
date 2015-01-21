@@ -50,7 +50,7 @@ public class Statement extends DialogAct {
         SemanticsModel ans = super.getNlgCommand();
         ans.getInternalRepresentation().put("verb",
                 SemanticsModel.parseJSON("{\"class\":\""+(String)this.getBoundClasses().get("verb_class")+"\"}"));
-        String topicString = OntologyRegistry.WebResourceWrap((String) this.getBoundIndividuals().get("topic_individual"));
+        String topicString = OntologyRegistry.webResourceWrap((String) this.getBoundIndividuals().get("topic_individual"));
         ((JSONObject)ans.newGetSlotPathFiller("verb")).put("Agent", SemanticsModel.parseJSON(topicString));
         ((JSONObject)ans.newGetSlotPathFiller("verb")).put("Patient",
                 SemanticsModel.parseJSON(((JSONObject)this.getBoundDescriptions().get("asserted_role_description")).toJSONString()));

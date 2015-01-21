@@ -37,7 +37,6 @@ public class YodaEnvironment {
         if (mongoLoggingActive)
             MongoLogHandler.start();
 
-
         // don't log all handlers to stdout
         Logger rootLogger = Logger.getLogger("");
         Handler[] handlers = rootLogger.getHandlers();

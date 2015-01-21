@@ -53,7 +53,7 @@ public class RequestConfirmValue extends ClarificationDialogAct {
     @Override
     public SemanticsModel getNlgCommand() {
         SemanticsModel ans = super.getNlgCommand();
-        String topicString = OntologyRegistry.WebResourceWrap((String) this.getBoundIndividuals().get("topic_individual"));
+        String topicString = OntologyRegistry.webResourceWrap((String) this.getBoundIndividuals().get("topic_individual"));
         ans.getInternalRepresentation().put("topic", SemanticsModel.parseJSON(topicString));
         return ans;
     }

@@ -5,16 +5,17 @@ import edu.cmu.sv.spoken_language_understanding.nested_chunking_understander.*;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.junit.Test;
 
-import java.io.*;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by David Cohen on 10/29/14.
  *
  * Generate an artificial corpus and use it to train language components (SLU / LM)
  */
-public class TestLanguageComponents {
+public class TestStatisticalLanguageComponents {
     @Test
     public void Test() throws FileNotFoundException, UnsupportedEncodingException {
         YodaEnvironment yodaEnvironment = YodaEnvironment.dialogTestingEnvironment();

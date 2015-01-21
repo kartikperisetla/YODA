@@ -3,11 +3,9 @@ package edu.cmu.sv.dialog_management;
 import com.google.common.collect.Iterables;
 import edu.cmu.sv.database.dialog_task.ReferenceResolution;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
-import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.ThingWithRoles;
-import edu.cmu.sv.ontology.adjective.Adjective;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.ontology.quality.TransientQuality;
 import edu.cmu.sv.ontology.role.Role;
@@ -126,7 +124,7 @@ public class ActionAnalysis {
                         SemanticsModel.wrap(description, UnknownThingWithRoles.class.getSimpleName(),
                                 descriptor.getLeft().getSimpleName());
                         responseStatement.put("dialogAct", Statement.class.getSimpleName());
-                        responseStatement.put("verb.Agent", SemanticsModel.parseJSON(OntologyRegistry.WebResourceWrap(entityURI)));
+                        responseStatement.put("verb.Agent", SemanticsModel.parseJSON(OntologyRegistry.webResourceWrap(entityURI)));
                         responseStatement.put("verb.Patient", description);
                     }
                 }

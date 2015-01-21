@@ -3,7 +3,6 @@ package edu.cmu.sv.natural_language_generation;
 
 import edu.cmu.sv.natural_language_generation.internal_templates.*;
 import edu.cmu.sv.natural_language_generation.top_level_templates.*;
-import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestFixMisunderstanding;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,6 +16,7 @@ public class Grammar {
 
     public static GrammarPreferences DEFAULT_GRAMMAR_PREFERENCES = new Grammar.GrammarPreferences(.5, .2, .2, 5, 2, 5, 5, 2, new HashMap<>());
     public static GrammarPreferences CORPUS_GENERATION_PREFERENCES = new Grammar.GrammarPreferences(.9, .3, .2, 5, 3, 5, 5, 2, new HashMap<>());
+    public static GrammarPreferences EXHAUSTIVE_GENERATION_PREFERENCES = new GrammarPreferences(.9, 1.0, 1.0, 5, 3, 3, 100, 100, new HashMap<>());
 
     public static class GrammarPreferences{
         public double referenceAmbiguityThreshold;
@@ -63,7 +63,7 @@ public class Grammar {
         grammar1_roots.add(ConfirmGroundingSuggestionTemplate0.class);
 //        grammar1_roots.add(RequestAgentTemplate.class);
         grammar1_roots.add(RequestRoleTemplate.class);
-        grammar1_roots.add(RequestRoleGivenRoleTemplate.class);
+//        grammar1_roots.add(RequestRoleGivenRoleTemplate.class);
         grammar1_roots.add(RequestFixMisunderstandingTemplate0.class);
         grammar1_roots.add(NotifyDialogLostTemplate0.class);
     }

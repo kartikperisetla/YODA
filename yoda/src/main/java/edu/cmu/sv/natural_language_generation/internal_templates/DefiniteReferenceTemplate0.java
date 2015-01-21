@@ -74,7 +74,7 @@ public class DefiniteReferenceTemplate0 implements Template {
             Set<String> singularNounForms;
             try {
                 singularNounForms = Lexicon.getPOSForClass(OntologyRegistry.thingNameMap.get(clsName),
-                        Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, yodaEnvironment);
+                        Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, yodaEnvironment.nlg.grammarPreferences);
             } catch (Lexicon.NoLexiconEntryException e) {
                 singularNounForms = new HashSet<>();
             }
@@ -109,7 +109,7 @@ public class DefiniteReferenceTemplate0 implements Template {
                             Set<String> adjStrings;
                             try {
                                 adjStrings = Lexicon.getPOSForClass(adjectiveClass,
-                                        Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, yodaEnvironment);
+                                        Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, yodaEnvironment.nlg.grammarPreferences);
                             } catch (Lexicon.NoLexiconEntryException e) {
                                 adjStrings = new HashSet<>();
                             }
@@ -168,7 +168,7 @@ public class DefiniteReferenceTemplate0 implements Template {
 
                                     if (childContent==null){
                                         childContent = SemanticsModel.parseJSON(
-                                                OntologyRegistry.WebResourceWrap(binding.get(0)));
+                                                OntologyRegistry.webResourceWrap(binding.get(0)));
                                         for (Map.Entry<String, JSONObject> entry : yodaEnvironment.nlg.
                                                 generateAll(childContent, yodaEnvironment, remainingDepth-1).entrySet()){
                                             childChunks.put(entry.getKey(), entry.getValue());
@@ -178,7 +178,7 @@ public class DefiniteReferenceTemplate0 implements Template {
                                     try{
                                         ppStrings = Lexicon.getPOSForClass(prepositionClass,
                                                 Lexicon.LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE,
-                                                yodaEnvironment);
+                                                yodaEnvironment.nlg.grammarPreferences);
                                     } catch (Lexicon.NoLexiconEntryException e) {
                                         ppStrings = new HashSet<>();
                                     }

@@ -45,7 +45,7 @@ public class AdjTemplate0 implements Template {
             Map<String, JSONObject> adjectiveChunks = new HashMap<>();
             Class<? extends Thing> adjectiveClass = OntologyRegistry.thingNameMap.get(adjectiveClassString);
             Set<String> adjectiveStrings = null;
-            adjectiveStrings = Lexicon.getPOSForClass(adjectiveClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, yodaEnvironment);
+            adjectiveStrings = Lexicon.getPOSForClass(adjectiveClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, yodaEnvironment.nlg.grammarPreferences);
 
             for (String ppString : adjectiveStrings) {
                 JSONObject tmp = SemanticsModel.parseJSON("{\"class\":\"" + adjectiveClass.getSimpleName() + "\"}");
