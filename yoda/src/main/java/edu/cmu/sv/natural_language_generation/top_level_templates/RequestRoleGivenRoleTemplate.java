@@ -47,13 +47,14 @@ public class RequestRoleGivenRoleTemplate implements Template {
         Class<? extends Role> requestedRoleClass;
         Class<? extends Role> givenRoleClass;
 
-        try{
+        try {
             Assert.verify(constraints.get("dialogAct").equals(RequestRoleGivenRole.class.getSimpleName()));
             Assert.verify(constraints.containsKey("verb"));
             JSONObject verbObject = (JSONObject)constraints.get("verb");
             verbClassString = (String)verbObject.get("class");
             Assert.verify(constraintsModel.findAllPathsToClass(Requested.class.getSimpleName()).size()==1);
             requestedSlotPath = new LinkedList<>(constraintsModel.findAllPathsToClass(Requested.class.getSimpleName())).get(0);
+
             String[] fillerSequence = requestedSlotPath.split("\\.");
             Assert.verify(OntologyRegistry.roleNameMap.containsKey(fillerSequence[fillerSequence.length - 1]));
             requestedRoleClass = OntologyRegistry.roleNameMap.get(fillerSequence[fillerSequence.length - 1]);

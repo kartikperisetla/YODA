@@ -9,6 +9,7 @@ import edu.cmu.sv.ontology.noun.PointOfInterest;
 import edu.cmu.sv.ontology.noun.Time;
 import edu.cmu.sv.ontology.noun.poi_types.*;
 import edu.cmu.sv.ontology.preposition.IsCloseTo;
+import edu.cmu.sv.ontology.quality.unary_quality.Expensiveness;
 import edu.cmu.sv.ontology.role.Agent;
 import edu.cmu.sv.ontology.role.Destination;
 import edu.cmu.sv.ontology.role.Origin;
@@ -198,11 +199,15 @@ public class Lexicon {
         {
             LexicalEntry entry = new LexicalEntry();
             entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "cheap");
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "inexpensive");
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "affordable");
             Lexicon.add(Cheap.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
             entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "expensive");
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "pricey");
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "costly");
             Lexicon.add(Expensive.class, entry);
         }
     }
@@ -215,6 +220,20 @@ public class Lexicon {
             entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "near to");
             entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "near");
             Lexicon.add(IsCloseTo.class, entry);
+        }
+    }
+
+    //// Lexicon for transitive qualities
+    static {
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "expensiveness");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "price range");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "cost");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "affordability");
+            entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "prices");
+            entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "costs");
+            Lexicon.add(Expensiveness.class, entry);
         }
     }
 
@@ -298,7 +317,7 @@ public class Lexicon {
     public static class LexicalEntry {
         public enum PART_OF_SPEECH {
             WH_PRONOUN, S1_PRONOUN, S3_PRONOUN,
-            SINGULAR_NOUN,
+            SINGULAR_NOUN, PLURAL_NOUN,
             S1_VERB, S3_VERB, PRESENT_PROGRESSIVE_VERB,
             ADJECTIVE, RELATIONAL_PREPOSITIONAL_PHRASE,
         AS_SUBJECT_PREFIX, AS_OBJECT_PREFIX, AS_OBJECT2_PREFIX}

@@ -1,90 +1,155 @@
 package edu.cmu.sv.natural_language_generation.top_level_templates;
 
-import edu.cmu.sv.utils.Assert;
-import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
+import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.natural_language_generation.Template;
+import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.ThingWithRoles;
+import edu.cmu.sv.ontology.misc.Requested;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
-import edu.cmu.sv.ontology.misc.WebResource;
-import edu.cmu.sv.ontology.role.Agent;
-import edu.cmu.sv.ontology.role.Patient;
+import edu.cmu.sv.ontology.quality.TransientQuality;
+import edu.cmu.sv.ontology.role.HasValue;
+import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.WHQuestion;
+import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestProperty;
+import edu.cmu.sv.utils.Assert;
+import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
  * Created by David Cohen on 11/13/14.
  */
 public class HasPropertyWHQTemplate0 implements Template {
-
     @Override
     public Map<String, JSONObject> generateAll(JSONObject constraints, YodaEnvironment yodaEnvironment, int remainingDepth) {
-        // required information to generate
-        JSONObject agentConstraint;
-        JSONObject patientConstraint;
 
-        // ensure that the constraints match this template
+        Map<String, JSONObject> ans = new HashMap<>();
+        SemanticsModel constraintsModel = new SemanticsModel(constraints);
+        String verbClassString;
+        String requestedSlotPath;
+        String givenSlotPath;
+        JSONObject requestedContent;
+        JSONObject givenDescription;
+        Class<? extends TransientQuality> requestedQuality = null;
+        Class<? extends Role> requestedRoleClass;
+        Class<? extends Role> givenRoleClass;
+
         try {
-            Assert.verify(constraints.keySet().size()==2);
-            Assert.verify(constraints.containsKey("dialogAct") && constraints.containsKey("verb"));
-            Assert.verify(constraints.get("dialogAct").equals(WHQuestion.class.getSimpleName()));
-            JSONObject verbConstraint = (JSONObject) constraints.get("verb");
-            Assert.verify(verbConstraint.keySet().size()==3);
-            Assert.verify(verbConstraint.get("class").equals(HasProperty.class.getSimpleName()));
-            Assert.verify(verbConstraint.containsKey(Agent.class.getSimpleName()));
-            Assert.verify(verbConstraint.containsKey(Patient.class.getSimpleName()));
-            agentConstraint = (JSONObject) verbConstraint.get(Agent.class.getSimpleName());
-            Assert.verify(agentConstraint.get("class").equals(WebResource.class.getSimpleName()));
-            patientConstraint = (JSONObject) verbConstraint.get(Patient.class.getSimpleName());
-            Assert.verify(patientConstraint.get("class").equals(UnknownThingWithRoles.class.getSimpleName()));
+            Assert.verify(constraints.get("dialogAct").equals(RequestProperty.class.getSimpleName()));
+            Assert.verify(constraints.containsKey("verb"));
+            JSONObject verbObject = (JSONObject) constraints.get("verb");
+            verbClassString = (String) verbObject.get("class");
+            Assert.verify(verbClassString.equals(HasProperty.class.getSimpleName()));
+            Assert.verify(constraintsModel.findAllPathsToClass(Requested.class.getSimpleName()).size() == 1);
+            requestedSlotPath = new LinkedList<>(constraintsModel.findAllPathsToClass(Requested.class.getSimpleName())).get(0);
+            requestedContent = (JSONObject) constraintsModel.newGetSlotPathFiller(requestedSlotPath);
+            if (requestedContent.containsKey(HasValue.class.getSimpleName())) {
+                requestedQuality = (Class<? extends TransientQuality>) OntologyRegistry.thingNameMap.get(
+                        (String) ((JSONObject) requestedContent.get(HasValue.class.getSimpleName())).get("class"));
+            }
+            String[] fillerSequence = requestedSlotPath.split("\\.");
+            Assert.verify(OntologyRegistry.roleNameMap.containsKey(fillerSequence[fillerSequence.length - 1]));
+            requestedRoleClass = OntologyRegistry.roleNameMap.get(fillerSequence[fillerSequence.length - 1]);
+
+            Assert.verify(verbObject.size() == 3); //class, requested, given
+            List<Object> verbRoles = new LinkedList<>(verbObject.keySet());
+            verbRoles.remove("class");
+            verbRoles.remove(fillerSequence[fillerSequence.length - 1]);
+            givenSlotPath = "verb." + verbRoles.get(0);
+            givenDescription = (JSONObject) new SemanticsModel(constraints).newGetSlotPathFiller(givenSlotPath);
+            Assert.verify(OntologyRegistry.roleNameMap.containsKey(verbRoles.get(0)));
+            givenRoleClass = OntologyRegistry.roleNameMap.get(verbRoles.get(0));
+            // remove the given information from the verb chunk content
+            System.out.println(constraints);
+            verbObject.remove(verbRoles.get(0));
         } catch (Assert.AssertException e) {
             return new HashMap<>();
         }
 
-        Map<String, JSONObject> howChunks = new HashMap<>();
-        howChunks.put("how", new JSONObject());
 
-        Map<String, JSONObject> patientChunks = yodaEnvironment.nlg.
-                generateAll(patientConstraint, yodaEnvironment, yodaEnvironment.nlg.grammarPreferences.maxNounPhraseDepth);
-
-        Map<String, JSONObject> toBeChunks = new HashMap<>();
-        toBeChunks.put("is", new JSONObject());
-
-        Map<String, JSONObject> agentChunks = yodaEnvironment.nlg.
-                generateAll(agentConstraint, yodaEnvironment, yodaEnvironment.nlg.grammarPreferences.maxNounPhraseDepth);
+        // Pair<given, requested>
+        Set<String> adjectiveStrings = new HashSet<>();
+        Set<String> qualityStrings = new HashSet<>();
+        Set<String> presentVerbStrings;
 
 
-        Map<String, Pair<Integer, Integer>> childNodeChunks = new HashMap<>();
-        childNodeChunks.put("verb."+Agent.class.getSimpleName(), new ImmutablePair<>(3,3));
-        childNodeChunks.put("verb."+Patient.class.getSimpleName(), new ImmutablePair<>(1,1));
-        return GenerationUtils.simpleOrderedCombinations(Arrays.asList(howChunks, patientChunks, toBeChunks, agentChunks),
-                HasPropertyWHQTemplate0::compositionFunction, childNodeChunks, yodaEnvironment);
+        if (requestedQuality != null) {
+            Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> qualityDescriptors = OntologyRegistry.qualityDescriptors(requestedQuality);
+            for (Class<? extends ThingWithRoles> adjectiveClass : qualityDescriptors.getRight()) {
+                try {
+                    adjectiveStrings.addAll(Lexicon.getPOSForClassHierarchy(adjectiveClass,
+                            Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, yodaEnvironment));
+                } catch (Lexicon.NoLexiconEntryException e) {
+                }
+                // just because one of the classes in the descriptor has no lexical info doesn't mean the template is broken
+            }
+        }
+
+        try {
+            qualityStrings.addAll(Lexicon.getPOSForClassHierarchy(requestedQuality,
+                    Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, yodaEnvironment));
+        } catch (Lexicon.NoLexiconEntryException e) {
+        }
+
+        Map<String, JSONObject> howPlusAdjectiveChunks = adjectiveStrings.stream().
+                collect(Collectors.toMap(x -> "how " + x, x -> SemanticsModel.parseJSON("{}")));
+        Map<String, JSONObject> qualityChunks = qualityStrings.stream().
+                collect(Collectors.toMap(x -> "how " + x, x -> SemanticsModel.parseJSON("{}")));
+        Map<String, JSONObject> whatChunk = new HashMap<>();
+        whatChunk.put("what", SemanticsModel.parseJSON("{}"));
+        Map<String, JSONObject> toBeChunk = new HashMap<>();
+        whatChunk.put("is", SemanticsModel.parseJSON(constraints.toJSONString()));
+
+
+        Map<String, JSONObject> givenChunks = yodaEnvironment.nlg.generateAll(givenDescription, yodaEnvironment, remainingDepth - 1);
+        // recursively wrap the given chunks in the given path
+        String[] slots = givenSlotPath.split("\\.");
+        for (int i = 0; i < slots.length; i++) {
+            for (String key : givenChunks.keySet()) {
+                SemanticsModel.wrap(givenChunks.get(key), UnknownThingWithRoles.class.getSimpleName(), slots[slots.length - i - 1]);
+            }
+        }
+
+        { // template: how X is Y?
+            Map<String, Pair<Integer, Integer>> childNodeChunks = new HashMap<>();
+            List<Map<String, JSONObject>> orderedChunks = new LinkedList<>();
+            orderedChunks.add(howPlusAdjectiveChunks);
+            orderedChunks.add(toBeChunk);
+            orderedChunks.add(givenChunks);
+            childNodeChunks.put(givenSlotPath, new ImmutablePair<>(2, 2));
+            childNodeChunks.put(requestedSlotPath, new ImmutablePair<>(0, 0));
+            ans.putAll(GenerationUtils.simpleOrderedCombinations(orderedChunks,
+                    HasPropertyWHQTemplate0::compositionFunction, childNodeChunks, yodaEnvironment));
+        }
+
+        { // template: what X is Y?
+            Map<String, Pair<Integer, Integer>> childNodeChunks = new HashMap<>();
+            List<Map<String, JSONObject>> orderedChunks = new LinkedList<>();
+            orderedChunks.add(whatChunk);
+            orderedChunks.add(qualityChunks);
+            orderedChunks.add(toBeChunk);
+            orderedChunks.add(givenChunks);
+            childNodeChunks.put(givenSlotPath, new ImmutablePair<>(3, 3));
+            childNodeChunks.put(requestedSlotPath, new ImmutablePair<>(0, 1));
+            ans.putAll(GenerationUtils.simpleOrderedCombinations(orderedChunks,
+                    HasPropertyWHQTemplate0::compositionFunction, childNodeChunks, yodaEnvironment));
+        }
+
+
+        return ans;
     }
 
-    private static JSONObject compositionFunction(List<JSONObject> children){
-        String empty = "{\"class\":\""+UnknownThingWithRoles.class.getSimpleName()+"\"}";
-        JSONObject how = children.get(0);
-        JSONObject patient = children.get(1);
-        JSONObject toBe = children.get(2);
-        JSONObject agent = children.get(3);
-
-        SemanticsModel ans = new SemanticsModel("{\"dialogAct\":\""+WHQuestion.class.getSimpleName()+
-                "\", \"verb\": {\"class\":\""+
-                HasProperty.class.getSimpleName()+"\", \""+
-                Agent.class.getSimpleName()+"\":"+empty+", \""+
-                Patient.class.getSimpleName()+"\":"+empty+"}}");
-
-        ans.extendAndOverwriteAtPoint("verb."+Agent.class.getSimpleName(), new SemanticsModel(agent.toJSONString()));
-        ans.extendAndOverwriteAtPoint("verb."+Patient.class.getSimpleName(), new SemanticsModel(patient.toJSONString()));
+    private static JSONObject compositionFunction(List<JSONObject> children) {
+        SemanticsModel ans = new SemanticsModel("{}");
+        for (JSONObject child : children)
+            ans.extendAndOverwrite(new SemanticsModel(child.toJSONString()));
         return ans.getInternalRepresentation();
     }
 }
