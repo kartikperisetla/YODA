@@ -42,16 +42,18 @@ public class YnqAdjectiveRegexInterpreter implements MiniLanguageInterpreter {
 
     @Override
     public Pair<JSONObject, Double> interpret(String utterance, YodaEnvironment yodaEnvironment) {
-        Pattern regexPattern = Pattern.compile("(is |are )(the |)?(.+)"+adjectiveRegexString);
-        Matcher matcher = regexPattern.matcher(utterance);
-        if (matcher.matches()) {
-            String PoiName = matcher.group(3);
-            String uri = yodaEnvironment.db.insertValue(PoiName);
-            String jsonString = "{\"dialogAct\":\"YNQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\"" +
-                    uri + "\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"},\"Patient\":{\"class\":\"UnknownThingWithRoles\",\""+
-                    hasQualityRole.getSimpleName()+"\":{\"class\":\""+adjectiveClass.getSimpleName()+"\"}},\"class\":\"HasProperty\"}}";
-            return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), 1.0);
-        } else
-            return null;
+        if (!adjectiveRegexString.equals("()")) {
+            Pattern regexPattern = Pattern.compile("(is |are )(the |)?(.+)" + adjectiveRegexString);
+            Matcher matcher = regexPattern.matcher(utterance);
+            if (matcher.matches()) {
+                String PoiName = matcher.group(3);
+                String uri = yodaEnvironment.db.insertValue(PoiName);
+                String jsonString = "{\"dialogAct\":\"YNQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\"" +
+                        uri + "\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"},\"Patient\":{\"class\":\"UnknownThingWithRoles\",\"" +
+                        hasQualityRole.getSimpleName() + "\":{\"class\":\"" + adjectiveClass.getSimpleName() + "\"}},\"class\":\"HasProperty\"}}";
+                return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), 1.0);
+            }
+        }
+        return null;
     }
 }

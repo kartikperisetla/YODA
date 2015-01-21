@@ -36,31 +36,53 @@ public class WhqAdjectiveRegexInterpreter implements MiniLanguageInterpreter {
                 filter(Adjective.class::isAssignableFrom).
                 map(x -> (Class<? extends Adjective>) x).
                 collect(Collectors.toSet());
+
         Set<String> adjectiveStrings = new HashSet<>();
         for (Class<? extends Adjective> adjectiveClass : adjectiveClasses) {
             try {
                 adjectiveStrings.addAll(Lexicon.getPOSForClass(adjectiveClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES));
-            } catch (Lexicon.NoLexiconEntryException e) {
-//                e.printStackTrace();
-            }
+            } catch (Lexicon.NoLexiconEntryException e) {}
         }
         this.adjectiveRegexString = "(" + String.join("|", adjectiveStrings) + ")";
+
+        Set<String> nounStrings = new HashSet<>();
+        try {
+            nounStrings.addAll(Lexicon.getPOSForClass(qualityClass, Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES));
+        } catch (Lexicon.NoLexiconEntryException e) {}
+        this.qualityNounRegexString = "(" + String.join("|", nounStrings) + ")";
 
     }
 
     @Override
     public Pair<JSONObject, Double> interpret(String utterance, YodaEnvironment yodaEnvironment) {
-        //todo: finish implementing
-        Pattern regexPattern = Pattern.compile("(is |are )(the |)?(.+)"+adjectiveRegexString);
-        Matcher matcher = regexPattern.matcher(utterance);
-        if (matcher.matches()) {
-            String PoiName = matcher.group(3);
-            String uri = yodaEnvironment.db.insertValue(PoiName);
-            String jsonString = "{\"dialogAct\":\"WHQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\"" +
-                    uri + "\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"},\"Patient\":{\"class\":\"UnknownThingWithRoles\",\""+
-                    hasQualityRole.getSimpleName()+"\":{\"class\":\""+adjectiveClass.getSimpleName()+"\"}},\"class\":\"HasProperty\"}}";
-            return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), 1.0);
-        } else
-            return null;
+        if (!adjectiveRegexString.equals("()")) {
+            Pattern regexPattern = Pattern.compile("how " + adjectiveRegexString + "( is | are | )(.+)");
+            Matcher matcher = regexPattern.matcher(utterance);
+            if (matcher.matches()) {
+                String PoiName = matcher.group(3);
+                String uri = yodaEnvironment.db.insertValue(PoiName);
+                String jsonString = "{\"dialogAct\":\"WHQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\"" +
+                        uri + "\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"},\"Patient\":" +
+                        "{\"class\":\"Requested\",\"HasValue\":{\"class\":\"" +
+                        qualityClass.getSimpleName() + "\"}},\"class\":\"HasProperty\"}}";
+                return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), 1.0);
+            }
+        }
+        if (!qualityNounRegexString.equals("()")) {
+            Pattern regexPattern = Pattern.compile("(what |how much |what's |what're )(is |are |)(the |)" +
+                    adjectiveRegexString +
+                    " (is |are |)"+MiniLanguageInterpreter.possessivePrepositionRegexString+"(.+)");
+            Matcher matcher = regexPattern.matcher(utterance);
+            if (matcher.matches()) {
+                String PoiName = matcher.group(8);
+                String uri = yodaEnvironment.db.insertValue(PoiName);
+                String jsonString = "{\"dialogAct\":\"WHQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\"" +
+                        uri + "\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"},\"Patient\":" +
+                        "{\"class\":\"Requested\",\"HasValue\":{\"class\":\"" +
+                        qualityClass.getSimpleName() + "\"}},\"class\":\"HasProperty\"}}";
+                return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), 1.0);
+            }
+        }
+        return null;
     }
 }

@@ -10,4 +10,5 @@ import org.json.simple.JSONObject;
 public interface MiniLanguageInterpreter {
     // interpreting
     public Pair<JSONObject, Double> interpret(String utterance, YodaEnvironment yodaEnvironment);
+    public static String possessivePrepositionRegexString = "(of|at|for|of|to|in|belonging to|by|)";
 }
