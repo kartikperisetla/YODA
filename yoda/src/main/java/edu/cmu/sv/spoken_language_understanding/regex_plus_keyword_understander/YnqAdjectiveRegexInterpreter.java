@@ -23,7 +23,7 @@ public class YnqAdjectiveRegexInterpreter implements MiniLanguageInterpreter {
     Class<? extends Adjective> adjectiveClass;
     Class<? extends TransientQuality> qualityClass;
     Class<? extends Role> hasQualityRole;
-    String adjectiveRegexString;
+    String adjectiveRegexString = "()";
 
     public YnqAdjectiveRegexInterpreter(Class<? extends Adjective> adjectiveClass) {
         this.adjectiveClass = adjectiveClass;
@@ -36,7 +36,7 @@ public class YnqAdjectiveRegexInterpreter implements MiniLanguageInterpreter {
             e.printStackTrace();
             System.exit(-1);
         } catch (Lexicon.NoLexiconEntryException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
     }
 

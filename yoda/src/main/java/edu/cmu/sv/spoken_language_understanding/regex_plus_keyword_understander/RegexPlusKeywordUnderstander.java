@@ -4,6 +4,7 @@ import edu.cmu.sv.dialog_state_tracking.Turn;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.adjective.Adjective;
 import edu.cmu.sv.ontology.quality.TransientQuality;
+import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.spoken_language_understanding.SpokenLanguageUnderstander;
 import edu.cmu.sv.utils.StringDistribution;
@@ -53,7 +54,9 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
         for (Class<? extends TransientQuality> qualityClass : OntologyRegistry.qualityClasses){
             languageInterpreters.add(new WhqAdjectiveRegexInterpreter(qualityClass));
         }
-//        for (Class<? extends Verb>)
+        for (Class<? extends Verb> verbClass : OntologyRegistry.verbClasses){
+            languageInterpreters.add(new CommandRegexInterpreter(verbClass));
+        }
 
 
         // add simple string match interpreters

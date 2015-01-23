@@ -184,6 +184,8 @@ public class Lexicon {
             LexicalEntry entry = new LexicalEntry();
             entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "give directions");
             entry.add(LexicalEntry.PART_OF_SPEECH.PRESENT_PROGRESSIVE_VERB, "giving directions");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "direction");
+            entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "directions");
             Lexicon.add(GiveDirections.class, entry);
         }
         {

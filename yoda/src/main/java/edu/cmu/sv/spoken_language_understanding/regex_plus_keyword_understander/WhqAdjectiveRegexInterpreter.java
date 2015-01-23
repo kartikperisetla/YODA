@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
 public class WhqAdjectiveRegexInterpreter implements MiniLanguageInterpreter {
     Class<? extends TransientQuality> qualityClass;
     Class<? extends Role> hasQualityRole;
-    String adjectiveRegexString;
-    String qualityNounRegexString;
+    String adjectiveRegexString = "()";
+    String qualityNounRegexString = "()";
 
     public WhqAdjectiveRegexInterpreter(Class<? extends TransientQuality> qualityClass) {
         this.qualityClass = qualityClass;
@@ -70,7 +70,7 @@ public class WhqAdjectiveRegexInterpreter implements MiniLanguageInterpreter {
         }
         if (!qualityNounRegexString.equals("()")) {
             Pattern regexPattern = Pattern.compile("(what |how much |what's |what're )(is |are |)(the |)" +
-                    adjectiveRegexString +
+                    qualityNounRegexString +
                     " (is |are |)"+MiniLanguageInterpreter.possessivePrepositionRegexString+"(.+)");
             Matcher matcher = regexPattern.matcher(utterance);
             if (matcher.matches()) {
