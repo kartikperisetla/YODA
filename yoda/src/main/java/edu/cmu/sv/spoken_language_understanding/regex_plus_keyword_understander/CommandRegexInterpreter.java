@@ -35,14 +35,13 @@ public class CommandRegexInterpreter implements MiniLanguageInterpreter {
         for (Class<? extends Role> roleClass : OntologyRegistry.roleClasses) {
             if (OntologyRegistry.inDomain(roleClass, verbClass)) {
                 try {
-                    Set<String> roleObj1PrefixStrings = Lexicon.getPOSForClass(verbClass, Lexicon.LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES);
+                    Set<String> roleObj1PrefixStrings = Lexicon.getPOSForClass(roleClass, Lexicon.LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES);
                     String regexString = "("+String.join("|",roleObj1PrefixStrings)+")";
                     if (!regexString.equals("()"))
                         roleObj1PrefixPatterns.put(roleClass, regexString);
                 } catch (Lexicon.NoLexiconEntryException e) {}
             }
         }
-
     }
 
     @Override
