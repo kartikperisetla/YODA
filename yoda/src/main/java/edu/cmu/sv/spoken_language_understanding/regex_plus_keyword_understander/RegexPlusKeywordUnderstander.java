@@ -3,6 +3,7 @@ package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander
 import edu.cmu.sv.dialog_state_tracking.Turn;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.adjective.Adjective;
+import edu.cmu.sv.ontology.noun.PointOfInterest;
 import edu.cmu.sv.ontology.quality.TransientQuality;
 import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
@@ -57,7 +58,7 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
         for (Class<? extends Verb> verbClass : OntologyRegistry.verbClasses){
             languageInterpreters.add(new CommandRegexInterpreter(verbClass));
         }
-
+        languageInterpreters.add(new NamedEntityFragmentInterpreter(PointOfInterest.class));
 
         // add simple string match interpreters
         languageInterpreters.add(
@@ -103,8 +104,6 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
         Map<String, JSONObject> JSONHypotheses = new HashMap<>();
         hypotheses.keySet().forEach(x -> JSONHypotheses.put(x, hypotheses.get(x).getInternalRepresentation()));
         JSONObject outputRecord = MongoLogHandler.createEventRecord("slu_output_record");
-        System.out.println(hypotheses);
-        System.out.println(hypothesisDistribution);
         outputRecord.put("hypothesis_distribution", hypothesisDistribution.getInternalDistribution());
         outputRecord.put("hypotheses", new JSONObject(JSONHypotheses));
         logger.info(outputRecord.toJSONString());

@@ -7,8 +7,8 @@ import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DialogStateTracker;
 import edu.cmu.sv.dialog_state_tracking.Turn;
 import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
-import edu.cmu.sv.spoken_language_understanding.RegexUnderstander;
 import edu.cmu.sv.spoken_language_understanding.SpokenLanguageUnderstander;
+import edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander.RegexPlusKeywordUnderstander;
 import edu.cmu.sv.system_action.CommandLineExecutor;
 import edu.cmu.sv.system_action.Executor;
 import edu.cmu.sv.system_action.JsonExecutor;
@@ -58,13 +58,6 @@ public class YodaEnvironment {
     // DM input
     public BlockingQueue<Pair<Map<String, DialogState>, StringDistribution>> DmInputQueue = new LinkedBlockingDeque<>();
 
-    public static YodaEnvironment dstTestingEnvironment(){
-        YodaEnvironment ans = new YodaEnvironment();
-        ans.dst = new DialogStateTracker(ans);
-        ans.db = new Database(ans);
-        return ans;
-    }
-
     public static YodaEnvironment dialogTestingEnvironment(){
         ActionEnumeration.enumerationType = ActionEnumeration.ENUMERATION_TYPE.EXHAUSTIVE;
         ActionEnumeration.focusConstraint = ActionEnumeration.FOCUS_CONSTRAINT.IN_FOCUS;
@@ -73,7 +66,7 @@ public class YodaEnvironment {
         ans.db = new Database(ans);
         ans.dm = new DialogManager(ans);
         ans.nlg = new NaturalLanguageGenerator(ans);
-        ans.slu = new RegexUnderstander(ans);
+        ans.slu = new RegexPlusKeywordUnderstander(ans);
         ans.exe = new CommandLineExecutor(ans);
         ans.out = new FlushingStandardOutOutputHandler();
         return ans;
@@ -87,7 +80,7 @@ public class YodaEnvironment {
         ans.db = new Database(ans);
         ans.dm = new DialogManager(ans);
         ans.nlg = new NaturalLanguageGenerator(ans);
-        ans.slu = new RegexUnderstander(ans);
+        ans.slu = new RegexPlusKeywordUnderstander(ans);
         ans.exe = new JsonExecutor(ans);
         ans.out = new FlushingStandardOutOutputHandler();
         return ans;
