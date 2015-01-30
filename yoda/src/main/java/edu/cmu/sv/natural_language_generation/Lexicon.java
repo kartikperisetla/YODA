@@ -35,6 +35,9 @@ public class Lexicon {
         {
             LexicalEntry entry = new LexicalEntry();
             entry.add(LexicalEntry.PART_OF_SPEECH.WH_PRONOUN, "what");
+            entry.add(LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, "it");
+            entry.add(LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, "that");
+            entry.add(LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, "this");
             Lexicon.add(Noun.class, entry);
         }
         {
@@ -48,12 +51,17 @@ public class Lexicon {
         {
             LexicalEntry entry = new LexicalEntry();
             entry.add(LexicalEntry.PART_OF_SPEECH.WH_PRONOUN, "where");
+            entry.add(LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, "there");
+            entry.add(LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, "here");
             Lexicon.add(PointOfInterest.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
             entry.add(LexicalEntry.PART_OF_SPEECH.WH_PRONOUN, "when");
             entry.add(LexicalEntry.PART_OF_SPEECH.WH_PRONOUN, "what time");
+            entry.add(LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, "then");
+            entry.add(LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, "that time");
+            entry.add(LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, "this time");
             Lexicon.add(Time.class, entry);
         }
     }
@@ -220,6 +228,7 @@ public class Lexicon {
             entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "close to");
             entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "near to");
             entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "near");
+            entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "by");
             Lexicon.add(IsCloseTo.class, entry);
         }
     }
