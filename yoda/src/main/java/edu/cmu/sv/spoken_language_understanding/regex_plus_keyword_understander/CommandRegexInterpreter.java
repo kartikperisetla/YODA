@@ -68,7 +68,7 @@ public class CommandRegexInterpreter implements MiniLanguageInterpreter {
                         Pattern obj1Pattern = Pattern.compile(roleObj1PrefixPatterns.get(roleClass)+"(.+)");
                         Matcher matcher2 = obj1Pattern.matcher(obj1String);
                         if (matcher2.matches()) {
-                            String npString = matcher.group(2);
+                            String npString = matcher2.group(2);
                             Pair<JSONObject, Double> npInterpretation =
                                     RegexPlusKeywordUnderstander.nounPhraseInterpreter.interpret(npString, yodaEnvironment);
                             String jsonString = "{\"dialogAct\":\"Command\",\"verb\":{\"class\":\""+verbClass.getSimpleName()+"\"}}";
