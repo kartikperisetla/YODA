@@ -1,14 +1,13 @@
 package edu.cmu.sv.natural_language_generation.top_level_templates;
 
-import edu.cmu.sv.yoda_environment.YodaEnvironment;
-import edu.cmu.sv.natural_language_generation.Template;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
+import edu.cmu.sv.natural_language_generation.Template;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Command;
+import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -21,12 +20,7 @@ import java.util.Map;
 public class CommandTemplate0 implements Template {
     static JSONObject applicabilityConstraint;
     static {
-        try {
-            applicabilityConstraint= (JSONObject) SemanticsModel.parser.
-                    parse("{\"dialogAct\":\"" + Command.class.getSimpleName() + "\"}");
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        applicabilityConstraint= (JSONObject) SemanticsModel.parseJSON("{\"dialogAct\":\"" + Command.class.getSimpleName() + "\"}");
     }
 
     @Override

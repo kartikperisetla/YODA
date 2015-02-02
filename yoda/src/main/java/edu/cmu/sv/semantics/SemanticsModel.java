@@ -1,7 +1,6 @@
 package edu.cmu.sv.semantics;
 
 
-import com.google.common.collect.Iterables;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
@@ -14,9 +13,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-
-import java.io.IOException;
-import java.lang.Object;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,16 +25,11 @@ import java.util.stream.Collectors;
  *
  */
 public class SemanticsModel {
-    public static JSONParser parser = new JSONParser();
+    private static final JSONParser parser = new JSONParser();
     JSONObject internalRepresentation;
 
     public SemanticsModel(String jsonSource) {
-        try {
-            internalRepresentation = (JSONObject)parser.parse(jsonSource);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            throw new Error("jsonSource is invalid");
-        }
+        internalRepresentation = parseJSON(jsonSource);
     }
 
     public SemanticsModel(JSONObject internalRepresentation){this.internalRepresentation = internalRepresentation;}
@@ -182,14 +173,7 @@ public class SemanticsModel {
 
     public SemanticsModel deepCopy(){
         SemanticsModel ans = new SemanticsModel();
-        try {
-            ans.internalRepresentation = (JSONObject) parser.parse(internalRepresentation.toJSONString());
-        } catch (ParseException e) {
-            e.printStackTrace();
-            throw new Error("failed to create a json object from an existing json object"+internalRepresentation);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new Error("failed to create a json object from an existing json object due to an index error"+internalRepresentation);
-        }
+        ans.internalRepresentation = parseJSON(internalRepresentation.toJSONString());
         return ans;
     }
 
@@ -515,19 +499,15 @@ public class SemanticsModel {
         }
     }
 
-    public static JSONObject parseJSON(String jsonString){
-        Object result = null;
+    public static JSONObject parseJSON(String jsonString) {
         try {
-            try {
-                result = parser.parse(jsonString);
-            } catch (ParseException e) {
-                e.printStackTrace();
-                throw new Error("failed to parse json string: input string:" + jsonString);
+            synchronized (parser) {
+                Object result = parser.parse(jsonString);
+                return (JSONObject) result;
             }
-            return (JSONObject) result;
-        } catch (ClassCastException e) {
+        } catch (ParseException e) {
             e.printStackTrace();
-            throw new Error("failed to caste string to JSON, parsing returned a string: input string:"+jsonString + "\nresult:" + result);
+            throw new Error("failed to parse json string: input string:" + jsonString);
         }
     }
 
