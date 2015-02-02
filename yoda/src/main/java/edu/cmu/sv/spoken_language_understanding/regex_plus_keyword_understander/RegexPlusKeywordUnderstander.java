@@ -46,6 +46,7 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
         }
     }
 
+    public static NounPhraseInterpreter nounPhraseInterpreter = new NounPhraseInterpreter();
     static Set<MiniLanguageInterpreter> languageInterpreters = new HashSet<>();
     static {
         // add regex interpreters

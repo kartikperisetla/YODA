@@ -63,18 +63,17 @@ public class CommandRegexInterpreter implements MiniLanguageInterpreter {
                         "(i want |give me |give |can i get |could i get |)(the |some |)" + verbRegexString + "(.+)" +endingPolitenessRegexString);
                 Matcher matcher = regexPattern.matcher(utterance);
                 if (matcher.matches()) {
-
                     String obj1String = matcher.group(6);
                     for (Class<? extends Role> roleClass : roleObj1PrefixPatterns.keySet()){
                         Pattern obj1Pattern = Pattern.compile(roleObj1PrefixPatterns.get(roleClass)+"(.+)");
                         Matcher matcher2 = obj1Pattern.matcher(obj1String);
                         if (matcher2.matches()) {
-                            String PoiName = matcher2.group(2);
-                            String uri = yodaEnvironment.db.insertValue(PoiName);
+                            String npString = matcher.group(2);
+                            Pair<JSONObject, Double> npInterpretation =
+                                    RegexPlusKeywordUnderstander.nounPhraseInterpreter.interpret(npString, yodaEnvironment);
                             String jsonString = "{\"dialogAct\":\"Command\",\"verb\":{\"class\":\""+verbClass.getSimpleName()+"\"}}";
                             JSONObject ans = SemanticsModel.parseJSON(jsonString);
-                            ((JSONObject)ans.get("verb")).put(roleClass.getSimpleName(),
-                                    SemanticsModel.parseJSON("{\"HasName\":{\"HasURI\":\"" + uri + "\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"}"));
+                            ((JSONObject)ans.get("verb")).put(roleClass.getSimpleName(),npInterpretation.getKey());
                             return new ImmutablePair<>(ans, 1.0);
                         }
                     }

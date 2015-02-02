@@ -5,9 +5,12 @@ import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.ThingWithRoles;
 import edu.cmu.sv.ontology.adjective.Adjective;
+import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.ontology.noun.Noun;
+import edu.cmu.sv.ontology.noun.PointOfInterest;
 import edu.cmu.sv.ontology.preposition.Preposition;
 import edu.cmu.sv.ontology.quality.TransientQuality;
+import edu.cmu.sv.ontology.role.HasName;
 import edu.cmu.sv.ontology.role.InRelationTo;
 import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.semantics.SemanticsModel;
@@ -54,15 +57,20 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         }
 
         for (Class<? extends Noun> nounClass : OntologyRegistry.nounClasses) {
+            Set<String> nounStrings = new HashSet<>();
             try {
-                Set<String> nounStrings = Lexicon.getPOSForClass(nounClass,
-                        Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES);
+                nounStrings.addAll(Lexicon.getPOSForClass(nounClass,
+                        Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES));
+            } catch (Lexicon.NoLexiconEntryException e) {
+            }
+            try {
                 nounStrings.addAll(Lexicon.getPOSForClass(nounClass,
                         Lexicon.LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES));
-                String regexString = "(" + String.join("|", nounStrings) + ")";
-                if (!regexString.equals("()"))
-                    nounRegexStringMap.put(nounClass, regexString);
-            } catch (Lexicon.NoLexiconEntryException e) {}
+            } catch (Lexicon.NoLexiconEntryException e) {
+            }
+            String regexString = "(" + String.join("|", nounStrings) + ")";
+            if (!regexString.equals("()"))
+                nounRegexStringMap.put(nounClass, regexString);
         }
 
         for (Class<? extends Adjective> adjectiveClass : OntologyRegistry.adjectiveClasses) {
@@ -115,8 +123,26 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
 
 
         // check for named entities
+        if (entity1JSON.isEmpty()){
+            String uri = yodaEnvironment.db.insertValue(entity1String);
+            JSONObject namedEntity = SemanticsModel.parseJSON(OntologyRegistry.webResourceWrap(uri));
+            entity1JSON.put("class", PointOfInterest.class.getSimpleName());
+            entity1JSON.put(HasName.class.getSimpleName(), namedEntity);
+        }
+        if (entity2String!=null && entity2JSON.isEmpty()){
+            String uri = yodaEnvironment.db.insertValue(entity2String);
+            JSONObject namedEntity = SemanticsModel.parseJSON(OntologyRegistry.webResourceWrap(uri));
+            entity2JSON.put("class", PointOfInterest.class.getSimpleName());
+            entity2JSON.put(HasName.class.getSimpleName(), namedEntity);
+        }
 
         // default to UnknownThingWithRoles
+        if (!entity1JSON.containsKey("class")){
+            entity1JSON.put("class", UnknownThingWithRoles.class.getSimpleName());
+        }
+        if (entity2String!=null && !entity2JSON.containsKey("class")){
+            entity2JSON.put("class", UnknownThingWithRoles.class.getSimpleName());
+        }
 
         return new ImmutablePair<>(entity1JSON, 1.0);
     }
@@ -129,7 +155,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
 
         // get class from pronoun
         for (Class<? extends Noun> cls : pronounRegexStringMap.keySet()) {
-            Pattern regexPattern = Pattern.compile("(.+ | |)" + pronounRegexStringMap.get(cls) + "( .+|)");
+            Pattern regexPattern = Pattern.compile("(.+ | |)" + pronounRegexStringMap.get(cls) + "( .+| |)");
             Matcher matcher = regexPattern.matcher(entityString);
             if (matcher.matches()) {
                 nounClass = cls;
@@ -139,7 +165,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
 
         // get class from noun
         for (Class<? extends Noun> cls : nounRegexStringMap.keySet()) {
-            Pattern regexPattern = Pattern.compile("(.+ | |)" + nounRegexStringMap.get(cls) + "( .+|)");
+            Pattern regexPattern = Pattern.compile("(.+ | |)" + nounRegexStringMap.get(cls) + "( .+| |)");
             Matcher matcher = regexPattern.matcher(entityString);
             if (matcher.matches()) {
                 nounClass = cls;
@@ -149,7 +175,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
 
         // get adjective
         for (Class<? extends Adjective> cls : adjectiveRegexStringMap.keySet()) {
-            Pattern regexPattern = Pattern.compile("(.+ | |)" + adjectiveRegexStringMap.get(cls) + "( .+|)");
+            Pattern regexPattern = Pattern.compile("(.+ | |)" + adjectiveRegexStringMap.get(cls) + "( .+| |)");
             Matcher matcher = regexPattern.matcher(entityString);
             if (matcher.matches()) {
                 adjectiveClasses.add(cls);

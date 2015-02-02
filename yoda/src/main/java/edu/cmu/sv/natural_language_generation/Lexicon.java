@@ -70,6 +70,11 @@ public class Lexicon {
     static {
         {
             LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "restaurant");
+            Lexicon.add(Restaurant.class, entry);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
             entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "bank");
             Lexicon.add(Bank.class, entry);
         }
@@ -91,6 +96,7 @@ public class Lexicon {
         {
             LexicalEntry entry = new LexicalEntry();
             entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "cafe");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "coffee shop");
             Lexicon.add(Cafe.class, entry);
         }
         {
@@ -229,6 +235,7 @@ public class Lexicon {
             entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "near to");
             entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "near");
             entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "by");
+            entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "on");
             Lexicon.add(IsCloseTo.class, entry);
         }
     }

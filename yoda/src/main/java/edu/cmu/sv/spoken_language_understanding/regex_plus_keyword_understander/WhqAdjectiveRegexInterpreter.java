@@ -59,10 +59,13 @@ public class WhqAdjectiveRegexInterpreter implements MiniLanguageInterpreter {
             Pattern regexPattern = Pattern.compile("how " + adjectiveRegexString + "( is | are | )(.+)");
             Matcher matcher = regexPattern.matcher(utterance);
             if (matcher.matches()) {
-                String PoiName = matcher.group(3);
-                String uri = yodaEnvironment.db.insertValue(PoiName);
-                String jsonString = "{\"dialogAct\":\"WHQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\"" +
-                        uri + "\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"},\"Patient\":" +
+                String npString = matcher.group(3);
+                Pair<JSONObject, Double> npInterpretation =
+                        RegexPlusKeywordUnderstander.nounPhraseInterpreter.interpret(npString, yodaEnvironment);
+
+                String jsonString = "{\"dialogAct\":\"WHQuestion\",\"verb\":{\"Agent\":"+
+                        npInterpretation.getKey().toJSONString()+
+                        ",\"Patient\":" +
                         "{\"class\":\"Requested\",\"HasValue\":{\"class\":\"" +
                         qualityClass.getSimpleName() + "\"}},\"class\":\"HasProperty\"}}";
                 return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), 1.0);
@@ -74,10 +77,12 @@ public class WhqAdjectiveRegexInterpreter implements MiniLanguageInterpreter {
                     " (is |are |)"+MiniLanguageInterpreter.possessivePrepositionRegexString+"(.+)");
             Matcher matcher = regexPattern.matcher(utterance);
             if (matcher.matches()) {
-                String PoiName = matcher.group(8);
-                String uri = yodaEnvironment.db.insertValue(PoiName);
-                String jsonString = "{\"dialogAct\":\"WHQuestion\",\"verb\":{\"Agent\":{\"HasName\":{\"HasURI\":\"" +
-                        uri + "\",\"class\":\"WebResource\"},\"class\":\"PointOfInterest\"},\"Patient\":" +
+                String npString = matcher.group(8);
+                Pair<JSONObject, Double> npInterpretation =
+                        RegexPlusKeywordUnderstander.nounPhraseInterpreter.interpret(npString, yodaEnvironment);
+
+                String jsonString = "{\"dialogAct\":\"WHQuestion\",\"verb\":{\"Agent\":"+
+                        npInterpretation.getKey().toJSONString()+"Patient\":" +
                         "{\"class\":\"Requested\",\"HasValue\":{\"class\":\"" +
                         qualityClass.getSimpleName() + "\"}},\"class\":\"HasProperty\"}}";
                 return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), 1.0);
