@@ -13,6 +13,7 @@ public class DatabaseRegistry {
     static {
         // point of interest database
         turtleDatabaseSources.add("./src/resources/poi.turtle");
+//        turtleDatabaseSources.add("/home/cohend/yelp_business.turtle");
 
         nonOntologyRelations.add("gps_lon");
         nonOntologyRelations.add("gps_lat");

@@ -1,9 +1,6 @@
 package edu.cmu.sv.yoda_environment;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.MongoClient;
+import com.mongodb.*;
 import edu.cmu.sv.semantics.SemanticsModel;
 import org.json.simple.JSONObject;
 
@@ -21,7 +18,8 @@ public class MongoLogHandler extends Handler {
     static DBCollection coll;
     public static void start(){
         try {
-            mongoClient = new MongoClient();
+            MongoClientURI uri = new MongoClientURI(System.getenv().get("YODA_MONGO_LOG_CONNECTION_STRING"));
+            mongoClient = new MongoClient(uri);
             db = mongoClient.getDB("scotty_logs");
             coll = db.getCollection("yoda_logs");
         } catch (UnknownHostException e) {
