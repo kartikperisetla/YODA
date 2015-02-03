@@ -159,6 +159,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
             Matcher matcher = regexPattern.matcher(entityString);
             if (matcher.matches()) {
                 nounClass = cls;
+                ans.put("refType", "pronoun");
                 break;
             }
         }

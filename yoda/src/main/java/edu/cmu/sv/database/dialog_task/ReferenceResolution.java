@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
  */
 public class ReferenceResolution {
 
+    // todo: remove dst focus update and move it to updateSalience
     /*
     * return a distribution over URI's that this JSONObject may refer to
     * */
@@ -342,6 +343,11 @@ public class ReferenceResolution {
         return null;
     }
 
-
+    // todo: implement
+    public static void updateSalience(YodaEnvironment yodaEnvironment){
+        // add new objects to dst focus based on dialog state
+        // re-weight salience based on dialog state
+        // remove objects from dst focus based on salience
+    }
 
 }

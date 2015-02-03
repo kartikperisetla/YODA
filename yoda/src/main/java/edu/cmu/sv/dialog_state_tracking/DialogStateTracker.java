@@ -1,5 +1,6 @@
 package edu.cmu.sv.dialog_state_tracking;
 
+import edu.cmu.sv.database.dialog_task.ReferenceResolution;
 import edu.cmu.sv.yoda_environment.MongoLogHandler;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.semantics.SemanticsModel;
@@ -113,8 +114,7 @@ public class DialogStateTracker implements Runnable {
                 hypothesisMap.put(key, newHypotheses.get(key));
             }
             hypothesisDistribution.normalize();
-
-            String topHyp = hypothesisDistribution.getTopHypothesis();
+            ReferenceResolution.updateSalience(yodaEnvironment);
 
             // generate log record
             JSONObject loopCompleteRecord = MongoLogHandler.createEventRecord("dst_loop_complete");

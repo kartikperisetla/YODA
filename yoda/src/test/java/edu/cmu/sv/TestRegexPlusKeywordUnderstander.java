@@ -21,16 +21,17 @@ public class TestRegexPlusKeywordUnderstander {
         RegexPlusKeywordUnderstander understander = new RegexPlusKeywordUnderstander(yodaEnvironment);
 
         List<String> testUtterances = new LinkedList<>();
-        testUtterances.add("is the chinese restaurant near red rock expensive");
-        testUtterances.add("is the chinese restaurant near red rock cheap");
-        testUtterances.add("how expensive is the chinese restaurant near red rock");
-        testUtterances.add("yes");
-        testUtterances.add("no");
-        testUtterances.add("harvard law school");
-        testUtterances.add("is expensive");
-        testUtterances.add("give me directions to castro street");
-        testUtterances.add("give me directions to the coffee shop on castro street");
-        testUtterances.add("directions");
+        testUtterances.add("give me directions there");
+//        testUtterances.add("is the chinese restaurant near red rock expensive");
+//        testUtterances.add("is the chinese restaurant near red rock cheap");
+//        testUtterances.add("how expensive is the chinese restaurant near red rock");
+//        testUtterances.add("yes");
+//        testUtterances.add("no");
+//        testUtterances.add("harvard law school");
+//        testUtterances.add("is expensive");
+//        testUtterances.add("give me directions to castro street");
+//        testUtterances.add("give me directions to the coffee shop on castro street");
+//        testUtterances.add("directions");
 
         for (String testUtterance : testUtterances){
             System.out.println("understanding utterance: " + testUtterance);
