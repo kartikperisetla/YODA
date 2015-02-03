@@ -35,6 +35,7 @@ import java.util.logging.SimpleFormatter;
  *
  */
 public class DialogManager implements Runnable {
+    private boolean outstandingSystemAction = false; // the dialog manager locks up while there is an outstanding system action un-detected by the DST
     private static Logger logger = Logger.getLogger("yoda.dialog_management.DialogManager");
     static {
         try {
@@ -57,6 +58,10 @@ public class DialogManager implements Runnable {
     YodaEnvironment yodaEnvironment;
     StringDistribution dialogStateDistribution = new StringDistribution();
     Map<String, DialogState> dialogStateHypotheses = new HashMap<>();
+
+    public void detectSystemAction(){
+        outstandingSystemAction = false;
+    }
 
     public YodaEnvironment getYodaEnvironment() {
         return yodaEnvironment;
@@ -229,52 +234,56 @@ public class DialogManager implements Runnable {
     public void run() {
         while (true){
             try {
-                Pair<Map<String, DialogState>, StringDistribution> DmInput = null;
-                // empty out the queue to get the most recent dialog state
-                while (true) {
-                    Pair<Map<String, DialogState>, StringDistribution> tmp;
-                    tmp = yodaEnvironment.DmInputQueue.poll(100, TimeUnit.MILLISECONDS);
-                    if (tmp==null)
-                        break;
-                    else
-                        DmInput = tmp;
-                }
-                if (DmInput!=null) {
-                    dialogStateHypotheses = DmInput.getLeft();
-                    dialogStateDistribution = DmInput.getRight();
-                }
-                List<Pair<SystemAction, Double>> rankedActions = enumerateAndScorePossibleActions();
-
-                // generate log record
-                JSONObject record = MongoLogHandler.createEventRecord("evaluated_actions");
-                JSONArray evaluatedActions = new JSONArray();
-                for (int i = 0; i < rankedActions.size(); i++) {
-                    Pair<SystemAction, Double> action = rankedActions.get(i);
-                    JSONObject JSONAction = SemanticsModel.parseJSON("{}");
-                    JSONAction.put("score", action.getRight());
-                    if (action.getLeft()==null) {
-                        JSONAction.put("class", "null");
-                        continue;
+                if (!outstandingSystemAction) {
+                    Pair<Map<String, DialogState>, StringDistribution> DmInput = null;
+                    // empty out the queue to get the most recent dialog state
+                    while (true) {
+                        Pair<Map<String, DialogState>, StringDistribution> tmp;
+                        tmp = yodaEnvironment.DmInputQueue.poll(100, TimeUnit.MILLISECONDS);
+                        if (tmp == null)
+                            break;
+                        else
+                            DmInput = tmp;
                     }
-                    JSONAction.put("class", action.getLeft().getClass().getSimpleName());
-                    if (NonDialogTask.class.isAssignableFrom(action.getLeft().getClass())){
-                        JSONAction.put("task_type", NonDialogTask.class.getSimpleName());
-                        JSONAction.put("task_spec", ((NonDialogTask) action.getLeft()).getTaskSpec());
-                    } else if (DialogAct.class.isAssignableFrom(action.getLeft().getClass())){
-                        JSONAction.put("task_type", DialogAct.class.getSimpleName());
-                        JSONAction.put("bound_individuals", new JSONObject(((DialogAct) action.getLeft()).getBoundIndividuals()));
-                        JSONAction.put("bound_classes", new JSONObject(((DialogAct) action.getLeft()).getBoundClasses()));
-                        JSONAction.put("bound_paths", new JSONObject(((DialogAct) action.getLeft()).getBoundPaths()));
-                        JSONAction.put("bound_descriptions", new JSONObject(((DialogAct) action.getLeft()).getBoundDescriptions()));
+                    if (DmInput != null) {
+                        dialogStateHypotheses = DmInput.getLeft();
+                        dialogStateDistribution = DmInput.getRight();
                     }
-                    evaluatedActions.add(JSONAction);
-                }
-                record.put("actions", evaluatedActions);
-                logger.info(record.toJSONString());
+                    List<Pair<SystemAction, Double>> rankedActions = enumerateAndScorePossibleActions();
 
-                SystemAction selectedAction = rankedActions.get(0).getKey();
-                if (selectedAction!=null) {
-                    yodaEnvironment.exe.execute(selectedAction);
+                    // generate log record
+                    JSONObject record = MongoLogHandler.createEventRecord("evaluated_actions");
+                    JSONArray evaluatedActions = new JSONArray();
+                    for (int i = 0; i < rankedActions.size(); i++) {
+                        Pair<SystemAction, Double> action = rankedActions.get(i);
+                        JSONObject JSONAction = SemanticsModel.parseJSON("{}");
+                        JSONAction.put("score", action.getRight());
+                        if (action.getLeft() == null) {
+                            JSONAction.put("class", "null");
+                            evaluatedActions.add(JSONAction);
+                            continue;
+                        }
+                        JSONAction.put("class", action.getLeft().getClass().getSimpleName());
+                        if (NonDialogTask.class.isAssignableFrom(action.getLeft().getClass())) {
+                            JSONAction.put("task_type", NonDialogTask.class.getSimpleName());
+                            JSONAction.put("task_spec", ((NonDialogTask) action.getLeft()).getTaskSpec());
+                        } else if (DialogAct.class.isAssignableFrom(action.getLeft().getClass())) {
+                            JSONAction.put("task_type", DialogAct.class.getSimpleName());
+                            JSONAction.put("bound_individuals", new JSONObject(((DialogAct) action.getLeft()).getBoundIndividuals()));
+                            JSONAction.put("bound_classes", new JSONObject(((DialogAct) action.getLeft()).getBoundClasses()));
+                            JSONAction.put("bound_paths", new JSONObject(((DialogAct) action.getLeft()).getBoundPaths()));
+                            JSONAction.put("bound_descriptions", new JSONObject(((DialogAct) action.getLeft()).getBoundDescriptions()));
+                        }
+                        evaluatedActions.add(JSONAction);
+                    }
+                    record.put("actions", evaluatedActions);
+                    logger.info(record.toJSONString());
+
+                    SystemAction selectedAction = rankedActions.get(0).getKey();
+                    if (selectedAction != null) {
+                        yodaEnvironment.exe.execute(selectedAction);
+                        outstandingSystemAction = true;
+                    }
                 }
                 Thread.sleep(100);
             } catch (InterruptedException e) {

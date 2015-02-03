@@ -159,6 +159,8 @@ public class DialogStateTracker implements Runnable {
             logger.info(loopCompleteRecord.toJSONString());
 
             yodaEnvironment.DmInputQueue.add(new ImmutablePair<>(hypothesisMap, hypothesisDistribution));
+            if (turn.speaker.equals("system"))
+                yodaEnvironment.dm.detectSystemAction();
 
 //        System.out.println("End of DialogStateTracker2.updateDialogStateTurn. discourseUnit.hypotheses:\n");
 //        for (DiscourseUnit2.DialogStateHypothesis hyp : discourseUnit.hypotheses.values()){
