@@ -103,8 +103,7 @@ public class DefiniteReferenceTemplate0 implements Template {
                             OntologyRegistry.qualityDescriptors(qualityClass);
                     for (Class<? extends ThingWithRoles> adjectiveClass : descriptor.getRight()) {
                         double degreeOfMatch = yodaEnvironment.db.
-                                evaluateQualityDegree(fullArgumentList,
-                                        descriptor.getLeft(), adjectiveClass);
+                                evaluateQualityDegree(fullArgumentList, adjectiveClass);
                         if (degreeOfMatch > 0.5) {
                             Set<String> adjStrings;
                             try {
@@ -161,8 +160,7 @@ public class DefiniteReferenceTemplate0 implements Template {
                                     continue;
                                 Map<String, JSONObject> ppChunks = new HashMap<>();
                                 double degreeOfMatch = yodaEnvironment.db.
-                                        evaluateQualityDegree(fullArgumentList,
-                                                descriptor.getLeft(), prepositionClass);
+                                        evaluateQualityDegree(fullArgumentList, prepositionClass);
 
                                 if (degreeOfMatch > 0.5) {
 

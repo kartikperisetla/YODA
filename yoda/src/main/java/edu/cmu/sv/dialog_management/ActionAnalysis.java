@@ -105,8 +105,7 @@ public class ActionAnalysis {
                         OntologyRegistry.qualityDescriptors(requestedQualityClass);
                 for (Class<? extends ThingWithRoles> adjectiveClass : descriptor.getRight()) {
                     Double degreeOfMatch = yodaEnvironment.db.
-                            evaluateQualityDegree(fullArgumentList,
-                                    descriptor.getLeft(), adjectiveClass);
+                            evaluateQualityDegree(fullArgumentList, adjectiveClass);
                     if (degreeOfMatch==null){
                         dontKnow = true;
                         responseStatement.put("dialogAct", DontKnow.class.getSimpleName());

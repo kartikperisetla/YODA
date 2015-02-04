@@ -375,8 +375,7 @@ public class Database {
 
     }
 
-    public Double evaluateQualityDegree(List<String> entityURIs, Class<? extends Role> hasQualityRoleClass,
-                                        Class<? extends ThingWithRoles> degreeClass){
+    public Double evaluateQualityDegree(List<String> entityURIs, Class<? extends ThingWithRoles> degreeClass){
         try {
             double center;
             double slope;
