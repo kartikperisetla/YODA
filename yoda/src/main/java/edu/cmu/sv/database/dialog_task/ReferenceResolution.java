@@ -6,24 +6,24 @@ import edu.cmu.sv.database.StringSimilarity;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.dialog_state_tracking.Utils;
-import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
-import edu.cmu.sv.ontology.misc.WebResource;
-import edu.cmu.sv.ontology.role.Role;
-import edu.cmu.sv.ontology.verb.Verb;
-import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.utils.HypothesisSetManagement;
-import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.adjective.Adjective;
+import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
+import edu.cmu.sv.ontology.misc.WebResource;
 import edu.cmu.sv.ontology.noun.Noun;
 import edu.cmu.sv.ontology.preposition.Preposition;
 import edu.cmu.sv.ontology.quality.TransientQuality;
 import edu.cmu.sv.ontology.role.HasName;
 import edu.cmu.sv.ontology.role.HasURI;
 import edu.cmu.sv.ontology.role.InRelationTo;
+import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.ontology.role.has_quality_subroles.HasQualityRole;
+import edu.cmu.sv.ontology.verb.Verb;
+import edu.cmu.sv.semantics.SemanticsModel;
+import edu.cmu.sv.utils.HypothesisSetManagement;
 import edu.cmu.sv.utils.StringDistribution;
+import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
@@ -397,6 +397,7 @@ public class ReferenceResolution {
                 update.execute();
             } catch (RepositoryException | UpdateExecutionException | MalformedQueryException e) {
                 e.printStackTrace();
+                System.exit(0);
             }
 
             // new salience / dst focus
@@ -415,6 +416,7 @@ public class ReferenceResolution {
                 update.execute();
             } catch (RepositoryException | UpdateExecutionException | MalformedQueryException e) {
                 e.printStackTrace();
+                System.exit(0);
             }
         }
 

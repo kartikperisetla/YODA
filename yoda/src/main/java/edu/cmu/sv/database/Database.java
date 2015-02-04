@@ -58,10 +58,9 @@ public class Database {
     }
 
     public YodaEnvironment yodaEnvironment;
-//    Repository repository;
     // a counter used to create new URIs
     private long URICounter = 0;
-    public RepositoryConnection connection;
+    public final RepositoryConnection connection;
     public final static String baseURI = "http://sv.cmu.edu/yoda#";
     public final static String dstFocusURI = "http://sv.cmu.edu/dst_focus#";
     public final static String prefixes = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
@@ -86,11 +85,19 @@ public class Database {
 //        // non-inferencing triple store
 //        repository = new SailRepository(new MemoryStore());
         // inferencing rdf database
+
         Repository repository = new SailRepository(new ForwardChainingRDFSInferencer(new MemoryStore()));
+
+        Object tmpConnection = null;
         try {
             repository.initialize();
-            connection = repository.getConnection();
+            tmpConnection = repository.getConnection();
+        } catch (RepositoryException e) {
+            System.exit(0);
+        }
+        connection = (RepositoryConnection) tmpConnection;
 
+        try{
             // generate the class hierarchy
             Set<Class> databaseClasses = new HashSet<>(OntologyRegistry.nounClasses);
             databaseClasses.addAll(OntologyRegistry.verbClasses);
@@ -103,7 +110,7 @@ public class Database {
             addIndividuals(OntologyRegistry.individualNameMap);
 
             // load the registered databases
-            for (String filename : DatabaseRegistry.turtleDatabaseSources){
+            for (String filename : DatabaseRegistry.turtleDatabaseSources) {
                 connection.add(new InputStreamReader(new FileInputStream(filename), "UTF-8"),
                         baseURI, RDFFormat.TURTLE);
             }
@@ -117,10 +124,10 @@ public class Database {
             List<String> restaurantURIList = new LinkedList<>(runQuerySelectX(restaurantSelectionQuery));
 
             Random r = new Random();
-            for (String restaurantURI : restaurantURIList){
+            for (String restaurantURI : restaurantURIList) {
                 // randomly insert Expensiveness
                 String expensivenessInsertString = prefixes +
-                        "INSERT DATA {<"+restaurantURI+"> base:expensiveness "+r.nextDouble()+" . }";
+                        "INSERT DATA {<" + restaurantURI + "> base:expensiveness " + r.nextDouble() + " . }";
                 try {
                     Update update = connection.prepareUpdate(QueryLanguage.SPARQL, expensivenessInsertString, baseURI);
                     update.execute();
@@ -128,15 +135,13 @@ public class Database {
                     e.printStackTrace();
                 }
             }
-
         } catch (RepositoryException | RDFParseException | IOException | MalformedQueryException | UpdateExecutionException e) {
             e.printStackTrace();
             System.exit(0);
         }
-
     }
 
-    public void addIndividuals(Map<String, Thing> individuals)
+    private void addIndividuals(Map<String, Thing> individuals)
             throws UpdateExecutionException, MalformedQueryException, RepositoryException {
         String insertString = prefixes+"INSERT DATA\n{\n";
         for (String key : individuals.keySet()){
@@ -149,7 +154,7 @@ public class Database {
         update.execute();
     }
 
-    public void addNonOntologyProperties(Set<String> properties)
+    private void addNonOntologyProperties(Set<String> properties)
             throws MalformedQueryException, RepositoryException, UpdateExecutionException {
 
         String insertString = prefixes+"INSERT DATA\n{\n";
@@ -169,7 +174,7 @@ public class Database {
     * Insert all direct parent-child relationships (assume that the database does its own class hierarchy inference)
     * Insert rdfs:class and rdfs:property as required
     * */
-    public void generateClassHierarchy(Set<Class> classes, Set<Class> properties)
+    private void generateClassHierarchy(Set<Class> classes, Set<Class> properties)
             throws MalformedQueryException, RepositoryException, UpdateExecutionException {
 
         String insertString = prefixes+"INSERT DATA {\n";
@@ -204,7 +209,7 @@ public class Database {
     * and needs a prefix.
     *
     * */
-    public String generateTriple(Object subject, Object predicate, Object obj) {
+    private String generateTriple(Object subject, Object predicate, Object obj) {
         assert (subject instanceof String || subject instanceof Class);
         assert (predicate instanceof String || predicate instanceof Class);
         assert (obj instanceof String || obj instanceof Class);
@@ -231,16 +236,6 @@ public class Database {
         return ans;
     }
 
-    public void insertTriple(String subject, String predicate, String object)
-            throws MalformedQueryException, RepositoryException, UpdateExecutionException {
-
-        String updateString = prefixes+"INSERT DATA \n{ base:"+subject+" "+predicate+" base:"+object+" }";
-//        System.out.println("attempting the following sparql update string:\n"+updateString);
-        log(updateString);
-        Update update = connection.prepareUpdate(QueryLanguage.SPARQL, updateString, baseURI);
-        update.execute();
-    }
-
     /*
     * Insert a data value to the triple store, return the unique identifier
     * */
@@ -250,15 +245,19 @@ public class Database {
             if (obj instanceof String) {
                 String updateString = prefixes + "INSERT DATA \n{ base:" + newURI + " rdf:value \"" + obj + "\"^^xsd:string}";
 //            System.out.println("Database.insertValue: updateString:"+updateString);
-                log(updateString);
-                Update update = connection.prepareUpdate(QueryLanguage.SPARQL, updateString, baseURI);
-                update.execute();
+                synchronized (connection) {
+                    log(updateString);
+                    Update update = connection.prepareUpdate(QueryLanguage.SPARQL, updateString, baseURI);
+                    update.execute();
+                }
             } else if (obj instanceof Integer) {
                 String updateString = prefixes + "INSERT DATA \n{ base:" + newURI + " rdf:value \"" + obj + "\"^^xsd:int}";
 //            System.out.println("Database.insertValue: updateString:"+updateString);
-                log(updateString);
-                Update update = connection.prepareUpdate(QueryLanguage.SPARQL, updateString, baseURI);
-                update.execute();
+                synchronized (connection) {
+                    log(updateString);
+                    Update update = connection.prepareUpdate(QueryLanguage.SPARQL, updateString, baseURI);
+                    update.execute();
+                }
             } else {
                 throw new Error("Can't insertValue of that type");
             }
@@ -277,15 +276,16 @@ public class Database {
         log(queryString);
         Set<String> ans = new HashSet<>();
         try {
-            TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
-            TupleQueryResult result = query.evaluate();
+            synchronized (connection) {
+                TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+                TupleQueryResult result = query.evaluate();
 
-            while (result.hasNext()){
-                BindingSet bindings = result.next();
-                ans.add(bindings.getValue("x").stringValue());
+                while (result.hasNext()) {
+                    BindingSet bindings = result.next();
+                    ans.add(bindings.getValue("x").stringValue());
+                }
+                result.close();
             }
-            result.close();
-
         } catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {
             e.printStackTrace();
             System.exit(0);
@@ -300,16 +300,17 @@ public class Database {
         log(queryString);
         Set<Pair<String, String>> ans = new HashSet<>();
         try {
-            TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
-            TupleQueryResult result = query.evaluate();
+            synchronized (connection) {
+                TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+                TupleQueryResult result = query.evaluate();
 
-            while (result.hasNext()){
-                BindingSet bindings = result.next();
-                ans.add(new ImmutablePair<>(bindings.getValue("x").stringValue(),
-                        bindings.getValue("y").stringValue()));
+                while (result.hasNext()) {
+                    BindingSet bindings = result.next();
+                    ans.add(new ImmutablePair<>(bindings.getValue("x").stringValue(),
+                            bindings.getValue("y").stringValue()));
+                }
+                result.close();
             }
-            result.close();
-
         } catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {
             e.printStackTrace();
         }
@@ -355,15 +356,17 @@ public class Database {
             String queryString = prefixes + "SELECT " +String.join(" ", variables.stream().map(x -> "?"+x).collect(Collectors.toList()))
                     + " WHERE { " + graph + "}";
 //            System.out.println("Database.possibleBindings. qQuerystring:\n"+queryString);
-            log(queryString);
-            TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
-            TupleQueryResult result = query.evaluate();
+            synchronized (connection) {
+                log(queryString);
+                TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+                TupleQueryResult result = query.evaluate();
 
-            while (result.hasNext()) {
-                BindingSet bindings = result.next();
-                ans.add(variables.stream().map(bindings::getValue).map(Value::stringValue).collect(Collectors.toList()));
+                while (result.hasNext()) {
+                    BindingSet bindings = result.next();
+                    ans.add(variables.stream().map(bindings::getValue).map(Value::stringValue).collect(Collectors.toList()));
+                }
+                result.close();
             }
-            result.close();
         } catch (MalformedQueryException | RepositoryException | QueryEvaluationException e) {
             e.printStackTrace();
             throw new Error(e);
@@ -371,27 +374,6 @@ public class Database {
         return ans;
 
     }
-
-    public void runQueryForever(String queryString){
-        long numSuccessfulRuns = 0;
-        while (true){
-            numSuccessfulRuns++;
-            if (numSuccessfulRuns%100==0)
-                System.out.println(numSuccessfulRuns);
-            try{
-                TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
-                TupleQueryResult result = query.evaluate();
-                if (result.hasNext()){
-                    BindingSet bindings = result.next();
-                }
-                result.close();
-            } catch (MalformedQueryException | RepositoryException | QueryEvaluationException e) {
-                e.printStackTrace();
-                throw new Error(e);
-            }
-        }
-    }
-
 
     public Double evaluateQualityDegree(List<String> entityURIs, Class<? extends Role> hasQualityRoleClass,
                                         Class<? extends ThingWithRoles> degreeClass){
@@ -419,16 +401,17 @@ public class Database {
             String queryString = prefixes + "SELECT ?fuzzy_mapped_quality WHERE {" +
                     qualityClass.newInstance().getQualityCalculatorSPARQLQuery().apply(params) +
                     "BIND(base:LinearFuzzyMap("+center+", "+slope+", ?transient_quality) AS ?fuzzy_mapped_quality)}";
-            log(queryString);
-//            System.out.println("evaluate quality degree query:\n" + queryString);
-            TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
-            TupleQueryResult result = query.evaluate();
             Double ans = null;
-            if (result.hasNext()){
-                BindingSet bindings = result.next();
-                ans = Double.parseDouble(bindings.getValue("fuzzy_mapped_quality").stringValue());
+            synchronized (connection) {
+                log(queryString);
+                TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+                TupleQueryResult result = query.evaluate();
+                if (result.hasNext()) {
+                    BindingSet bindings = result.next();
+                    ans = Double.parseDouble(bindings.getValue("fuzzy_mapped_quality").stringValue());
+                }
+                result.close();
             }
-            result.close();
             return ans;
 
         } catch (InstantiationException | IllegalAccessException | MalformedQueryException | RepositoryException | QueryEvaluationException e) {

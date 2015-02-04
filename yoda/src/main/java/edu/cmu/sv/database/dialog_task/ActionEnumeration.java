@@ -32,9 +32,8 @@ public class ActionEnumeration {
     public static ENUMERATION_TYPE enumerationType;
 
     public static Set<Map<String, Object>> getPossibleIndividualBindings(DialogAct dialogAct,
-                                                                         YodaEnvironment yodaEnvironment){
-
-        if (dialogAct.getIndividualParameters().size()==0){
+                                                                         YodaEnvironment yodaEnvironment) {
+        if (dialogAct.getIndividualParameters().size() == 0) {
             Set<Map<String, Object>> ans = new HashSet<>();
             ans.add(new HashMap<>());
             return ans;
@@ -46,34 +45,39 @@ public class ActionEnumeration {
         for (String parameter : dialogAct.getIndividualParameters().keySet()) {
             variableEnumerationString += "?" + parameter + " ";
             classConstraintString += "?" + parameter + " rdf:type base:" + dialogAct.getIndividualParameters().get(parameter).getSimpleName() + " .\n";
-            if (focusConstraint==FOCUS_CONSTRAINT.IN_FOCUS)
+            if (focusConstraint == FOCUS_CONSTRAINT.IN_FOCUS)
                 focusConstraintString += "?" + parameter + " rdf:type dst:InFocus .\n";
         }
-        String queryString = Database.prefixes + "SELECT DISTINCT "+variableEnumerationString+"WHERE {\n";
+        String queryString = Database.prefixes + "SELECT DISTINCT " + variableEnumerationString + "WHERE {\n";
         queryString += focusConstraintString;
         queryString += classConstraintString;
         queryString += "}";
         if (enumerationType.equals(ENUMERATION_TYPE.SAMPLED))
-            queryString += " LIMIT "+maxIndividualBindings;
-        yodaEnvironment.db.log(queryString);
-        Database.getLogger().info("Action enumeration query:\n"+queryString);
+            queryString += " LIMIT " + maxIndividualBindings;
 
         Set<Map<String, Object>> ans = new HashSet<>();
-        try {
-            TupleQuery query = yodaEnvironment.db.connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
-            TupleQueryResult result = query.evaluate();
 
-            while (result.hasNext()){
-                Map<String, Object> binding = new HashMap<>();
-                BindingSet bindings = result.next();
-                for (String variable: bindings.getBindingNames()){
-                    binding.put(variable, bindings.getValue(variable).stringValue());
+        synchronized (yodaEnvironment.db.connection) {
+            yodaEnvironment.db.log(queryString);
+            Database.getLogger().info("Action enumeration query:\n" + queryString);
+
+            try {
+                TupleQuery query = yodaEnvironment.db.connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+                TupleQueryResult result = query.evaluate();
+
+                while (result.hasNext()) {
+                    Map<String, Object> binding = new HashMap<>();
+                    BindingSet bindings = result.next();
+                    for (String variable : bindings.getBindingNames()) {
+                        binding.put(variable, bindings.getValue(variable).stringValue());
+                    }
+                    ans.add(binding);
                 }
-                ans.add(binding);
+                result.close();
+            } catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {
+                e.printStackTrace();
+                System.exit(0);
             }
-            result.close();
-        } catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {
-            e.printStackTrace();
         }
 
         return ans;
