@@ -39,7 +39,6 @@ import java.util.stream.Collectors;
 public class ReferenceResolution {
     public static final double minFocusSalience = .002;
 
-    // todo: remove dst focus update and move it to updateSalience
     /*
     * return a distribution over URI's that this JSONObject may refer to
     * */
@@ -69,20 +68,6 @@ public class ReferenceResolution {
             e.printStackTrace();
         }
 
-//        // insert all possible references into the dst focus (no salience for now)
-//        String insertString = Database.prefixes + "INSERT DATA {";
-//        for (String uri : ans.keySet()){
-//            insertString += "<"+uri+"> rdf:type dst:InFocus .\n";
-//        }
-//        insertString +="}";
-//        Database.getLogger().info("DST update insert:\n"+insertString);
-//        try {
-//            Update update = yodaEnvironment.db.connection.prepareUpdate(
-//                    QueryLanguage.SPARQL, insertString, Database.dstFocusURI);
-//            update.execute();
-//        } catch (RepositoryException | UpdateExecutionException | MalformedQueryException e) {
-//            e.printStackTrace();
-//        }
         ans.normalize();
         return ans;
     }
@@ -98,15 +83,28 @@ public class ReferenceResolution {
             int referenceIndex = tmpVarIndex;
             tmpVarIndex ++;
             String ans = "";
-//            String ans = "{ SELECT ?x" + referenceIndex + " ?score" + referenceIndex + " WHERE {\n";
             if (Noun.class.isAssignableFrom(OntologyRegistry.thingNameMap.get((String) reference.get("class")))) {
                 ans += "?x" + referenceIndex + " rdf:type base:" + reference.get("class") + " .\n";
             }
             List<String> scoresToAccumulate = new LinkedList<>();
+
+            scoresToAccumulate.add("?score"+tmpVarIndex);
+            ans += "{{OPTIONAL { ?x"+referenceIndex+" dst:salience ?score"+tmpVarIndex+" }}\n" +
+                    "UNION\n" +
+                    "{OPTIONAL { FILTER NOT EXISTS { ?x"+referenceIndex+" dst:salience ?score"+tmpVarIndex+" } " +
+                    "BIND( "+minFocusSalience+" AS ?score"+tmpVarIndex+" ) }}}\n";
+            tmpVarIndex++;
+
             for (Object key : reference.keySet()) {
 
                 if (key.equals("class")) {
                     continue;
+                } else if (key.equals("refType")){
+                    if (reference.get(key).equals("pronoun")){
+                        ans += "?x rdf:type dst:InFocus . \n";
+                    } else {
+                        throw new Error("unknown / unhandled reference type"+ reference.get(key));
+                    }
                 } else if (HasQualityRole.class.isAssignableFrom(OntologyRegistry.roleNameMap.get((String) key))) {
                     double center;
                     double slope;
@@ -120,7 +118,7 @@ public class ReferenceResolution {
                         center = preposition.getCenter();
                         slope = preposition.getSlope();
                         qualityClass = preposition.getQuality();
-                        //recursively resolve the child to this PP, add the child's variable to entityURIs
+                        //recursively resolveDiscourseUnit the child to this PP, add the child's variable to entityURIs
                         tmpVarIndex++;
                         entityURIs.add("?x" + tmpVarIndex);
                         scoresToAccumulate.add("?score" + tmpVarIndex);
@@ -181,9 +179,11 @@ public class ReferenceResolution {
                 if (key.equals("class")) {
                     if (description.get(key).equals(UnknownThingWithRoles.class.getSimpleName()))
                         continue;
-                    queryString += "<"+individualURI+"> rdf:type base:"+description.get(key)+" . \n";
+                    queryString += "<" + individualURI + "> rdf:type base:" + description.get(key) + " . \n";
 //                    queryString += "BIND(IF({<" + individualURI + "> rdf:type base:" + description.get(key) + "}, 1.0, 0.0) AS ?score"+tmpVarIndex+")\n";
 //                    System.out.println("requiring individual to have type: base:"+description.get(key));
+                } else if (key.equals("refType")){
+                    continue;
                 } else if (HasQualityRole.class.isAssignableFrom(OntologyRegistry.roleNameMap.get((String) key))) {
                     double center;
                     double slope;
@@ -259,16 +259,16 @@ public class ReferenceResolution {
         }
     }
 
-    public static Pair<Map<String, DiscourseUnit>, StringDistribution> resolve(DiscourseUnit hypothesis, YodaEnvironment yodaEnvironment) {
+    public static Pair<Map<String, DiscourseUnit>, StringDistribution> resolveDiscourseUnit(DiscourseUnit hypothesis, YodaEnvironment yodaEnvironment) {
         // get grounded hypotheses / corresponding weights
-        Pair<Map<String, DiscourseUnit>, StringDistribution> groundingHypotheses = resolveHelper(hypothesis, yodaEnvironment);
+        Pair<Map<String, DiscourseUnit>, StringDistribution> groundingHypotheses = resolveDiscourseUnitHelper(hypothesis, yodaEnvironment);
         Map<String, DiscourseUnit> discourseUnits = groundingHypotheses.getLeft();
         StringDistribution discourseUnitDistribution = groundingHypotheses.getRight();
         discourseUnitDistribution.normalize();
         return new ImmutablePair<>(discourseUnits, discourseUnitDistribution);
     }
 
-    private static Pair<Map<String, DiscourseUnit>, StringDistribution> resolveHelper(DiscourseUnit targetDiscourseUnit, YodaEnvironment yodaEnvironment) {
+    private static Pair<Map<String, DiscourseUnit>, StringDistribution> resolveDiscourseUnitHelper(DiscourseUnit targetDiscourseUnit, YodaEnvironment yodaEnvironment) {
         List<String> slotPathsToResolve = new LinkedList<>();
         SemanticsModel spokenByThem = targetDiscourseUnit.getSpokenByThem();
         SemanticsModel currentGroundedInterpretation = targetDiscourseUnit.getGroundInterpretation();
@@ -296,8 +296,8 @@ public class ReferenceResolution {
             }
             slotPathsToResolve.removeAll(alreadyGroundedPaths);
 
-            // only attempt to resolve slots that have associated semantic information
-            // do not try to resolve slots for which the verb only requires descriptions
+            // only attempt to resolveDiscourseUnit slots that have associated semantic information
+            // do not try to resolveDiscourseUnit slots for which the verb only requires descriptions
             slotPathsToResolve = slotPathsToResolve.stream().
                     filter(x -> targetDiscourseUnit.getSpokenByThem().newGetSlotPathFiller(x)!=null).
                     collect(Collectors.toList());

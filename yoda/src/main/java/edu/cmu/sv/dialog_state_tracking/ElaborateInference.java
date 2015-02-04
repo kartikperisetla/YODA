@@ -57,7 +57,7 @@ public class ElaborateInference extends DialogStateUpdateInference {
                         Utils.returnToGround(predecessor, newSpokenByThemHypothesis, timeStamp);
 
                         Pair<Map<String, DiscourseUnit>, StringDistribution> groundedHypotheses =
-                                ReferenceResolution.resolve(predecessor, yodaEnvironment);
+                                ReferenceResolution.resolveDiscourseUnit(predecessor, yodaEnvironment);
                         for (String groundedDuKey: groundedHypotheses.getRight().keySet()) {
                             String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
                             DialogState newDialogState = currentState.deepCopy();

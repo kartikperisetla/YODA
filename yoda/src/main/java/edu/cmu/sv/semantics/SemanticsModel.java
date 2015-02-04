@@ -476,7 +476,7 @@ public class SemanticsModel {
         Class<? extends Thing> cls = OntologyRegistry.thingNameMap.get(clsString);
         // check that all slots correspond to roles which this node's class is in the domain of
         for (Object slot : description.keySet()){
-            if (slot.equals("class"))
+            if (slot.equals("class") || slot.equals("refType"))
                 continue;
             boolean inDomain = false;
             if (!OntologyRegistry.roleNameMap.containsKey((String)slot))

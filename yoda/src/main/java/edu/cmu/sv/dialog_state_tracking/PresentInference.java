@@ -42,7 +42,7 @@ public class PresentInference extends DialogStateUpdateInference {
                     newDUHypothesis.initiator = turn.speaker;
 
                     Pair<Map<String, DiscourseUnit>, StringDistribution> groundedHypotheses =
-                            ReferenceResolution.resolve(newDUHypothesis, yodaEnvironment);
+                            ReferenceResolution.resolveDiscourseUnit(newDUHypothesis, yodaEnvironment);
                     for (String groundedDuKey: groundedHypotheses.getRight().keySet()){
                         String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
                         DialogState newDialogState = currentState.deepCopy();

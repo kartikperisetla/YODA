@@ -52,7 +52,7 @@ public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpda
                             continue;
                         }
 
-                        // copy suggestion, re-resolve the discourse unit
+                        // copy suggestion, re-resolveDiscourseUnit the discourse unit
                         SemanticsModel newSpokenByThemHypothesis = predecessor.getSpokenByThem().deepCopy();
                         SemanticsModel.overwrite(((JSONObject) newSpokenByThemHypothesis.newGetSlotPathFiller(duAnalysis.suggestionPath)),
                                 correctionContent);
@@ -61,7 +61,7 @@ public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpda
                         Utils.returnToGround(predecessor, newSpokenByThemHypothesis, timeStamp);
 
                         Pair<Map<String, DiscourseUnit>, StringDistribution> groundedHypotheses =
-                                ReferenceResolution.resolve(predecessor, yodaEnvironment);
+                                ReferenceResolution.resolveDiscourseUnit(predecessor, yodaEnvironment);
                         for (String groundedDuKey: groundedHypotheses.getRight().keySet()) {
                             String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
                             DiscourseUnit currentDu = groundedHypotheses.getLeft().get(groundedDuKey);
