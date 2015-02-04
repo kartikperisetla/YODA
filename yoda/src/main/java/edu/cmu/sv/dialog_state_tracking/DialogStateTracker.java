@@ -114,7 +114,7 @@ public class DialogStateTracker implements Runnable {
                 hypothesisMap.put(key, newHypotheses.get(key));
             }
             hypothesisDistribution.normalize();
-            ReferenceResolution.updateSalience(yodaEnvironment);
+            ReferenceResolution.updateSalience(yodaEnvironment, hypothesisDistribution, hypothesisMap);
 
             // generate log record
             JSONObject loopCompleteRecord = MongoLogHandler.createEventRecord("dst_loop_complete");

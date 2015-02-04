@@ -3,8 +3,11 @@ package edu.cmu.sv.database.dialog_task;
 import edu.cmu.sv.database.Database;
 import edu.cmu.sv.database.Product;
 import edu.cmu.sv.database.StringSimilarity;
+import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
+import edu.cmu.sv.dialog_state_tracking.Utils;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
+import edu.cmu.sv.ontology.misc.WebResource;
 import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
@@ -34,6 +37,7 @@ import java.util.stream.Collectors;
  * Created by David Cohen on 11/17/14.
  */
 public class ReferenceResolution {
+    public static final double minFocusSalience = .002;
 
     // todo: remove dst focus update and move it to updateSalience
     /*
@@ -65,20 +69,20 @@ public class ReferenceResolution {
             e.printStackTrace();
         }
 
-        // insert all possible references into the dst focus (no salience for now)
-        String insertString = Database.prefixes + "INSERT DATA {";
-        for (String uri : ans.keySet()){
-            insertString += "<"+uri+"> rdf:type dst:InFocus .\n";
-        }
-        insertString +="}";
-        Database.getLogger().info("DST update insert:\n"+insertString);
-        try {
-            Update update = yodaEnvironment.db.connection.prepareUpdate(
-                    QueryLanguage.SPARQL, insertString, Database.dstFocusURI);
-            update.execute();
-        } catch (RepositoryException | UpdateExecutionException | MalformedQueryException e) {
-            e.printStackTrace();
-        }
+//        // insert all possible references into the dst focus (no salience for now)
+//        String insertString = Database.prefixes + "INSERT DATA {";
+//        for (String uri : ans.keySet()){
+//            insertString += "<"+uri+"> rdf:type dst:InFocus .\n";
+//        }
+//        insertString +="}";
+//        Database.getLogger().info("DST update insert:\n"+insertString);
+//        try {
+//            Update update = yodaEnvironment.db.connection.prepareUpdate(
+//                    QueryLanguage.SPARQL, insertString, Database.dstFocusURI);
+//            update.execute();
+//        } catch (RepositoryException | UpdateExecutionException | MalformedQueryException e) {
+//            e.printStackTrace();
+//        }
         ans.normalize();
         return ans;
     }
@@ -344,10 +348,76 @@ public class ReferenceResolution {
     }
 
     // todo: implement
-    public static void updateSalience(YodaEnvironment yodaEnvironment){
-        // add new objects to dst focus based on dialog state
-        // re-weight salience based on dialog state
-        // remove objects from dst focus based on salience
+    public static void updateSalience(YodaEnvironment yodaEnvironment, StringDistribution dialogStateDistribution,
+                                      Map<String, DialogState> dialogStateHypotheses){
+        synchronized (yodaEnvironment.db.connection) {
+            // compute salience from the active dialog state hypotheses
+            Map<String, Double> salienceFromDialogState = new HashMap<>();
+            for (String dsIdentifier : dialogStateDistribution.keySet()) {
+                DialogState currentDialogState = dialogStateHypotheses.get(dsIdentifier);
+                Map<String, DiscourseUnit> discourseUnits = currentDialogState.getDiscourseUnitHypothesisMap();
+                for (String duIdentifier : discourseUnits.keySet()) {
+                    DiscourseUnit currentDiscourseUnit = discourseUnits.get(duIdentifier);
+                    double salienceBoost = dialogStateDistribution.get(dsIdentifier) *
+                            Utils.discourseUnitContextProbability(currentDialogState, currentDiscourseUnit);
+                    Set<String> individualsInGroundedDiscourseUnit = new HashSet<>();
+                    if (currentDiscourseUnit.getGroundInterpretation() != null) {
+                        Set<String> pathsToGroundedIndividuals =
+                                currentDiscourseUnit.getGroundInterpretation().findAllPathsToClass(WebResource.class.getSimpleName());
+                        pathsToGroundedIndividuals.forEach(x ->
+                                individualsInGroundedDiscourseUnit.add((String) currentDiscourseUnit.
+                                        getGroundInterpretation().
+                                        newGetSlotPathFiller(x + "." + HasURI.class.getSimpleName())));
+                    }
+                    if (currentDiscourseUnit.getGroundTruth() != null) {
+                        Set<String> pathsToGroundedIndividuals =
+                                currentDiscourseUnit.getGroundTruth().findAllPathsToClass(WebResource.class.getSimpleName());
+                        pathsToGroundedIndividuals.forEach(x ->
+                                individualsInGroundedDiscourseUnit.add((String) currentDiscourseUnit.
+                                        getGroundTruth().
+                                        newGetSlotPathFiller(x + "." + HasURI.class.getSimpleName())));
+                    }
+                    for (String key : individualsInGroundedDiscourseUnit) {
+                        if (!salienceFromDialogState.containsKey(key))
+                            salienceFromDialogState.put(key, 0.0);
+                        salienceFromDialogState.put(key, salienceFromDialogState.get(key) + salienceBoost);
+                    }
+
+                }
+            }
+
+            // todo: retain / collect salience for objects not in the immediate discourse history
+
+            // clear dst focus
+            String deleteString = Database.prefixes + "DELETE {?x rdf:type dst:InFocus} WHERE {?x rdf:type dst:InFocus . }";
+            Database.getLogger().info("DST delete:\n" + deleteString);
+            try {
+                Update update = yodaEnvironment.db.connection.prepareUpdate(
+                        QueryLanguage.SPARQL, deleteString, Database.dstFocusURI);
+                update.execute();
+            } catch (RepositoryException | UpdateExecutionException | MalformedQueryException e) {
+                e.printStackTrace();
+            }
+
+            // new salience / dst focus
+            String insertString = Database.prefixes + "INSERT DATA {";
+            for (String uri : salienceFromDialogState.keySet()) {
+                if (salienceFromDialogState.get(uri) < minFocusSalience)
+                    continue;
+                insertString += "<" + uri + "> rdf:type dst:InFocus .\n";
+                insertString += "<" + uri + "> dst:salience " + salienceFromDialogState.get(uri) + ".\n";
+            }
+            insertString += "}";
+            Database.getLogger().info("DST salience update:\n" + insertString);
+            try {
+                Update update = yodaEnvironment.db.connection.prepareUpdate(
+                        QueryLanguage.SPARQL, insertString, Database.dstFocusURI);
+                update.execute();
+            } catch (RepositoryException | UpdateExecutionException | MalformedQueryException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
 }
