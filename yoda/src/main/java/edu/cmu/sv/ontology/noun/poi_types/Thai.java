@@ -9,6 +9,6 @@ import java.util.Set;
 /**
  * Created by David Cohen on 2/5/15.
  */
-public class FastFood extends PointOfInterest {
+public class Thai extends PointOfInterest {
 }
 
