@@ -142,7 +142,7 @@ def write_turtle_line(json_data, file_out):
         if turtle_label:
             file_out.write(entry_prefix + 'rdf:type base:' + turtle_label + ' .\n')
             # Label
-            file_out.write(entry_prefix + 'rdfs:label "' + json_data.get('name').encode('utf-8').strip() + '"^^xsd:string .\n')
+            file_out.write(entry_prefix + 'rdfs:label "' + json_data.get('name').encode('utf-8').strip().replace('"', '') + '"^^xsd:string .\n')
             # Stars
             if json_data.get('stars'):
                 file_out.write(entry_prefix + 'base:yelp_stars ' + str(json_data.get('stars')) + ' .\n')
