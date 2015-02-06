@@ -72,484 +72,547 @@ public class Lexicon {
 
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "restaurant");
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "restaurant");
             Lexicon.add(Restaurants.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "some food");
             Lexicon.add(Food.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "bar");
             Lexicon.add(Bars.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "mexican restaurant");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "mexican place");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "mexican food");
             Lexicon.add(Mexican.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "american restaurant");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "american food");
             Lexicon.add(AmericanTraditional.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "fast food");
             Lexicon.add(FastFood.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "pizza");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "pizzeria");
             Lexicon.add(Pizza.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "travel agency");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "kiosk");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "travel guide");
             Lexicon.add(HotelsAndTravel.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "sandwich shop");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "sandwich store");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "sandwich restaurant");
             Lexicon.add(Sandwiches.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "coffee shop");
             Lexicon.add(CoffeeAndTea.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "modern american restaurant");
             Lexicon.add(AmericanNew.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "italian place");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "italian food");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "italian restaurant");
             Lexicon.add(Italian.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "chinese food");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "chinese place");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "chinese restaurant");
             Lexicon.add(Chinese.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "hotel");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "motel");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "inn");
             Lexicon.add(Hotels.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "burger joint");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "hamburger joint");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "burger restaurant");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "hamburger restaurant");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "hambuger stand");
             Lexicon.add(Burgers.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "grocer");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "grocery store");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "supermarket");
             Lexicon.add(Grocery.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "breakfast food");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "breakfast restaurant");
             Lexicon.add(BreakfastAndBrunch.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "creamery");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "ice cream restaurant");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "ice cream store");
             Lexicon.add(IceCreamAndFrozenYogurt.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "specialty restaurant");
             Lexicon.add(SpecialtyFood.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "bakery");
             Lexicon.add(Bakeries.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "pub");
             Lexicon.add(Pubs.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "japanese restaurant");
             Lexicon.add(Japanese.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "sports bar");
             Lexicon.add(SportsBars.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "convenience store");
             Lexicon.add(ConvenienceStores.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "deli");
             Lexicon.add(Delis.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "sushi bar");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "sushi restaurant");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "sushi place");
             Lexicon.add(SushiBars.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "steak house");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "steakhouse");
             Lexicon.add(Steakhouses.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "cafe");
             Lexicon.add(Cafes.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "seafood restaurant");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "seafood place");
             Lexicon.add(Seafood.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "dessert shop");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "dessert restaurant");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "dessert place");
             Lexicon.add(Desserts.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "buffet");
             Lexicon.add(Buffets.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "barbeque");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "bbq");
             Lexicon.add(Barbeque.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "thai restaurant");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "thai place");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "thai food");
             Lexicon.add(Thai.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "mediterranean restaurant");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "mediterranean place");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "mediterranean food");
             Lexicon.add(Mediterranean.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "spirits");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "wine and spirits");
             Lexicon.add(BeerWineAndSpirits.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "wings");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "wings place");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "wing stop");
             Lexicon.add(ChickenWings.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "asian fusion restaurant");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "asian fusion place");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "asian fusion food");
             Lexicon.add(AsianFusion.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "smoothie shop");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "juice bar");
             Lexicon.add(JuiceBarsAndSmoothies.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "greek restaurant");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "greek place");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "greek food");
             Lexicon.add(Greek.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "indian restaurant");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "indian place");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "indian food");
             Lexicon.add(Indian.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "tex mex restaurant");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "tex mex place");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "tex mex food");
             Lexicon.add(TexMex.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "donut shop");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "donut store");
             Lexicon.add(Donuts.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "diner");
             Lexicon.add(Diners.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "hot dog stand");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "hot dog restaurant");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "hot dog place");
             Lexicon.add(HotDogs.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "vietnamese restaurant");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "vietnamese place");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "vietnamese food");
             Lexicon.add(Vietnamese.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "wine bar");
             Lexicon.add(WineBars.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "local food");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "local restaurant");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "local place");
             Lexicon.add(LocalFlavor.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "salad restaurant");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "salad place");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "salad food");
             Lexicon.add(Salad.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "dive bar");
             Lexicon.add(DiveBars.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "vegetarian restaurant");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "vegetarian place");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "vegetarian food");
             Lexicon.add(Vegetarian.class, entry);
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "british restaurant");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "british place");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "british food");
             Lexicon.add(British.class, entry);
         }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(French.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(Bagels.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(Korean.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(EthnicFood.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(Hawaiian.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(Caterers.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(GlutenFree.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(MiddleEastern.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(FarmersMarket.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(Gastropubs.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(LatinAmerican.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(FoodTrucks.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(Karaoke.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(CandyStores.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(Breweries.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(FishAndChips.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(Vegan.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(GayBars.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(ChocolatiersAndShops.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(FoodDeliveryServices.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(Pakistani.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(ShavedIce.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(FoodStands.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(Filipino.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(CocktailBars.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(Southern.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(HookahBars.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(CajunCreole.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(Irish.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(TeaRooms.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(SoulFood.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(Soup.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(Caribbean.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(Spanish.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(TapasSmallPlates.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(FruitsAndVeggies.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(Cheesesteaks.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(TapasBars.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(SportsClubs.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(DimSum.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(ComfortFood.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(ModernEuropean.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(Scottish.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(Creperies.class, entry);
-        }
-        {
-            LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
-            Lexicon.add(CheeseShops.class, entry);
-        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(French.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(Bagels.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(Korean.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(EthnicFood.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(Hawaiian.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(Caterers.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(GlutenFree.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(MiddleEastern.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(FarmersMarket.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(Gastropubs.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(LatinAmerican.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(FoodTrucks.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(Karaoke.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(CandyStores.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(Breweries.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(FishAndChips.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(Vegan.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(GayBars.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(ChocolatiersAndShops.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(FoodDeliveryServices.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(Pakistani.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(ShavedIce.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(FoodStands.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(Filipino.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(CocktailBars.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(Southern.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(HookahBars.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(CajunCreole.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(Irish.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(TeaRooms.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(SoulFood.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(Soup.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(Caribbean.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(Spanish.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(TapasSmallPlates.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(FruitsAndVeggies.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(Cheesesteaks.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(TapasBars.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(SportsClubs.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(DimSum.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(ComfortFood.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(ModernEuropean.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(Scottish.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(Creperies.class, entry);
+//        }
+//        {
+//            LexicalEntry entry = new LexicalEntry();
+//            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "");
+//            Lexicon.add(CheeseShops.class, entry);
+//        }
+
+        
+
 
         // {
         //     LexicalEntry entry = new LexicalEntry();
