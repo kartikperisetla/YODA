@@ -54,8 +54,13 @@ public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpda
 
                         // copy suggestion, re-resolveDiscourseUnit the discourse unit
                         SemanticsModel newSpokenByThemHypothesis = predecessor.getSpokenByThem().deepCopy();
-                        SemanticsModel.overwrite(((JSONObject) newSpokenByThemHypothesis.newGetSlotPathFiller(duAnalysis.suggestionPath)),
-                                correctionContent);
+                        if (newSpokenByThemHypothesis.newGetSlotPathFiller(duAnalysis.suggestionPath)==null){
+                            SemanticsModel.putAtPath(newSpokenByThemHypothesis.getInternalRepresentation(),
+                                    duAnalysis.suggestionPath, correctionContent);
+                        } else {
+                            SemanticsModel.overwrite(((JSONObject) newSpokenByThemHypothesis.newGetSlotPathFiller(duAnalysis.suggestionPath)),
+                                    correctionContent);
+                        }
                         SemanticsModel.putAtPath(predecessor.groundInterpretation.getInternalRepresentation(),
                                 duAnalysis.suggestionPath, null);
                         Utils.returnToGround(predecessor, newSpokenByThemHypothesis, timeStamp);
