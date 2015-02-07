@@ -118,23 +118,6 @@ public class Database {
             // load the non-ontology relations
             addNonOntologyProperties(DatabaseRegistry.nonOntologyRelations);
 
-            //// randomly insert 'expensiveness' information
-            String restaurantSelectionQuery = prefixes +
-                    "SELECT ?x WHERE { ?x rdf:type base:Restaurant . \n }";
-            List<String> restaurantURIList = new LinkedList<>(runQuerySelectX(restaurantSelectionQuery));
-
-            Random r = new Random();
-            for (String restaurantURI : restaurantURIList) {
-                // randomly insert Expensiveness
-                String expensivenessInsertString = prefixes +
-                        "INSERT DATA {<" + restaurantURI + "> base:expensiveness " + r.nextDouble() + " . }";
-                try {
-                    Update update = connection.prepareUpdate(QueryLanguage.SPARQL, expensivenessInsertString, baseURI);
-                    update.execute();
-                } catch (RepositoryException | UpdateExecutionException | MalformedQueryException e) {
-                    e.printStackTrace();
-                }
-            }
         } catch (RepositoryException | RDFParseException | IOException | MalformedQueryException | UpdateExecutionException e) {
             e.printStackTrace();
             System.exit(0);

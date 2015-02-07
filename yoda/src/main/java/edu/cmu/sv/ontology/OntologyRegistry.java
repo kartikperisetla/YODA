@@ -1,8 +1,6 @@
 package edu.cmu.sv.ontology;
 
-import edu.cmu.sv.ontology.adjective.Adjective;
-import edu.cmu.sv.ontology.adjective.Cheap;
-import edu.cmu.sv.ontology.adjective.Expensive;
+import edu.cmu.sv.ontology.adjective.*;
 import edu.cmu.sv.ontology.misc.*;
 import edu.cmu.sv.ontology.noun.*;
 import edu.cmu.sv.ontology.noun.poi_types.*;
@@ -11,10 +9,10 @@ import edu.cmu.sv.ontology.preposition.Preposition;
 import edu.cmu.sv.ontology.quality.TransientQuality;
 import edu.cmu.sv.ontology.quality.binary_quality.Distance;
 import edu.cmu.sv.ontology.quality.unary_quality.Expensiveness;
+import edu.cmu.sv.ontology.quality.unary_quality.Goodness;
+import edu.cmu.sv.ontology.quality.unary_quality.Popularity;
 import edu.cmu.sv.ontology.role.*;
-import edu.cmu.sv.ontology.role.has_quality_subroles.HasDistance;
-import edu.cmu.sv.ontology.role.has_quality_subroles.HasExpensiveness;
-import edu.cmu.sv.ontology.role.has_quality_subroles.HasQualityRole;
+import edu.cmu.sv.ontology.role.has_quality_subroles.*;
 import edu.cmu.sv.ontology.verb.*;
 import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -190,18 +188,24 @@ public class OntologyRegistry {
         roleClasses.add(HasURI.class);
         roleClasses.add(HasDistance.class);
         roleClasses.add(HasExpensiveness.class);
+        roleClasses.add(HasGoodness.class);
+        roleClasses.add(HasPopularity.class);
         roleClasses.add(InRelationTo.class);
         roleClasses.add(Origin.class);
         roleClasses.add(Destination.class);
 
         adjectiveClasses.add(Cheap.class);
         adjectiveClasses.add(Expensive.class);
+        adjectiveClasses.add(Good.class);
+        adjectiveClasses.add(Popular.class);
 //        adjectiveClasses.add(ExpensivenessAdjective.class);
 
         prepositionClasses.add(IsCloseTo.class);
 //        prepositionClasses.add(DistancePreposition.class);
 
         qualityClasses.add(Expensiveness.class);
+        qualityClasses.add(Goodness.class);
+        qualityClasses.add(Popularity.class);
         qualityClasses.add(Distance.class);
 
         miscClasses.add(NonHearing.class);

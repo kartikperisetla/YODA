@@ -14,7 +14,7 @@ import java.util.Set;
  */
 public class Grammar {
 
-    public static GrammarPreferences DEFAULT_GRAMMAR_PREFERENCES = new Grammar.GrammarPreferences(.5, .2, .2, 5, 2, 5, 5, 2, new HashMap<>());
+    public static GrammarPreferences DEFAULT_GRAMMAR_PREFERENCES = new Grammar.GrammarPreferences(.5, .01, .2, 3, 2, 3, 5, 2, new HashMap<>());
     public static GrammarPreferences CORPUS_GENERATION_PREFERENCES = new Grammar.GrammarPreferences(.9, .3, .2, 5, 3, 5, 5, 2, new HashMap<>());
     public static GrammarPreferences EXHAUSTIVE_GENERATION_PREFERENCES = new GrammarPreferences(.9, 1.0, 1.0, 5, 3, 3, 100, 100, new HashMap<>());
 

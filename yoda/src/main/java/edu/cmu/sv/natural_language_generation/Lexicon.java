@@ -3,6 +3,8 @@ package edu.cmu.sv.natural_language_generation;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.adjective.Cheap;
 import edu.cmu.sv.ontology.adjective.Expensive;
+import edu.cmu.sv.ontology.adjective.Good;
+import edu.cmu.sv.ontology.adjective.Popular;
 import edu.cmu.sv.ontology.noun.Noun;
 import edu.cmu.sv.ontology.noun.Person;
 import edu.cmu.sv.ontology.noun.PointOfInterest;
@@ -10,6 +12,7 @@ import edu.cmu.sv.ontology.noun.Time;
 import edu.cmu.sv.ontology.noun.poi_types.*;
 import edu.cmu.sv.ontology.preposition.IsCloseTo;
 import edu.cmu.sv.ontology.quality.unary_quality.Expensiveness;
+import edu.cmu.sv.ontology.quality.unary_quality.Goodness;
 import edu.cmu.sv.ontology.role.Agent;
 import edu.cmu.sv.ontology.role.Destination;
 import edu.cmu.sv.ontology.role.Origin;
@@ -771,6 +774,20 @@ public class Lexicon {
             entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "costly");
             Lexicon.add(Expensive.class, entry);
         }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "good");
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "excellent");
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "highly rated");
+            Lexicon.add(Good.class, entry);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "en vogue");
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "hip");
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "popular");
+            Lexicon.add(Popular.class, entry);
+        }
     }
 
     //// Lexicon for prepositions
@@ -797,6 +814,12 @@ public class Lexicon {
             entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "prices");
             entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "costs");
             Lexicon.add(Expensiveness.class, entry);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "quality");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "rating");
+            Lexicon.add(Goodness.class, entry);
         }
     }
 
