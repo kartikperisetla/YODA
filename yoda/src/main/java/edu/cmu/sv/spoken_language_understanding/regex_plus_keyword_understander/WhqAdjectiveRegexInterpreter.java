@@ -40,14 +40,14 @@ public class WhqAdjectiveRegexInterpreter implements MiniLanguageInterpreter {
         Set<String> adjectiveStrings = new HashSet<>();
         for (Class<? extends Adjective> adjectiveClass : adjectiveClasses) {
             try {
-                adjectiveStrings.addAll(Lexicon.getPOSForClass(adjectiveClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES));
+                adjectiveStrings.addAll(Lexicon.getPOSForClass(adjectiveClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true));
             } catch (Lexicon.NoLexiconEntryException e) {}
         }
         this.adjectiveRegexString = "(" + String.join("|", adjectiveStrings) + ")";
 
         Set<String> nounStrings = new HashSet<>();
         try {
-            nounStrings.addAll(Lexicon.getPOSForClass(qualityClass, Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES));
+            nounStrings.addAll(Lexicon.getPOSForClass(qualityClass, Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true));
         } catch (Lexicon.NoLexiconEntryException e) {}
         this.qualityNounRegexString = "(" + String.join("|", nounStrings) + ")";
 

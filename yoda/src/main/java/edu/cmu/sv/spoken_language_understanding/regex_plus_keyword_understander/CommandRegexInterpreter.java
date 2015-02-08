@@ -28,14 +28,14 @@ public class CommandRegexInterpreter implements MiniLanguageInterpreter {
     public CommandRegexInterpreter(Class<? extends Verb> verbClass) {
         this.verbClass = verbClass;
         try {
-            Set<String> verbNounStrings = Lexicon.getPOSForClass(verbClass, Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES);
-            verbNounStrings.addAll(Lexicon.getPOSForClass(verbClass, Lexicon.LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES));
+            Set<String> verbNounStrings = Lexicon.getPOSForClass(verbClass, Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true);
+            verbNounStrings.addAll(Lexicon.getPOSForClass(verbClass, Lexicon.LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true));
             this.verbRegexString = "("+String.join("|",verbNounStrings)+")";
         } catch (Lexicon.NoLexiconEntryException e) {}
         for (Class<? extends Role> roleClass : OntologyRegistry.roleClasses) {
             if (OntologyRegistry.inDomain(roleClass, verbClass)) {
                 try {
-                    Set<String> roleObj1PrefixStrings = Lexicon.getPOSForClass(roleClass, Lexicon.LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES);
+                    Set<String> roleObj1PrefixStrings = Lexicon.getPOSForClass(roleClass, Lexicon.LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true);
                     String regexString = "("+String.join("|",roleObj1PrefixStrings)+")";
                     if (!regexString.equals("()"))
                         roleObj1PrefixPatterns.put(roleClass, regexString);

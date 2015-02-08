@@ -50,7 +50,7 @@ public class RequestAgentTemplate implements Template {
         Set<String> verbStrings;
         try{
             verbStrings = Lexicon.getPOSForClass(OntologyRegistry.thingNameMap.get(verbClassString),
-                    Lexicon.LexicalEntry.PART_OF_SPEECH.S1_VERB, yodaEnvironment.nlg.grammarPreferences);
+                    Lexicon.LexicalEntry.PART_OF_SPEECH.S1_VERB, yodaEnvironment.nlg.grammarPreferences, false);
         } catch (Lexicon.NoLexiconEntryException e) {
             verbStrings = new HashSet<>();
         }

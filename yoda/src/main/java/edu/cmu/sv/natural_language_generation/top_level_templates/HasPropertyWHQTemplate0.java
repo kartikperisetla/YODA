@@ -85,7 +85,7 @@ public class HasPropertyWHQTemplate0 implements Template {
             for (Class<? extends ThingWithRoles> adjectiveClass : qualityDescriptors.getRight()) {
                 try {
                     adjectiveStrings.addAll(Lexicon.getPOSForClassHierarchy(adjectiveClass,
-                            Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, yodaEnvironment.nlg.grammarPreferences));
+                            Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, yodaEnvironment.nlg.grammarPreferences, false));
                 } catch (Lexicon.NoLexiconEntryException e) {
                 }
                 // just because one of the classes in the descriptor has no lexical info doesn't mean the template is broken
@@ -94,7 +94,7 @@ public class HasPropertyWHQTemplate0 implements Template {
 
         try {
             qualityStrings.addAll(Lexicon.getPOSForClassHierarchy(requestedQuality,
-                    Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, yodaEnvironment.nlg.grammarPreferences));
+                    Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, yodaEnvironment.nlg.grammarPreferences, false));
         } catch (Lexicon.NoLexiconEntryException e) {
         }
 

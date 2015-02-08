@@ -30,7 +30,7 @@ public class YnqAdjectiveRegexInterpreter implements MiniLanguageInterpreter {
         try {
             this.qualityClass = adjectiveClass.newInstance().getQuality();
             this.hasQualityRole = OntologyRegistry.qualityDescriptors(qualityClass).getKey();
-            Set<String> adjectiveStrings = Lexicon.getPOSForClass(adjectiveClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES);
+            Set<String> adjectiveStrings = Lexicon.getPOSForClass(adjectiveClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true);
             this.adjectiveRegexString = "("+String.join("|",adjectiveStrings)+")";
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();

@@ -39,7 +39,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         for (Class<? extends Preposition> prepositionClass : OntologyRegistry.prepositionClasses) {
             try {
                 Set<String> relationalPhraseStrings = Lexicon.getPOSForClass(prepositionClass,
-                        Lexicon.LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES);
+                        Lexicon.LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, false);
                 String regexString = "(" + String.join("|", relationalPhraseStrings) + ")";
                 if (!regexString.equals("()"))
                     prepositionSeparatorRegexStringMap.put(prepositionClass, regexString);
@@ -49,7 +49,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         for (Class<? extends Noun> nounClass : OntologyRegistry.nounClasses) {
             try {
                 Set<String> pronounStrings = Lexicon.getPOSForClass(nounClass,
-                        Lexicon.LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES);
+                        Lexicon.LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, false);
                 String regexString = "(" + String.join("|", pronounStrings) + ")";
                 if (!regexString.equals("()"))
                     pronounRegexStringMap.put(nounClass, regexString);
@@ -60,12 +60,12 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
             Set<String> nounStrings = new HashSet<>();
             try {
                 nounStrings.addAll(Lexicon.getPOSForClass(nounClass,
-                        Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES));
+                        Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, false));
             } catch (Lexicon.NoLexiconEntryException e) {
             }
             try {
                 nounStrings.addAll(Lexicon.getPOSForClass(nounClass,
-                        Lexicon.LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES));
+                        Lexicon.LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, false));
             } catch (Lexicon.NoLexiconEntryException e) {
             }
             String regexString = "(" + String.join("|", nounStrings) + ")";
@@ -76,7 +76,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         for (Class<? extends Adjective> adjectiveClass : OntologyRegistry.adjectiveClasses) {
             try {
                 Set<String> adjectiveStrings = Lexicon.getPOSForClass(adjectiveClass,
-                        Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES);
+                        Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, false);
                 String regexString = "(" + String.join("|", adjectiveStrings) + ")";
                 if (!regexString.equals("()"))
                     adjectiveRegexStringMap.put(adjectiveClass, regexString);

@@ -107,7 +107,7 @@ public class Utils {
                 }
             }
         }
-        System.out.println("DST.Utils: possible points of attachment:"+ans);
+//        System.out.println("DST.Utils: possible points of attachment:"+ans);
         return ans;
     }
 

@@ -59,16 +59,16 @@ public class RequestRoleTemplate implements Template {
             Set<Class <? extends Thing>> classesInRange = roleClass.newInstance().getRange();
             for (Class <? extends Thing> cls : classesInRange){
                 try {
-                    whStrings.addAll(Lexicon.getPOSForClassHierarchy(cls, Lexicon.LexicalEntry.PART_OF_SPEECH.WH_PRONOUN, yodaEnvironment.nlg.grammarPreferences));
+                    whStrings.addAll(Lexicon.getPOSForClassHierarchy(cls, Lexicon.LexicalEntry.PART_OF_SPEECH.WH_PRONOUN, yodaEnvironment.nlg.grammarPreferences, false));
                 } catch(Lexicon.NoLexiconEntryException e){}
                 // just because one of the classes in range has no lexical info doesn't mean the template is broken
             }
 
             rolePrefixStrings = Lexicon.getPOSForClass(roleClass,
-                    Lexicon.LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, yodaEnvironment.nlg.grammarPreferences);
+                    Lexicon.LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, yodaEnvironment.nlg.grammarPreferences, false);
 
             verbStrings = Lexicon.getPOSForClass(OntologyRegistry.thingNameMap.get(verbClassString),
-                    Lexicon.LexicalEntry.PART_OF_SPEECH.S1_VERB, yodaEnvironment.nlg.grammarPreferences);
+                    Lexicon.LexicalEntry.PART_OF_SPEECH.S1_VERB, yodaEnvironment.nlg.grammarPreferences, false);
 
         } catch (InstantiationException | IllegalAccessException | Lexicon.NoLexiconEntryException e) {
 //            e.printStackTrace();

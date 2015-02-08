@@ -79,7 +79,7 @@ public class ReferenceResolution {
             e.printStackTrace();
             System.exit(0);
         }
-        System.out.printf("Role inference marginal:" + ans);
+//        System.out.printf("Role inference marginal:" + ans);
         return ans;
     }
 

@@ -374,7 +374,7 @@ public class Database {
                 slope = adjective.getSlope();
                 qualityClass = adjective.getQuality();
             } else {
-                throw new Error("degreeClass is neither an Adjective nor a Preposition class");
+                throw new Error("degreeClass is neither an Adjective nor a Preposition class:" + degreeClass.getSimpleName());
             }
 
             List<String> params = entityURIs.stream().map(x -> "<"+x+">").collect(Collectors.toList());
