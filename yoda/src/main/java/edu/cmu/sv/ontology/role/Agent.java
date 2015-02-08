@@ -2,7 +2,7 @@ package edu.cmu.sv.ontology.role;
 
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.ThingWithRoles;
-import edu.cmu.sv.ontology.noun.Person;
+import edu.cmu.sv.ontology.noun.Noun;
 import edu.cmu.sv.ontology.verb.GiveDirections;
 import edu.cmu.sv.ontology.verb.HasProperty;
 
@@ -15,7 +15,7 @@ import java.util.Set;
  */
 public class Agent extends Role {
     static Set<Class <? extends ThingWithRoles>> domain = new HashSet<>(Arrays.asList(HasProperty.class, GiveDirections.class));
-    static Set<Class <? extends Thing>> range = new HashSet<>(Arrays.asList(Person.class));
+    static Set<Class <? extends Thing>> range = new HashSet<>(Arrays.asList(Noun.class));
 
     @Override
     public Set<Class<? extends ThingWithRoles>> getDomain() {

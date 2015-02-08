@@ -90,7 +90,9 @@ public class GiveGroundingSuggestionInference extends DialogStateUpdateInference
 
                     JSONObject daContent = (JSONObject) hypModel.newGetSlotPathFiller("topic");
                     StringDistribution attachmentPoints = Utils.findPossiblePointsOfAttachment(
-                            predecessor.getSpokenByThem(), daContent);
+                            predecessor, daContent);
+//                    StringDistribution attachmentPoints = Utils.findPossiblePointsOfAttachment(
+//                            predecessor.getSpokenByThem(), daContent);
                     SemanticsModel suggestion = new SemanticsModel(daContent.toJSONString());
 
                     for (String attachmentPoint : attachmentPoints.keySet()) {
@@ -99,7 +101,12 @@ public class GiveGroundingSuggestionInference extends DialogStateUpdateInference
                         DiscourseUnit updatedPredecessor = newDialogState.discourseUnitHypothesisMap.get(predecessorId);
 
                         SemanticsModel newSpokenByMeHypothesis = updatedPredecessor.getSpokenByThem().deepCopy();
-                        newSpokenByMeHypothesis.extendAndOverwriteAtPoint(attachmentPoint, suggestion.deepCopy());
+                        if (newSpokenByMeHypothesis.newGetSlotPathFiller(attachmentPoint)==null){
+                            SemanticsModel.putAtPath(newSpokenByMeHypothesis.getInternalRepresentation(),
+                                    attachmentPoint, suggestion.deepCopy().getInternalRepresentation());
+                        } else {
+                            newSpokenByMeHypothesis.extendAndOverwriteAtPoint(attachmentPoint, suggestion.deepCopy());
+                        }
                         SemanticsModel.wrap((JSONObject) newSpokenByMeHypothesis.newGetSlotPathFiller(attachmentPoint),
                                 Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
 

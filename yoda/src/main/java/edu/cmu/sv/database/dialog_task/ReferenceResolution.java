@@ -38,6 +38,50 @@ import java.util.stream.Collectors;
  */
 public class ReferenceResolution {
     public static final double minFocusSalience = .002;
+    public static final double missingRoleNotInferredPenalty = .3;
+    private static final String unfilledJunkString = "UNFILLED JUNK STRING@@234";
+
+
+    public static StringDistribution inferRole(YodaEnvironment yodaEnvironment,
+                                               Class<? extends Role> roleClass){
+        StringDistribution ans = new StringDistribution();
+        try {
+            // find out what classes are acceptable to fill this role
+            Set<Class<? extends Thing>> range = roleClass.newInstance().getRange();
+
+            // query the most salient objects of that class (only look for DST in focus fillers)
+            String queryString = Database.prefixes + "SELECT DISTINCT ?x0 ?score0 WHERE {\n";
+            queryString += "?x0 rdf:type dst:InFocus .\n";
+            queryString += "{ " + String.join(" UNION ", range.stream().map(x -> "{ ?x0 rdf:type base:"+x.getSimpleName()+" } ").collect(Collectors.toList()))+ "} \n";
+            queryString += "?x0 dst:salience ?score0 . \n";
+            queryString += "} \nORDER BY DESC(?score0) \nLIMIT 10";
+
+            yodaEnvironment.db.log(queryString);
+            Database.getLogger().info("Role inference query:\n"+queryString);
+            try {
+                TupleQuery query = yodaEnvironment.db.connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+                TupleQueryResult result = query.evaluate();
+
+                while (result.hasNext()){
+                    BindingSet bindings = result.next();
+                    ans.put(bindings.getValue("x0").stringValue(),
+                            Double.parseDouble(bindings.getValue("score0").stringValue()));
+                }
+                result.close();
+            } catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {
+                e.printStackTrace();
+                System.exit(0);
+            }
+
+            ans.put(unfilledJunkString, missingRoleNotInferredPenalty);
+            ans.normalize();
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+            System.exit(0);
+        }
+        System.out.printf("Role inference marginal:" + ans);
+        return ans;
+    }
 
     /*
     * return a distribution over URI's that this JSONObject may refer to
@@ -66,6 +110,7 @@ public class ReferenceResolution {
             result.close();
         } catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {
             e.printStackTrace();
+            System.exit(0);
         }
 
         ans.normalize();
@@ -296,12 +341,7 @@ public class ReferenceResolution {
             }
             slotPathsToResolve.removeAll(alreadyGroundedPaths);
 
-            // only attempt to resolveDiscourseUnit slots that have associated semantic information
-            // do not try to resolveDiscourseUnit slots for which the verb only requires descriptions
-            slotPathsToResolve = slotPathsToResolve.stream().
-                    filter(x -> targetDiscourseUnit.getSpokenByThem().newGetSlotPathFiller(x)!=null).
-                    collect(Collectors.toList());
-
+            // do not try to resolve slots for which the verb only requires descriptions
             Set<Class <? extends Role>> requiredDescriptions = verbClass.newInstance().getRequiredDescriptions();
             slotPathsToResolve.removeAll(
                     requiredDescriptions.stream().
@@ -309,25 +349,47 @@ public class ReferenceResolution {
                             collect(Collectors.toSet()));
 
 
-            Map<String, StringDistribution> referenceMarginals = new HashMap<>();
+            Map<String, StringDistribution> resolutionMarginals = new HashMap<>();
             for (String slotPathToResolve : slotPathsToResolve) {
-                referenceMarginals.put(slotPathToResolve,
-                        ReferenceResolution.resolveReference(yodaEnvironment,
+                resolutionMarginals.put(slotPathToResolve,
+                        resolveReference(yodaEnvironment,
                                 (JSONObject) targetDiscourseUnit.getSpokenByThem().newGetSlotPathFiller(slotPathToResolve),
                                 false));
             }
-            Pair<StringDistribution, Map<String, Map<String, String>>> referenceJoint =
-                    HypothesisSetManagement.getJointFromMarginals(referenceMarginals, 10);
+
+            // add inferred required roles to reference marginals
+            //todo: add roles missing from prepositions
+            List<String> pathsToInfer = verbClass.newInstance().getRequiredGroundedRoles().stream().
+                    map(x -> "verb." + x.getSimpleName()).
+                    filter(x -> !alreadyGroundedPaths.contains(x)).
+                    filter(x -> !slotPathsToResolve.contains(x)).
+                    collect(Collectors.toList());
+            for (String pathToInfer : pathsToInfer){
+                resolutionMarginals.put(pathToInfer,
+                        inferRole(yodaEnvironment,
+                                OntologyRegistry.roleNameMap.get(pathToInfer.split("\\.")[pathToInfer.split("\\.").length - 1])));
+            }
+
+
+            Pair<StringDistribution, Map<String, Map<String, String>>> resolutionJoint =
+                    HypothesisSetManagement.getJointFromMarginals(resolutionMarginals, 10);
             Map<String, DiscourseUnit> discourseUnits = new HashMap<>();
 
-            for (String jointHypothesisID : referenceJoint.getKey().keySet()){
+            for (String jointHypothesisID : resolutionJoint.getKey().keySet()){
                 DiscourseUnit groundedDiscourseUnit = targetDiscourseUnit.deepCopy();
                 SemanticsModel groundedModel = targetDiscourseUnit.getSpokenByThem().deepCopy();
-                Map<String, String> assignment = referenceJoint.getValue().get(jointHypothesisID);
+                Map<String, String> assignment = resolutionJoint.getValue().get(jointHypothesisID);
                 // add new bindings
                 for (String slotPathVariable : assignment.keySet()){
-                    SemanticsModel.overwrite((JSONObject) groundedModel.newGetSlotPathFiller(slotPathVariable),
-                            SemanticsModel.parseJSON(OntologyRegistry.webResourceWrap(assignment.get(slotPathVariable))));
+                    if (assignment.get(slotPathVariable).equals(unfilledJunkString))
+                        continue;
+                    if (groundedModel.newGetSlotPathFiller(slotPathVariable)==null){
+                        SemanticsModel.putAtPath(groundedModel.getInternalRepresentation(), slotPathVariable,
+                                SemanticsModel.parseJSON(OntologyRegistry.webResourceWrap(assignment.get(slotPathVariable))));
+                    } else {
+                        SemanticsModel.overwrite((JSONObject) groundedModel.newGetSlotPathFiller(slotPathVariable),
+                                SemanticsModel.parseJSON(OntologyRegistry.webResourceWrap(assignment.get(slotPathVariable))));
+                    }
                 }
                 // include previously grounded paths
                 for (String path : alreadyGroundedPaths){
@@ -338,7 +400,7 @@ public class ReferenceResolution {
                 discourseUnits.put(jointHypothesisID, groundedDiscourseUnit);
             }
 
-            return new ImmutablePair<>(discourseUnits, referenceJoint.getLeft());
+            return new ImmutablePair<>(discourseUnits, resolutionJoint.getLeft());
 
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
@@ -347,7 +409,6 @@ public class ReferenceResolution {
         return null;
     }
 
-    // todo: implement
     public static void updateSalience(YodaEnvironment yodaEnvironment, StringDistribution dialogStateDistribution,
                                       Map<String, DialogState> dialogStateHypotheses){
         synchronized (yodaEnvironment.db.connection) {

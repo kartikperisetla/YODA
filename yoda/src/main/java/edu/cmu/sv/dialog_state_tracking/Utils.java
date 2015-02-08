@@ -1,19 +1,16 @@
 package edu.cmu.sv.dialog_state_tracking;
 
-import edu.cmu.sv.database.dialog_task.ReferenceResolution;
 import edu.cmu.sv.ontology.OntologyRegistry;
-import edu.cmu.sv.ontology.misc.Suggested;
+import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.ontology.noun.Noun;
-import edu.cmu.sv.ontology.role.HasValue;
+import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.system_action.dialog_act.DialogAct;
-import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.utils.StringDistribution;
-import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.json.simple.JSONObject;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by David Cohen on 10/17/14.
@@ -84,6 +81,36 @@ public class Utils {
         }
         return ans;
     }
+
+    public static StringDistribution findPossiblePointsOfAttachment(DiscourseUnit predecessorDiscourseUnit,
+                                                                    JSONObject suggestionContent){
+        StringDistribution ans = new StringDistribution();
+        Set<Object> verbRoles = ((JSONObject) predecessorDiscourseUnit.
+                getGroundInterpretation().newGetSlotPathFiller("verb")).keySet();
+        Class<? extends Thing> contentClass = OntologyRegistry.thingNameMap.get(suggestionContent.get("class"));
+        for (Object key : verbRoles){
+            if (OntologyRegistry.roleNameMap.containsKey(key)){
+                Class<? extends Role> roleClass = OntologyRegistry.roleNameMap.get(key);
+                Set<Class<? extends Thing>> range = new HashSet<>();
+                try {
+                    range = roleClass.newInstance().getRange();
+                } catch ( InstantiationException e) {
+                } catch ( IllegalAccessException e) {
+                    e.printStackTrace();
+                    System.exit(0);
+                }
+                for (Class<? extends Thing> rangeCls : range) {
+                    if (rangeCls.isAssignableFrom(contentClass)) {
+                        ans.put("verb." + (String) key, 1.0);
+                        break;
+                    }
+                }
+            }
+        }
+        System.out.println("DST.Utils: possible points of attachment:"+ans);
+        return ans;
+    }
+
 
     /*
     * Update the discourse unit by bringing it back to a grounded state from a non-grounded state
