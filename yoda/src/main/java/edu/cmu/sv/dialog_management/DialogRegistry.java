@@ -2,6 +2,7 @@ package edu.cmu.sv.dialog_management;
 
 import com.google.common.collect.Iterables;
 import edu.cmu.sv.ontology.verb.GiveDirections;
+import edu.cmu.sv.ontology.verb.MakeReservation;
 import edu.cmu.sv.system_action.ActionSchema;
 import edu.cmu.sv.system_action.GenericCommandSchema;
 import edu.cmu.sv.system_action.SystemAction;
@@ -14,6 +15,7 @@ import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestFixMisun
 import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestRole;
 import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestRoleGivenRole;
 import edu.cmu.sv.system_action.non_dialog_task.GiveDirectionsTask;
+import edu.cmu.sv.system_action.non_dialog_task.MakeReservationTask;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 
 import java.util.*;
@@ -57,8 +59,10 @@ public class DialogRegistry {
         discourseUnitDialogActs.add(Command.class);
 
         nonDialogTasks.add(GiveDirectionsTask.class);
+        nonDialogTasks.add(MakeReservationTask.class);
 
         actionSchemata.add(new GenericCommandSchema(GiveDirections.class, GiveDirectionsTask.class));
+        actionSchemata.add(new GenericCommandSchema(MakeReservation.class, MakeReservationTask.class));
 
         for (Class<? extends DialogAct> cls : Iterables.concat(discourseUnitDialogActs, argumentationDialogActs,
                 clarificationDialogActs, Arrays.asList(Fragment.class))) {

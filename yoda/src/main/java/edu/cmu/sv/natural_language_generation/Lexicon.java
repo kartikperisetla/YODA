@@ -19,6 +19,7 @@ import edu.cmu.sv.ontology.role.Origin;
 import edu.cmu.sv.ontology.role.Patient;
 import edu.cmu.sv.ontology.verb.GiveDirections;
 import edu.cmu.sv.ontology.verb.HasProperty;
+import edu.cmu.sv.ontology.verb.MakeReservation;
 import edu.cmu.sv.utils.Combination;
 
 import java.util.HashMap;
@@ -83,7 +84,7 @@ public class Lexicon {
         {
             LexicalEntry entry = new LexicalEntry();
             entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "some food");
-            Lexicon.add(Food.class, entry, false);
+            Lexicon.add(Food.class, entry, true);
         }
         {
             LexicalEntry entry = new LexicalEntry();
@@ -744,6 +745,20 @@ public class Lexicon {
 
     //// Lexicon for verbs
     static {
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "make a reservation");
+            entry.add(LexicalEntry.PART_OF_SPEECH.PRESENT_PROGRESSIVE_VERB, "making a reservation");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "reservation");
+            entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "reservations");
+            Lexicon.add(MakeReservation.class, entry, false);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "make reservation");
+            entry.add(LexicalEntry.PART_OF_SPEECH.PRESENT_PROGRESSIVE_VERB, "making reservation");
+            Lexicon.add(MakeReservation.class, entry, true);
+        }
         {
             LexicalEntry entry = new LexicalEntry();
             entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "give directions");

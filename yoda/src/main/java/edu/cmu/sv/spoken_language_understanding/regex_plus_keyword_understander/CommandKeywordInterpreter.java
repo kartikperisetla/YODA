@@ -20,12 +20,12 @@ import java.util.regex.Pattern;
 /**
  * Created by David Cohen on 1/21/15.
  */
-public class CommandRegexInterpreter implements MiniLanguageInterpreter {
+public class CommandKeywordInterpreter implements MiniLanguageInterpreter {
     Class<? extends Verb> verbClass;
     String verbRegexString = "()";
     Map<Class<? extends Role>, String> roleObj1PrefixPatterns = new HashMap<>();
 
-    public CommandRegexInterpreter(Class<? extends Verb> verbClass) {
+    public CommandKeywordInterpreter(Class<? extends Verb> verbClass) {
         this.verbClass = verbClass;
         try {
             Set<String> verbNounStrings = Lexicon.getPOSForClass(verbClass, Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true);
@@ -47,30 +47,15 @@ public class CommandRegexInterpreter implements MiniLanguageInterpreter {
     @Override
     public Pair<JSONObject, Double> interpret(String utterance, YodaEnvironment yodaEnvironment) {
         if (!verbRegexString.equals("()")) {
-            // command with one role as the obj1
+            // command with no roles provided
             {
-                Pattern regexPattern = Pattern.compile(startingPolitenessRegexString + "(could you |can you |will you please |)" +
-                        "(i want |give me |give |can i get |could i get |)(the |some |)" + verbRegexString + "(.+)" +endingPolitenessRegexString);
+                Pattern regexPattern = Pattern.compile("(\\.* |)" + verbRegexString + "(| \\.*)");
                 Matcher matcher = regexPattern.matcher(utterance);
                 if (matcher.matches()) {
-                    String obj1String = matcher.group(6);
-                    for (Class<? extends Role> roleClass : roleObj1PrefixPatterns.keySet()){
-                        Pattern obj1Pattern = Pattern.compile(roleObj1PrefixPatterns.get(roleClass)+"(.+)");
-                        Matcher matcher2 = obj1Pattern.matcher(obj1String);
-                        if (matcher2.matches()) {
-                            String npString = matcher2.group(2);
-                            Pair<JSONObject, Double> npInterpretation =
-                                    RegexPlusKeywordUnderstander.nounPhraseInterpreter.interpret(npString, yodaEnvironment);
-                            String jsonString = "{\"dialogAct\":\"Command\",\"verb\":{\"class\":\""+verbClass.getSimpleName()+"\"}}";
-                            JSONObject ans = SemanticsModel.parseJSON(jsonString);
-                            ((JSONObject)ans.get("verb")).put(roleClass.getSimpleName(),npInterpretation.getKey());
-                            return new ImmutablePair<>(ans, 1.0);
-                        }
-                    }
-
+                    String jsonString = "{\"dialogAct\":\"Command\",\"verb\":{\"class\":\""+verbClass.getSimpleName()+"\"}}";
+                    return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), 0.5);
                 }
             }
-
         }
         return null;
     }

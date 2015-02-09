@@ -58,6 +58,7 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
         }
         for (Class<? extends Verb> verbClass : OntologyRegistry.verbClasses){
             languageInterpreters.add(new CommandRegexInterpreter(verbClass));
+            languageInterpreters.add(new CommandKeywordInterpreter(verbClass));
         }
         languageInterpreters.add(new NamedEntityFragmentInterpreter(PointOfInterest.class));
 

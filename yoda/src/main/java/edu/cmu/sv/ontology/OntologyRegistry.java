@@ -48,6 +48,7 @@ public class OntologyRegistry {
         verbClasses.add(HasProperty.class);
         verbClasses.add(Exist.class);
         verbClasses.add(GiveDirections.class);
+        verbClasses.add(MakeReservation.class);
 
         nounClasses.add(Noun.class);
         nounClasses.add(Person.class);
