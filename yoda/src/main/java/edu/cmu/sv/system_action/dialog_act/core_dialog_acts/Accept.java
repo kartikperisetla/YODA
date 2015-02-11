@@ -1,6 +1,5 @@
 package edu.cmu.sv.system_action.dialog_act.core_dialog_acts;
 
-import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.ontology.Thing;
@@ -37,11 +36,12 @@ public class Accept extends DialogAct {
 
     @Override
     public Double reward(DialogState dialogState, DiscourseUnit discourseUnit){
-        return (RewardAndCostCalculator.discourseIndependentArgumentationReward(discourseUnit, this) *
-                RewardAndCostCalculator.probabilityInterpretedCorrectly(discourseUnit, dialogState, this)) +
-                (RewardAndCostCalculator.answerObliged(discourseUnit) &&
-                        !RewardAndCostCalculator.answerAlreadyProvided(discourseUnit, dialogState) ?
-                        RewardAndCostCalculator.penaltyForIgnoringUserRequest : 0);
+//        return (RewardAndCostCalculator.discourseIndependentArgumentationReward(discourseUnit, this) *
+//                RewardAndCostCalculator.probabilityInterpretedCorrectly(discourseUnit, dialogState, this)) +
+//                (RewardAndCostCalculator.answerObliged(discourseUnit) &&
+//                        !RewardAndCostCalculator.answerAlreadyProvided(discourseUnit, dialogState) ?
+//                        RewardAndCostCalculator.penaltyForIgnoringUserRequest : 0);
+        return -1.0;
     }
 
 }

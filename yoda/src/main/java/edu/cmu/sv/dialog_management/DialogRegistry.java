@@ -33,6 +33,7 @@ public class DialogRegistry {
     public static Map<String, Class <? extends SystemAction>> actionNameMap = new HashMap<>();
 
     public static Set<Class <? extends ClarificationDialogAct>> clarificationDialogActs = new HashSet<>();
+    public static Set<Class <? extends DialogAct>> userOnlyDialogActs = new HashSet<>();
     public static Set<Class <? extends DialogAct>> argumentationDialogActs = new HashSet<>();
     public static Set<Class <? extends DialogAct>> slotFillingDialogActs = new HashSet<>();
     public static Set<Class <? extends DialogAct>> discourseUnitDialogActs = new HashSet<>();
@@ -44,8 +45,6 @@ public class DialogRegistry {
         clarificationDialogActs.add(ConfirmValueSuggestion.class);
         clarificationDialogActs.add(RequestConfirmValue.class);
 
-        argumentationDialogActs.add(Accept.class);
-        argumentationDialogActs.add(Reject.class);
         argumentationDialogActs.add(DontKnow.class);
         // these are not really argumentation dialog acts, but reward is scored like one
         argumentationDialogActs.add(RequestFixMisunderstanding.class);
@@ -58,6 +57,10 @@ public class DialogRegistry {
         discourseUnitDialogActs.add(YNQuestion.class);
         discourseUnitDialogActs.add(Command.class);
 
+        userOnlyDialogActs.add(Accept.class);
+        userOnlyDialogActs.add(Reject.class);
+
+
         nonDialogTasks.add(GiveDirectionsTask.class);
         nonDialogTasks.add(MakeReservationTask.class);
 
@@ -65,12 +68,12 @@ public class DialogRegistry {
         actionSchemata.add(new GenericCommandSchema(MakeReservation.class, MakeReservationTask.class));
 
         for (Class<? extends DialogAct> cls : Iterables.concat(discourseUnitDialogActs, argumentationDialogActs,
-                clarificationDialogActs, Arrays.asList(Fragment.class))) {
+                userOnlyDialogActs, clarificationDialogActs, Arrays.asList(Fragment.class))) {
             dialogActNameMap.put(cls.getSimpleName(), cls);
         }
 
         for (Class<? extends SystemAction> cls : Iterables.concat(discourseUnitDialogActs, argumentationDialogActs,
-                clarificationDialogActs, Arrays.asList(Fragment.class), nonDialogTasks)) {
+                userOnlyDialogActs, clarificationDialogActs, Arrays.asList(Fragment.class), nonDialogTasks)) {
             actionNameMap.put(cls.getSimpleName(), cls);
         }
 

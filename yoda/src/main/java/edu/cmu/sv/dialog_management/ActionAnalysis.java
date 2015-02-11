@@ -1,7 +1,6 @@
 package edu.cmu.sv.dialog_management;
 
 import com.google.common.collect.Iterables;
-import edu.cmu.sv.database.dialog_task.ReferenceResolution;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
@@ -9,6 +8,7 @@ import edu.cmu.sv.ontology.ThingWithRoles;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.ontology.quality.TransientQuality;
 import edu.cmu.sv.ontology.role.Role;
+import edu.cmu.sv.ontology.role.has_quality_subroles.HasQualityRole;
 import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
@@ -31,14 +31,12 @@ import java.util.*;
 * Performs and contains results for analysis of the action-related consequences of a discourse unit
 * */
 public class ActionAnalysis {
-    public Double ynqTruth;
     public Map<String, Object> responseStatement = new HashMap<>();
     public Set<String> missingRequiredVerbSlots = new HashSet<>();
     public Set<NonDialogTask> enumeratedNonDialogTasks = new HashSet<>();
 
     public ActionAnalysis deepCopy(){
         ActionAnalysis ans = new ActionAnalysis();
-        ans.ynqTruth = ynqTruth;
         ans.missingRequiredVerbSlots = new HashSet<>(missingRequiredVerbSlots);
         ans.enumeratedNonDialogTasks = new HashSet<>(enumeratedNonDialogTasks);
         ans.responseStatement = new HashMap<>();
@@ -71,26 +69,37 @@ public class ActionAnalysis {
             System.exit(0);
         }
 
-        if (missingRequiredVerbSlots.size()>0) {
-            ynqTruth = null;
-        } else if (dialogActString.equals(YNQuestion.class.getSimpleName())) {
-            if (verbClass.equals(HasProperty.class)) {
-                ynqTruth = ReferenceResolution.descriptionMatch(yodaEnvironment,
-                        (JSONObject) groundedMeaning.newGetSlotPathFiller("verb.Agent"),
-                        (JSONObject) groundedMeaning.newGetSlotPathFiller("verb.Patient"));
-            }
-        }
-
         responseStatement = new HashMap<>();
-//        System.out.println("ActionAnalysis: missingRequiredVerbSlots.size():"+missingRequiredVerbSlots.size());
-//        System.out.println("ActionAnalysis: dialog act string:"+dialogActString);
-        if (missingRequiredVerbSlots.size()==0 && dialogActString.equals(WHQuestion.class.getSimpleName())) {
-            if (verbClass.equals(HasProperty.class)) {
-//                System.out.println("grounded meaning:\n"+groundedMeaning.getInternalRepresentation().toJSONString());
+
+        if (missingRequiredVerbSlots.size()==0) {
+            if ((dialogActString.equals(YNQuestion.class.getSimpleName()) || dialogActString.equals(WHQuestion.class.getSimpleName()))
+                    && verbClass.equals(HasProperty.class)) {
+//                    ynqTruth = ReferenceResolution.descriptionMatch(yodaEnvironment,
+//                            (JSONObject) groundedMeaning.newGetSlotPathFiller("verb.Agent"),
+//                            (JSONObject) groundedMeaning.newGetSlotPathFiller("verb.Patient"));
+
                 String entityURI = (String) groundedMeaning.newGetSlotPathFiller("verb.Agent.HasURI");
-                Class<? extends TransientQuality> requestedQualityClass = (Class<? extends TransientQuality>)
-                        OntologyRegistry.thingNameMap.get(
-                                (String) groundedMeaning.newGetSlotPathFiller("verb.Patient.HasValue.class"));
+                Class<? extends TransientQuality> requestedQualityClass;
+                if (dialogActString.equals(WHQuestion.class.getSimpleName())) {
+                    requestedQualityClass = (Class<? extends TransientQuality>)
+                            OntologyRegistry.thingNameMap.get(
+                                    (String) groundedMeaning.newGetSlotPathFiller("verb.Patient.HasValue.class"));
+                } else {
+                    Set<Object> patientRoles = ((JSONObject) groundedMeaning.newGetSlotPathFiller("verb.Patient")).keySet();
+                    Class<? extends Role> suggestedRole = null;
+                    for (Object role : patientRoles){
+                        if (OntologyRegistry.roleNameMap.containsKey(role) &&
+                                HasQualityRole.class.isAssignableFrom(OntologyRegistry.roleNameMap.get(role))){
+                            suggestedRole = OntologyRegistry.roleNameMap.get(role);
+                            break;
+                        }
+                    }
+                    if (suggestedRole == null){
+                        throw new Error("no role has been suggested");
+                    }
+                    requestedQualityClass = OntologyRegistry.qualityInRolesRange(suggestedRole);
+                }
+
 
                 List<Class<? extends Thing>> qualityArguments = OntologyRegistry.qualityArguments(requestedQualityClass);
                 if (qualityArguments.size() != 0)
@@ -106,7 +115,7 @@ public class ActionAnalysis {
                 for (Class<? extends ThingWithRoles> adjectiveClass : descriptor.getRight()) {
                     Double degreeOfMatch = yodaEnvironment.db.
                             evaluateQualityDegree(fullArgumentList, adjectiveClass);
-                    if (degreeOfMatch==null){
+                    if (degreeOfMatch == null) {
                         dontKnow = true;
                         responseStatement.put("dialogAct", DontKnow.class.getSimpleName());
                     } else {
@@ -116,7 +125,7 @@ public class ActionAnalysis {
 
                 if (!dontKnow) {
                     Class<? extends Thing> adjectiveClass = OntologyRegistry.thingNameMap.get(adjectiveScores.getTopHypothesis());
-                    if (adjectiveClass==null){
+                    if (adjectiveClass == null) {
                         responseStatement.put("dialogAct", DontKnow.class.getSimpleName());
                     } else {
                         JSONObject description = SemanticsModel.parseJSON("{\"class\":\"" + adjectiveClass.getSimpleName() + "\"}");
@@ -127,7 +136,6 @@ public class ActionAnalysis {
                         responseStatement.put("verb.Patient", description);
                     }
                 }
-//                System.out.println("response statement:\n"+responseStatement);
             }
         }
 

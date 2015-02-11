@@ -36,12 +36,7 @@ public class DontKnow extends DialogAct {
 
     @Override
     public Double reward(DialogState dialogState, DiscourseUnit discourseUnit) {
-
-//        System.out.println("evaluating Don't know:");
-//        System.out.println("argumentation:" + RewardAndCostCalculator.discourseIndependentArgumentationReward(discourseUnit, this));
-//        System.out.println("statement: "+RewardAndCostCalculator.discourseIndependentStatementReward(this, discourseUnit));
-        return (Double.max(RewardAndCostCalculator.discourseIndependentArgumentationReward(discourseUnit, this),
-                RewardAndCostCalculator.discourseIndependentStatementReward(this, discourseUnit)) *
+        return (RewardAndCostCalculator.discourseIndependentStatementReward(this, discourseUnit) *
                 RewardAndCostCalculator.probabilityInterpretedCorrectly(discourseUnit, dialogState, this)) +
                 (RewardAndCostCalculator.answerObliged(discourseUnit) &&
                         !RewardAndCostCalculator.answerAlreadyProvided(discourseUnit, dialogState) ?

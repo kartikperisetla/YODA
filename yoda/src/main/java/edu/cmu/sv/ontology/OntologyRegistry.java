@@ -368,6 +368,36 @@ public class OntologyRegistry {
         }
     }
 
+    public static Class<? extends TransientQuality> qualityInRolesRange(Class<? extends Role> roleClass){
+        try {
+            Set<Class<? extends Thing>> range = roleClass.newInstance().getRange();
+            for (Class<? extends Thing> rangeClass : range){
+                if (Adjective.class.isAssignableFrom(rangeClass)) {
+                    if (Modifier.isAbstract(rangeClass.getModifiers())) {
+                        for (Class<? extends Adjective> adjectiveClass : adjectiveClasses) {
+                            if (rangeClass.isAssignableFrom(adjectiveClass))
+                                return adjectiveClass.newInstance().getQuality();
+                        }
+                    }
+                    throw new Error("the requested adjective class has no descendants registered");
+                }
+                if (Preposition.class.isAssignableFrom(rangeClass)){
+                    if (Modifier.isAbstract(rangeClass.getModifiers())) {
+                        for (Class<? extends Preposition> prepositionClass : prepositionClasses) {
+                            if (rangeClass.isAssignableFrom(prepositionClass))
+                                return prepositionClass.newInstance().getQuality();
+                        }
+                    }
+                    throw new Error("the requested preposition class has no descendants registered");
+                }
+            }
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+            System.exit(0);
+        }
+        return null;
+    }
+
     public static String webResourceWrap(String URI){
         String ans = "{\"class\": \""+ WebResource.class.getSimpleName()+"\", \""+
                 HasURI.class.getSimpleName()+"\":\""+URI+"\"}";
