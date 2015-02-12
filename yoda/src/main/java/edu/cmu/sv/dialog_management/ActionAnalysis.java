@@ -24,7 +24,6 @@ import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
-import org.openrdf.query.algebra.Exists;
 
 import java.util.*;
 
@@ -138,10 +137,13 @@ public class ActionAnalysis {
                 } else if (verbClass.equals(Exist.class)){
                     JSONObject searchDescription = (JSONObject) groundedMeaning.newGetSlotPathFiller("verb.Agent");
                     StringDistribution recommendations = ReferenceResolution.resolveReference(yodaEnvironment, searchDescription, false);
+                    System.out.println(recommendations);
                     String bestRecommendation = recommendations.getTopHypothesis();
+                    JSONObject responseDescription = SemanticsModel.parseJSON(searchDescription.toJSONString());
+                    responseDescription.put("refType", "indefinite");
                     responseStatement.put("dialogAct", Statement.class.getSimpleName());
                     responseStatement.put("verb.Agent", SemanticsModel.parseJSON(OntologyRegistry.webResourceWrap(bestRecommendation)));
-                    responseStatement.put("verb.Patient", searchDescription);
+                    responseStatement.put("verb.Patient", responseDescription);
                     System.out.println("here\n" + responseStatement);
                 }
             }

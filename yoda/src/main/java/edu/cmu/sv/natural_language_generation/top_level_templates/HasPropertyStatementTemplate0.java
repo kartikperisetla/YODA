@@ -9,7 +9,6 @@ import edu.cmu.sv.ontology.role.Patient;
 import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Statement;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.YNQuestion;
 import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -46,10 +45,12 @@ public class HasPropertyStatementTemplate0 implements Template {
             agentConstraint = (JSONObject) verbConstraint.get(Agent.class.getSimpleName());
             Assert.verify(agentConstraint.get("class").equals(WebResource.class.getSimpleName()));
             patientConstraint = (JSONObject) verbConstraint.get(Patient.class.getSimpleName());
-            Assert.verify(patientConstraint.get("class").equals(UnknownThingWithRoles.class.getSimpleName()));
+//            Assert.verify(patientConstraint.get("class").equals(UnknownThingWithRoles.class.getSimpleName()));
         } catch (Assert.AssertException e) {
             return new HashMap<>();
         }
+
+        System.out.println("HasPropertyStatementTemplate: here");
 
         Map<String, JSONObject> toBeChunks = new HashMap<>();
         toBeChunks.put("is", new JSONObject());

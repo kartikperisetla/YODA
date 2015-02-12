@@ -368,6 +368,22 @@ public class OntologyRegistry {
         }
     }
 
+    public static Class<? extends Thing> adjectiveOrPrepositionInRange(Class<? extends Role> roleClass){
+        try {
+            Set<Class<? extends Thing>> range = roleClass.newInstance().getRange();
+            for (Class<? extends Thing> rangeClass : range){
+                if (Adjective.class.isAssignableFrom(rangeClass))
+                    return Adjective.class;
+                if (Preposition.class.isAssignableFrom(rangeClass))
+                    return Preposition.class;
+            }
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+            System.exit(0);
+        }
+        return null;
+    }
+
     public static Class<? extends TransientQuality> qualityInRolesRange(Class<? extends Role> roleClass){
         try {
             Set<Class<? extends Thing>> range = roleClass.newInstance().getRange();
