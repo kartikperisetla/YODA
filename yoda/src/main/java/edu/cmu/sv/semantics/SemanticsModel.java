@@ -479,7 +479,7 @@ public class SemanticsModel {
             if (slot.equals("class") || slot.equals("refType"))
                 continue;
             boolean inDomain = false;
-            if (!OntologyRegistry.roleNameMap.containsKey((String)slot))
+            if (!OntologyRegistry.roleNameMap.containsKey(slot))
                 throw new Error("thing description's class not in registry: "+description);
             for (Class<? extends Thing> domainMember : OntologyRegistry.roleNameMap.get(slot).newInstance().getDomain()){
                 if (domainMember.isAssignableFrom(cls)) {

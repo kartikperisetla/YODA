@@ -78,6 +78,7 @@ public class Lexicon {
         {
             LexicalEntry entry = new LexicalEntry();
             entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "restaurant");
+            entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "restaurants");
 //            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "restaurant");
             Lexicon.add(Restaurants.class, entry, false);
         }

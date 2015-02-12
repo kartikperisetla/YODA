@@ -50,11 +50,12 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
     static Set<MiniLanguageInterpreter> languageInterpreters = new HashSet<>();
     static {
         // add regex interpreters
+        languageInterpreters.add(new YnqExistRegexInterpreter());
         for (Class<? extends Adjective> adjectiveClass : OntologyRegistry.adjectiveClasses){
-            languageInterpreters.add(new YnqAdjectiveRegexInterpreter(adjectiveClass));
+            languageInterpreters.add(new YnqHasPropertyRegexInterpreter(adjectiveClass));
         }
         for (Class<? extends TransientQuality> qualityClass : OntologyRegistry.qualityClasses){
-            languageInterpreters.add(new WhqAdjectiveRegexInterpreter(qualityClass));
+            languageInterpreters.add(new WhqHasPropertyRegexInterpreter(qualityClass));
         }
         for (Class<? extends Verb> verbClass : OntologyRegistry.verbClasses){
             languageInterpreters.add(new CommandRegexInterpreter(verbClass));

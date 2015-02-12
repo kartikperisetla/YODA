@@ -22,13 +22,13 @@ import java.util.stream.Collectors;
 /**
  * Created by David Cohen on 1/21/15.
  */
-public class WhqAdjectiveRegexInterpreter implements MiniLanguageInterpreter {
+public class WhqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
     Class<? extends TransientQuality> qualityClass;
     Class<? extends Role> hasQualityRole;
     String adjectiveRegexString = "()";
     String qualityNounRegexString = "()";
 
-    public WhqAdjectiveRegexInterpreter(Class<? extends TransientQuality> qualityClass) {
+    public WhqHasPropertyRegexInterpreter(Class<? extends TransientQuality> qualityClass) {
         this.qualityClass = qualityClass;
         Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> descriptor = OntologyRegistry.qualityDescriptors(qualityClass);
         this.hasQualityRole = descriptor.getKey();

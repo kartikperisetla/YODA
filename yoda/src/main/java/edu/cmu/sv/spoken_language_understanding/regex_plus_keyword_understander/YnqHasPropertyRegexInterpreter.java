@@ -19,13 +19,13 @@ import java.util.regex.Pattern;
 /**
  * Created by David Cohen on 1/21/15.
  */
-public class YnqAdjectiveRegexInterpreter implements MiniLanguageInterpreter {
+public class YnqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
     Class<? extends Adjective> adjectiveClass;
     Class<? extends TransientQuality> qualityClass;
     Class<? extends Role> hasQualityRole;
     String adjectiveRegexString = "()";
 
-    public YnqAdjectiveRegexInterpreter(Class<? extends Adjective> adjectiveClass) {
+    public YnqHasPropertyRegexInterpreter(Class<? extends Adjective> adjectiveClass) {
         this.adjectiveClass = adjectiveClass;
         try {
             this.qualityClass = adjectiveClass.newInstance().getQuality();
