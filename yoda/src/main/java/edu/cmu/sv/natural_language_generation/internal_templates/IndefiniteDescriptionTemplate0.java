@@ -91,7 +91,26 @@ public class IndefiniteDescriptionTemplate0 implements Template {
             }
             chunks.add(clsChunk);
         }
-        // todo: add PPs
+        // add PPs
+        for (Object key : prepositionDescriptors.keySet()){
+            Map<String, JSONObject> prepositionChunk = new HashMap<>();
+            JSONObject prepositionContent = SemanticsModel.parseJSON(prepositionDescriptors.get(key).toJSONString());
+            SemanticsModel.wrap(prepositionContent, UnknownThingWithRoles.class.getSimpleName(), (String) key);
+            for (Map.Entry<String, JSONObject> entry : yodaEnvironment.nlg.
+                    generateAll(prepositionContent, yodaEnvironment, remainingDepth-1).entrySet()){
+                prepositionChunk.put(entry.getKey(), entry.getValue());
+            }
+            chunks.add(prepositionChunk);
+
+            adjectivesAddedCounter += 1;
+            if (adjectivesAddedCounter==adjectiveDescriptors.size()-1 &&
+                    nounClass==null &&
+                    adjectiveDescriptors.size()>1){
+                Map<String, JSONObject> andChunk = new HashMap<>();
+                andChunk.put("and", SemanticsModel.parseJSON("{}"));
+                chunks.add(andChunk);
+            }
+        }
 
 
         Map<String, JSONObject> ans = new HashMap<>();
