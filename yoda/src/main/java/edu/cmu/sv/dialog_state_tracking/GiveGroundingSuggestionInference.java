@@ -4,7 +4,6 @@ import edu.cmu.sv.ontology.misc.Suggested;
 import edu.cmu.sv.ontology.role.HasValue;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestConfirmValue;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
 import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -28,48 +27,7 @@ public class GiveGroundingSuggestionInference extends DialogStateUpdateInference
 
         int newHypothesisCounter = 0;
         if (turn.speaker.equals("user")){
-            for (String sluHypothesisID : turn.hypothesisDistribution.keySet()) {
-                SemanticsModel hypModel = turn.hypotheses.get(sluHypothesisID);
-                String dialogAct = hypModel.getSlotPathFiller("dialogAct");
-                if (Fragment.class.getSimpleName().equals(dialogAct)) {
-//                    for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
-//                        DiscourseUnitHypothesis predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId);
-//                        if (predecessor.initiator.equals("user"))
-//                            continue;
-//                        Set<String> suggestionPaths = predecessor.getSpokenByMe().findAllPathsToClass(Suggested.class.getSimpleName());
-//                        if (suggestionPaths.size() > 0)
-//                            continue;
-//
-//                        JSONObject daContent = (JSONObject) hypModel.newGetSlotPathFiller("topic");
-//                        StringDistribution attachmentPoints = Utils.findPossiblePointsOfAttachment(
-//                                predecessor.getSpokenByMe(), daContent);
-//                        SemanticsModel wrapped = new SemanticsModel(daContent.toJSONString());
-//                        SemanticsModel.wrap((JSONObject) wrapped.newGetSlotPathFiller(""),
-//                                Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
-//
-//                        for (String attachmentPoint : attachmentPoints.keySet()) {
-//                            String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
-//                            DialogStateHypothesis newDialogStateHypothesis = currentState.deepCopy();
-//                            DiscourseUnitHypothesis updatedPredecessor = newDialogStateHypothesis.discourseUnitHypothesisMap.get(predecessorId);
-//
-//                            SemanticsModel newSpokenByThemHypothesis = updatedPredecessor.getSpokenByMe().deepCopy();
-//                            newSpokenByThemHypothesis.extendAndOverwriteAtPoint(attachmentPoint, wrapped.deepCopy());
-//                            SemanticsModel.wrap((JSONObject) newSpokenByThemHypothesis.newGetSlotPathFiller(attachmentPoint),
-//                                    Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
-//
-//                            updatedPredecessor.timeOfLastActByThem = timeStamp;
-//                            updatedPredecessor.spokenByThem = newSpokenByThemHypothesis;
-//                            resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
-//                            Double score = attachmentPoints.get(attachmentPoint) *
-//                                    Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(
-//                                            updatedPredecessor, newDialogStateHypothesis, "system")) *
-//                                    Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(
-//                                            updatedPredecessor, newDialogStateHypothesis, "user"));
-//                            resultDistribution.put(newDialogStateHypothesisID, score);
-//                        }
-//                    }
-                }
-            }
+
         } else { // if turn.speaker.equals("system")
 
             SemanticsModel hypModel = turn.systemUtterance;

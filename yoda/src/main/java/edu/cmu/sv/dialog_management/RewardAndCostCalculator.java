@@ -113,31 +113,6 @@ public class RewardAndCostCalculator {
                 predecessorDialogAct.equals(WHQuestion.class.getSimpleName());
     }
 
-//    /*
-//    * Return the specific clarificationReward that this argumentation act should give,
-//    * based on the analysis of the predecessor discourse unit
-//    * */
-//    public static Double discourseIndependentArgumentationReward(DiscourseUnit predecessorDiscourseUnit,
-//                                                                 DialogAct dialogAct){
-////        System.out.println("discourseIndependentArgumentationReward: "+dialogAct);
-//        Double probabilityCorrectAnswer = 0.0;
-//        if (dialogAct instanceof Accept) {
-//            if (predecessorDiscourseUnit.actionAnalysis.ynqTruth!=null)
-//                probabilityCorrectAnswer = predecessorDiscourseUnit.actionAnalysis.ynqTruth;
-//        } else if (dialogAct instanceof Reject) {
-//            if (predecessorDiscourseUnit.actionAnalysis.ynqTruth!=null)
-//                probabilityCorrectAnswer = 1 - predecessorDiscourseUnit.actionAnalysis.ynqTruth;
-//        } else if (dialogAct instanceof DontKnow) {
-//            if (predecessorDiscourseUnit.actionAnalysis.ynqTruth==null &&
-//                    predecessorDiscourseUnit.actionAnalysis.responseStatement.isEmpty() &&
-//                    predecessorDiscourseUnit.actionAnalysis.missingRequiredVerbSlots.isEmpty()) {
-//                probabilityCorrectAnswer = 1.0;
-////                System.out.println("discourse unit where DontKnow's action analysis is just right:\n"+predecessorDiscourseUnit);
-//            }
-//        }
-//        return rewardForCorrectDialogTaskExecution *probabilityCorrectAnswer - penaltyForIncorrectDialogTaskExecution *(1-probabilityCorrectAnswer);
-//    }
-
     public static Double discourseIndependentStatementReward(DialogAct dialogAct, DiscourseUnit discourseUnit) {
         double probabilityAppropriateInContext = 0.0;
         if (discourseUnit.actionAnalysis.responseStatement.isEmpty()) {

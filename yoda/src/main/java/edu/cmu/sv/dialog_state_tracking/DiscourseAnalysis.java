@@ -105,6 +105,9 @@ public class DiscourseAnalysis {
     }
 
     public void analyseCommonGround() throws Assert.AssertException {
+        System.out.println("analyseCommonGround");
+        System.out.println(discourseUnit.groundTruth);
+        System.out.println(discourseUnit.groundInterpretation);
         analyseValidity();
         if (discourseUnit.groundTruth==null || discourseUnit.groundInterpretation==null) {
             groundMatch = false;
