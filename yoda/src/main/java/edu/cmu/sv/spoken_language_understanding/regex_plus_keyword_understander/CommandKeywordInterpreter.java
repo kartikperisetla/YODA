@@ -49,7 +49,7 @@ public class CommandKeywordInterpreter implements MiniLanguageInterpreter {
         if (!verbRegexString.equals("()")) {
             // command with no roles provided
             {
-                Pattern regexPattern = Pattern.compile("(\\.* |)" + verbRegexString + "(| \\.*)");
+                Pattern regexPattern = Pattern.compile("(.* |)" + verbRegexString + "(| .*)");
                 Matcher matcher = regexPattern.matcher(utterance);
                 if (matcher.matches()) {
                     String jsonString = "{\"dialogAct\":\"Command\",\"verb\":{\"class\":\""+verbClass.getSimpleName()+"\"}}";

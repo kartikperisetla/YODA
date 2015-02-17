@@ -89,6 +89,7 @@ public class ReferenceResolution {
     public static StringDistribution resolveReference(YodaEnvironment yodaEnvironment,
                                                       JSONObject reference,
                                                       boolean requireReferentInFocus){
+//        System.out.println("resolveReference: reference:" + reference);
         String queryString = Database.prefixes + "SELECT DISTINCT ?x0 ?score0 WHERE {\n";
         if (requireReferentInFocus)
             queryString += "?x0 rdf:type dst:InFocus .\n";

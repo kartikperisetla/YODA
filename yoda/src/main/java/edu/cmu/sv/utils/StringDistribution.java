@@ -91,6 +91,15 @@ public class StringDistribution{
         }
     }
 
+    public void normalizeIfTooLarge(){
+        Double total = internalDistribution.values().stream().reduce(0.0, (x, y) -> x + y);
+        if (total>1.0) {
+            for (String key : internalDistribution.keySet()) {
+                internalDistribution.put(key, internalDistribution.get(key) / total);
+            }
+        }
+    }
+
     public double information(){
         double ans = 0.0;
         for (String key : internalDistribution.keySet()){
