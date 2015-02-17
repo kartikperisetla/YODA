@@ -76,7 +76,7 @@ public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpda
                             currentDu.actionAnalysis.update(yodaEnvironment, currentDu);
                             resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
                             Double score = groundedHypotheses.getRight().get(groundedDuKey) *
-                                    (duAnalysis.groundMatch ? 1.0 : penaltyForNonGroundedMatch) *
+//                                    (duAnalysis.groundMatch ? 1.0 : penaltyForNonGroundedMatch) *
                                     penaltyForThisInference *
                                     Utils.discourseUnitContextProbability(newDialogState, currentDu);
                             resultDistribution.put(newDialogStateHypothesisID, score);
@@ -85,35 +85,6 @@ public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpda
                 }
             }
         } else { // if turn.speaker.equals("system")
-            SemanticsModel hypModel = turn.systemUtterance;
-            String dialogAct = hypModel.getSlotPathFiller("dialogAct");
-
-//            if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(ConfirmValueSuggestion.class)) {
-//
-//                for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
-//                    String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
-//                    DialogStateHypothesis newDialogStateHypothesis = currentState.deepCopy();
-//                    DiscourseUnitHypothesis updatedPredecessor = newDialogStateHypothesis.discourseUnitHypothesisMap.get(predecessorId);
-//                    Set<String> suggestionPaths = updatedPredecessor.getSpokenByThem().findAllPathsToClass(Suggested.class.getSimpleName());
-//
-//                    SemanticsModel newSpokenByMeHypothesis = updatedPredecessor.getSpokenByThem().deepCopy();
-//                    for (String acceptancePath : suggestionPaths) {
-//                        SemanticsModel.unwrap((JSONObject) newSpokenByMeHypothesis.newGetSlotPathFiller(acceptancePath),
-//                                HasValue.class.getSimpleName());
-//                    }
-//
-//                    updatedPredecessor.timeOfLastActByMe = timeStamp;
-//                    updatedPredecessor.spokenByMe = newSpokenByMeHypothesis;
-//                    updatedPredecessor.timeOfLastActByThem = null;
-//                    updatedPredecessor.spokenByThem = null;
-//                    resultHypotheses.put(newDialogStateHypothesisID, newDialogStateHypothesis);
-//                    Double score = Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(
-//                            updatedPredecessor, newDialogStateHypothesis, "system")) *
-//                            Math.pow(.1, Utils.numberOfIntermediateDiscourseUnitsBySpeaker(
-//                                    updatedPredecessor, newDialogStateHypothesis, "user"));
-//                    resultDistribution.put(newDialogStateHypothesisID, score);
-//                }
-//            }
         }
         return new ImmutablePair<>(resultHypotheses, resultDistribution);
     }

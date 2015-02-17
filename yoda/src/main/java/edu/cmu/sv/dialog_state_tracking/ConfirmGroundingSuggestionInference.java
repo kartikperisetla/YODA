@@ -56,12 +56,13 @@ public class ConfirmGroundingSuggestionInference extends DialogStateUpdateInfere
 
                         // collect the result
                         resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
-//                        Double score = duAnalysis.descriptionMatch *
+                        Double score = Math.pow(duAnalysis.descriptionMatch, 2)*
+                                Utils.discourseUnitContextProbability(newDialogState, predecessor);
 //                                (duAnalysis.groundMatch ? 1.0 : penaltyForNonGroundedMatch) *
 //                                Utils.discourseUnitContextProbability(newDialogState, predecessor);
-                        System.out.println("groundmatch:"+ duAnalysis.groundMatch);
-                        Double score = (duAnalysis.groundMatch ? 1.0 : penaltyForNonGroundedMatch) *
-                                Utils.discourseUnitContextProbability(newDialogState, predecessor);
+//                        System.out.println("groundmatch:"+ duAnalysis.groundMatch);
+//                        Double score = (duAnalysis.groundMatch ? 1.0 : penaltyForNonGroundedMatch) *
+//                                Utils.discourseUnitContextProbability(newDialogState, predecessor);
                         resultDistribution.put(newDialogStateHypothesisID, score);
                     }
 

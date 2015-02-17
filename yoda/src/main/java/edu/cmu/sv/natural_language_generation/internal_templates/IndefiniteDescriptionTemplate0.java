@@ -38,7 +38,6 @@ public class IndefiniteDescriptionTemplate0 implements Template {
                     continue;
                 if (!OntologyRegistry.roleNameMap.containsKey(key))
                     continue;
-                System.out.println("IndefiniteDesctriptionTemplate:"+key);
                 if (OntologyRegistry.adjectiveOrPrepositionInRange(OntologyRegistry.roleNameMap.get(key)).equals(Adjective.class))
                     adjectiveDescriptors.put(key, (JSONObject) constraints.get(key));
                 else if (OntologyRegistry.adjectiveOrPrepositionInRange(OntologyRegistry.roleNameMap.get(key)).equals(Preposition.class))
