@@ -1,5 +1,6 @@
 package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander;
 
+import com.google.common.primitives.Doubles;
 import edu.cmu.sv.natural_language_generation.Grammar;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.ontology.OntologyRegistry;
@@ -31,9 +32,9 @@ import java.util.regex.Pattern;
  */
 public class NounPhraseInterpreter implements MiniLanguageInterpreter{
     static Map<Class<? extends Preposition>, String> prepositionSeparatorRegexStringMap = new HashMap<>();
-    static Map<Class<? extends Noun>, String> pronounRegexStringMap = new HashMap<>();
-    static Map<Class<? extends Noun>, String> nounRegexStringMap = new HashMap<>();
-    static Map<Class<? extends Adjective>, String> adjectiveRegexStringMap = new HashMap<>();
+    static Map<Class<? extends Noun>, Set<String>> pronounStringSetMap = new HashMap<>();
+    static Map<Class<? extends Noun>, Set<String>> nounStringSetMap = new HashMap<>();
+    static Map<Class<? extends Adjective>, Set<String>> adjectiveStringSetMap = new HashMap<>();
 
     static {
         for (Class<? extends Preposition> prepositionClass : OntologyRegistry.prepositionClasses) {
@@ -50,9 +51,10 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
             try {
                 Set<String> pronounStrings = Lexicon.getPOSForClass(nounClass,
                         Lexicon.LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, false);
-                String regexString = "(" + String.join("|", pronounStrings) + ")";
-                if (!regexString.equals("()"))
-                    pronounRegexStringMap.put(nounClass, regexString);
+                pronounStringSetMap.put(nounClass, pronounStrings);
+//                String regexString = "(" + String.join("|", pronounStrings) + ")";
+//                if (!regexString.equals("()"))
+//                    pronounStringSetMap.put(nounClass, regexString);
             } catch (Lexicon.NoLexiconEntryException e) {}
         }
 
@@ -68,21 +70,34 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
                         Lexicon.LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, false));
             } catch (Lexicon.NoLexiconEntryException e) {
             }
-            String regexString = "(" + String.join("|", nounStrings) + ")";
-            if (!regexString.equals("()"))
-                nounRegexStringMap.put(nounClass, regexString);
+            nounStringSetMap.put(nounClass, nounStrings);
+//            String regexString = "(" + String.join("|", nounStrings) + ")";
+//            if (!regexString.equals("()"))
+//                nounStringSetMap.put(nounClass, regexString);
         }
 
         for (Class<? extends Adjective> adjectiveClass : OntologyRegistry.adjectiveClasses) {
             try {
                 Set<String> adjectiveStrings = Lexicon.getPOSForClass(adjectiveClass,
                         Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, false);
-                String regexString = "(" + String.join("|", adjectiveStrings) + ")";
-                if (!regexString.equals("()"))
-                    adjectiveRegexStringMap.put(adjectiveClass, regexString);
+                adjectiveStringSetMap.put(adjectiveClass, adjectiveStrings);
+//                String regexString = "(" + String.join("|", adjectiveStrings) + ")";
+//                if (!regexString.equals("()"))
+//                    adjectiveStringSetMap.put(adjectiveClass, regexString);
             } catch (Lexicon.NoLexiconEntryException e) {}
         }
 
+    }
+
+    private double stringSetCoverage(String phrase, Set<String> matchingStrings){
+        double ans = 0.0;
+        for (String matchingString : matchingStrings) {
+            Pattern regexPattern = Pattern.compile("(.+ | |)" + matchingString + "( .+| |)");
+            Matcher matcher = regexPattern.matcher(phrase);
+            if (matcher.matches())
+                ans = Doubles.max(ans, matchingString.length() * 1.0 / phrase.length());
+        }
+        return ans;
     }
 
     @Override
@@ -117,22 +132,31 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
             }
         }
 
-        entity1JSON.putAll(getClassAndAdjectives(entity1String));
-        if (entity2String!=null)
-            entity2JSON.putAll(getClassAndAdjectives(entity2String));
+        Double entity1CoverageScore = null;
+        Double entity2CoverageScore = null;
 
+        Pair<Map<String, Object>, Double> entity1classAndAdjectives = getClassAndAdjectives(entity1String);
+        entity1JSON.putAll(entity1classAndAdjectives.getLeft());
+        entity1CoverageScore = entity1classAndAdjectives.getRight();
+        if (entity2String!=null) {
+            Pair<Map<String, Object>, Double> entity2classAndAdjectives = getClassAndAdjectives(entity2String);
+            entity2JSON.putAll(entity2classAndAdjectives.getLeft());
+            entity2CoverageScore = entity2classAndAdjectives.getRight();
+        }
 
         // check for named entities
-        if (entity1JSON.isEmpty()){
+        if (entity1JSON.isEmpty() || entity1CoverageScore < .75){
             String uri = yodaEnvironment.db.insertValue(entity1String);
             JSONObject namedEntity = SemanticsModel.parseJSON(OntologyRegistry.webResourceWrap(uri));
-            entity1JSON.put("class", PointOfInterest.class.getSimpleName());
+            if (!entity1JSON.containsKey("class"))
+                entity1JSON.put("class", PointOfInterest.class.getSimpleName());
             entity1JSON.put(HasName.class.getSimpleName(), namedEntity);
         }
-        if (entity2String!=null && entity2JSON.isEmpty()){
+        if (entity2String!=null && (entity2JSON.isEmpty() || entity2CoverageScore < .75)){
             String uri = yodaEnvironment.db.insertValue(entity2String);
             JSONObject namedEntity = SemanticsModel.parseJSON(OntologyRegistry.webResourceWrap(uri));
-            entity2JSON.put("class", PointOfInterest.class.getSimpleName());
+            if (!entity2JSON.containsKey("class"))
+                entity2JSON.put("class", PointOfInterest.class.getSimpleName());
             entity2JSON.put(HasName.class.getSimpleName(), namedEntity);
         }
 
@@ -147,41 +171,42 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         return new ImmutablePair<>(entity1JSON, 1.0);
     }
 
-    private Map<String, Object> getClassAndAdjectives(String entityString){
+    private Pair<Map<String, Object>, Double> getClassAndAdjectives(String entityString){
         Map<String,Object> ans = new HashMap<>();
+        Double bestNounCoverage = 0.0;
+        Double bestAdjectiveCoverage = 0.0;
 
         Class<? extends Noun> nounClass = null;
         Set<Class<? extends Adjective>> adjectiveClasses = new HashSet<>();
 
         // get class from pronoun
-        for (Class<? extends Noun> cls : pronounRegexStringMap.keySet()) {
-            Pattern regexPattern = Pattern.compile("(.+ | |)" + pronounRegexStringMap.get(cls) + "( .+| |)");
-            Matcher matcher = regexPattern.matcher(entityString);
-            if (matcher.matches()) {
+        for (Class<? extends Noun> cls : pronounStringSetMap.keySet()){
+            Double coverage = stringSetCoverage(entityString, pronounStringSetMap.get(cls));
+            if (coverage > bestNounCoverage){
+                bestNounCoverage = coverage;
                 nounClass = cls;
                 ans.put("refType", "pronoun");
-                break;
             }
         }
 
         // get class from noun
-        for (Class<? extends Noun> cls : nounRegexStringMap.keySet()) {
-            Pattern regexPattern = Pattern.compile("(.+ | |)" + nounRegexStringMap.get(cls) + "( .+| |)");
-            Matcher matcher = regexPattern.matcher(entityString);
-            if (matcher.matches()) {
+        for (Class<? extends Noun> cls : nounStringSetMap.keySet()) {
+            Double coverage = stringSetCoverage(entityString, nounStringSetMap.get(cls));
+            if (coverage > bestNounCoverage){
+                bestNounCoverage = coverage;
                 nounClass = cls;
-                break;
             }
         }
 
         // get adjective
-        for (Class<? extends Adjective> cls : adjectiveRegexStringMap.keySet()) {
-            Pattern regexPattern = Pattern.compile("(.+ | |)" + adjectiveRegexStringMap.get(cls) + "( .+| |)");
-            Matcher matcher = regexPattern.matcher(entityString);
-            if (matcher.matches()) {
+        for (Class<? extends Adjective> cls : adjectiveStringSetMap.keySet()) {
+            Double coverage = stringSetCoverage(entityString, adjectiveStringSetMap.get(cls));
+            if (coverage > bestAdjectiveCoverage){
+                bestAdjectiveCoverage = coverage;
                 adjectiveClasses.add(cls);
             }
         }
+
 
         // create sub-JSON object for adjectives
         for (Class<? extends Adjective> cls : adjectiveClasses){
@@ -198,7 +223,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         if (nounClass!=null)
             ans.put("class", nounClass.getSimpleName());
 
-        return ans;
+        return new ImmutablePair<>(ans, bestNounCoverage + bestAdjectiveCoverage);
     }
 
 }
