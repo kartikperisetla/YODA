@@ -167,6 +167,10 @@ public class RewardAndCostCalculator {
     }
 
 
+
+
+
+
     /*
     * To compute the clarificationReward for a clarification dialog act,
     * estimate the improvement in clarificationReward to all possible dialog and non-dialog tasks
@@ -174,34 +178,52 @@ public class RewardAndCostCalculator {
     * */
     public static Double clarificationDialogActReward(StringDistribution dialogStateDistribution,
                                                       Map<String, DialogState> dialogStateHypotheses,
-                                                      StringDistribution predictedRelativeConfidenceGain) {
-        Double totalReward = 0.0;
+                                                      StringDistribution predictedRelativeConfidenceGainIfConfirmed) {
+        Double totalExpectedReward = 0.0;
         // sum up the predicted rewards supposing that each current hypothesis is true,
         // weighting the predicted clarificationReward by the current belief that the hypothesis is true.
         for (String dialogStateHypothesisID : dialogStateHypotheses.keySet()){
             DialogState dialogState = dialogStateHypotheses.get(dialogStateHypothesisID);
             Double currentConfidence = dialogStateDistribution.get(dialogStateHypothesisID);
-            Double predictedConfidence = currentConfidence + currentConfidence * (1-currentConfidence)*
-                    predictedRelativeConfidenceGain.get(dialogStateHypothesisID);
+            Double predictedConfidence = currentConfidence + (1-currentConfidence)*
+                    predictedRelativeConfidenceGainIfConfirmed.get(dialogStateHypothesisID);
 
-            // predict the difference in expected clarificationReward after clarification
-            for (DiscourseUnit contextDiscourseUnit : dialogState.getDiscourseUnitHypothesisMap().values()) {
+            Double predictedReward = 0.0;
+            predictedReward += predictedConfidence * rewardForCorrectDialogTaskExecution;
+            predictedReward -= (1 - predictedConfidence) * penaltyForIncorrectDialogTaskExecution;
+            totalExpectedReward += currentConfidence * predictedReward;
+        }
+        return totalExpectedReward;
+    }
+
+    public static Double heuristicClarificationReward(StringDistribution dialogStateDistribution,
+                                                      Map<String, DialogState> dialogStateHypotheses,
+                                                      String valueURI){
+        Double probabilityOfValue = 0.0;
+        for (String dialogStateHypothesisId : dialogStateDistribution.keySet()){
+            DialogState dialogState = dialogStateHypotheses.get(dialogStateHypothesisId);
+            for (DiscourseUnit contextDiscourseUnit : dialogState.getDiscourseUnitHypothesisMap().values()){
                 if (contextDiscourseUnit.getInitiator().equals("system"))
                     continue;
                 Double discourseUnitConfidence = Utils.discourseUnitContextProbability(dialogState, contextDiscourseUnit);
-
-                // add contribution for dialog tasks
-                Double predictedRewardDifference = 0.0;
-                predictedRewardDifference += predictedConfidence * rewardForCorrectDialogTaskExecution;
-                predictedRewardDifference -= (1 - predictedConfidence) * penaltyForIncorrectDialogTaskExecution;
-                predictedRewardDifference -= currentConfidence * rewardForCorrectDialogTaskExecution;
-                predictedRewardDifference += (1 - currentConfidence) * penaltyForIncorrectDialogTaskExecution;
-                totalReward += currentConfidence * discourseUnitConfidence * predictedRewardDifference;
+                boolean anyMatches = false;
+                for (String path : contextDiscourseUnit.getGroundInterpretation().findAllPathsToClass(WebResource.class.getSimpleName())){
+                    if (contextDiscourseUnit.getGroundInterpretation().newGetSlotPathFiller(path+"."+ HasURI.class.getSimpleName()).equals(valueURI)){
+                        anyMatches = true;
+                        break;
+                    }
+                }
+                if (anyMatches) {
+                    probabilityOfValue += discourseUnitConfidence;
+                }
             }
         }
-        return totalReward;
+        probabilityOfValue = 1 - probabilityOfValue <= .00001 ? .99999 : probabilityOfValue;
+        probabilityOfValue = probabilityOfValue <= .00001 ? .00001 : probabilityOfValue;
+        Double informationOfValue = Math.log(probabilityOfValue) * probabilityOfValue +
+                Math.log(1 - probabilityOfValue) * (1 - probabilityOfValue);
+        !!!
     }
-
 
     /*
     * Confirming a value is confirming that some role is filled by it,
