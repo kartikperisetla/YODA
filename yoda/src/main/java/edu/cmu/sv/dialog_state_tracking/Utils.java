@@ -2,8 +2,6 @@ package edu.cmu.sv.dialog_state_tracking;
 
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
-import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
-import edu.cmu.sv.ontology.noun.Noun;
 import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.StringDistribution;
@@ -48,45 +46,12 @@ public class Utils {
         return ans;
     }
 
-    /*
-    * Rank the possible places where the suggestion content might attach to the existing semantics model
-    * */
-    public static StringDistribution findPossiblePointsOfAttachment(SemanticsModel discourseUnitSemantics,
-                                                                    /*SemanticsModel groundedSemantics,*/
-                                                                    JSONObject suggestionContent){
-        StringDistribution ans = new StringDistribution();
-        Set<Object> verbRoles = ((JSONObject) discourseUnitSemantics.newGetSlotPathFiller("verb")).keySet();
-        String contentClass = (String) suggestionContent.get("class");
-        if (contentClass.equals(UnknownThingWithRoles.class.getSimpleName())){
-            for (Object key : verbRoles){
-                if (key.equals("class"))
-                    continue;
-                JSONObject filler = (JSONObject) discourseUnitSemantics.newGetSlotPathFiller("verb."+key);
-                if (filler.get("class").equals(UnknownThingWithRoles.class.getSimpleName()))
-                    ans.put("verb."+key, 1.0);
-            }
-        } else if (Noun.class.isAssignableFrom(OntologyRegistry.thingNameMap.get(contentClass))) {
-            for (Object key : verbRoles) {
-                if (key.equals("class"))
-                    continue;
-                JSONObject filler = (JSONObject) discourseUnitSemantics.newGetSlotPathFiller("verb." + key);
-                if (filler.get("class").equals(contentClass))
-                    ans.put("verb." + key, 1.0);
-                else if (OntologyRegistry.thingNameMap.get(contentClass).isAssignableFrom(OntologyRegistry.thingNameMap.get(filler.get("class"))) ||
-                        OntologyRegistry.thingNameMap.get(filler.get("class")).isAssignableFrom(OntologyRegistry.thingNameMap.get(contentClass)))
-                    ans.put("verb." + key, 1.0);
-                else if (Noun.class.isAssignableFrom(OntologyRegistry.thingNameMap.get(filler.get("class"))))
-                    ans.put("verb." + key, .5);
-            }
-        }
-        return ans;
-    }
-
     public static StringDistribution findPossiblePointsOfAttachment(DiscourseUnit predecessorDiscourseUnit,
                                                                     JSONObject suggestionContent){
         StringDistribution ans = new StringDistribution();
-        Set<Object> verbRoles = ((JSONObject) predecessorDiscourseUnit.
-                getGroundInterpretation().newGetSlotPathFiller("verb")).keySet();
+        SemanticsModel targetSemanticsModel = predecessorDiscourseUnit.initiator.equals("system") ?
+                predecessorDiscourseUnit.getGroundTruth() : predecessorDiscourseUnit.getGroundInterpretation();
+        Set<Object> verbRoles = ((JSONObject) targetSemanticsModel.newGetSlotPathFiller("verb")).keySet();
         Class<? extends Thing> contentClass = OntologyRegistry.thingNameMap.get(suggestionContent.get("class"));
         for (Object key : verbRoles){
             if (OntologyRegistry.roleNameMap.containsKey(key)){
@@ -94,14 +59,13 @@ public class Utils {
                 Set<Class<? extends Thing>> range = new HashSet<>();
                 try {
                     range = roleClass.newInstance().getRange();
-                } catch ( InstantiationException e) {
-                } catch ( IllegalAccessException e) {
+                } catch ( InstantiationException | IllegalAccessException e) {
                     e.printStackTrace();
                     System.exit(0);
                 }
                 for (Class<? extends Thing> rangeCls : range) {
                     if (rangeCls.isAssignableFrom(contentClass)) {
-                        ans.put("verb." + (String) key, 1.0);
+                        ans.put("verb." + key, 1.0);
                         break;
                     }
                 }

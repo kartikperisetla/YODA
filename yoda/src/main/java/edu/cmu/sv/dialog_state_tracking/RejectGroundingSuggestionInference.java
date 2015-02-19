@@ -55,8 +55,7 @@ public class RejectGroundingSuggestionInference extends DialogStateUpdateInferen
 
                         // collect the result
                         resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
-                        Double score = Math.pow((1 - duAnalysis.descriptionMatch),2) *
-//                                (duAnalysis.groundMatch ? penaltyForNonGroundedMatch : 1.0) *
+                        Double score = (duAnalysis.groundMatch ? penaltyForNonGroundedMatch : 1.0) *
                                 Utils.discourseUnitContextProbability(newDialogState, predecessor);
                         resultDistribution.put(newDialogStateHypothesisID, score);
                     }

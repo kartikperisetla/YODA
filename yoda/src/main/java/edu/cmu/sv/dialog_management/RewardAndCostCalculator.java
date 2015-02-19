@@ -27,7 +27,7 @@ import java.util.Map;
  *
  */
 public class RewardAndCostCalculator {
-    public static double penaltyForSpeaking = .5;
+    public static double penaltyForSpeaking = .2;
     public static double penaltyForIgnoringUserRequest = 2;
     public static double rewardForCorrectDialogTaskExecution = 5;
     public static double rewardForFillingRequiredSlot = 1.0;
@@ -181,7 +181,7 @@ public class RewardAndCostCalculator {
         for (String dialogStateHypothesisID : dialogStateHypotheses.keySet()){
             DialogState dialogState = dialogStateHypotheses.get(dialogStateHypothesisID);
             Double currentConfidence = dialogStateDistribution.get(dialogStateHypothesisID);
-            Double predictedConfidence = currentConfidence + (1-currentConfidence)*
+            Double predictedConfidence = currentConfidence + currentConfidence * (1-currentConfidence)*
                     predictedRelativeConfidenceGain.get(dialogStateHypothesisID);
 
             // predict the difference in expected clarificationReward after clarification
@@ -189,24 +189,6 @@ public class RewardAndCostCalculator {
                 if (contextDiscourseUnit.getInitiator().equals("system"))
                     continue;
                 Double discourseUnitConfidence = Utils.discourseUnitContextProbability(dialogState, contextDiscourseUnit);
-
-//                SemanticsModel spokenByThem = contextDiscourseUnit.getSpokenByThem();
-//                Class<? extends DialogAct> daClass = DialogRegistry.dialogActNameMap.
-//                        get((String) spokenByThem.newGetSlotPathFiller("dialogAct"));
-
-//                // add contribution from non-dialog tasks
-//                if (DialogRegistry.nonDialogTaskRegistry.containsKey(daClass)) {
-//                    for (Class<? extends NonDialogTask> taskClass : DialogRegistry.nonDialogTaskRegistry.get(daClass)) {
-//                        NonDialogTaskPreferences preferences = taskClass.getConstructor(Database.class).newInstance(yodaEnvironment).getPreferences();
-//                        Double predictedRewardDifference = 0.0;
-//                        predictedRewardDifference += predictedConfidence * preferences.rewardForCorrectExecution;
-//                        predictedRewardDifference -= (1 - predictedConfidence) * preferences.penaltyForIncorrectExecution;
-//                        predictedRewardDifference -= currentConfidence * preferences.rewardForCorrectExecution;
-//                        predictedRewardDifference += (1 - currentConfidence) * preferences.penaltyForIncorrectExecution;
-//                        totalReward += currentConfidence * discourseUnitConfidence * predictedRewardDifference /
-//                                DialogRegistry.nonDialogTaskRegistry.get(daClass).size();
-//                    }
-//                }
 
                 // add contribution for dialog tasks
                 Double predictedRewardDifference = 0.0;

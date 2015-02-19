@@ -31,6 +31,7 @@ public class GiveGroundingSuggestionInference extends DialogStateUpdateInference
         } else { // if turn.speaker.equals("system")
 
             SemanticsModel hypModel = turn.systemUtterance;
+            SemanticsModel groundedHypModel = turn.groundedSystemMeaning;
             String dialogAct = hypModel.getSlotPathFiller("dialogAct");
             if (RequestConfirmValue.class.getSimpleName().equals(dialogAct)) {
                 for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
@@ -40,25 +41,27 @@ public class GiveGroundingSuggestionInference extends DialogStateUpdateInference
                         DiscourseAnalysis analysis = new DiscourseAnalysis(predecessor, yodaEnvironment);
                         analysis.analyseValidity();
                         Assert.verify(!analysis.ungrounded());
-//                        Set<String> suggestionPaths = predecessor.getSpokenByThem().findAllPathsToClass(Suggested.class.getSimpleName());
-//                        Assert.verify(suggestionPaths.size()==0);
                     } catch (Assert.AssertException e){
                         continue;
                     }
 
                     JSONObject daContent = (JSONObject) hypModel.newGetSlotPathFiller("topic");
+                    JSONObject groundedDaContent = (JSONObject) groundedHypModel.newGetSlotPathFiller("topic");
                     StringDistribution attachmentPoints = Utils.findPossiblePointsOfAttachment(
                             predecessor, daContent);
-//                    StringDistribution attachmentPoints = Utils.findPossiblePointsOfAttachment(
-//                            predecessor.getSpokenByThem(), daContent);
                     SemanticsModel suggestion = new SemanticsModel(daContent.toJSONString());
+                    SemanticsModel groundedSuggestion = new SemanticsModel(groundedDaContent.toJSONString());
 
                     for (String attachmentPoint : attachmentPoints.keySet()) {
                         String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
                         DialogState newDialogState = currentState.deepCopy();
                         DiscourseUnit updatedPredecessor = newDialogState.discourseUnitHypothesisMap.get(predecessorId);
 
+                        // determine newSpokenByMeHypothesis: copy what they said,
+                        // overwrite at the attachment point with the suggestion
+                        // and wrap in "suggested"
                         SemanticsModel newSpokenByMeHypothesis = updatedPredecessor.getSpokenByThem().deepCopy();
+                        newSpokenByMeHypothesis.putAtPath(newSpokenByMeHypothesis.getInternalRepresentation(), "dialogAct", dialogAct);
                         if (newSpokenByMeHypothesis.newGetSlotPathFiller(attachmentPoint)==null){
                             SemanticsModel.putAtPath(newSpokenByMeHypothesis.getInternalRepresentation(),
                                     attachmentPoint, suggestion.deepCopy().getInternalRepresentation());
@@ -68,7 +71,20 @@ public class GiveGroundingSuggestionInference extends DialogStateUpdateInference
                         SemanticsModel.wrap((JSONObject) newSpokenByMeHypothesis.newGetSlotPathFiller(attachmentPoint),
                                 Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
 
-                        Utils.unground(updatedPredecessor, newSpokenByMeHypothesis, turn.groundedSystemMeaning, timeStamp);
+                        // determine newGroundTruth by copying groundInterpretation, then
+                        // overwrite at the attachment point with the suggestion
+                        // DO NOT wrap in "suggested"
+                        SemanticsModel newGroundTruth = updatedPredecessor.getGroundInterpretation().deepCopy();
+                        if (newGroundTruth.newGetSlotPathFiller(attachmentPoint)==null){
+                            SemanticsModel.putAtPath(newGroundTruth.getInternalRepresentation(),
+                                    attachmentPoint, groundedSuggestion.deepCopy().getInternalRepresentation());
+                        } else {
+                            newGroundTruth.extendAndOverwriteAtPoint(attachmentPoint, groundedSuggestion.deepCopy());
+                        }
+//                        SemanticsModel.wrap((JSONObject) newGroundTruth.newGetSlotPathFiller(attachmentPoint),
+//                                Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
+
+                        Utils.unground(updatedPredecessor, newSpokenByMeHypothesis, newGroundTruth, timeStamp);
                         resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
                         Double score = attachmentPoints.get(attachmentPoint) *
                                 Utils.discourseUnitContextProbability(newDialogState, updatedPredecessor);

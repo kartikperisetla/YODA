@@ -76,7 +76,6 @@ public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpda
                             currentDu.actionAnalysis.update(yodaEnvironment, currentDu);
                             resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
                             Double score = groundedHypotheses.getRight().get(groundedDuKey) *
-//                                    (duAnalysis.groundMatch ? 1.0 : penaltyForNonGroundedMatch) *
                                     penaltyForThisInference *
                                     Utils.discourseUnitContextProbability(newDialogState, currentDu);
                             resultDistribution.put(newDialogStateHypothesisID, score);

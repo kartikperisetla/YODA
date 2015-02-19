@@ -24,7 +24,6 @@ public class DiscourseAnalysis {
     private YodaEnvironment yodaEnvironment;
 
     public String requestPath;
-
     public String suggestionPath;
     public JSONObject suggestedContent;
     public JSONObject groundedSuggestionIndividual;
@@ -41,12 +40,12 @@ public class DiscourseAnalysis {
         if (discourseUnit.initiator.equals("user")){
             Assert.verify(discourseUnit.spokenByMe!= null);
             Assert.verify(discourseUnit.groundTruth != null);
-            return discourseUnit.groundTruth.newGetSlotPathFiller("dialogAct").
+            return discourseUnit.spokenByMe.newGetSlotPathFiller("dialogAct").
                     equals(ungroundingAction.getSimpleName());
         } else { //discourseUnitHypothesis.initiator.equals("system")
             Assert.verify(discourseUnit.spokenByThem!= null);
             Assert.verify(discourseUnit.groundInterpretation != null);
-            return discourseUnit.groundInterpretation.newGetSlotPathFiller("dialogAct").
+            return discourseUnit.spokenByThem.newGetSlotPathFiller("dialogAct").
                     equals(ungroundingAction.getSimpleName());
         }
     }
