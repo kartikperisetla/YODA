@@ -176,7 +176,7 @@ public class DialogStateTracker implements Runnable {
     public void run() {
         while (true){
             try {
-                Pair<Turn, Long> DstInput = yodaEnvironment.DstInputQueue.poll(1000, TimeUnit.MILLISECONDS);
+                Pair<Turn, Long> DstInput = yodaEnvironment.DstInputQueue.poll(100, TimeUnit.MILLISECONDS);
                 if (DstInput!=null) {
                     updateDialogState(DstInput.getKey(), DstInput.getValue());
                 }

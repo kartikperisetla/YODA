@@ -41,12 +41,10 @@ public class RequestConfirmValue extends ClarificationDialogAct {
 
     @Override
     public Double clarificationReward(StringDistribution dialogStateDistribution, Map<String, DialogState> dialogStateHypotheses) {
-        StringDistribution predictedConfidenceGain = RewardAndCostCalculator.predictConfidenceGainFromValueConfirmation(
+        Double clarificationReward = RewardAndCostCalculator.heuristicClarificationReward(
                 dialogStateDistribution, dialogStateHypotheses, (String) getBoundIndividuals().get("topic_individual"));
         Double probabilityOutstandingGroundingRequest =
                 RewardAndCostCalculator.outstandingGroundingRequest(dialogStateDistribution, dialogStateHypotheses, "user");
-        Double clarificationReward = RewardAndCostCalculator.clarificationDialogActReward(
-                dialogStateDistribution, dialogStateHypotheses, predictedConfidenceGain);
         return (1-probabilityOutstandingGroundingRequest) * clarificationReward;
     }
 

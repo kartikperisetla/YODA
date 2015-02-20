@@ -33,7 +33,12 @@ public class RewardAndCostCalculator {
     public static double rewardForFillingRequiredSlot = 1.0;
     public static double penaltyForIncorrectDialogTaskExecution = 10;
     public static double penaltyForSpeakingOutOfTurn = 1.0;
+    public static double defaultPredictedInformation = .5;
 
+
+    public static double rewardForInformation(Double information){
+        return Math.exp(-1.0*information);
+    }
 
     public static Double rewardForRequestFixMisunderstanding(DialogState dialogState, DiscourseUnit discourseUnit){
         return 1.0 * Utils.discourseUnitContextProbability(dialogState, discourseUnit) *
@@ -199,8 +204,14 @@ public class RewardAndCostCalculator {
     public static Double heuristicClarificationReward(StringDistribution dialogStateDistribution,
                                                       Map<String, DialogState> dialogStateHypotheses,
                                                       String valueURI){
+        StringDistribution futureStateDistributionIfConfirmed = new StringDistribution();
+        StringDistribution futureStateDistributionIfRejected = new StringDistribution();
+
         Double probabilityOfValue = 0.0;
         for (String dialogStateHypothesisId : dialogStateDistribution.keySet()){
+            futureStateDistributionIfConfirmed.put(dialogStateHypothesisId, 0.0);
+            futureStateDistributionIfRejected.put(dialogStateHypothesisId, 0.0);
+
             DialogState dialogState = dialogStateHypotheses.get(dialogStateHypothesisId);
             for (DiscourseUnit contextDiscourseUnit : dialogState.getDiscourseUnitHypothesisMap().values()){
                 if (contextDiscourseUnit.getInitiator().equals("system"))
@@ -214,15 +225,39 @@ public class RewardAndCostCalculator {
                     }
                 }
                 if (anyMatches) {
-                    probabilityOfValue += discourseUnitConfidence;
+                    futureStateDistributionIfConfirmed.put(dialogStateHypothesisId,
+                            futureStateDistributionIfConfirmed.get(dialogStateHypothesisId) +
+                            discourseUnitConfidence * dialogStateDistribution.get(dialogStateHypothesisId));
+                    probabilityOfValue += discourseUnitConfidence * dialogStateDistribution.get(dialogStateHypothesisId);
+                } else {
+                    futureStateDistributionIfRejected.put(dialogStateHypothesisId,
+                            futureStateDistributionIfConfirmed.get(dialogStateHypothesisId) +
+                                    discourseUnitConfidence * dialogStateDistribution.get(dialogStateHypothesisId));
                 }
             }
         }
+
         probabilityOfValue = 1 - probabilityOfValue <= .00001 ? .99999 : probabilityOfValue;
         probabilityOfValue = probabilityOfValue <= .00001 ? .00001 : probabilityOfValue;
-        Double informationOfValue = Math.log(probabilityOfValue) * probabilityOfValue +
-                Math.log(1 - probabilityOfValue) * (1 - probabilityOfValue);
-        !!!
+        futureStateDistributionIfConfirmed.put("XYZ", MisunderstoodTurnInference.probabilityUserTurnMisunderstood);
+        futureStateDistributionIfRejected.put("XYZ", MisunderstoodTurnInference.probabilityUserTurnMisunderstood);
+        futureStateDistributionIfConfirmed.normalize();
+        futureStateDistributionIfRejected.normalize();
+
+//        System.out.println("current information:" + dialogStateDistribution.information());
+//        System.out.println("future information if confirmed:" + futureStateDistributionIfConfirmed.information());
+//        System.out.println("future information if rejected:" + futureStateDistributionIfRejected.information());
+        double reward =  -1 * (rewardForInformation(dialogStateDistribution.information()) +
+                rewardForInformation(probabilityOfValue * futureStateDistributionIfConfirmed.information()) +
+                rewardForInformation((1 - probabilityOfValue) * futureStateDistributionIfRejected.information()));
+        System.out.println("current information" + dialogStateDistribution.information() + ", probability of value" + probabilityOfValue + ", reward:" + reward);
+        return reward;
+
+//        Double informationOfDialogState = dialogStateDistribution.information();
+//        Double informationOfValue = -1.0 * Math.log(probabilityOfValue) * probabilityOfValue +
+//                -1.0 * Math.log(1 - probabilityOfValue) * (1 - probabilityOfValue);
+//        System.out.println("reward:" + informationOfDialogState * probabilityOfValue * Math.log(1 + informationOfValue) * rewardForInformation);
+//        return informationOfDialogState * probabilityOfValue * Math.log(1 + informationOfValue) * rewardForInformation;
     }
 
     /*
