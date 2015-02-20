@@ -28,6 +28,7 @@ import java.util.Map;
  */
 public class RewardAndCostCalculator {
     public static double penaltyForSpeaking = .2;
+    public static double valueOfInformation = 2.0;
     public static double penaltyForIgnoringUserRequest = 2;
     public static double rewardForCorrectDialogTaskExecution = 5;
     public static double rewardForFillingRequiredSlot = 1.0;
@@ -35,10 +36,6 @@ public class RewardAndCostCalculator {
     public static double penaltyForSpeakingOutOfTurn = 1.0;
     public static double defaultPredictedInformation = .5;
 
-
-    public static double rewardForInformation(Double information){
-        return Math.exp(-1.0*information);
-    }
 
     public static Double rewardForRequestFixMisunderstanding(DialogState dialogState, DiscourseUnit discourseUnit){
         return 1.0 * Utils.discourseUnitContextProbability(dialogState, discourseUnit) *
@@ -247,17 +244,17 @@ public class RewardAndCostCalculator {
 //        System.out.println("current information:" + dialogStateDistribution.information());
 //        System.out.println("future information if confirmed:" + futureStateDistributionIfConfirmed.information());
 //        System.out.println("future information if rejected:" + futureStateDistributionIfRejected.information());
-        double reward =  -1 * (rewardForInformation(dialogStateDistribution.information()) +
-                rewardForInformation(probabilityOfValue * futureStateDistributionIfConfirmed.information()) +
-                rewardForInformation((1 - probabilityOfValue) * futureStateDistributionIfRejected.information()));
+        double reward =  valueOfInformation * (dialogStateDistribution.information() -
+                probabilityOfValue * futureStateDistributionIfConfirmed.information() -
+                (1 - probabilityOfValue) * futureStateDistributionIfRejected.information());
         System.out.println("current information" + dialogStateDistribution.information() + ", probability of value" + probabilityOfValue + ", reward:" + reward);
         return reward;
 
 //        Double informationOfDialogState = dialogStateDistribution.information();
 //        Double informationOfValue = -1.0 * Math.log(probabilityOfValue) * probabilityOfValue +
 //                -1.0 * Math.log(1 - probabilityOfValue) * (1 - probabilityOfValue);
-//        System.out.println("reward:" + informationOfDialogState * probabilityOfValue * Math.log(1 + informationOfValue) * rewardForInformation);
-//        return informationOfDialogState * probabilityOfValue * Math.log(1 + informationOfValue) * rewardForInformation;
+//        System.out.println("reward:" + informationOfDialogState * probabilityOfValue * Math.log(1 + informationOfValue) * valueOfInformation);
+//        return informationOfDialogState * probabilityOfValue * Math.log(1 + informationOfValue) * valueOfInformation;
     }
 
     /*

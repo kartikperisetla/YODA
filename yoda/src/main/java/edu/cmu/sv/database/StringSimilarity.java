@@ -2,7 +2,6 @@ package edu.cmu.sv.database;
 
 import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.MetaInfServices;
-import org.openrdf.model.Literal;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.query.algebra.evaluation.ValueExprEvaluationException;
@@ -37,6 +36,6 @@ public class StringSimilarity implements Function{
 
 //        double levenshteinSimilarity = 1.0 - (1.0*StringUtils.getLevenshteinDistance(s1.toLowerCase(), s2.toLowerCase()) / (Integer.max(s1.length(),s2.length())));
         double jaroWinklerSimilarity = StringUtils.getJaroWinklerDistance(s1.toLowerCase(), s2.toLowerCase());
-        return valueFactory.createLiteral(Math.pow(jaroWinklerSimilarity,3));
+        return valueFactory.createLiteral(Math.pow(jaroWinklerSimilarity,10));
     }
 }
