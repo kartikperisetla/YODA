@@ -27,15 +27,13 @@ import java.util.Map;
  *
  */
 public class RewardAndCostCalculator {
-    public static double penaltyForSpeaking = .2;
+    public static double penaltyForSpeaking = .5;
     public static double valueOfInformation = 2.0;
     public static double penaltyForIgnoringUserRequest = 2;
     public static double rewardForCorrectDialogTaskExecution = 5;
     public static double rewardForFillingRequiredSlot = 1.0;
     public static double penaltyForIncorrectDialogTaskExecution = 10;
-    public static double penaltyForSpeakingOutOfTurn = 1.0;
-    public static double defaultPredictedInformation = .5;
-
+    public static double penaltyForSpeakingOutOfTurn = 2.0;
 
     public static Double rewardForRequestFixMisunderstanding(DialogState dialogState, DiscourseUnit discourseUnit){
         return 1.0 * Utils.discourseUnitContextProbability(dialogState, discourseUnit) *
@@ -84,7 +82,7 @@ public class RewardAndCostCalculator {
     * */
     public static Double probabilityInterpretedCorrectly(DiscourseUnit duHypothesis, DialogState dsHypothesis,
                                                          DialogAct dialogAct){
-        if (dialogAct instanceof Accept || dialogAct instanceof Reject || dialogAct instanceof DontKnow) {
+        if (dialogAct instanceof Accept || dialogAct instanceof Reject || dialogAct instanceof DontKnow || dialogAct instanceof Statement) {
             if (!duHypothesis.getInitiator().equals("user"))
                 return 0.0;
             double probabilityInterpretedThisWay = Utils.discourseUnitContextProbability(dsHypothesis, duHypothesis);
@@ -134,6 +132,7 @@ public class RewardAndCostCalculator {
                 new SemanticsModel((JSONObject)discourseUnit.actionAnalysis.responseStatement.get("verb.Patient")))){
             probabilityAppropriateInContext = 1.0;
         }
+//        System.out.println("dialog act:" + dialogAct.getClass().getSimpleName() + ", probability appropriate in context:" + probabilityAppropriateInContext);
         return rewardForCorrectDialogTaskExecution *probabilityAppropriateInContext -
                 penaltyForIncorrectDialogTaskExecution *(1-probabilityAppropriateInContext);
 
@@ -205,6 +204,8 @@ public class RewardAndCostCalculator {
         StringDistribution futureStateDistributionIfRejected = new StringDistribution();
 
         Double probabilityOfValue = 0.0;
+        Double probabilityClarificationRequestAppropriate = 0.0;
+
         for (String dialogStateHypothesisId : dialogStateDistribution.keySet()){
             futureStateDistributionIfConfirmed.put(dialogStateHypothesisId, 0.0);
             futureStateDistributionIfRejected.put(dialogStateHypothesisId, 0.0);
@@ -231,6 +232,9 @@ public class RewardAndCostCalculator {
                             futureStateDistributionIfConfirmed.get(dialogStateHypothesisId) +
                                     discourseUnitConfidence * dialogStateDistribution.get(dialogStateHypothesisId));
                 }
+
+                probabilityClarificationRequestAppropriate += answerObliged(contextDiscourseUnit) &&
+                        !answerAlreadyProvided(contextDiscourseUnit, dialogState) ? discourseUnitConfidence : 0;
             }
         }
 
@@ -241,13 +245,11 @@ public class RewardAndCostCalculator {
         futureStateDistributionIfConfirmed.normalize();
         futureStateDistributionIfRejected.normalize();
 
-//        System.out.println("current information:" + dialogStateDistribution.information());
-//        System.out.println("future information if confirmed:" + futureStateDistributionIfConfirmed.information());
-//        System.out.println("future information if rejected:" + futureStateDistributionIfRejected.information());
         double reward =  valueOfInformation * (dialogStateDistribution.information() -
                 probabilityOfValue * futureStateDistributionIfConfirmed.information() -
                 (1 - probabilityOfValue) * futureStateDistributionIfRejected.information());
-        System.out.println("current information" + dialogStateDistribution.information() + ", probability of value" + probabilityOfValue + ", reward:" + reward);
+        reward = probabilityClarificationRequestAppropriate * reward;
+//        System.out.println("current information" + dialogStateDistribution.information() + ", probability of value" + probabilityOfValue + ", reward:" + reward);
         return reward;
 
 //        Double informationOfDialogState = dialogStateDistribution.information();
