@@ -74,25 +74,6 @@ public class RewardAndCostCalculator {
                 preferences.penaltyForIncorrectExecution * (1 - probabilityTaskAppropriate);
     }
 
-    /*
-    * Return the probability that this dialog act will be interpreted in this context.
-    * duHypothesis is the DU that the system intends to respond to.
-    * */
-    public static Double probabilityInterpretedCorrectly(DiscourseUnit duHypothesis, DialogState dsHypothesis,
-                                                         DialogAct dialogAct){
-        if (dialogAct instanceof Accept || dialogAct instanceof Reject || dialogAct instanceof DontKnow || dialogAct instanceof Statement) {
-            if (!duHypothesis.getInitiator().equals("user"))
-                return 0.0;
-            double probabilityInterpretedThisWay = Utils.discourseUnitContextProbability(dsHypothesis, duHypothesis);
-//            System.out.println("R&CC: probability interpreted this way:" + probabilityInterpretedThisWay);
-            if (answerObliged(duHypothesis) && !answerAlreadyProvided(duHypothesis, dsHypothesis))
-                return probabilityInterpretedThisWay;
-            else if (answerObliged(duHypothesis))
-                return .1 * probabilityInterpretedThisWay;
-        }
-        return 0.0;
-    }
-
     public static boolean answerAlreadyProvided(DiscourseUnit predecessor, DialogState dsHypothesis){
         return answerObliged(predecessor) &&
                 dsHypothesis.getArgumentationLinks().stream().anyMatch(
@@ -103,13 +84,8 @@ public class RewardAndCostCalculator {
     * Return weather or not the predecessor obliges a response
     * */
     public static boolean answerObliged(DiscourseUnit predecessor){
-        String predecessorDialogAct;
-        if (predecessor.getInitiator().equals("user"))
-            predecessorDialogAct = (String) predecessor.getSpokenByThem().newGetSlotPathFiller("dialogAct");
-        else
-            predecessorDialogAct = (String) predecessor.getSpokenByMe().newGetSlotPathFiller("dialogAct");
-        return predecessorDialogAct.equals(YNQuestion.class.getSimpleName()) ||
-                predecessorDialogAct.equals(WHQuestion.class.getSimpleName());
+        String predecessorDialogAct = (String) predecessor.getFromInitiator("dialogAct");
+        return DialogRegistry.discourseUnitDialogActs.contains(DialogRegistry.dialogActNameMap.get(predecessorDialogAct));
     }
 
     public static Double discourseIndependentStatementReward(DialogAct dialogAct, DiscourseUnit discourseUnit) {
