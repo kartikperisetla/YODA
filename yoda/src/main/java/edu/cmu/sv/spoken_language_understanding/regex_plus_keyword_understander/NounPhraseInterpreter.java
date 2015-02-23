@@ -174,7 +174,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
     private Pair<Map<String, Object>, Double> getClassAndAdjectives(String entityString){
         Map<String,Object> ans = new HashMap<>();
         Double bestNounCoverage = 0.0;
-        Double bestAdjectiveCoverage = 0.0;
+        Double totalAdjectiveCoverage = 0.0;
 
         Class<? extends Noun> nounClass = null;
         Set<Class<? extends Adjective>> adjectiveClasses = new HashSet<>();
@@ -201,8 +201,8 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         // get adjective
         for (Class<? extends Adjective> cls : adjectiveStringSetMap.keySet()) {
             Double coverage = stringSetCoverage(entityString, adjectiveStringSetMap.get(cls));
-            if (coverage > bestAdjectiveCoverage){
-                bestAdjectiveCoverage = coverage;
+            if (coverage > 0) {
+                totalAdjectiveCoverage += coverage;
                 adjectiveClasses.add(cls);
             }
         }
@@ -223,7 +223,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         if (nounClass!=null)
             ans.put("class", nounClass.getSimpleName());
 
-        return new ImmutablePair<>(ans, bestNounCoverage + bestAdjectiveCoverage);
+        return new ImmutablePair<>(ans, bestNounCoverage + totalAdjectiveCoverage);
     }
 
 }
