@@ -21,10 +21,10 @@ public class Distance extends TransientQuality {
     @Override
     public java.util.function.Function<List<String>, String> getQualityCalculatorSPARQLQuery() {
         java.util.function.Function<List<String>, String> queryGen = (List<String> entityURIs) ->
-                entityURIs.get(0)+" base:gps_lat ?i ; base:gps_lon ?j . "+
-                        entityURIs.get(1)+" base:gps_lat ?k ; base:gps_lon ?l . "+
+                entityURIs.get(0)+" base:gps_lat ?i_distance ; base:gps_lon ?j_distance . "+
+                        entityURIs.get(1)+" base:gps_lat ?k_distance ; base:gps_lon ?l_distance . "+
                         "BIND(base:"+ DistanceFunction.class.getSimpleName()+
-                        "(?i, ?j, ?k, ?l) AS "+entityURIs.get(2)+") ";
+                        "(?i_distance, ?j_distance, ?k_distance, ?l_distance) AS "+entityURIs.get(2)+") ";
 
         return queryGen;
     }

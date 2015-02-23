@@ -27,9 +27,9 @@ public class Popularity extends TransientQuality {
     @Override
     public Function<List<String>, String> getQualityCalculatorSPARQLQuery() {
         Function<List<String>, String> queryGen = (List<String> entityURIs) ->
-                entityURIs.get(0)+" base:yelp_review_count ?i . "+
+                entityURIs.get(0)+" base:yelp_review_count ?i_popularity . "+
                 "BIND(base:"+ PopularityFunction.class.getSimpleName()+
-                "(?i) AS "+entityURIs.get(1)+") ";
+                "(?i_popularity) AS "+entityURIs.get(1)+") ";
 
         return queryGen;
     }

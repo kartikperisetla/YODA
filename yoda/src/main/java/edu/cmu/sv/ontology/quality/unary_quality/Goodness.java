@@ -27,9 +27,9 @@ public class Goodness extends TransientQuality {
     @Override
     public Function<List<String>, String> getQualityCalculatorSPARQLQuery() {
         Function<List<String>, String> queryGen = (List<String> entityURIs) ->
-                entityURIs.get(0)+" base:yelp_stars ?i . "+
+                entityURIs.get(0)+" base:yelp_stars ?i_stars . "+
                 "BIND(base:"+ GoodnessFunction.class.getSimpleName()+
-                "(?i) AS "+entityURIs.get(1)+") ";
+                "(?i_stars) AS "+entityURIs.get(1)+") ";
 
         return queryGen;
     }
