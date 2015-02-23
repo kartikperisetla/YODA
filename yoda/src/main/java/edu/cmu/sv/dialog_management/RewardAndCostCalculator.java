@@ -76,9 +76,7 @@ public class RewardAndCostCalculator {
 
     /*
     * Return the probability that this dialog act will be interpreted in this context.
-    *
-    * If this is a grounding act, duHypothesis is the DU that the system intends to clarify,
-    * Otherwise, this is the DU that the system intends to respond to.
+    * duHypothesis is the DU that the system intends to respond to.
     * */
     public static Double probabilityInterpretedCorrectly(DiscourseUnit duHypothesis, DialogState dsHypothesis,
                                                          DialogAct dialogAct){
@@ -86,6 +84,7 @@ public class RewardAndCostCalculator {
             if (!duHypothesis.getInitiator().equals("user"))
                 return 0.0;
             double probabilityInterpretedThisWay = Utils.discourseUnitContextProbability(dsHypothesis, duHypothesis);
+//            System.out.println("R&CC: probability interpreted this way:" + probabilityInterpretedThisWay);
             if (answerObliged(duHypothesis) && !answerAlreadyProvided(duHypothesis, dsHypothesis))
                 return probabilityInterpretedThisWay;
             else if (answerObliged(duHypothesis))
@@ -164,6 +163,7 @@ public class RewardAndCostCalculator {
                 }
             }
         }
+//        System.out.println("outstanding grounding request:" + ans);
         return Doubles.min(ans, 1.0);
     }
 

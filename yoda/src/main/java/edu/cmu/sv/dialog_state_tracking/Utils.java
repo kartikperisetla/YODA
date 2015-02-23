@@ -78,6 +78,7 @@ public class Utils {
 
     /*
     * Update the discourse unit by bringing it back to a grounded state from a non-grounded state
+    * Leave the resolved meanings from the initiator alone
     * */
     public static void returnToGround(DiscourseUnit predecessor,
                                       SemanticsModel newSpokenByInitiator,
