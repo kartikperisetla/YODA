@@ -91,13 +91,14 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
 
     private double stringSetCoverage(String phrase, Set<String> matchingStrings){
         double ans = 0.0;
+        int adjustedLength = phrase.replace("any ","").replace("the ","").replace("some ","").trim().length();
         for (String matchingString : matchingStrings) {
             Pattern regexPattern = Pattern.compile("(.+ | |)" + matchingString + "( .+| |)");
             Matcher matcher = regexPattern.matcher(phrase);
             if (matcher.matches())
-                ans = Doubles.max(ans, matchingString.length() * 1.0 / phrase.length());
+                ans = Doubles.max(ans, matchingString.length() * 1.0 / adjustedLength);
         }
-        return ans;
+        return Doubles.min(ans, 1.0);
     }
 
     @Override
@@ -167,7 +168,6 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         if (entity2String!=null && !entity2JSON.containsKey("class")){
             entity2JSON.put("class", UnknownThingWithRoles.class.getSimpleName());
         }
-
         return new ImmutablePair<>(entity1JSON, 1.0);
     }
 
@@ -207,7 +207,6 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
             }
         }
 
-
         // create sub-JSON object for adjectives
         for (Class<? extends Adjective> cls : adjectiveClasses){
             try {
@@ -222,7 +221,6 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
 
         if (nounClass!=null)
             ans.put("class", nounClass.getSimpleName());
-
         return new ImmutablePair<>(ans, bestNounCoverage + totalAdjectiveCoverage);
     }
 

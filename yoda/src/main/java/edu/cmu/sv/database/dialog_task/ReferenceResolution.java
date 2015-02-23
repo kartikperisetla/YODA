@@ -97,7 +97,7 @@ public class ReferenceResolution {
         queryString += "} \nORDER BY DESC(?score0) \nLIMIT 10";
 
         yodaEnvironment.db.log(queryString);
-        Database.getLogger().info("Reference resolution query:\n"+queryString);
+        Database.getLogger().info("Reference resolution query:\n" + queryString);
         StringDistribution ans = new StringDistribution();
         try {
             TupleQuery query = yodaEnvironment.db.connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
@@ -105,6 +105,8 @@ public class ReferenceResolution {
 
             while (result.hasNext()){
                 BindingSet bindings = result.next();
+                if (bindings.getValue("score0")==null)
+                    continue;
                 ans.put(bindings.getValue("x0").stringValue(),
                         Double.parseDouble(bindings.getValue("score0").stringValue()));
             }
@@ -138,11 +140,10 @@ public class ReferenceResolution {
             ans += "{{OPTIONAL { ?x"+referenceIndex+" dst:salience ?score"+tmpVarIndex+" }}\n" +
                     "UNION\n" +
                     "{OPTIONAL { FILTER NOT EXISTS { ?x"+referenceIndex+" dst:salience ?score"+tmpVarIndex+" } " +
-                    "BIND( "+minFocusSalience+" AS ?score"+tmpVarIndex+" ) }}}\n";
+                    "BIND("+minFocusSalience+" AS ?score"+tmpVarIndex+" ) }}}\n";
             tmpVarIndex++;
 
             for (Object key : reference.keySet()) {
-
                 if (key.equals("class")) {
                     continue;
                 } else if (key.equals("refType")){
@@ -152,6 +153,43 @@ public class ReferenceResolution {
                         throw new Error("unknown / unhandled reference type"+ reference.get(key));
                     }
                 } else if (HasQualityRole.class.isAssignableFrom(OntologyRegistry.roleNameMap.get((String) key))) {
+                    double center;
+                    double slope;
+                    Class<? extends TransientQuality> qualityClass;
+                    Class<? extends Thing> qualityDegreeClass = OntologyRegistry.thingNameMap.
+                            get((String) ((JSONObject) reference.get(key)).get("class"));
+                    List<String> entityURIs = new LinkedList<>();
+                    entityURIs.add("?x" + referenceIndex);
+                    if (Adjective.class.isAssignableFrom(qualityDegreeClass)) {
+                        Adjective adjective = (Adjective) qualityDegreeClass.newInstance();
+                        center = adjective.getCenter();
+                        slope = adjective.getSlope();
+                        qualityClass = adjective.getQuality();
+                    } else {
+                        continue;
+                    }
+                    scoresToAccumulate.add("?score" + tmpVarIndex);
+                    entityURIs.add("?transient_quality" + tmpVarIndex);
+                    ans += qualityClass.newInstance().getQualityCalculatorSPARQLQuery().apply(entityURIs) +
+                            "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
+                    ans += "FILTER(?score"+tmpVarIndex+" > "+.5+")\n";
+                } else if (HasName.class.equals(OntologyRegistry.roleNameMap.get((String) key))) {
+                    ans += "?x" + referenceIndex + " rdfs:label ?tmp" + tmpVarIndex + " . \n" +
+                            "base:" + ((JSONObject)reference.get(HasName.class.getSimpleName())).
+                            get(HasURI.class.getSimpleName()) + " rdf:value ?tmpV" + tmpVarIndex + " . \n" +
+                            "BIND(base:" + StringSimilarity.class.getSimpleName() +
+                            "(?tmp" + tmpVarIndex + ", ?tmpV" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
+                    scoresToAccumulate.add("?score"+tmpVarIndex);
+                } else {
+                    throw new Error("this role isn't handled:" + key);
+                }
+                tmpVarIndex++;
+            }
+
+            for (Object key : reference.keySet()) {
+                if (key.equals("class") || key.equals("refType"))
+                    continue;
+                if (HasQualityRole.class.isAssignableFrom(OntologyRegistry.roleNameMap.get((String) key))) {
                     double center;
                     double slope;
                     Class<? extends TransientQuality> qualityClass;
@@ -171,34 +209,25 @@ public class ReferenceResolution {
                         Pair<String, Integer> updates = referenceResolutionHelper(
                                 (JSONObject) ((JSONObject) reference.get(key)).get(InRelationTo.class.getSimpleName()),
                                 tmpVarIndex);
-                        ans += "{\nSELECT ?x" + tmpVarIndex + " ?score" + tmpVarIndex + " WHERE {\n";
+                        ans += "{\nSELECT DISTINCT ?x" + tmpVarIndex + " ?score" + tmpVarIndex + " WHERE {\n";
                         ans += updates.getKey();
-                        ans += "}\nORDER BY DESC(?score" + tmpVarIndex+ ")\n" + "LIMIT 30\n} .\n";
+                        ans += "}\nORDER BY DESC(?score" + tmpVarIndex+ ")\n" + "LIMIT 5\n} .\n";
                         tmpVarIndex = updates.getRight();
-                    } else if (Adjective.class.isAssignableFrom(qualityDegreeClass)) {
-                        Adjective adjective = (Adjective) qualityDegreeClass.newInstance();
-                        center = adjective.getCenter();
-                        slope = adjective.getSlope();
-                        qualityClass = adjective.getQuality();
                     } else {
-                        throw new Error("degreeClass is neither an Adjective nor a Preposition class");
+                        continue;
                     }
                     scoresToAccumulate.add("?score" + tmpVarIndex);
                     entityURIs.add("?transient_quality" + tmpVarIndex);
                     ans += qualityClass.newInstance().getQualityCalculatorSPARQLQuery().apply(entityURIs) +
                             "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
-                } else if (HasName.class.equals(OntologyRegistry.roleNameMap.get((String) key))) {
-                    ans += "?x" + referenceIndex + " rdfs:label ?tmp" + tmpVarIndex + " . \n" +
-                            "base:" + ((JSONObject)reference.get(HasName.class.getSimpleName())).
-                            get(HasURI.class.getSimpleName()) + " rdf:value ?tmpV" + tmpVarIndex + " . \n" +
-                            "BIND( base:" + StringSimilarity.class.getSimpleName() +
-                            "(?tmp" + tmpVarIndex + ", ?tmpV" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
-                    scoresToAccumulate.add("?score"+tmpVarIndex);
-                } else {
-                    throw new Error("this role isn't handled:" + key);
+                    ans += "FILTER(?score"+tmpVarIndex+" > "+.5+")\n";
                 }
                 tmpVarIndex++;
             }
+
+
+
+
             ans += "BIND(base:" + Product.class.getSimpleName() + "(";
             ans += String.join(", ", scoresToAccumulate);
             ans += ") AS ?score" + referenceIndex + ")\n";
@@ -262,7 +291,7 @@ public class ReferenceResolution {
                     queryString += "<"+individualURI+"> rdfs:label ?tmp" + tmpVarIndex + " . \n" +
                             "base:" + ((JSONObject)description.get(HasName.class.getSimpleName())).
                             get(HasURI.class.getSimpleName()) + " rdf:value ?tmpV" + tmpVarIndex + " . \n" +
-                            "BIND( base:" + StringSimilarity.class.getSimpleName() +
+                            "BIND(base:" + StringSimilarity.class.getSimpleName() +
                             "(?tmp" + tmpVarIndex + ", ?tmpV" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
                     scoresToAccumulate.add("?score"+tmpVarIndex);
                 }
