@@ -89,6 +89,7 @@ public class Lexicon {
         {
             LexicalEntry entry = new LexicalEntry();
             entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "bar");
+            entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "bars");
             Lexicon.add(Bars.class, entry, false);
         }
         {

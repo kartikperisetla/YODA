@@ -111,6 +111,7 @@ public class ReferenceResolution {
                         Double.parseDouble(bindings.getValue("score0").stringValue()));
             }
             result.close();
+
         } catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {
             e.printStackTrace();
             System.exit(0);

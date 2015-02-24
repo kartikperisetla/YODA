@@ -139,12 +139,16 @@ public class ActionAnalysis {
                     StringDistribution recommendations = ReferenceResolution.resolveReference(yodaEnvironment, searchDescription, false);
 //                    System.out.println(recommendations);
                     String bestRecommendation = recommendations.getTopHypothesis();
-                    JSONObject responseDescription = SemanticsModel.parseJSON(searchDescription.toJSONString());
-                    responseDescription.put("refType", "indefinite");
-                    responseStatement.put("dialogAct", Statement.class.getSimpleName());
-                    responseStatement.put("verb.Agent", SemanticsModel.parseJSON(OntologyRegistry.webResourceWrap(bestRecommendation)));
-                    responseStatement.put("verb.Patient", responseDescription);
+                    if (bestRecommendation==null){
+                        responseStatement.put("dialogAct", DontKnow.class.getSimpleName());
+                    } else {
+                        JSONObject responseDescription = SemanticsModel.parseJSON(searchDescription.toJSONString());
+                        responseDescription.put("refType", "indefinite");
+                        responseStatement.put("dialogAct", Statement.class.getSimpleName());
+                        responseStatement.put("verb.Agent", SemanticsModel.parseJSON(OntologyRegistry.webResourceWrap(bestRecommendation)));
+                        responseStatement.put("verb.Patient", responseDescription);
 //                    System.out.println("ActionAnalysis: response statement:\n" + responseStatement);
+                    }
                 }
             }
         }
