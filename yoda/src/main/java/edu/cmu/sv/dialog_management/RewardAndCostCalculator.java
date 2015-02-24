@@ -205,7 +205,7 @@ public class RewardAndCostCalculator {
                     probabilityOfValue += discourseUnitConfidence * dialogStateDistribution.get(dialogStateHypothesisId);
                 } else {
                     futureStateDistributionIfRejected.put(dialogStateHypothesisId,
-                            futureStateDistributionIfConfirmed.get(dialogStateHypothesisId) +
+                            futureStateDistributionIfRejected.get(dialogStateHypothesisId) +
                                     discourseUnitConfidence * dialogStateDistribution.get(dialogStateHypothesisId));
                 }
 
