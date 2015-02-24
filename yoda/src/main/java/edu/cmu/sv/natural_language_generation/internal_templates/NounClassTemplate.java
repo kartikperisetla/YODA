@@ -20,7 +20,6 @@ public class NounClassTemplate implements Template {
     @Override
     public Map<String, JSONObject> generateAll(JSONObject constraints, YodaEnvironment yodaEnvironment, int remainingDepth) {
         // required information to generate
-        String entityURI;
         Class<? extends Thing> nounClass;
         // ensure that the constraints match this template
         try {

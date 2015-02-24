@@ -95,8 +95,9 @@ public class IndefiniteDescriptionTemplate0 implements Template {
             Map<String, JSONObject> prepositionChunk = new HashMap<>();
             JSONObject prepositionContent = SemanticsModel.parseJSON(prepositionDescriptors.get(key).toJSONString());
             SemanticsModel.wrap(prepositionContent, UnknownThingWithRoles.class.getSimpleName(), (String) key);
+//            System.out.println("IndefiniteDescriptionTemplate: preposition content:" + prepositionContent);
             for (Map.Entry<String, JSONObject> entry : yodaEnvironment.nlg.
-                    generateAll(prepositionContent, yodaEnvironment, remainingDepth-1).entrySet()){
+                    generateAll(prepositionContent, yodaEnvironment, remainingDepth).entrySet()){
                 prepositionChunk.put(entry.getKey(), entry.getValue());
             }
             chunks.add(prepositionChunk);

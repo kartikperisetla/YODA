@@ -49,8 +49,10 @@ public class HasPropertyStatementTemplate0 implements Template {
         } catch (Assert.AssertException e) {
             return new HashMap<>();
         }
-
-        System.out.println("HasPropertyStatementTemplate: here");
+//        System.out.println("HasPropertyStatementTemplate: here");
+//        System.out.println(constraints);
+//        System.out.println("agent constraint:" + agentConstraint);
+//        System.out.println("patient constraint:" + patientConstraint);
 
         Map<String, JSONObject> toBeChunks = new HashMap<>();
         toBeChunks.put("is", new JSONObject());

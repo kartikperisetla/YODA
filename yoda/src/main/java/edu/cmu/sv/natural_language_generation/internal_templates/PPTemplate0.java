@@ -1,18 +1,16 @@
 package edu.cmu.sv.natural_language_generation.internal_templates;
 
-import edu.cmu.sv.natural_language_generation.Lexicon;
-import edu.cmu.sv.utils.Assert;
-import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
+import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.natural_language_generation.Template;
 import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
-
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
-import edu.cmu.sv.ontology.misc.WebResource;
 import edu.cmu.sv.ontology.preposition.Preposition;
 import edu.cmu.sv.ontology.role.InRelationTo;
 import edu.cmu.sv.semantics.SemanticsModel;
+import edu.cmu.sv.utils.Assert;
+import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
@@ -44,13 +42,16 @@ public class PPTemplate0 implements Template {
             prepositionClassString = (String) prepositionContent.get("class");
             child = ((JSONObject) prepositionContent.get(InRelationTo.class.getSimpleName())).toJSONString();
             Assert.verify(SemanticsModel.parseJSON(child).containsKey("class"));
-            Assert.verify(SemanticsModel.parseJSON(child).get("class").equals(WebResource.class.getSimpleName()));
+//            System.out.println(2.5);
+//            Assert.verify(SemanticsModel.parseJSON(child).get("class").equals(WebResource.class.getSimpleName()));
+//            System.out.println(3);
             Assert.verify(OntologyRegistry.thingNameMap.containsKey(prepositionClassString));
             Assert.verify(Preposition.class.isAssignableFrom(OntologyRegistry.thingNameMap.get(prepositionClassString)));
         } catch (Assert.AssertException e){
             return new HashMap<>();
         }
-
+//        System.out.println("PPTemplate: here");
+//        System.out.println(constraints);
         Map<String, JSONObject> prepositionChunks = new HashMap<>();
         Class<? extends Thing> prepositionClass = OntologyRegistry.thingNameMap.get(prepositionClassString);
         Set<String> ppStrings;
@@ -67,7 +68,7 @@ public class PPTemplate0 implements Template {
             SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(), hasQualityRole);
             prepositionChunks.put(ppString, tmp);
         }
-
+//        System.out.println("PPTemplate: child constraints:" + child);
         Map<String, JSONObject> childChunks = yodaEnvironment.nlg.generateAll(SemanticsModel.parseJSON(child),
                 yodaEnvironment, remainingDepth - 1);
 

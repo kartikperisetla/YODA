@@ -102,7 +102,8 @@ public class DefiniteReferenceTemplate0 implements Template {
                     Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> descriptor =
                             OntologyRegistry.qualityDescriptors(qualityClass);
                     for (Class<? extends ThingWithRoles> adjectiveClass : descriptor.getRight()) {
-//                        System.out.println(adjectiveClass);
+//                        System.out.println("definite reference template: adjective class:" + adjectiveClass);
+//                        System.out.println("definite reference template: full argument list:" + fullArgumentList);
                         double degreeOfMatch = yodaEnvironment.db.
                                 evaluateQualityDegree(fullArgumentList, adjectiveClass);
                         if (degreeOfMatch > 0.5) {
