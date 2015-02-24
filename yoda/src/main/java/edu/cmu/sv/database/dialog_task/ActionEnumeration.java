@@ -10,6 +10,7 @@ import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.utils.Combination;
+import edu.cmu.sv.yoda_environment.MongoLogHandler;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.json.simple.JSONObject;
 import org.openrdf.query.*;
@@ -59,7 +60,7 @@ public class ActionEnumeration {
 
         synchronized (yodaEnvironment.db.connection) {
             yodaEnvironment.db.log(queryString);
-            Database.getLogger().info("Action enumeration query:\n" + queryString);
+            Database.getLogger().info(MongoLogHandler.createSimpleRecord("action enumeration query", queryString).toJSONString());
 
             try {
                 TupleQuery query = yodaEnvironment.db.connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);

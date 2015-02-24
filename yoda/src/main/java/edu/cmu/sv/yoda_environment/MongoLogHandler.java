@@ -69,4 +69,10 @@ public class MongoLogHandler extends Handler {
         return SemanticsModel.parseJSON("{\"eventType\":\""+eventType+"\"}");
     }
 
+    public static JSONObject createSimpleRecord(String eventType, String content){
+        JSONObject ans = new JSONObject();
+        ans.put("eventType", eventType);
+        ans.put("content", content);
+        return ans;
+    }
 }

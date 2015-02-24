@@ -23,6 +23,7 @@ import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.HypothesisSetManagement;
 import edu.cmu.sv.utils.StringDistribution;
+import edu.cmu.sv.yoda_environment.MongoLogHandler;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -57,7 +58,8 @@ public class ReferenceResolution {
             queryString += "} \nORDER BY DESC(?score0) \nLIMIT 10";
 
             yodaEnvironment.db.log(queryString);
-            Database.getLogger().info("Role inference query:\n"+queryString);
+            Database.getLogger().info(MongoLogHandler.createSimpleRecord("role inference query", queryString).toJSONString());
+//            Database.getLogger().info("Role inference query:\n"+queryString);
             try {
                 TupleQuery query = yodaEnvironment.db.connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
                 TupleQueryResult result = query.evaluate();
@@ -97,7 +99,8 @@ public class ReferenceResolution {
         queryString += "} \nORDER BY DESC(?score0) \nLIMIT 10";
 
         yodaEnvironment.db.log(queryString);
-        Database.getLogger().info("Reference resolution query:\n" + queryString);
+        Database.getLogger().info(MongoLogHandler.createSimpleRecord("reference resolution query", queryString).toJSONString());
+//        Database.getLogger().info("Reference resolution query:\n" + queryString);
         StringDistribution ans = new StringDistribution();
         try {
             TupleQuery query = yodaEnvironment.db.connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
@@ -305,7 +308,8 @@ public class ReferenceResolution {
             queryString += "}";
 
             yodaEnvironment.db.log(queryString);
-            Database.getLogger().info("Description match query:\n"+queryString);
+            Database.getLogger().info(MongoLogHandler.createSimpleRecord("description match query", queryString).toJSONString());
+//            Database.getLogger().info("Description match query:\n"+queryString);
 
             Double ans = null;
             try {
@@ -316,11 +320,11 @@ public class ReferenceResolution {
                     BindingSet bindings = result.next();
                     ans = Double.parseDouble(bindings.getValue("score").stringValue());
                     result.close();
-                    Database.getLogger().info("Description match result:"+ans);
+//                    Database.getLogger().info("Description match result:"+ans);
                 }
                 else {
                     // answer is unknown / question doesn't make sense
-                    Database.getLogger().info("Description match result is unknown / question doesn't make sense: "+ans);
+//                    Database.getLogger().info("Description match result is unknown / question doesn't make sense: "+ans);
                 }
             } catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {
                 e.printStackTrace();
@@ -482,7 +486,8 @@ public class ReferenceResolution {
 
             // clear dst focus
             String deleteString = Database.prefixes + "DELETE {?x rdf:type dst:InFocus} WHERE {?x rdf:type dst:InFocus . }";
-            Database.getLogger().info("DST delete:\n" + deleteString);
+//            Database.getLogger().info("DST delete:\n" + deleteString);
+            Database.getLogger().info(MongoLogHandler.createSimpleRecord("DST salience delete", deleteString).toJSONString());
             try {
                 Update update = yodaEnvironment.db.connection.prepareUpdate(
                         QueryLanguage.SPARQL, deleteString, Database.dstFocusURI);
@@ -501,7 +506,8 @@ public class ReferenceResolution {
                 insertString += "<" + uri + "> dst:salience " + salienceFromDialogState.get(uri) + ".\n";
             }
             insertString += "}";
-            Database.getLogger().info("DST salience update:\n" + insertString);
+            Database.getLogger().info(MongoLogHandler.createSimpleRecord("DST salience update", insertString).toJSONString());
+//            Database.getLogger().info("DST salience update:\n" + insertString);
             try {
                 Update update = yodaEnvironment.db.connection.prepareUpdate(
                         QueryLanguage.SPARQL, insertString, Database.dstFocusURI);
