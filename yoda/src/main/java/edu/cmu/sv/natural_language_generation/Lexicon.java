@@ -1020,6 +1020,13 @@ public class Lexicon {
             Lexicon.add(Destination.class, entry, false);
         }
         {
+            // directions X, directions to X, directions <...> to X
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, "at");
+            entry.add(LexicalEntry.PART_OF_SPEECH.AS_OBJECT2_PREFIX, "at");
+            Lexicon.add(Destination.class, entry, true);
+        }
+        {
             // directions from X, directions <...> from X
             LexicalEntry entry = new LexicalEntry();
             entry.add(LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, "from");

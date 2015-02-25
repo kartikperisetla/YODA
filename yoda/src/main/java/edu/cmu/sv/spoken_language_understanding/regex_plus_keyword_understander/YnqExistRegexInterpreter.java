@@ -31,6 +31,19 @@ public class YnqExistRegexInterpreter implements MiniLanguageInterpreter {
             return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), matchQuality);
         }
 
+        Pattern regexPattern2 = Pattern.compile(startingPolitenessRegexString + "(.+)" + endingPolitenessRegexString);
+        Matcher matcher2 = regexPattern2.matcher(utterance);
+        if (matcher2.matches()) {
+            String npString = matcher2.group(2);
+            Pair<JSONObject, Double> npInterpretation =
+                    RegexPlusKeywordUnderstander.nounPhraseInterpreter.interpret(npString, yodaEnvironment);
+            if (npInterpretation.getKey().containsKey("HasName"))
+                return null;
+            String jsonString = "{\"dialogAct\":\"YNQuestion\",\"verb\":{\"Agent\":" +
+                    npInterpretation.getKey().toJSONString() + ",\"class\":\"Exist\"}}";
+            return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), .3);
+        }
+
         return null;
     }
 }
