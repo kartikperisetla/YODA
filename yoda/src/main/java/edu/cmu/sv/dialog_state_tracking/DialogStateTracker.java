@@ -107,7 +107,8 @@ public class DialogStateTracker implements Runnable {
                 }
             }
 
-            hypothesisDistribution = HypothesisSetManagement.keepRatioDistribution(newHypothesisDistribution, .05, 10);
+//            hypothesisDistribution = HypothesisSetManagement.keepRatioDistribution(newHypothesisDistribution, .05, 10);
+            hypothesisDistribution = HypothesisSetManagement.keepRatioDistribution(newHypothesisDistribution, .05, 5);
 
             hypothesisMap = new HashMap<>();
             for (String key : hypothesisDistribution.keySet()) {
