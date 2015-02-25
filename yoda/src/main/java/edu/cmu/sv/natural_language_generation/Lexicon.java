@@ -951,10 +951,27 @@ public class Lexicon {
         }
         {
             LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "cheapest");
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "cheaper");
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "most inexpensive");
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "most affordable");
+            Lexicon.add(Cheap.class, entry, true);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
             entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "expensive");
             entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "pricey");
             entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "costly");
             Lexicon.add(Expensive.class, entry, false);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "most expensive");
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "more expensive");
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "pricier");
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "priciest");
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "costliest");
+            Lexicon.add(Expensive.class, entry, true);
         }
         {
             LexicalEntry entry = new LexicalEntry();
@@ -965,10 +982,24 @@ public class Lexicon {
         }
         {
             LexicalEntry entry = new LexicalEntry();
-            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "en vogue");
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "better");
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "best");
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "highest rated");
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "higher rated");
+            Lexicon.add(Good.class, entry, true);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
             entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "hip");
             entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "popular");
             Lexicon.add(Popular.class, entry, false);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "en vogue");
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "hippest");
+            entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "most popular");
+            Lexicon.add(Popular.class, entry, true);
         }
     }
 
@@ -985,6 +1016,10 @@ public class Lexicon {
         {
             LexicalEntry entry = new LexicalEntry();
             entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "on");
+            entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "closest to");
+            entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "closest");
+            entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "nearest to");
+            entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "nearest");
             Lexicon.add(IsCloseTo.class, entry, true);
         }
     }
