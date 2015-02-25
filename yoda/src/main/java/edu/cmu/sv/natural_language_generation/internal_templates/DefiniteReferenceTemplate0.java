@@ -104,6 +104,8 @@ public class DefiniteReferenceTemplate0 implements Template {
                     for (Class<? extends ThingWithRoles> adjectiveClass : descriptor.getRight()) {
 //                        System.out.println("definite reference template: adjective class:" + adjectiveClass);
 //                        System.out.println("definite reference template: full argument list:" + fullArgumentList);
+                        if (adjectiveClass==null)
+                            continue;
                         double degreeOfMatch = yodaEnvironment.db.
                                 evaluateQualityDegree(fullArgumentList, adjectiveClass);
                         if (degreeOfMatch > 0.5) {

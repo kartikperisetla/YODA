@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  * Created by David Cohen on 1/21/15.
  */
 public class YnqExistRegexInterpreter implements MiniLanguageInterpreter {
-    static String ynqExistsPrefixRegexString = "(are there |i'm looking for |i want |find |get |search for )";
+    static String ynqExistsPrefixRegexString = "(are there |i'm looking for |i want |find |get |search for |show me )";
 
     @Override
     public Pair<JSONObject, Double> interpret(String utterance, YodaEnvironment yodaEnvironment) {
