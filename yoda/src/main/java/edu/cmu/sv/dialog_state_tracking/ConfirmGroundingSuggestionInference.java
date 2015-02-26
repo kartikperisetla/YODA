@@ -37,6 +37,7 @@ public class ConfirmGroundingSuggestionInference extends DialogStateUpdateInfere
                         String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
                         DialogState newDialogState = currentState.deepCopy();
                         DiscourseUnit predecessor = newDialogState.discourseUnitHypothesisMap.get(predecessorId);
+                        newDialogState.misunderstandingCounter = 0;
 
                         DiscourseAnalysis duAnalysis = new DiscourseAnalysis(predecessor, yodaEnvironment);
                         try {

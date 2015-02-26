@@ -67,6 +67,7 @@ public class TakeRequestedActionInference extends DialogStateUpdateInference {
                     newDUHypothesis.groundTruth = turn.groundedSystemMeaning;
                     newDUHypothesis.initiator = turn.speaker;
                     newDialogState.discourseUnitCounter += 1;
+                    newDialogState.misunderstandingCounter = 0;
                     String newDiscourseUnitId = "du_" + newDialogState.discourseUnitCounter;
                     newDialogState.getDiscourseUnitHypothesisMap().
                             put(newDiscourseUnitId, newDUHypothesis);

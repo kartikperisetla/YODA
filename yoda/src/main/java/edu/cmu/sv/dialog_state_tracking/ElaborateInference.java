@@ -63,6 +63,7 @@ public class ElaborateInference extends DialogStateUpdateInference {
                             DialogState newDialogState = currentState.deepCopy();
                             DiscourseUnit currentDu = groundedHypotheses.getLeft().get(groundedDuKey);
                             newDialogState.getDiscourseUnitHypothesisMap().put(predecessorId, currentDu);
+                            newDialogState.misunderstandingCounter = 0;
 
                             currentDu.actionAnalysis.update(yodaEnvironment, currentDu);
                             Double score = Utils.discourseUnitContextProbability(newDialogState, currentDu) *
