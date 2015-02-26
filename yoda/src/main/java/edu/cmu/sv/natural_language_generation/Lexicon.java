@@ -914,7 +914,9 @@ public class Lexicon {
         {
             LexicalEntry entry = new LexicalEntry();
             entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "make a reservation");
+            entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "book a reservation");
             entry.add(LexicalEntry.PART_OF_SPEECH.PRESENT_PROGRESSIVE_VERB, "making a reservation");
+            entry.add(LexicalEntry.PART_OF_SPEECH.PRESENT_PROGRESSIVE_VERB, "booking a reservation");
             entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "reservation");
             entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "reservations");
             Lexicon.add(MakeReservation.class, entry, false);
@@ -922,7 +924,9 @@ public class Lexicon {
         {
             LexicalEntry entry = new LexicalEntry();
             entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "make reservation");
+            entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "book reservation");
             entry.add(LexicalEntry.PART_OF_SPEECH.PRESENT_PROGRESSIVE_VERB, "making reservation");
+            entry.add(LexicalEntry.PART_OF_SPEECH.PRESENT_PROGRESSIVE_VERB, "booking a reservation");
             Lexicon.add(MakeReservation.class, entry, true);
         }
         {

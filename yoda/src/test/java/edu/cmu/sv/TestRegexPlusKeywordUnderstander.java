@@ -21,7 +21,10 @@ public class TestRegexPlusKeywordUnderstander {
         RegexPlusKeywordUnderstander understander = new RegexPlusKeywordUnderstander(yodaEnvironment);
 
         List<String> testUtterances = new LinkedList<>();
-        testUtterances.add("are there any good cheap restaurants");
+//        testUtterances.add("are there any good cheap restaurants");
+//        testUtterances.add("i'd like to book a reservation at garden grove restaurant");
+//        testUtterances.add("what is the rating of that restaurant");
+        testUtterances.add("make a reservation at this restaurant");
 //        testUtterances.add("give me directions there");
 //        testUtterances.add("is the chinese restaurant near red rock expensive");
 //        testUtterances.add("is the chinese restaurant near red rock cheap");

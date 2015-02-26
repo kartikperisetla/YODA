@@ -50,7 +50,7 @@ public class CommandRegexInterpreter implements MiniLanguageInterpreter {
             // command with one role as the obj1
             {
                 Pattern regexPattern = Pattern.compile(startingPolitenessRegexString + "(could you |can you |will you please |)" +
-                        "(i want |give me |give |can i get |could i get |make |set up )(a |the |some |)" + verbRegexString + "(.+)" +endingPolitenessRegexString);
+                        "(i'd like |i would like |i want |give me |give |can i get |could i get |make |set up )(a |the |some |)" + verbRegexString + "(.+)" +endingPolitenessRegexString);
                 Matcher matcher = regexPattern.matcher(utterance);
                 if (matcher.matches()) {
                     String obj1String = matcher.group(6);

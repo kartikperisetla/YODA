@@ -173,6 +173,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
 
     private Pair<Map<String, Object>, Double> getClassAndAdjectives(String entityString){
         Map<String,Object> ans = new HashMap<>();
+        Double pronounCoverage = 0.0;
         Double bestNounCoverage = 0.0;
         Double totalAdjectiveCoverage = 0.0;
 
@@ -182,8 +183,8 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         // get class from pronoun
         for (Class<? extends Noun> cls : pronounStringSetMap.keySet()){
             Double coverage = stringSetCoverage(entityString, pronounStringSetMap.get(cls));
-            if (coverage > bestNounCoverage){
-                bestNounCoverage = coverage;
+            if (coverage > pronounCoverage){
+                pronounCoverage = coverage;
                 nounClass = cls;
                 ans.put("refType", "pronoun");
             }
@@ -221,7 +222,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
 
         if (nounClass!=null)
             ans.put("class", nounClass.getSimpleName());
-        return new ImmutablePair<>(ans, bestNounCoverage + totalAdjectiveCoverage);
+        return new ImmutablePair<>(ans, pronounCoverage + bestNounCoverage + totalAdjectiveCoverage);
     }
 
 }

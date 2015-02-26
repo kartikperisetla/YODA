@@ -77,12 +77,12 @@ public class WhqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
                     " (is |are |)"+MiniLanguageInterpreter.possessivePrepositionRegexString+"(.+)");
             Matcher matcher = regexPattern.matcher(utterance);
             if (matcher.matches()) {
-                String npString = matcher.group(8);
+                String npString = matcher.group(7);
                 Pair<JSONObject, Double> npInterpretation =
                         RegexPlusKeywordUnderstander.nounPhraseInterpreter.interpret(npString, yodaEnvironment);
 
                 String jsonString = "{\"dialogAct\":\"WHQuestion\",\"verb\":{\"Agent\":"+
-                        npInterpretation.getKey().toJSONString()+"Patient\":" +
+                        npInterpretation.getKey().toJSONString()+", \"Patient\":" +
                         "{\"class\":\"Requested\",\"HasValue\":{\"class\":\"" +
                         qualityClass.getSimpleName() + "\"}},\"class\":\"HasProperty\"}}";
                 return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), 1.0);
