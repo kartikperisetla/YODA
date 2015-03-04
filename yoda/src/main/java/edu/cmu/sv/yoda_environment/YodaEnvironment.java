@@ -3,6 +3,7 @@ package edu.cmu.sv.yoda_environment;
 import edu.cmu.sv.database.Database;
 import edu.cmu.sv.database.dialog_task.ActionEnumeration;
 import edu.cmu.sv.dialog_management.DialogManager;
+import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DialogStateTracker;
 import edu.cmu.sv.dialog_state_tracking.Turn;
@@ -64,10 +65,11 @@ public class YodaEnvironment {
 
 
     public void loadDomain(DomainSpec domainSpec){
-        //TODO: load all domain databases, add classes to ontology, load lexicon, register non-dialog tasks
         Ontology.loadOntologyRegistry(domainSpec.getOntologyRegistry());
         lex.loadLexicon(domainSpec.getLexicon());
-
+        DialogRegistry.registerNonDialogTasks(domainSpec.getNonDialogTaskRegistry());
+        db.updateOntology();
+        db.addDatabaseRegistry(domainSpec.getDatabaseRegistry());
     }
 
     public static YodaEnvironment dialogTestingEnvironment(){

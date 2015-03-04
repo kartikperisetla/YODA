@@ -1,6 +1,7 @@
 package edu.cmu.sv.dialog_management;
 
 import com.google.common.collect.Iterables;
+import edu.cmu.sv.domain.NonDialogTaskRegistry;
 import edu.cmu.sv.ontology.verb.GiveDirections;
 import edu.cmu.sv.ontology.verb.MakeReservation;
 import edu.cmu.sv.system_action.ActionSchema;
@@ -60,13 +61,6 @@ public class DialogRegistry {
         userOnlyDialogActs.add(Accept.class);
         userOnlyDialogActs.add(Reject.class);
 
-
-        nonDialogTasks.add(GiveDirectionsTask.class);
-        nonDialogTasks.add(MakeReservationTask.class);
-
-        actionSchemata.add(new GenericCommandSchema(GiveDirections.class, GiveDirectionsTask.class));
-        actionSchemata.add(new GenericCommandSchema(MakeReservation.class, MakeReservationTask.class));
-
         for (Class<? extends DialogAct> cls : Iterables.concat(discourseUnitDialogActs, argumentationDialogActs,
                 userOnlyDialogActs, clarificationDialogActs, Arrays.asList(Fragment.class))) {
             dialogActNameMap.put(cls.getSimpleName(), cls);
@@ -78,4 +72,8 @@ public class DialogRegistry {
         }
     }
 
+    public static void registerNonDialogTasks(NonDialogTaskRegistry registry){
+        nonDialogTasks.addAll(registry.nonDialogTasks);
+        actionSchemata.addAll(registry.actionSchemata);
+    }
 }

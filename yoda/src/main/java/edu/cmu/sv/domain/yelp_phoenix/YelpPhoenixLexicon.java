@@ -20,8 +20,8 @@ import edu.cmu.sv.ontology.verb.MakeReservation;
 /**
  * Created by David Cohen on 3/3/15.
  */
-public class PhoenixYelpLexicon extends Lexicon {
-    public PhoenixYelpLexicon() {
+public class YelpPhoenixLexicon extends Lexicon {
+    public YelpPhoenixLexicon() {
         //// Lexicon for points of interest
         {
             {

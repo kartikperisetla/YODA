@@ -1,6 +1,7 @@
 package edu.cmu.sv.database;
 
 
+import edu.cmu.sv.domain.DatabaseRegistry;
 import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.yoda_environment.MongoLogHandler;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -25,9 +26,7 @@ import org.openrdf.rio.RDFParseException;
 import org.openrdf.sail.inferencer.fc.ForwardChainingRDFSInferencer;
 import org.openrdf.sail.memory.MemoryStore;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.lang.Object;
 import java.util.*;
 import java.util.logging.FileHandler;
@@ -73,17 +72,53 @@ public class Database {
         return logger;
     }
 
-    /*
-        * log interactions with the database
-        * */
     public void log(String interaction){
 //        System.out.println(interaction);
     }
 
+    public void updateOntology(){
+        try{
+            // generate the class hierarchy
+            Set<Class> databaseClasses = new HashSet<>(Ontology.nounClasses);
+            databaseClasses.addAll(Ontology.verbClasses);
+            databaseClasses.addAll(Ontology.qualityClasses);
+            Set<Class> databaseProperties = new HashSet<>(Ontology.roleClasses);
+            databaseProperties.addAll(Ontology.roleClasses);
+            generateClassHierarchy(databaseClasses, databaseProperties);
+
+            // generate the special individuals
+            addIndividuals(Ontology.individualNameMap);
+
+        } catch (RepositoryException | MalformedQueryException | UpdateExecutionException e) {
+            e.printStackTrace();
+            System.exit(0);
+        }
+    }
+
+    public void addDatabaseRegistry(DatabaseRegistry registry){
+        try {
+            // load the registered databases
+            for (String filename : registry.turtleDatabaseSources) {
+                connection.add(new InputStreamReader(new FileInputStream(filename), "UTF-8"),
+                        baseURI, RDFFormat.TURTLE);
+            }
+
+            // load the non-ontology relations
+            addNonOntologyProperties(registry.nonOntologyRelations);
+
+        } catch (UpdateExecutionException | RDFParseException | RepositoryException | UnsupportedEncodingException | MalformedQueryException e) {
+            e.printStackTrace();
+            System.exit(0);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     public Database(YodaEnvironment yodaEnvironment) {
         this.yodaEnvironment = yodaEnvironment;
-//        // non-inferencing triple store
-//        repository = new SailRepository(new MemoryStore());
         // inferencing rdf database
 
         Repository repository = new SailRepository(new ForwardChainingRDFSInferencer(new MemoryStore()));
@@ -97,31 +132,6 @@ public class Database {
         }
         connection = (RepositoryConnection) tmpConnection;
 
-        try{
-            // generate the class hierarchy
-            Set<Class> databaseClasses = new HashSet<>(Ontology.nounClasses);
-            databaseClasses.addAll(Ontology.verbClasses);
-            databaseClasses.addAll(Ontology.qualityClasses);
-            Set<Class> databaseProperties = new HashSet<>(Ontology.roleClasses);
-            databaseProperties.addAll(Ontology.roleClasses);
-            generateClassHierarchy(databaseClasses, databaseProperties);
-
-            // generate the special individuals
-            addIndividuals(Ontology.individualNameMap);
-
-            // load the registered databases
-            for (String filename : DatabaseRegistry.turtleDatabaseSources) {
-                connection.add(new InputStreamReader(new FileInputStream(filename), "UTF-8"),
-                        baseURI, RDFFormat.TURTLE);
-            }
-
-            // load the non-ontology relations
-            addNonOntologyProperties(DatabaseRegistry.nonOntologyRelations);
-
-        } catch (RepositoryException | RDFParseException | IOException | MalformedQueryException | UpdateExecutionException e) {
-            e.printStackTrace();
-            System.exit(0);
-        }
     }
 
     private void addIndividuals(Map<String, Thing> individuals)
