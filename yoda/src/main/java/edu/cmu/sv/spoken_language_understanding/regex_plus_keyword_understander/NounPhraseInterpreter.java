@@ -31,15 +31,17 @@ import java.util.regex.Pattern;
  * Created by David Cohen on 1/27/15.
  */
 public class NounPhraseInterpreter implements MiniLanguageInterpreter{
-    static Map<Class<? extends Preposition>, String> prepositionSeparatorRegexStringMap = new HashMap<>();
-    static Map<Class<? extends Noun>, Set<String>> pronounStringSetMap = new HashMap<>();
-    static Map<Class<? extends Noun>, Set<String>> nounStringSetMap = new HashMap<>();
-    static Map<Class<? extends Adjective>, Set<String>> adjectiveStringSetMap = new HashMap<>();
+    Map<Class<? extends Preposition>, String> prepositionSeparatorRegexStringMap = new HashMap<>();
+    Map<Class<? extends Noun>, Set<String>> pronounStringSetMap = new HashMap<>();
+    Map<Class<? extends Noun>, Set<String>> nounStringSetMap = new HashMap<>();
+    Map<Class<? extends Adjective>, Set<String>> adjectiveStringSetMap = new HashMap<>();
+    YodaEnvironment yodaEnvironment;
 
-    static {
+    public NounPhraseInterpreter(YodaEnvironment yodaEnvironment) {
+        this.yodaEnvironment = yodaEnvironment;
         for (Class<? extends Preposition> prepositionClass : Ontology.prepositionClasses) {
             try {
-                Set<String> relationalPhraseStrings = Lexicon.getPOSForClass(prepositionClass,
+                Set<String> relationalPhraseStrings = this.yodaEnvironment.lex.getPOSForClass(prepositionClass,
                         Lexicon.LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, false);
                 String regexString = "(" + String.join("|", relationalPhraseStrings) + ")";
                 if (!regexString.equals("()"))
@@ -49,7 +51,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
 
         for (Class<? extends Noun> nounClass : Ontology.nounClasses) {
             try {
-                Set<String> pronounStrings = Lexicon.getPOSForClass(nounClass,
+                Set<String> pronounStrings = this.yodaEnvironment.lex.getPOSForClass(nounClass,
                         Lexicon.LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, false);
                 pronounStringSetMap.put(nounClass, pronounStrings);
 //                String regexString = "(" + String.join("|", pronounStrings) + ")";
@@ -61,12 +63,12 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         for (Class<? extends Noun> nounClass : Ontology.nounClasses) {
             Set<String> nounStrings = new HashSet<>();
             try {
-                nounStrings.addAll(Lexicon.getPOSForClass(nounClass,
+                nounStrings.addAll(this.yodaEnvironment.lex.getPOSForClass(nounClass,
                         Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, false));
             } catch (Lexicon.NoLexiconEntryException e) {
             }
             try {
-                nounStrings.addAll(Lexicon.getPOSForClass(nounClass,
+                nounStrings.addAll(this.yodaEnvironment.lex.getPOSForClass(nounClass,
                         Lexicon.LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, false));
             } catch (Lexicon.NoLexiconEntryException e) {
             }
@@ -78,7 +80,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
 
         for (Class<? extends Adjective> adjectiveClass : Ontology.adjectiveClasses) {
             try {
-                Set<String> adjectiveStrings = Lexicon.getPOSForClass(adjectiveClass,
+                Set<String> adjectiveStrings = this.yodaEnvironment.lex.getPOSForClass(adjectiveClass,
                         Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, false);
                 adjectiveStringSetMap.put(adjectiveClass, adjectiveStrings);
 //                String regexString = "(" + String.join("|", adjectiveStrings) + ")";

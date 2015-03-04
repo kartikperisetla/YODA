@@ -24,18 +24,20 @@ public class CommandKeywordInterpreter implements MiniLanguageInterpreter {
     Class<? extends Verb> verbClass;
     String verbRegexString = "()";
     Map<Class<? extends Role>, String> roleObj1PrefixPatterns = new HashMap<>();
+    YodaEnvironment yodaEnvironment;
 
-    public CommandKeywordInterpreter(Class<? extends Verb> verbClass) {
+    public CommandKeywordInterpreter(Class<? extends Verb> verbClass, YodaEnvironment yodaEnvironment) {
         this.verbClass = verbClass;
+        this.yodaEnvironment = yodaEnvironment;
         try {
-            Set<String> verbNounStrings = Lexicon.getPOSForClass(verbClass, Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true);
-            verbNounStrings.addAll(Lexicon.getPOSForClass(verbClass, Lexicon.LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true));
+            Set<String> verbNounStrings = this.yodaEnvironment.lex.getPOSForClass(verbClass, Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true);
+            verbNounStrings.addAll(this.yodaEnvironment.lex.getPOSForClass(verbClass, Lexicon.LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true));
             this.verbRegexString = "("+String.join("|",verbNounStrings)+")";
         } catch (Lexicon.NoLexiconEntryException e) {}
         for (Class<? extends Role> roleClass : Ontology.roleClasses) {
             if (Ontology.inDomain(roleClass, verbClass)) {
                 try {
-                    Set<String> roleObj1PrefixStrings = Lexicon.getPOSForClass(roleClass, Lexicon.LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true);
+                    Set<String> roleObj1PrefixStrings = this.yodaEnvironment.lex.getPOSForClass(roleClass, Lexicon.LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true);
                     String regexString = "("+String.join("|",roleObj1PrefixStrings)+")";
                     if (!regexString.equals("()"))
                         roleObj1PrefixPatterns.put(roleClass, regexString);

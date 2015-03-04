@@ -24,13 +24,15 @@ public class YnqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
     Class<? extends TransientQuality> qualityClass;
     Class<? extends Role> hasQualityRole;
     String adjectiveRegexString = "()";
+    YodaEnvironment yodaEnvironment;
 
-    public YnqHasPropertyRegexInterpreter(Class<? extends Adjective> adjectiveClass) {
+    public YnqHasPropertyRegexInterpreter(Class<? extends Adjective> adjectiveClass, YodaEnvironment yodaEnvironment) {
         this.adjectiveClass = adjectiveClass;
+        this.yodaEnvironment = yodaEnvironment;
         try {
             this.qualityClass = adjectiveClass.newInstance().getQuality();
             this.hasQualityRole = Ontology.qualityDescriptors(qualityClass).getKey();
-            Set<String> adjectiveStrings = Lexicon.getPOSForClass(adjectiveClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true);
+            Set<String> adjectiveStrings = this.yodaEnvironment.lex.getPOSForClass(adjectiveClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true);
             this.adjectiveRegexString = "("+String.join("|",adjectiveStrings)+")";
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
@@ -48,7 +50,7 @@ public class YnqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
             if (matcher.matches()) {
                 String npString = matcher.group(3);
                 Pair<JSONObject, Double> npInterpretation =
-                        RegexPlusKeywordUnderstander.nounPhraseInterpreter.interpret(npString, yodaEnvironment);
+                        ((RegexPlusKeywordUnderstander)yodaEnvironment.slu).nounPhraseInterpreter.interpret(npString, yodaEnvironment);
 
                 String jsonString = "{\"dialogAct\":\"YNQuestion\",\"verb\":{\"Agent\":"+
                         npInterpretation.getKey().toJSONString()+

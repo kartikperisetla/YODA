@@ -23,7 +23,7 @@ public class YnqExistRegexInterpreter implements MiniLanguageInterpreter {
         if (matcher.matches()) {
             String npString = matcher.group(3);
             Pair<JSONObject, Double> npInterpretation =
-                    RegexPlusKeywordUnderstander.nounPhraseInterpreter.interpret(npString, yodaEnvironment);
+                    ((RegexPlusKeywordUnderstander)yodaEnvironment.slu).nounPhraseInterpreter.interpret(npString, yodaEnvironment);
             if (npInterpretation.getKey().containsKey("HasName"))
                 return null;
             String jsonString = "{\"dialogAct\":\"YNQuestion\",\"verb\":{\"Agent\":" +
@@ -36,7 +36,7 @@ public class YnqExistRegexInterpreter implements MiniLanguageInterpreter {
         if (matcher2.matches()) {
             String npString = matcher2.group(2);
             Pair<JSONObject, Double> npInterpretation =
-                    RegexPlusKeywordUnderstander.nounPhraseInterpreter.interpret(npString, yodaEnvironment);
+                    ((RegexPlusKeywordUnderstander)yodaEnvironment.slu).nounPhraseInterpreter.interpret(npString, yodaEnvironment);
             if (npInterpretation.getKey().containsKey("HasName"))
                 return null;
             String jsonString = "{\"dialogAct\":\"YNQuestion\",\"verb\":{\"Agent\":" +

@@ -28,6 +28,10 @@ import java.util.logging.SimpleFormatter;
  *
  */
 public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
+    public NounPhraseInterpreter nounPhraseInterpreter;
+    YodaEnvironment yodaEnvironment;
+    Set<MiniLanguageInterpreter> languageInterpreters = new HashSet<>();
+
     private static Logger logger = Logger.getLogger("yoda.spoken_language_understanding.RegexPlusKeywordUnderstander");
     static {
         try {
@@ -46,20 +50,21 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
         }
     }
 
-    public static NounPhraseInterpreter nounPhraseInterpreter = new NounPhraseInterpreter();
-    static Set<MiniLanguageInterpreter> languageInterpreters = new HashSet<>();
-    static {
+    public RegexPlusKeywordUnderstander(YodaEnvironment yodaEnvironment) {
+        this.yodaEnvironment = yodaEnvironment;
+        nounPhraseInterpreter = new NounPhraseInterpreter(yodaEnvironment);
+
         // add regex interpreters
         languageInterpreters.add(new YnqExistRegexInterpreter());
         for (Class<? extends Adjective> adjectiveClass : Ontology.adjectiveClasses){
-            languageInterpreters.add(new YnqHasPropertyRegexInterpreter(adjectiveClass));
+            languageInterpreters.add(new YnqHasPropertyRegexInterpreter(adjectiveClass, yodaEnvironment));
         }
         for (Class<? extends TransientQuality> qualityClass : Ontology.qualityClasses){
-            languageInterpreters.add(new WhqHasPropertyRegexInterpreter(qualityClass));
+            languageInterpreters.add(new WhqHasPropertyRegexInterpreter(qualityClass, yodaEnvironment));
         }
         for (Class<? extends Verb> verbClass : Ontology.verbClasses){
-            languageInterpreters.add(new CommandRegexInterpreter(verbClass));
-            languageInterpreters.add(new CommandKeywordInterpreter(verbClass));
+            languageInterpreters.add(new CommandRegexInterpreter(verbClass, yodaEnvironment));
+            languageInterpreters.add(new CommandKeywordInterpreter(verbClass, yodaEnvironment));
         }
         languageInterpreters.add(new NamedEntityFragmentInterpreter(PointOfInterest.class));
 
@@ -117,8 +122,4 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
         process1BestAsr(asrNBestResult.getTopHypothesis());
     }
 
-    YodaEnvironment yodaEnvironment;
-    public RegexPlusKeywordUnderstander(YodaEnvironment yodaEnvironment) {
-        this.yodaEnvironment = yodaEnvironment;
-    }
 }

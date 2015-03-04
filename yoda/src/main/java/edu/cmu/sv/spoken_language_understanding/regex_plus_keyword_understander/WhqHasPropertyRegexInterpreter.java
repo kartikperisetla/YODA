@@ -27,9 +27,11 @@ public class WhqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
     Class<? extends Role> hasQualityRole;
     String adjectiveRegexString = "()";
     String qualityNounRegexString = "()";
+    YodaEnvironment yodaEnvironment;
 
-    public WhqHasPropertyRegexInterpreter(Class<? extends TransientQuality> qualityClass) {
+    public WhqHasPropertyRegexInterpreter(Class<? extends TransientQuality> qualityClass, YodaEnvironment yodaEnvironment) {
         this.qualityClass = qualityClass;
+        this.yodaEnvironment = yodaEnvironment;
         Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> descriptor = Ontology.qualityDescriptors(qualityClass);
         this.hasQualityRole = descriptor.getKey();
         Set<Class<? extends Adjective>> adjectiveClasses = descriptor.getRight().stream().
@@ -40,14 +42,14 @@ public class WhqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
         Set<String> adjectiveStrings = new HashSet<>();
         for (Class<? extends Adjective> adjectiveClass : adjectiveClasses) {
             try {
-                adjectiveStrings.addAll(Lexicon.getPOSForClass(adjectiveClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true));
+                adjectiveStrings.addAll(this.yodaEnvironment.lex.getPOSForClass(adjectiveClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true));
             } catch (Lexicon.NoLexiconEntryException e) {}
         }
         this.adjectiveRegexString = "(" + String.join("|", adjectiveStrings) + ")";
 
         Set<String> nounStrings = new HashSet<>();
         try {
-            nounStrings.addAll(Lexicon.getPOSForClass(qualityClass, Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true));
+            nounStrings.addAll(this.yodaEnvironment.lex.getPOSForClass(qualityClass, Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true));
         } catch (Lexicon.NoLexiconEntryException e) {}
         this.qualityNounRegexString = "(" + String.join("|", nounStrings) + ")";
 
@@ -61,7 +63,7 @@ public class WhqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
             if (matcher.matches()) {
                 String npString = matcher.group(3);
                 Pair<JSONObject, Double> npInterpretation =
-                        RegexPlusKeywordUnderstander.nounPhraseInterpreter.interpret(npString, yodaEnvironment);
+                        ((RegexPlusKeywordUnderstander)yodaEnvironment.slu).nounPhraseInterpreter.interpret(npString, yodaEnvironment);
 
                 String jsonString = "{\"dialogAct\":\"WHQuestion\",\"verb\":{\"Agent\":"+
                         npInterpretation.getKey().toJSONString()+
@@ -79,7 +81,7 @@ public class WhqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
             if (matcher.matches()) {
                 String npString = matcher.group(7);
                 Pair<JSONObject, Double> npInterpretation =
-                        RegexPlusKeywordUnderstander.nounPhraseInterpreter.interpret(npString, yodaEnvironment);
+                        ((RegexPlusKeywordUnderstander)yodaEnvironment.slu).nounPhraseInterpreter.interpret(npString, yodaEnvironment);
 
                 String jsonString = "{\"dialogAct\":\"WHQuestion\",\"verb\":{\"Agent\":"+
                         npInterpretation.getKey().toJSONString()+", \"Patient\":" +
