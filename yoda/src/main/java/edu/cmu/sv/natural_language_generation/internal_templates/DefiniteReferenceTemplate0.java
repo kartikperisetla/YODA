@@ -73,7 +73,7 @@ public class DefiniteReferenceTemplate0 implements Template {
                 continue;
             Set<String> singularNounForms;
             try {
-                singularNounForms = Lexicon.getPOSForClass(Ontology.thingNameMap.get(clsName),
+                singularNounForms = yodaEnvironment.lex.getPOSForClass(Ontology.thingNameMap.get(clsName),
                         Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, yodaEnvironment.nlg.grammarPreferences, false);
             } catch (Lexicon.NoLexiconEntryException e) {
                 singularNounForms = new HashSet<>();
@@ -111,7 +111,7 @@ public class DefiniteReferenceTemplate0 implements Template {
                         if (degreeOfMatch > 0.5) {
                             Set<String> adjStrings;
                             try {
-                                adjStrings = Lexicon.getPOSForClass(adjectiveClass,
+                                adjStrings = yodaEnvironment.lex.getPOSForClass(adjectiveClass,
                                         Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, yodaEnvironment.nlg.grammarPreferences, false);
                             } catch (Lexicon.NoLexiconEntryException e) {
                                 adjStrings = new HashSet<>();
@@ -178,7 +178,7 @@ public class DefiniteReferenceTemplate0 implements Template {
                                     }
                                     Set<String> ppStrings;
                                     try{
-                                        ppStrings = Lexicon.getPOSForClass(prepositionClass,
+                                        ppStrings = yodaEnvironment.lex.getPOSForClass(prepositionClass,
                                                 Lexicon.LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE,
                                                 yodaEnvironment.nlg.grammarPreferences, false);
                                     } catch (Lexicon.NoLexiconEntryException e) {

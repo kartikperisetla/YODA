@@ -80,7 +80,7 @@ public class IndefiniteDescriptionTemplate0 implements Template {
             Map<String, JSONObject> clsChunk = new HashMap<>();
             Set<String> singularNounForms;
             try {
-                singularNounForms = Lexicon.getPOSForClass(nounClass,
+                singularNounForms = yodaEnvironment.lex.getPOSForClass(nounClass,
                         Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, yodaEnvironment.nlg.grammarPreferences, false);
             } catch (Lexicon.NoLexiconEntryException e) {
                 singularNounForms = new HashSet<>();

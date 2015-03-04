@@ -49,7 +49,7 @@ public class RequestAgentTemplate implements Template {
         Map<String, JSONObject> verbChunks = new HashMap<>();
         Set<String> verbStrings;
         try{
-            verbStrings = Lexicon.getPOSForClass(Ontology.thingNameMap.get(verbClassString),
+            verbStrings = yodaEnvironment.lex.getPOSForClass(Ontology.thingNameMap.get(verbClassString),
                     Lexicon.LexicalEntry.PART_OF_SPEECH.S1_VERB, yodaEnvironment.nlg.grammarPreferences, false);
         } catch (Lexicon.NoLexiconEntryException e) {
             verbStrings = new HashSet<>();

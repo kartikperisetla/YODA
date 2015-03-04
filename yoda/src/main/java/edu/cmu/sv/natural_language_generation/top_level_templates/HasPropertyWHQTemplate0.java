@@ -84,7 +84,7 @@ public class HasPropertyWHQTemplate0 implements Template {
             Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> qualityDescriptors = Ontology.qualityDescriptors(requestedQuality);
             for (Class<? extends ThingWithRoles> adjectiveClass : qualityDescriptors.getRight()) {
                 try {
-                    adjectiveStrings.addAll(Lexicon.getPOSForClassHierarchy(adjectiveClass,
+                    adjectiveStrings.addAll(yodaEnvironment.lex.getPOSForClassHierarchy(adjectiveClass,
                             Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, yodaEnvironment.nlg.grammarPreferences, false));
                 } catch (Lexicon.NoLexiconEntryException e) {
                 }
@@ -93,7 +93,7 @@ public class HasPropertyWHQTemplate0 implements Template {
         }
 
         try {
-            qualityStrings.addAll(Lexicon.getPOSForClassHierarchy(requestedQuality,
+            qualityStrings.addAll(yodaEnvironment.lex.getPOSForClassHierarchy(requestedQuality,
                     Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, yodaEnvironment.nlg.grammarPreferences, false));
         } catch (Lexicon.NoLexiconEntryException e) {
         }

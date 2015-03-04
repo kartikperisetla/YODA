@@ -56,7 +56,7 @@ public class PPTemplate0 implements Template {
         Class<? extends Thing> prepositionClass = Ontology.thingNameMap.get(prepositionClassString);
         Set<String> ppStrings;
         try{
-            ppStrings = Lexicon.getPOSForClass(prepositionClass,
+            ppStrings = yodaEnvironment.lex.getPOSForClass(prepositionClass,
                 Lexicon.LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE,
                 yodaEnvironment.nlg.grammarPreferences, false);
         } catch (Lexicon.NoLexiconEntryException e) {

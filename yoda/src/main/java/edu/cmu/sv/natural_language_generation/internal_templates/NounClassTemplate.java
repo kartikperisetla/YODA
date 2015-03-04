@@ -34,7 +34,7 @@ public class NounClassTemplate implements Template {
         Map<String, JSONObject> clsChunks = new HashMap<>();
         Set<String> singularNounForms;
         try {
-            singularNounForms = Lexicon.getPOSForClassHierarchy(nounClass,
+            singularNounForms = yodaEnvironment.lex.getPOSForClassHierarchy(nounClass,
                     Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, yodaEnvironment.nlg.grammarPreferences, false);
         } catch (Lexicon.NoLexiconEntryException e) {
             singularNounForms = new HashSet<>();
