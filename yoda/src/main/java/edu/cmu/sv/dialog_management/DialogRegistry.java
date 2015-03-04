@@ -76,8 +76,6 @@ public class DialogRegistry {
                 userOnlyDialogActs, clarificationDialogActs, Arrays.asList(Fragment.class), nonDialogTasks)) {
             actionNameMap.put(cls.getSimpleName(), cls);
         }
-
-
     }
 
 }
