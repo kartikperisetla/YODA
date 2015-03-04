@@ -1,6 +1,6 @@
 package edu.cmu.sv.spoken_language_understanding.nested_chunking_understander;
 
-import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.ontology.role.HasName;
 import edu.cmu.sv.ontology.role.HasURI;
 import edu.cmu.sv.ontology.role.has_quality_subroles.HasQualityRole;
@@ -105,8 +105,8 @@ public class NestedChunkingUnderstander implements SpokenLanguageUnderstander {
                     SemanticsModel tmpSemanticsModel = new SemanticsModel(newUnderstandingState.structure);
 
                     Object filler = currentClassificationProblem.outputRolesAndFillers.get(classificationResultKey).get(slotString);
-                    if (OntologyRegistry.thingNameMap.containsKey(slotString) &&
-                            HasQualityRole.class.isAssignableFrom(OntologyRegistry.thingNameMap.get(slotString))){
+                    if (Ontology.thingNameMap.containsKey(slotString) &&
+                            HasQualityRole.class.isAssignableFrom(Ontology.thingNameMap.get(slotString))){
                         filler = SemanticsModel.parseJSON("{\"class\":\""+filler+"\"}");
                     }
 

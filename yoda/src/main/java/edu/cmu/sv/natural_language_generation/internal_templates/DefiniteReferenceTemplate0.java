@@ -2,11 +2,11 @@ package edu.cmu.sv.natural_language_generation.internal_templates;
 
 import edu.cmu.sv.database.dialog_task.ReferenceResolution;
 import edu.cmu.sv.natural_language_generation.*;
+import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.database.Database;
-import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.ThingWithRoles;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
@@ -69,11 +69,11 @@ public class DefiniteReferenceTemplate0 implements Template {
         // collect class name chunks
         for (String clsName : classNames.stream().map(Database::getLocalName).
                 collect(Collectors.toList())) {
-            if (!OntologyRegistry.thingNameMap.containsKey(clsName))
+            if (!Ontology.thingNameMap.containsKey(clsName))
                 continue;
             Set<String> singularNounForms;
             try {
-                singularNounForms = Lexicon.getPOSForClass(OntologyRegistry.thingNameMap.get(clsName),
+                singularNounForms = Lexicon.getPOSForClass(Ontology.thingNameMap.get(clsName),
                         Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, yodaEnvironment.nlg.grammarPreferences, false);
             } catch (Lexicon.NoLexiconEntryException e) {
                 singularNounForms = new HashSet<>();
@@ -84,14 +84,14 @@ public class DefiniteReferenceTemplate0 implements Template {
         }
 
         String mostSpecificClass = yodaEnvironment.db.mostSpecificClass(entityURI);
-        if (OntologyRegistry.thingNameMap.containsKey(mostSpecificClass) &&
-                ThingWithRoles.class.isAssignableFrom(OntologyRegistry.thingNameMap.get(mostSpecificClass))) {
+        if (Ontology.thingNameMap.containsKey(mostSpecificClass) &&
+                ThingWithRoles.class.isAssignableFrom(Ontology.thingNameMap.get(mostSpecificClass))) {
 
             // collect adjectives
 //            System.out.println("most specific class:"+mostSpecificClass);
-            for (Class<? extends TransientQuality> qualityClass : OntologyRegistry.qualitiesForClass.get(
-                    OntologyRegistry.thingNameMap.get(mostSpecificClass))) {
-                List<Class<? extends Thing>> qualityArguments = OntologyRegistry.qualityArguments(qualityClass);
+            for (Class<? extends TransientQuality> qualityClass : Ontology.qualitiesForClass.get(
+                    Ontology.thingNameMap.get(mostSpecificClass))) {
+                List<Class<? extends Thing>> qualityArguments = Ontology.qualityArguments(qualityClass);
                 // iterate through every possible binding for the quality arguments
                 // adjectives
                 if (qualityArguments.size() == 0) {
@@ -100,7 +100,7 @@ public class DefiniteReferenceTemplate0 implements Template {
                     List<String> fullArgumentList = Arrays.asList(entityURI);
 
                     Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> descriptor =
-                            OntologyRegistry.qualityDescriptors(qualityClass);
+                            Ontology.qualityDescriptors(qualityClass);
                     for (Class<? extends ThingWithRoles> adjectiveClass : descriptor.getRight()) {
 //                        System.out.println("definite reference template: adjective class:" + adjectiveClass);
 //                        System.out.println("definite reference template: full argument list:" + fullArgumentList);
@@ -131,16 +131,16 @@ public class DefiniteReferenceTemplate0 implements Template {
 
             if (remainingDepth>1) {
                 // collect prepositions
-                for (Class<? extends TransientQuality> qualityClass : OntologyRegistry.qualitiesForClass.get(
-                        OntologyRegistry.thingNameMap.get(mostSpecificClass))) {
-                    List<Class<? extends Thing>> qualityArguments = OntologyRegistry.qualityArguments(qualityClass);
+                for (Class<? extends TransientQuality> qualityClass : Ontology.qualitiesForClass.get(
+                        Ontology.thingNameMap.get(mostSpecificClass))) {
+                    List<Class<? extends Thing>> qualityArguments = Ontology.qualityArguments(qualityClass);
                     // iterate through every possible binding for the quality arguments
                     if (qualityArguments.size() == 1) {
                         if (!expandPP)
                             continue;
 
                         Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> descriptor =
-                                OntologyRegistry.qualityDescriptors(qualityClass);
+                                Ontology.qualityDescriptors(qualityClass);
                         // init preposition counter
                         Map<Class<? extends ThingWithRoles>, Integer> prepositionUsageCounter = new HashMap<>();
                         for (Class<? extends ThingWithRoles> prepositionClass : descriptor.getRight())
@@ -170,7 +170,7 @@ public class DefiniteReferenceTemplate0 implements Template {
 
                                     if (childContent==null){
                                         childContent = SemanticsModel.parseJSON(
-                                                OntologyRegistry.webResourceWrap(binding.get(0)));
+                                                Ontology.webResourceWrap(binding.get(0)));
                                         for (Map.Entry<String, JSONObject> entry : yodaEnvironment.nlg.
                                                 generateAll(childContent, yodaEnvironment, remainingDepth-1).entrySet()){
                                             childChunks.put(entry.getKey(), entry.getValue());

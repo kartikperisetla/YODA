@@ -3,7 +3,7 @@ package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander
 import com.google.common.primitives.Doubles;
 import edu.cmu.sv.natural_language_generation.Grammar;
 import edu.cmu.sv.natural_language_generation.Lexicon;
-import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.ontology.ThingWithRoles;
 import edu.cmu.sv.ontology.adjective.Adjective;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
@@ -37,7 +37,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
     static Map<Class<? extends Adjective>, Set<String>> adjectiveStringSetMap = new HashMap<>();
 
     static {
-        for (Class<? extends Preposition> prepositionClass : OntologyRegistry.prepositionClasses) {
+        for (Class<? extends Preposition> prepositionClass : Ontology.prepositionClasses) {
             try {
                 Set<String> relationalPhraseStrings = Lexicon.getPOSForClass(prepositionClass,
                         Lexicon.LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, false);
@@ -47,7 +47,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
             } catch (Lexicon.NoLexiconEntryException e) {}
         }
 
-        for (Class<? extends Noun> nounClass : OntologyRegistry.nounClasses) {
+        for (Class<? extends Noun> nounClass : Ontology.nounClasses) {
             try {
                 Set<String> pronounStrings = Lexicon.getPOSForClass(nounClass,
                         Lexicon.LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, false);
@@ -58,7 +58,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
             } catch (Lexicon.NoLexiconEntryException e) {}
         }
 
-        for (Class<? extends Noun> nounClass : OntologyRegistry.nounClasses) {
+        for (Class<? extends Noun> nounClass : Ontology.nounClasses) {
             Set<String> nounStrings = new HashSet<>();
             try {
                 nounStrings.addAll(Lexicon.getPOSForClass(nounClass,
@@ -76,7 +76,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
 //                nounStringSetMap.put(nounClass, regexString);
         }
 
-        for (Class<? extends Adjective> adjectiveClass : OntologyRegistry.adjectiveClasses) {
+        for (Class<? extends Adjective> adjectiveClass : Ontology.adjectiveClasses) {
             try {
                 Set<String> adjectiveStrings = Lexicon.getPOSForClass(adjectiveClass,
                         Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, false);
@@ -120,7 +120,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
 
                 try {
                     Class<? extends TransientQuality> qualityClass = prepositionClass.newInstance().getQuality();
-                    Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> descriptor = OntologyRegistry.qualityDescriptors(qualityClass);
+                    Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> descriptor = Ontology.qualityDescriptors(qualityClass);
                     JSONObject intermediateObject = SemanticsModel.parseJSON("{\"class\":\""+cls.getSimpleName()+"\"}");
                     intermediateObject.put(InRelationTo.class.getSimpleName(), entity2JSON);
                     entity1JSON.put(descriptor.getKey().getSimpleName(), intermediateObject);
@@ -148,14 +148,14 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         // check for named entities
         if (entity1JSON.isEmpty() || entity1CoverageScore < .75){
             String uri = yodaEnvironment.db.insertValue(entity1String);
-            JSONObject namedEntity = SemanticsModel.parseJSON(OntologyRegistry.webResourceWrap(uri));
+            JSONObject namedEntity = SemanticsModel.parseJSON(Ontology.webResourceWrap(uri));
             if (!entity1JSON.containsKey("class"))
                 entity1JSON.put("class", PointOfInterest.class.getSimpleName());
             entity1JSON.put(HasName.class.getSimpleName(), namedEntity);
         }
         if (entity2String!=null && (entity2JSON.isEmpty() || entity2CoverageScore < .75)){
             String uri = yodaEnvironment.db.insertValue(entity2String);
-            JSONObject namedEntity = SemanticsModel.parseJSON(OntologyRegistry.webResourceWrap(uri));
+            JSONObject namedEntity = SemanticsModel.parseJSON(Ontology.webResourceWrap(uri));
             if (!entity2JSON.containsKey("class"))
                 entity2JSON.put("class", PointOfInterest.class.getSimpleName());
             entity2JSON.put(HasName.class.getSimpleName(), namedEntity);
@@ -212,7 +212,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         for (Class<? extends Adjective> cls : adjectiveClasses){
             try {
                 Class<? extends TransientQuality> qualityClass = cls.newInstance().getQuality();
-                Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> descriptor = OntologyRegistry.qualityDescriptors(qualityClass);
+                Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> descriptor = Ontology.qualityDescriptors(qualityClass);
                 ans.put(descriptor.getKey().getSimpleName(), SemanticsModel.parseJSON("{\"class\":\"" + cls.getSimpleName() + "\"}"));
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();

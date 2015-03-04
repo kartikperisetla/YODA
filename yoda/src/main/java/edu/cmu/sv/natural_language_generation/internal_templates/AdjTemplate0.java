@@ -1,11 +1,11 @@
 package edu.cmu.sv.natural_language_generation.internal_templates;
 
 import edu.cmu.sv.natural_language_generation.Lexicon;
+import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
 import edu.cmu.sv.natural_language_generation.Template;
-import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.adjective.Adjective;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
@@ -35,15 +35,15 @@ public class AdjTemplate0 implements Template {
             Assert.verify(adjectiveContent.keySet().size()==1);
             Assert.verify(adjectiveContent.containsKey("class"));
             adjectiveClassString = (String) adjectiveContent.get("class");
-            Assert.verify(OntologyRegistry.thingNameMap.containsKey(adjectiveClassString));
-            Assert.verify(Adjective.class.isAssignableFrom(OntologyRegistry.thingNameMap.get(adjectiveClassString)));
+            Assert.verify(Ontology.thingNameMap.containsKey(adjectiveClassString));
+            Assert.verify(Adjective.class.isAssignableFrom(Ontology.thingNameMap.get(adjectiveClassString)));
         } catch (Assert.AssertException e){
             return new HashMap<>();
         }
 
         try {
             Map<String, JSONObject> adjectiveChunks = new HashMap<>();
-            Class<? extends Thing> adjectiveClass = OntologyRegistry.thingNameMap.get(adjectiveClassString);
+            Class<? extends Thing> adjectiveClass = Ontology.thingNameMap.get(adjectiveClassString);
             Set<String> adjectiveStrings = null;
             adjectiveStrings = Lexicon.getPOSForClass(adjectiveClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, yodaEnvironment.nlg.grammarPreferences, false);
 

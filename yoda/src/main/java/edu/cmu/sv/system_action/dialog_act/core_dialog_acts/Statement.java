@@ -4,7 +4,7 @@ import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.dialog_state_tracking.Utils;
-import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.noun.Noun;
 import edu.cmu.sv.ontology.verb.Verb;
@@ -51,7 +51,7 @@ public class Statement extends DialogAct {
         SemanticsModel ans = super.getNlgCommand();
         ans.getInternalRepresentation().put("verb",
                 SemanticsModel.parseJSON("{\"class\":\""+this.getBoundClasses().get("verb_class")+"\"}"));
-        String topicString = OntologyRegistry.webResourceWrap((String) this.getBoundIndividuals().get("topic_individual"));
+        String topicString = Ontology.webResourceWrap((String) this.getBoundIndividuals().get("topic_individual"));
         ((JSONObject)ans.newGetSlotPathFiller("verb")).put("Agent", SemanticsModel.parseJSON(topicString));
         ((JSONObject)ans.newGetSlotPathFiller("verb")).put("Patient",
                 SemanticsModel.parseJSON(((JSONObject)this.getBoundDescriptions().get("asserted_role_description")).toJSONString()));

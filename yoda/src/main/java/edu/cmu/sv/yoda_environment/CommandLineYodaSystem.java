@@ -1,8 +1,12 @@
 package edu.cmu.sv.yoda_environment;
 
+import edu.cmu.sv.domain.DomainSpec;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by David Cohen on 11/21/14.
@@ -12,8 +16,15 @@ import java.io.InputStreamReader;
  */
 public class CommandLineYodaSystem {
 
+    public static Set<DomainSpec> domainSpecs = new HashSet<>();
+
     public static void main(String[] args) throws IOException {
         YodaEnvironment yodaEnvironment = YodaEnvironment.dialogTestingEnvironment();
+
+        for (DomainSpec spec : domainSpecs){
+            yodaEnvironment.loadDomain(spec);
+        }
+
         Thread dstThread = new Thread(yodaEnvironment.dst);
         dstThread.start();
         Thread dmThread = new Thread(yodaEnvironment.dm);

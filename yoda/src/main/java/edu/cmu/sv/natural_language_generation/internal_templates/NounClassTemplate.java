@@ -3,7 +3,7 @@ package edu.cmu.sv.natural_language_generation.internal_templates;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.natural_language_generation.Template;
-import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.noun.Noun;
 import edu.cmu.sv.semantics.SemanticsModel;
@@ -25,7 +25,7 @@ public class NounClassTemplate implements Template {
         try {
             Assert.verify(constraints.containsKey("class"));
             Assert.verify(constraints.keySet().size()==1);
-            nounClass = OntologyRegistry.thingNameMap.get((String) constraints.get("class"));
+            nounClass = Ontology.thingNameMap.get((String) constraints.get("class"));
             Assert.verify(Noun.class.isAssignableFrom(nounClass));
         } catch (Assert.AssertException e){
             return new HashMap<>();

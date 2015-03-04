@@ -1,8 +1,6 @@
 package edu.cmu.sv.utils;
 
 import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
-import edu.cmu.sv.ontology.OntologyRegistry;
-import edu.cmu.sv.ontology.verb.Verb;
 import org.apache.commons.math3.random.RandomData;
 import org.apache.commons.math3.random.RandomDataImpl;
 

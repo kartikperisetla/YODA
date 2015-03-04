@@ -2,7 +2,7 @@ package edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts;
 
 import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
-import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.noun.Noun;
 import edu.cmu.sv.semantics.SemanticsModel;
@@ -51,7 +51,7 @@ public class RequestConfirmValue extends ClarificationDialogAct {
     @Override
     public SemanticsModel getNlgCommand() {
         SemanticsModel ans = super.getNlgCommand();
-        String topicString = OntologyRegistry.webResourceWrap((String) this.getBoundIndividuals().get("topic_individual"));
+        String topicString = Ontology.webResourceWrap((String) this.getBoundIndividuals().get("topic_individual"));
         ans.getInternalRepresentation().put("topic", SemanticsModel.parseJSON(topicString));
         return ans;
     }

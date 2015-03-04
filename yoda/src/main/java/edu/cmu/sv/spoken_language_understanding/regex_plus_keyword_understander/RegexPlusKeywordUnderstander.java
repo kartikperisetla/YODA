@@ -1,7 +1,7 @@
 package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander;
 
 import edu.cmu.sv.dialog_state_tracking.Turn;
-import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.ontology.adjective.Adjective;
 import edu.cmu.sv.ontology.noun.PointOfInterest;
 import edu.cmu.sv.ontology.quality.TransientQuality;
@@ -51,13 +51,13 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
     static {
         // add regex interpreters
         languageInterpreters.add(new YnqExistRegexInterpreter());
-        for (Class<? extends Adjective> adjectiveClass : OntologyRegistry.adjectiveClasses){
+        for (Class<? extends Adjective> adjectiveClass : Ontology.adjectiveClasses){
             languageInterpreters.add(new YnqHasPropertyRegexInterpreter(adjectiveClass));
         }
-        for (Class<? extends TransientQuality> qualityClass : OntologyRegistry.qualityClasses){
+        for (Class<? extends TransientQuality> qualityClass : Ontology.qualityClasses){
             languageInterpreters.add(new WhqHasPropertyRegexInterpreter(qualityClass));
         }
-        for (Class<? extends Verb> verbClass : OntologyRegistry.verbClasses){
+        for (Class<? extends Verb> verbClass : Ontology.verbClasses){
             languageInterpreters.add(new CommandRegexInterpreter(verbClass));
             languageInterpreters.add(new CommandKeywordInterpreter(verbClass));
         }

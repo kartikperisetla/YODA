@@ -3,7 +3,7 @@ package edu.cmu.sv.natural_language_generation.top_level_templates;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.natural_language_generation.Template;
-import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.ontology.misc.Requested;
 import edu.cmu.sv.ontology.verb.HasProperty;
 import edu.cmu.sv.semantics.SemanticsModel;
@@ -49,7 +49,7 @@ public class RequestAgentTemplate implements Template {
         Map<String, JSONObject> verbChunks = new HashMap<>();
         Set<String> verbStrings;
         try{
-            verbStrings = Lexicon.getPOSForClass(OntologyRegistry.thingNameMap.get(verbClassString),
+            verbStrings = Lexicon.getPOSForClass(Ontology.thingNameMap.get(verbClassString),
                     Lexicon.LexicalEntry.PART_OF_SPEECH.S1_VERB, yodaEnvironment.nlg.grammarPreferences, false);
         } catch (Lexicon.NoLexiconEntryException e) {
             verbStrings = new HashSet<>();

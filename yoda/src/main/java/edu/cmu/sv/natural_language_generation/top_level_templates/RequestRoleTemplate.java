@@ -3,7 +3,7 @@ package edu.cmu.sv.natural_language_generation.top_level_templates;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.natural_language_generation.Template;
-import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.misc.Requested;
 import edu.cmu.sv.ontology.role.Role;
@@ -45,8 +45,8 @@ public class RequestRoleTemplate implements Template {
             Assert.verify(constraintsModel.findAllPathsToClass(Requested.class.getSimpleName()).size()==1);
             requestedSlotPath = new LinkedList<>(constraintsModel.findAllPathsToClass(Requested.class.getSimpleName())).get(0);
             String[] fillerPath = requestedSlotPath.split("\\.");
-            Assert.verify(OntologyRegistry.roleNameMap.containsKey(fillerPath[fillerPath.length - 1]));
-            roleClass = OntologyRegistry.roleNameMap.get(fillerPath[fillerPath.length - 1]);
+            Assert.verify(Ontology.roleNameMap.containsKey(fillerPath[fillerPath.length - 1]));
+            roleClass = Ontology.roleNameMap.get(fillerPath[fillerPath.length - 1]);
         } catch (Assert.AssertException e){
             return new HashMap<>();
         }
@@ -67,7 +67,7 @@ public class RequestRoleTemplate implements Template {
             rolePrefixStrings = Lexicon.getPOSForClass(roleClass,
                     Lexicon.LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, yodaEnvironment.nlg.grammarPreferences, false);
 
-            verbStrings = Lexicon.getPOSForClass(OntologyRegistry.thingNameMap.get(verbClassString),
+            verbStrings = Lexicon.getPOSForClass(Ontology.thingNameMap.get(verbClassString),
                     Lexicon.LexicalEntry.PART_OF_SPEECH.S1_VERB, yodaEnvironment.nlg.grammarPreferences, false);
 
         } catch (InstantiationException | IllegalAccessException | Lexicon.NoLexiconEntryException e) {

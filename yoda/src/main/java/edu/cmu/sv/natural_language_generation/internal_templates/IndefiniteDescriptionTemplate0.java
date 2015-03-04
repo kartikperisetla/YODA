@@ -3,7 +3,7 @@ package edu.cmu.sv.natural_language_generation.internal_templates;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.natural_language_generation.Template;
-import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.adjective.Adjective;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
@@ -30,17 +30,17 @@ public class IndefiniteDescriptionTemplate0 implements Template {
             Assert.verify(constraints.containsKey("refType"));
             Assert.verify(constraints.get("refType").equals("indefinite"));
             if (constraints.containsKey("class")) {
-                nounClass = OntologyRegistry.thingNameMap.get((String) constraints.get("class"));
+                nounClass = Ontology.thingNameMap.get((String) constraints.get("class"));
                 Assert.verify(Noun.class.isAssignableFrom(nounClass));
             }
             for (Object key : constraints.keySet()){
                 if (key.equals("refType") || key.equals("class"))
                     continue;
-                if (!OntologyRegistry.roleNameMap.containsKey(key))
+                if (!Ontology.roleNameMap.containsKey(key))
                     continue;
-                if (OntologyRegistry.adjectiveOrPrepositionInRange(OntologyRegistry.roleNameMap.get(key)).equals(Adjective.class))
+                if (Ontology.adjectiveOrPrepositionInRange(Ontology.roleNameMap.get(key)).equals(Adjective.class))
                     adjectiveDescriptors.put(key, (JSONObject) constraints.get(key));
-                else if (OntologyRegistry.adjectiveOrPrepositionInRange(OntologyRegistry.roleNameMap.get(key)).equals(Preposition.class))
+                else if (Ontology.adjectiveOrPrepositionInRange(Ontology.roleNameMap.get(key)).equals(Preposition.class))
                     prepositionDescriptors.put(key, (JSONObject) constraints.get(key));
             }
         } catch (Assert.AssertException e){

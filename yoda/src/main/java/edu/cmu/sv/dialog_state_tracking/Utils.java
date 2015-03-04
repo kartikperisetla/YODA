@@ -1,6 +1,6 @@
 package edu.cmu.sv.dialog_state_tracking;
 
-import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.semantics.SemanticsModel;
@@ -52,10 +52,10 @@ public class Utils {
         SemanticsModel targetSemanticsModel = predecessorDiscourseUnit.initiator.equals("system") ?
                 predecessorDiscourseUnit.getGroundTruth() : predecessorDiscourseUnit.getGroundInterpretation();
         Set<Object> verbRoles = ((JSONObject) targetSemanticsModel.newGetSlotPathFiller("verb")).keySet();
-        Class<? extends Thing> contentClass = OntologyRegistry.thingNameMap.get(suggestionContent.get("class"));
+        Class<? extends Thing> contentClass = Ontology.thingNameMap.get(suggestionContent.get("class"));
         for (Object key : verbRoles){
-            if (OntologyRegistry.roleNameMap.containsKey(key)){
-                Class<? extends Role> roleClass = OntologyRegistry.roleNameMap.get(key);
+            if (Ontology.roleNameMap.containsKey(key)){
+                Class<? extends Role> roleClass = Ontology.roleNameMap.get(key);
                 Set<Class<? extends Thing>> range = new HashSet<>();
                 try {
                     range = roleClass.newInstance().getRange();

@@ -6,7 +6,7 @@ import edu.cmu.sv.database.StringSimilarity;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.dialog_state_tracking.Utils;
-import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.adjective.Adjective;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
@@ -135,7 +135,7 @@ public class ReferenceResolution {
             int referenceIndex = tmpVarIndex;
             tmpVarIndex ++;
             String ans = "";
-            if (Noun.class.isAssignableFrom(OntologyRegistry.thingNameMap.get((String) reference.get("class")))) {
+            if (Noun.class.isAssignableFrom(Ontology.thingNameMap.get((String) reference.get("class")))) {
                 ans += "?x" + referenceIndex + " rdf:type base:" + reference.get("class") + " .\n";
             }
             List<String> scoresToAccumulate = new LinkedList<>();
@@ -156,11 +156,11 @@ public class ReferenceResolution {
                     } else {
                         throw new Error("unknown / unhandled reference type"+ reference.get(key));
                     }
-                } else if (HasQualityRole.class.isAssignableFrom(OntologyRegistry.roleNameMap.get((String) key))) {
+                } else if (HasQualityRole.class.isAssignableFrom(Ontology.roleNameMap.get((String) key))) {
                     double center;
                     double slope;
                     Class<? extends TransientQuality> qualityClass;
-                    Class<? extends Thing> qualityDegreeClass = OntologyRegistry.thingNameMap.
+                    Class<? extends Thing> qualityDegreeClass = Ontology.thingNameMap.
                             get((String) ((JSONObject) reference.get(key)).get("class"));
                     List<String> entityURIs = new LinkedList<>();
                     entityURIs.add("?x" + referenceIndex);
@@ -177,7 +177,7 @@ public class ReferenceResolution {
                     ans += qualityClass.newInstance().getQualityCalculatorSPARQLQuery().apply(entityURIs) +
                             "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
                     ans += "FILTER(?score"+tmpVarIndex+" > "+.5+")\n";
-                } else if (HasName.class.equals(OntologyRegistry.roleNameMap.get((String) key))) {
+                } else if (HasName.class.equals(Ontology.roleNameMap.get((String) key))) {
                     ans += "?x" + referenceIndex + " rdfs:label ?tmp" + tmpVarIndex + " . \n" +
                             "base:" + ((JSONObject)reference.get(HasName.class.getSimpleName())).
                             get(HasURI.class.getSimpleName()) + " rdf:value ?tmpV" + tmpVarIndex + " . \n" +
@@ -193,11 +193,11 @@ public class ReferenceResolution {
             for (Object key : reference.keySet()) {
                 if (key.equals("class") || key.equals("refType"))
                     continue;
-                if (HasQualityRole.class.isAssignableFrom(OntologyRegistry.roleNameMap.get((String) key))) {
+                if (HasQualityRole.class.isAssignableFrom(Ontology.roleNameMap.get((String) key))) {
                     double center;
                     double slope;
                     Class<? extends TransientQuality> qualityClass;
-                    Class<? extends Thing> qualityDegreeClass = OntologyRegistry.thingNameMap.
+                    Class<? extends Thing> qualityDegreeClass = Ontology.thingNameMap.
                             get((String) ((JSONObject) reference.get(key)).get("class"));
                     List<String> entityURIs = new LinkedList<>();
                     entityURIs.add("?x" + referenceIndex);
@@ -263,11 +263,11 @@ public class ReferenceResolution {
 //                    System.out.println("requiring individual to have type: base:"+description.get(key));
                 } else if (key.equals("refType")){
                     continue;
-                } else if (HasQualityRole.class.isAssignableFrom(OntologyRegistry.roleNameMap.get((String) key))) {
+                } else if (HasQualityRole.class.isAssignableFrom(Ontology.roleNameMap.get((String) key))) {
                     double center;
                     double slope;
                     Class<? extends TransientQuality> qualityClass;
-                    Class<? extends Thing> qualityDegreeClass = OntologyRegistry.thingNameMap.
+                    Class<? extends Thing> qualityDegreeClass = Ontology.thingNameMap.
                             get((String) ((JSONObject) description.get(key)).get("class"));
                     List<String> entityURIs = new LinkedList<>();
                     entityURIs.add("<"+individualURI+">");
@@ -291,7 +291,7 @@ public class ReferenceResolution {
                     queryString += qualityClass.newInstance().getQualityCalculatorSPARQLQuery().apply(entityURIs) +
                             "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
                     scoresToAccumulate.add("?score"+tmpVarIndex);
-                } else if (HasName.class.equals(OntologyRegistry.roleNameMap.get((String) key))) {
+                } else if (HasName.class.equals(Ontology.roleNameMap.get((String) key))) {
                     queryString += "<"+individualURI+"> rdfs:label ?tmp" + tmpVarIndex + " . \n" +
                             "base:" + ((JSONObject)description.get(HasName.class.getSimpleName())).
                             get(HasURI.class.getSimpleName()) + " rdf:value ?tmpV" + tmpVarIndex + " . \n" +
@@ -353,7 +353,7 @@ public class ReferenceResolution {
         SemanticsModel spokenByThem = targetDiscourseUnit.getSpokenByThem();
         SemanticsModel currentGroundedInterpretation = targetDiscourseUnit.getGroundInterpretation();
         String verb = (String)spokenByThem.newGetSlotPathFiller("verb.class");
-        Class<? extends Verb> verbClass = OntologyRegistry.verbNameMap.get(verb);
+        Class<? extends Verb> verbClass = Ontology.verbNameMap.get(verb);
 
         try {
             for (String path : targetDiscourseUnit.getSpokenByThem().getAllInternalNodePaths().stream().
@@ -362,7 +362,7 @@ public class ReferenceResolution {
                         || Arrays.asList("", "dialogAct", "verb").contains(path)
                         || slotPathsToResolve.stream().anyMatch(x -> path.startsWith(x)))
                     continue;
-                if (!Noun.class.isAssignableFrom(OntologyRegistry.thingNameMap.get(((JSONObject)spokenByThem.newGetSlotPathFiller(path)).get("class"))))
+                if (!Noun.class.isAssignableFrom(Ontology.thingNameMap.get(((JSONObject)spokenByThem.newGetSlotPathFiller(path)).get("class"))))
                     continue;
                 slotPathsToResolve.add(path);
             }
@@ -402,7 +402,7 @@ public class ReferenceResolution {
             for (String pathToInfer : pathsToInfer){
                 resolutionMarginals.put(pathToInfer,
                         inferRole(yodaEnvironment,
-                                OntologyRegistry.roleNameMap.get(pathToInfer.split("\\.")[pathToInfer.split("\\.").length - 1])));
+                                Ontology.roleNameMap.get(pathToInfer.split("\\.")[pathToInfer.split("\\.").length - 1])));
             }
 
 
@@ -420,10 +420,10 @@ public class ReferenceResolution {
                         continue;
                     if (groundedModel.newGetSlotPathFiller(slotPathVariable)==null){
                         SemanticsModel.putAtPath(groundedModel.getInternalRepresentation(), slotPathVariable,
-                                SemanticsModel.parseJSON(OntologyRegistry.webResourceWrap(assignment.get(slotPathVariable))));
+                                SemanticsModel.parseJSON(Ontology.webResourceWrap(assignment.get(slotPathVariable))));
                     } else {
                         SemanticsModel.overwrite((JSONObject) groundedModel.newGetSlotPathFiller(slotPathVariable),
-                                SemanticsModel.parseJSON(OntologyRegistry.webResourceWrap(assignment.get(slotPathVariable))));
+                                SemanticsModel.parseJSON(Ontology.webResourceWrap(assignment.get(slotPathVariable))));
                     }
                 }
                 // include previously grounded paths

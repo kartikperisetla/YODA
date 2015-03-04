@@ -47,8 +47,8 @@ public class RequestRoleGivenRoleTemplate implements Template {
 //            requestedSlotPath = new LinkedList<>(constraintsModel.findAllPathsToClass(Requested.class.getSimpleName())).get(0);
 //
 //            String[] fillerSequence = requestedSlotPath.split("\\.");
-//            Assert.verify(OntologyRegistry.roleNameMap.containsKey(fillerSequence[fillerSequence.length - 1]));
-//            requestedRoleClass = OntologyRegistry.roleNameMap.get(fillerSequence[fillerSequence.length - 1]);
+//            Assert.verify(Ontology.roleNameMap.containsKey(fillerSequence[fillerSequence.length - 1]));
+//            requestedRoleClass = Ontology.roleNameMap.get(fillerSequence[fillerSequence.length - 1]);
 //
 //            Assert.verify(verbObject.size()==3); //class, requested, given
 //            List<Object> verbRoles = new LinkedList<>(verbObject.keySet());
@@ -56,8 +56,8 @@ public class RequestRoleGivenRoleTemplate implements Template {
 //            verbRoles.remove(fillerSequence[fillerSequence.length - 1]);
 //            givenSlotPath = "verb."+verbRoles.get(0);
 //            givenDescription = (JSONObject) new SemanticsModel(constraints).newGetSlotPathFiller(givenSlotPath);
-//            Assert.verify(OntologyRegistry.roleNameMap.containsKey(verbRoles.get(0)));
-//            givenRoleClass = OntologyRegistry.roleNameMap.get(verbRoles.get(0));
+//            Assert.verify(Ontology.roleNameMap.containsKey(verbRoles.get(0)));
+//            givenRoleClass = Ontology.roleNameMap.get(verbRoles.get(0));
 //            // remove the given information from the verb chunk content
 //            System.out.println(constraints);
 //            verbObject.remove(verbRoles.get(0));
@@ -104,12 +104,12 @@ public class RequestRoleGivenRoleTemplate implements Template {
 //                    // just because one of the classes in range has no lexical info doesn't mean the template is broken
 //                }
 //
-//                presentVerbStrings = Lexicon.getPOSForClass(OntologyRegistry.thingNameMap.get(verbClassString),
+//                presentVerbStrings = Lexicon.getPOSForClass(Ontology.thingNameMap.get(verbClassString),
 //                        Lexicon.LexicalEntry.PART_OF_SPEECH.S1_VERB, yodaEnvironment);
 //                Map<String, JSONObject> singularVerbChunks = presentVerbStrings.stream().
 //                        collect(Collectors.toMap(x->x, (x -> SemanticsModel.parseJSON(constraints.toJSONString()))));
 //
-//                progressiveVerbStrings = Lexicon.getPOSForClass(OntologyRegistry.thingNameMap.get(verbClassString),
+//                progressiveVerbStrings = Lexicon.getPOSForClass(Ontology.thingNameMap.get(verbClassString),
 //                        Lexicon.LexicalEntry.PART_OF_SPEECH.PRESENT_PROGRESSIVE_VERB, yodaEnvironment);
 //                Map<String, JSONObject> progressiveVerbChunks = progressiveVerbStrings.stream().
 //                        collect(Collectors.toMap(x->x, (x -> SemanticsModel.parseJSON(constraints.toJSONString()))));

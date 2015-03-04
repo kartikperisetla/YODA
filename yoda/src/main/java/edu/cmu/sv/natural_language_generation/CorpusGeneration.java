@@ -2,7 +2,7 @@ package edu.cmu.sv.natural_language_generation;
 
 import edu.cmu.sv.database.dialog_task.ActionEnumeration;
 import edu.cmu.sv.dialog_management.DialogRegistry;
-import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.ontology.ThingWithRoles;
 import edu.cmu.sv.ontology.adjective.Adjective;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
@@ -54,9 +54,9 @@ public class CorpusGeneration {
                     HasProperty.class.getSimpleName() + "\", \"" +
                     Agent.class.getSimpleName() + "\":" + empty + ", \"" +
                     Patient.class.getSimpleName() + "\":" + empty + "}}";
-            for (Class<? extends TransientQuality> qualityClass : OntologyRegistry.qualityClasses) {
+            for (Class<? extends TransientQuality> qualityClass : Ontology.qualityClasses) {
                 Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> qualityDescriptor =
-                        OntologyRegistry.qualityDescriptors(qualityClass);
+                        Ontology.qualityDescriptors(qualityClass);
                 for (Class<? extends ThingWithRoles> absoluteQualityDegreeClass : qualityDescriptor.getRight()) {
                     if (Preposition.class.isAssignableFrom(absoluteQualityDegreeClass)) {
                         // get 3 example URIs
@@ -64,9 +64,9 @@ public class CorpusGeneration {
                         for (String childURI : childURIs) {
                             SemanticsModel ex0 = new SemanticsModel(YNQBaseString);
                             ex0.extendAndOverwriteAtPoint("verb." + Agent.class.getSimpleName(),
-                                    new SemanticsModel(OntologyRegistry.webResourceWrap(uri)));
+                                    new SemanticsModel(Ontology.webResourceWrap(uri)));
 
-                            JSONObject tmp = SemanticsModel.parseJSON(OntologyRegistry.webResourceWrap(childURI));
+                            JSONObject tmp = SemanticsModel.parseJSON(Ontology.webResourceWrap(childURI));
                             SemanticsModel.wrap(tmp, absoluteQualityDegreeClass.getSimpleName(), InRelationTo.class.getSimpleName());
                             SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(),
                                     qualityDescriptor.getLeft().getSimpleName());
@@ -78,7 +78,7 @@ public class CorpusGeneration {
                     } else if (Adjective.class.isAssignableFrom(absoluteQualityDegreeClass)) {
                         SemanticsModel ex0 = new SemanticsModel(YNQBaseString);
                         ex0.extendAndOverwriteAtPoint("verb." + Agent.class.getSimpleName(),
-                                new SemanticsModel(OntologyRegistry.webResourceWrap(uri)));
+                                new SemanticsModel(Ontology.webResourceWrap(uri)));
 
                         JSONObject tmp = SemanticsModel.parseJSON("{\"class\":\"" + absoluteQualityDegreeClass.getSimpleName() + "\"}");
                         SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(),
@@ -97,9 +97,9 @@ public class CorpusGeneration {
                     HasProperty.class.getSimpleName() + "\", \"" +
                     Agent.class.getSimpleName() + "\":" + empty + ", \"" +
                     Patient.class.getSimpleName() + "\":" + empty + "}}";
-            for (Class<? extends TransientQuality> qualityClass : OntologyRegistry.qualityClasses) {
+            for (Class<? extends TransientQuality> qualityClass : Ontology.qualityClasses) {
                 Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> qualityDescriptor =
-                        OntologyRegistry.qualityDescriptors(qualityClass);
+                        Ontology.qualityDescriptors(qualityClass);
 
                 for (Class<? extends ThingWithRoles> absoluteQualityDegreeClass : qualityDescriptor.getRight()) {
                     if (Preposition.class.isAssignableFrom(absoluteQualityDegreeClass)) {
@@ -109,9 +109,9 @@ public class CorpusGeneration {
 
                             SemanticsModel ex0 = new SemanticsModel(WHQBaseString);
                             ex0.extendAndOverwriteAtPoint("verb." + Agent.class.getSimpleName(),
-                                    new SemanticsModel(OntologyRegistry.webResourceWrap(uri)));
+                                    new SemanticsModel(Ontology.webResourceWrap(uri)));
 
-                            JSONObject tmp = SemanticsModel.parseJSON(OntologyRegistry.webResourceWrap(childURI));
+                            JSONObject tmp = SemanticsModel.parseJSON(Ontology.webResourceWrap(childURI));
                             SemanticsModel.wrap(tmp, absoluteQualityDegreeClass.getSimpleName(), InRelationTo.class.getSimpleName());
                             SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(),
                                     qualityDescriptor.getLeft().getSimpleName());
@@ -123,7 +123,7 @@ public class CorpusGeneration {
                     } else if (Adjective.class.isAssignableFrom(absoluteQualityDegreeClass)) {
                         SemanticsModel ex0 = new SemanticsModel(WHQBaseString);
                         ex0.extendAndOverwriteAtPoint("verb." + Agent.class.getSimpleName(),
-                                new SemanticsModel(OntologyRegistry.webResourceWrap(uri)));
+                                new SemanticsModel(Ontology.webResourceWrap(uri)));
 
                         JSONObject tmp = SemanticsModel.parseJSON("{\"class\":\"" + absoluteQualityDegreeClass.getSimpleName() + "\"}");
                         SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(),
@@ -139,7 +139,7 @@ public class CorpusGeneration {
 
 
             SemanticsModel ex1 = new SemanticsModel("{\"dialogAct\": \"Fragment\", \"topic\": " +
-                    OntologyRegistry.webResourceWrap(uri) + "}");
+                    Ontology.webResourceWrap(uri) + "}");
             ans.putAll(yodaEnvironment.nlg.generateAll(ex1, yodaEnvironment, corpusPreferences));
         }
         return ans;

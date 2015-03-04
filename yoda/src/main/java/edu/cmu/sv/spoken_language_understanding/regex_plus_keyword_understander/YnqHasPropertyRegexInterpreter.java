@@ -2,7 +2,7 @@ package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander
 
 import edu.cmu.sv.natural_language_generation.Grammar;
 import edu.cmu.sv.natural_language_generation.Lexicon;
-import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.ontology.adjective.Adjective;
 import edu.cmu.sv.ontology.quality.TransientQuality;
 import edu.cmu.sv.ontology.role.Role;
@@ -29,7 +29,7 @@ public class YnqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
         this.adjectiveClass = adjectiveClass;
         try {
             this.qualityClass = adjectiveClass.newInstance().getQuality();
-            this.hasQualityRole = OntologyRegistry.qualityDescriptors(qualityClass).getKey();
+            this.hasQualityRole = Ontology.qualityDescriptors(qualityClass).getKey();
             Set<String> adjectiveStrings = Lexicon.getPOSForClass(adjectiveClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true);
             this.adjectiveRegexString = "("+String.join("|",adjectiveStrings)+")";
         } catch (InstantiationException | IllegalAccessException e) {

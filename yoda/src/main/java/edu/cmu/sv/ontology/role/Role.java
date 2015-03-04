@@ -13,7 +13,7 @@ public abstract class Role extends Thing {
     * Domain and Range are the *UNION* of the set of classes in getDomain and getRange
     *
     * Domain and range *MUST* be based on static variables within each class, so that they can be modified
-    * inside the OntologyRegistry
+    * inside the Ontology
     *
     * */
     public abstract Set<Class <? extends ThingWithRoles>> getDomain();

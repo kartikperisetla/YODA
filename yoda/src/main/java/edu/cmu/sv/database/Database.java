@@ -1,9 +1,9 @@
 package edu.cmu.sv.database;
 
 
+import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.yoda_environment.MongoLogHandler;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
-import edu.cmu.sv.ontology.OntologyRegistry;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.ThingWithRoles;
 import edu.cmu.sv.ontology.adjective.Adjective;
@@ -99,15 +99,15 @@ public class Database {
 
         try{
             // generate the class hierarchy
-            Set<Class> databaseClasses = new HashSet<>(OntologyRegistry.nounClasses);
-            databaseClasses.addAll(OntologyRegistry.verbClasses);
-            databaseClasses.addAll(OntologyRegistry.qualityClasses);
-            Set<Class> databaseProperties = new HashSet<>(OntologyRegistry.roleClasses);
-            databaseProperties.addAll(OntologyRegistry.roleClasses);
+            Set<Class> databaseClasses = new HashSet<>(Ontology.nounClasses);
+            databaseClasses.addAll(Ontology.verbClasses);
+            databaseClasses.addAll(Ontology.qualityClasses);
+            Set<Class> databaseProperties = new HashSet<>(Ontology.roleClasses);
+            databaseProperties.addAll(Ontology.roleClasses);
             generateClassHierarchy(databaseClasses, databaseProperties);
 
             // generate the special individuals
-            addIndividuals(OntologyRegistry.individualNameMap);
+            addIndividuals(Ontology.individualNameMap);
 
             // load the registered databases
             for (String filename : DatabaseRegistry.turtleDatabaseSources) {
@@ -308,8 +308,8 @@ public class Database {
         String queryString = prefixes + "SELECT ?x WHERE { <"+entityName+"> rdf:type ?x . }";
         Set<Class> classes = runQuerySelectX(queryString).stream().
                 map(Database::getLocalName).
-                filter(x -> OntologyRegistry.thingNameMap.containsKey(x)).
-                map(OntologyRegistry.thingNameMap::get).
+                filter(x -> Ontology.thingNameMap.containsKey(x)).
+                map(Ontology.thingNameMap::get).
                 collect(Collectors.toSet());
         for (Class cls : classes){
             boolean anyChildren = false;

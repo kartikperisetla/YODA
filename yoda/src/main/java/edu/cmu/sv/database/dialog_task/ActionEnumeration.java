@@ -2,7 +2,7 @@ package edu.cmu.sv.database.dialog_task;
 
 import edu.cmu.sv.database.Database;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
-import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.ontology.verb.Verb;
@@ -93,9 +93,9 @@ public class ActionEnumeration {
                 ans.add(contextDiscourseUnit.getFromInitiator(path));
         } else {
             String[] roles = path.split("\\.");
-            Class<? extends Role> lastRole = OntologyRegistry.roleNameMap.get(roles[roles.length-1]);
-            for (Class<? extends Thing> thingClass : OntologyRegistry.thingNameMap.values()){
-                if (OntologyRegistry.inRange(lastRole, thingClass)){
+            Class<? extends Role> lastRole = Ontology.roleNameMap.get(roles[roles.length-1]);
+            for (Class<? extends Thing> thingClass : Ontology.thingNameMap.values()){
+                if (Ontology.inRange(lastRole, thingClass)){
                     JSONObject description = SemanticsModel.parseJSON("{\"class\":\""+thingClass.getSimpleName()+"\"}");
                     ans.add(description);
                     // todo: by name
@@ -118,13 +118,13 @@ public class ActionEnumeration {
 
 //        Set<Class<? extends Verb>> verbClassSet;
 //        if (enumerationType.equals(ENUMERATION_TYPE.SAMPLED)){
-//            verbClassSet = Combination.randomSubset(OntologyRegistry.verbClasses, maxOntologyBindings);
+//            verbClassSet = Combination.randomSubset(Ontology.verbClasses, maxOntologyBindings);
 //        } else {
-//            verbClassSet = OntologyRegistry.verbClasses;
+//            verbClassSet = Ontology.verbClasses;
 //        }
 
-        for (Class<? extends Verb> verbClass : OntologyRegistry.verbClasses) {
-            if (verbConstraint != null && !OntologyRegistry.thingNameMap.get(verbConstraint).equals(verbClass))
+        for (Class<? extends Verb> verbClass : Ontology.verbClasses) {
+            if (verbConstraint != null && !Ontology.thingNameMap.get(verbConstraint).equals(verbClass))
                 continue;
             if (verbClass==Verb.class)
                 continue;
@@ -133,15 +133,15 @@ public class ActionEnumeration {
 
             if (dialogAct.getPathParameters().containsKey("given_role_path")) {
                 possibleBindingsPerVariable.put("given_role_path",
-                        OntologyRegistry.roleClasses.stream().
-                                filter(x -> OntologyRegistry.inDomain(x, verbClass)).
+                        Ontology.roleClasses.stream().
+                                filter(x -> Ontology.inDomain(x, verbClass)).
                                 map(x -> "verb." + x.getSimpleName()).
                                 collect(Collectors.toSet()));
             }
             if (dialogAct.getPathParameters().containsKey("requested_role_path")) {
                 possibleBindingsPerVariable.put("requested_role_path",
-                        OntologyRegistry.roleClasses.stream().
-                                filter(x -> OntologyRegistry.inDomain(x, verbClass)).
+                        Ontology.roleClasses.stream().
+                                filter(x -> Ontology.inDomain(x, verbClass)).
                                 map(x -> "verb." + x.getSimpleName()).
                                 collect(Collectors.toSet()));
             }

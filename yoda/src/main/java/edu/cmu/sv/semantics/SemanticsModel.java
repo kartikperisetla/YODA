@@ -1,7 +1,7 @@
 package edu.cmu.sv.semantics;
 
 
-import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.ontology.misc.WebResource;
@@ -54,8 +54,8 @@ public class SemanticsModel {
         // check for class compatibility
         if (source.get("class")==null || insertionContent.get("class")==null)
             throw new Error("one of these does not have a class!"+source + insertionContent);
-        Class sourceClass = OntologyRegistry.thingNameMap.get(source.get("class"));
-        Class insertionClass = OntologyRegistry.thingNameMap.get(insertionContent.get("class"));
+        Class sourceClass = Ontology.thingNameMap.get(source.get("class"));
+        Class insertionClass = Ontology.thingNameMap.get(insertionContent.get("class"));
         if (sourceClass==null || insertionClass==null){
             System.out.println("one of these classes is missing from thingNameMap: "+source.get("class")+", "+insertionContent.get("class"));
         }
@@ -104,8 +104,8 @@ public class SemanticsModel {
         // check for class compatibility
         if (source.get("class")==null || insertionContent.get("class")==null)
             throw new Error("one of these does not have a class!" + source + insertionContent);
-        Class sourceClass = OntologyRegistry.thingNameMap.get(source.get("class"));
-        Class insertionClass = OntologyRegistry.thingNameMap.get(insertionContent.get("class"));
+        Class sourceClass = Ontology.thingNameMap.get(source.get("class"));
+        Class insertionClass = Ontology.thingNameMap.get(insertionContent.get("class"));
         if (sourceClass==null || insertionClass==null){
             System.out.println("one of these classes is missing from thingNameMap: "+source.get("class")+", "+insertionContent.get("class"));
         }
@@ -473,15 +473,15 @@ public class SemanticsModel {
         String clsString = (String) getSlotPathFillerHelper(description, "class");
         if (clsString==null)
             throw new Error("thing description missing class slot: "+description);
-        Class<? extends Thing> cls = OntologyRegistry.thingNameMap.get(clsString);
+        Class<? extends Thing> cls = Ontology.thingNameMap.get(clsString);
         // check that all slots correspond to roles which this node's class is in the domain of
         for (Object slot : description.keySet()){
             if (slot.equals("class") || slot.equals("refType"))
                 continue;
             boolean inDomain = false;
-            if (!OntologyRegistry.roleNameMap.containsKey(slot))
+            if (!Ontology.roleNameMap.containsKey(slot))
                 throw new Error("thing description's class not in registry: "+description);
-            for (Class<? extends Thing> domainMember : OntologyRegistry.roleNameMap.get(slot).newInstance().getDomain()){
+            for (Class<? extends Thing> domainMember : Ontology.roleNameMap.get(slot).newInstance().getDomain()){
                 if (domainMember.isAssignableFrom(cls)) {
                     inDomain = true;
                     break;

@@ -3,7 +3,7 @@ package edu.cmu.sv.natural_language_generation.top_level_templates;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.natural_language_generation.Template;
-import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.ontology.ThingWithRoles;
 import edu.cmu.sv.ontology.misc.Requested;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
@@ -51,12 +51,12 @@ public class HasPropertyWHQTemplate0 implements Template {
             requestedSlotPath = new LinkedList<>(constraintsModel.findAllPathsToClass(Requested.class.getSimpleName())).get(0);
             requestedContent = (JSONObject) constraintsModel.newGetSlotPathFiller(requestedSlotPath);
             if (requestedContent.containsKey(HasValue.class.getSimpleName())) {
-                requestedQuality = (Class<? extends TransientQuality>) OntologyRegistry.thingNameMap.get(
+                requestedQuality = (Class<? extends TransientQuality>) Ontology.thingNameMap.get(
                         (String) ((JSONObject) requestedContent.get(HasValue.class.getSimpleName())).get("class"));
             }
             String[] fillerSequence = requestedSlotPath.split("\\.");
-            Assert.verify(OntologyRegistry.roleNameMap.containsKey(fillerSequence[fillerSequence.length - 1]));
-            requestedRoleClass = OntologyRegistry.roleNameMap.get(fillerSequence[fillerSequence.length - 1]);
+            Assert.verify(Ontology.roleNameMap.containsKey(fillerSequence[fillerSequence.length - 1]));
+            requestedRoleClass = Ontology.roleNameMap.get(fillerSequence[fillerSequence.length - 1]);
 
             Assert.verify(verbObject.size() == 3); //class, requested, given
             List<Object> verbRoles = new LinkedList<>(verbObject.keySet());
@@ -64,8 +64,8 @@ public class HasPropertyWHQTemplate0 implements Template {
             verbRoles.remove(fillerSequence[fillerSequence.length - 1]);
             givenSlotPath = "verb." + verbRoles.get(0);
             givenDescription = (JSONObject) new SemanticsModel(constraints).newGetSlotPathFiller(givenSlotPath);
-            Assert.verify(OntologyRegistry.roleNameMap.containsKey(verbRoles.get(0)));
-            givenRoleClass = OntologyRegistry.roleNameMap.get(verbRoles.get(0));
+            Assert.verify(Ontology.roleNameMap.containsKey(verbRoles.get(0)));
+            givenRoleClass = Ontology.roleNameMap.get(verbRoles.get(0));
             // remove the given information from the verb chunk content
             System.out.println(constraints);
             verbObject.remove(verbRoles.get(0));
@@ -81,7 +81,7 @@ public class HasPropertyWHQTemplate0 implements Template {
 
 
         if (requestedQuality != null) {
-            Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> qualityDescriptors = OntologyRegistry.qualityDescriptors(requestedQuality);
+            Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> qualityDescriptors = Ontology.qualityDescriptors(requestedQuality);
             for (Class<? extends ThingWithRoles> adjectiveClass : qualityDescriptors.getRight()) {
                 try {
                     adjectiveStrings.addAll(Lexicon.getPOSForClassHierarchy(adjectiveClass,

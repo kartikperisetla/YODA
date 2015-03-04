@@ -2,7 +2,7 @@ package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander
 
 import edu.cmu.sv.natural_language_generation.Grammar;
 import edu.cmu.sv.natural_language_generation.Lexicon;
-import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.ontology.role.Role;
 import edu.cmu.sv.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
@@ -32,8 +32,8 @@ public class CommandRegexInterpreter implements MiniLanguageInterpreter {
             verbNounStrings.addAll(Lexicon.getPOSForClass(verbClass, Lexicon.LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true));
             this.verbRegexString = "("+String.join("|",verbNounStrings)+")";
         } catch (Lexicon.NoLexiconEntryException e) {}
-        for (Class<? extends Role> roleClass : OntologyRegistry.roleClasses) {
-            if (OntologyRegistry.inDomain(roleClass, verbClass)) {
+        for (Class<? extends Role> roleClass : Ontology.roleClasses) {
+            if (Ontology.inDomain(roleClass, verbClass)) {
                 try {
                     Set<String> roleObj1PrefixStrings = Lexicon.getPOSForClass(roleClass, Lexicon.LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true);
                     String regexString = "("+String.join("|",roleObj1PrefixStrings)+")";

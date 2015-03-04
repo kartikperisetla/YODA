@@ -1,19 +1,16 @@
 package edu.cmu.sv.ontology;
 
-import edu.cmu.sv.ontology.adjective.*;
-import edu.cmu.sv.ontology.misc.*;
-import edu.cmu.sv.ontology.noun.*;
-import edu.cmu.sv.ontology.noun.poi_types.*;
-import edu.cmu.sv.ontology.preposition.IsCloseTo;
+import edu.cmu.sv.domain.OntologyRegistry;
+import edu.cmu.sv.ontology.adjective.Adjective;
+import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
+import edu.cmu.sv.ontology.misc.WebResource;
+import edu.cmu.sv.ontology.noun.Noun;
 import edu.cmu.sv.ontology.preposition.Preposition;
 import edu.cmu.sv.ontology.quality.TransientQuality;
-import edu.cmu.sv.ontology.quality.binary_quality.Distance;
-import edu.cmu.sv.ontology.quality.unary_quality.Expensiveness;
-import edu.cmu.sv.ontology.quality.unary_quality.Goodness;
-import edu.cmu.sv.ontology.quality.unary_quality.Popularity;
-import edu.cmu.sv.ontology.role.*;
-import edu.cmu.sv.ontology.role.has_quality_subroles.*;
-import edu.cmu.sv.ontology.verb.*;
+import edu.cmu.sv.ontology.role.HasURI;
+import edu.cmu.sv.ontology.role.Role;
+import edu.cmu.sv.ontology.role.has_quality_subroles.HasQualityRole;
+import edu.cmu.sv.ontology.verb.Verb;
 import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -25,7 +22,7 @@ import java.util.stream.Collectors;
 /**
  * Created by David Cohen on 9/22/14.
  */
-public class OntologyRegistry {
+public class Ontology {
     public static Set<Class <? extends Verb>> verbClasses = new HashSet<>();
     public static Set<Class <? extends Noun>> nounClasses = new HashSet<>();
     public static Set<Class <? extends Adjective>> adjectiveClasses = new HashSet<>();
@@ -41,183 +38,18 @@ public class OntologyRegistry {
 
     public static Map<Class<? extends ThingWithRoles>, Set<Class<? extends TransientQuality>>> qualitiesForClass = new HashMap<>();
 
+    public static void loadOntologyRegistry(OntologyRegistry registry){
+        verbClasses.addAll(registry.getVerbClasses());
+        nounClasses.addAll(registry.getNounClasses());
+        adjectiveClasses.addAll(registry.getAdjectiveClasses());
+        prepositionClasses.addAll(registry.getPrepositionClasses());
+        roleClasses.addAll(registry.getRoleClasses());
+        qualityClasses.addAll(registry.getQualityClasses());
+        miscClasses.addAll(registry.getMiscClasses());
+    }
+
+
     static{
-        // register classes
-        verbClasses.add(Verb.class);
-        verbClasses.add(Create.class);
-        verbClasses.add(HasProperty.class);
-        verbClasses.add(Exist.class);
-        verbClasses.add(GiveDirections.class);
-        verbClasses.add(MakeReservation.class);
-
-        nounClasses.add(Noun.class);
-        nounClasses.add(Person.class);
-        nounClasses.add(Email.class);
-        nounClasses.add(Meeting.class);
-        nounClasses.add(Time.class);
-        nounClasses.add(PointOfInterest.class);
-
-	nounClasses.add(Restaurants.class);
-	nounClasses.add(Food.class);
-	nounClasses.add(Bars.class);
-	nounClasses.add(Mexican.class);
-	nounClasses.add(AmericanTraditional.class);
-	nounClasses.add(FastFood.class);
-	nounClasses.add(Pizza.class);
-	nounClasses.add(HotelsAndTravel.class);
-	nounClasses.add(Sandwiches.class);
-	nounClasses.add(CoffeeAndTea.class);
-	nounClasses.add(AmericanNew.class);
-	nounClasses.add(Italian.class);
-	nounClasses.add(Chinese.class);
-	nounClasses.add(Hotels.class);
-	nounClasses.add(Burgers.class);
-	nounClasses.add(Grocery.class);
-	nounClasses.add(BreakfastAndBrunch.class);
-	nounClasses.add(IceCreamAndFrozenYogurt.class);
-	nounClasses.add(SpecialtyFood.class);
-	nounClasses.add(Bakeries.class);
-	nounClasses.add(Pubs.class);
-	nounClasses.add(Japanese.class);
-	nounClasses.add(SportsBars.class);
-	nounClasses.add(ConvenienceStores.class);
-	nounClasses.add(Delis.class);
-	nounClasses.add(SushiBars.class);
-	nounClasses.add(Steakhouses.class);
-	nounClasses.add(Cafes.class);
-	nounClasses.add(Seafood.class);
-	nounClasses.add(Desserts.class);
-	nounClasses.add(Buffets.class);
-	nounClasses.add(Barbeque.class);
-	nounClasses.add(Thai.class);
-	nounClasses.add(Mediterranean.class);
-	nounClasses.add(BeerWineAndSpirits.class);
-	nounClasses.add(ChickenWings.class);
-	nounClasses.add(AsianFusion.class);
-	nounClasses.add(JuiceBarsAndSmoothies.class);
-	nounClasses.add(Greek.class);
-	nounClasses.add(Indian.class);
-	nounClasses.add(TexMex.class);
-	nounClasses.add(Donuts.class);
-	nounClasses.add(Diners.class);
-	nounClasses.add(HotDogs.class);
-	nounClasses.add(Vietnamese.class);
-	nounClasses.add(WineBars.class);
-	nounClasses.add(LocalFlavor.class);
-	nounClasses.add(Salad.class);
-	nounClasses.add(DiveBars.class);
-	nounClasses.add(Vegetarian.class);
-	nounClasses.add(British.class);
-	nounClasses.add(French.class);
-	nounClasses.add(Bagels.class);
-	nounClasses.add(Korean.class);
-	nounClasses.add(EthnicFood.class);
-	nounClasses.add(Hawaiian.class);
-	nounClasses.add(Caterers.class);
-	nounClasses.add(GlutenFree.class);
-	nounClasses.add(MiddleEastern.class);
-	nounClasses.add(FarmersMarket.class);
-	nounClasses.add(Gastropubs.class);
-	nounClasses.add(LatinAmerican.class);
-	nounClasses.add(FoodTrucks.class);
-	nounClasses.add(Karaoke.class);
-	nounClasses.add(CandyStores.class);
-	nounClasses.add(Breweries.class);
-	nounClasses.add(FishAndChips.class);
-	nounClasses.add(Vegan.class);
-	nounClasses.add(GayBars.class);
-	nounClasses.add(ChocolatiersAndShops.class);
-	nounClasses.add(FoodDeliveryServices.class);
-	nounClasses.add(Pakistani.class);
-	nounClasses.add(ShavedIce.class);
-	nounClasses.add(FoodStands.class);
-	nounClasses.add(Filipino.class);
-	nounClasses.add(CocktailBars.class);
-	nounClasses.add(Southern.class);
-	nounClasses.add(HookahBars.class);
-	nounClasses.add(CajunCreole.class);
-	nounClasses.add(Irish.class);
-	nounClasses.add(TeaRooms.class);
-	nounClasses.add(SoulFood.class);
-	nounClasses.add(Soup.class);
-	nounClasses.add(Caribbean.class);
-	nounClasses.add(Spanish.class);
-	nounClasses.add(TapasSmallPlates.class);
-	nounClasses.add(FruitsAndVeggies.class);
-	nounClasses.add(Cheesesteaks.class);
-	nounClasses.add(TapasBars.class);
-	nounClasses.add(SportsClubs.class);
-	nounClasses.add(DimSum.class);
-	nounClasses.add(ComfortFood.class);
-	nounClasses.add(ModernEuropean.class);
-	nounClasses.add(Scottish.class);
-	nounClasses.add(Creperies.class);
-	nounClasses.add(CheeseShops.class);
-
-        // nounClasses.add(Bank.class);
-        // nounClasses.add(Bar.class);
-        // nounClasses.add(Bench.class);
-        // nounClasses.add(BicycleParking.class);
-        // nounClasses.add(Cafe.class);
-        // nounClasses.add(FastFood.class);
-        // nounClasses.add(GarbageCan.class);
-        // nounClasses.add(GasStation.class);
-        // nounClasses.add(GraveYard.class);
-        // nounClasses.add(Hospital.class);
-        // nounClasses.add(Kindergarten.class);
-        // nounClasses.add(MailBox.class);
-        // nounClasses.add(Parking.class);
-        // nounClasses.add(Pharmacy.class);
-        // nounClasses.add(PlaceOfWorship.class);
-        // nounClasses.add(PostOffice.class);
-        // nounClasses.add(PublicBuilding.class);
-        // nounClasses.add(PublicTelephone.class);
-        // nounClasses.add(Recycling.class);
-        // nounClasses.add(Restaurant.class);
-        // nounClasses.add(Restroom.class);
-        // nounClasses.add(School.class);
-        // nounClasses.add(Shelter.class);
-
-        roleClasses.add(Role.class);
-        roleClasses.add(Agent.class);
-        roleClasses.add(Patient.class);
-        roleClasses.add(HasAtTime.class);
-        roleClasses.add(HasHour.class);
-        roleClasses.add(HasName.class);
-        roleClasses.add(HasValues.class);
-        roleClasses.add(HasValue.class);
-        roleClasses.add(HasURI.class);
-        roleClasses.add(HasDistance.class);
-        roleClasses.add(HasExpensiveness.class);
-        roleClasses.add(HasGoodness.class);
-        roleClasses.add(HasPopularity.class);
-        roleClasses.add(InRelationTo.class);
-        roleClasses.add(Origin.class);
-        roleClasses.add(Destination.class);
-
-        adjectiveClasses.add(Cheap.class);
-        adjectiveClasses.add(Expensive.class);
-        adjectiveClasses.add(Good.class);
-        adjectiveClasses.add(Popular.class);
-//        adjectiveClasses.add(ExpensivenessAdjective.class);
-
-        prepositionClasses.add(IsCloseTo.class);
-//        prepositionClasses.add(DistancePreposition.class);
-
-        qualityClasses.add(Expensiveness.class);
-        qualityClasses.add(Goodness.class);
-        qualityClasses.add(Popularity.class);
-        qualityClasses.add(Distance.class);
-
-        miscClasses.add(NonHearing.class);
-        miscClasses.add(NonUnderstanding.class);
-        miscClasses.add(Requested.class);
-        miscClasses.add(Suggested.class);
-        miscClasses.add(UnknownThingWithRoles.class);
-        miscClasses.add(Or.class);
-        miscClasses.add(And.class);
-        miscClasses.add(WebResource.class);
-
         // recursively register parents
         recursivelyRegisterParents(verbClasses);
         recursivelyRegisterParents(nounClasses);
@@ -315,7 +147,7 @@ public class OntologyRegistry {
             return new ImmutablePair<>(roleClass, adjectiveAndPrepositionClasses);
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
-            throw new Error("OntologyRegistry.qualityDescriptors: instantiation or access exception:" + qualityClass);
+            throw new Error("Ontology.qualityDescriptors: instantiation or access exception:" + qualityClass);
         }
     }
 

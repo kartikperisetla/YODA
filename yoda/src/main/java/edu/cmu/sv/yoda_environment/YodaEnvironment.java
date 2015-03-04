@@ -6,7 +6,10 @@ import edu.cmu.sv.dialog_management.DialogManager;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DialogStateTracker;
 import edu.cmu.sv.dialog_state_tracking.Turn;
+import edu.cmu.sv.domain.DomainSpec;
+import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
+import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.spoken_language_understanding.SpokenLanguageUnderstander;
 import edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander.RegexPlusKeywordUnderstander;
 import edu.cmu.sv.system_action.CommandLineExecutor;
@@ -52,11 +55,20 @@ public class YodaEnvironment {
     public SpokenLanguageUnderstander slu;
     public Executor exe;
     public OutputHandler out;
+    public Lexicon lex;
 
     // turn + time stamp of DST input
     public BlockingQueue<Pair<Turn, Long>> DstInputQueue = new LinkedBlockingDeque<>();
     // DM input
     public BlockingQueue<Pair<Map<String, DialogState>, StringDistribution>> DmInputQueue = new LinkedBlockingDeque<>();
+
+
+    public void loadDomain(DomainSpec domainSpec){
+        //TODO: load all domain databases, add classes to ontology, load lexicon, register non-dialog tasks
+        Ontology.loadOntologyRegistry(domainSpec.getOntologyRegistry());
+        lex.loadLexicon(domainSpec.getLexicon());
+
+    }
 
     public static YodaEnvironment dialogTestingEnvironment(){
         ActionEnumeration.enumerationType = ActionEnumeration.ENUMERATION_TYPE.EXHAUSTIVE;
@@ -69,6 +81,7 @@ public class YodaEnvironment {
         ans.slu = new RegexPlusKeywordUnderstander(ans);
         ans.exe = new CommandLineExecutor(ans);
         ans.out = new FlushingStandardOutOutputHandler();
+        ans.lex = new Lexicon();
         return ans;
     }
 
@@ -83,6 +96,7 @@ public class YodaEnvironment {
         ans.slu = new RegexPlusKeywordUnderstander(ans);
         ans.exe = new JsonExecutor(ans);
         ans.out = new FlushingStandardOutOutputHandler();
+        ans.lex = new Lexicon();
         return ans;
     }
 
@@ -92,6 +106,7 @@ public class YodaEnvironment {
         YodaEnvironment ans = new YodaEnvironment();
         ans.db = new Database(ans);
         ans.nlg = new NaturalLanguageGenerator(ans);
+        ans.lex = new Lexicon();
         return ans;
     }
 

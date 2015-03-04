@@ -3,7 +3,7 @@ package edu.cmu.sv.natural_language_generation.internal_templates;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.natural_language_generation.Template;
-import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.ontology.preposition.Preposition;
@@ -45,15 +45,15 @@ public class PPTemplate0 implements Template {
 //            System.out.println(2.5);
 //            Assert.verify(SemanticsModel.parseJSON(child).get("class").equals(WebResource.class.getSimpleName()));
 //            System.out.println(3);
-            Assert.verify(OntologyRegistry.thingNameMap.containsKey(prepositionClassString));
-            Assert.verify(Preposition.class.isAssignableFrom(OntologyRegistry.thingNameMap.get(prepositionClassString)));
+            Assert.verify(Ontology.thingNameMap.containsKey(prepositionClassString));
+            Assert.verify(Preposition.class.isAssignableFrom(Ontology.thingNameMap.get(prepositionClassString)));
         } catch (Assert.AssertException e){
             return new HashMap<>();
         }
 //        System.out.println("PPTemplate: here");
 //        System.out.println(constraints);
         Map<String, JSONObject> prepositionChunks = new HashMap<>();
-        Class<? extends Thing> prepositionClass = OntologyRegistry.thingNameMap.get(prepositionClassString);
+        Class<? extends Thing> prepositionClass = Ontology.thingNameMap.get(prepositionClassString);
         Set<String> ppStrings;
         try{
             ppStrings = Lexicon.getPOSForClass(prepositionClass,

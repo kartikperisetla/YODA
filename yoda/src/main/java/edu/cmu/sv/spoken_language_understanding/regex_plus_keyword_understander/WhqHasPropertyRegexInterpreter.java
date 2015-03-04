@@ -2,7 +2,7 @@ package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander
 
 import edu.cmu.sv.natural_language_generation.Grammar;
 import edu.cmu.sv.natural_language_generation.Lexicon;
-import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.ontology.ThingWithRoles;
 import edu.cmu.sv.ontology.adjective.Adjective;
 import edu.cmu.sv.ontology.quality.TransientQuality;
@@ -30,7 +30,7 @@ public class WhqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
 
     public WhqHasPropertyRegexInterpreter(Class<? extends TransientQuality> qualityClass) {
         this.qualityClass = qualityClass;
-        Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> descriptor = OntologyRegistry.qualityDescriptors(qualityClass);
+        Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> descriptor = Ontology.qualityDescriptors(qualityClass);
         this.hasQualityRole = descriptor.getKey();
         Set<Class<? extends Adjective>> adjectiveClasses = descriptor.getRight().stream().
                 filter(Adjective.class::isAssignableFrom).

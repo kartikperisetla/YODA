@@ -2,7 +2,7 @@ package edu.cmu.sv.natural_language_generation.internal_templates;
 
 import edu.cmu.sv.database.dialog_task.ReferenceResolution;
 import edu.cmu.sv.natural_language_generation.Template;
-import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.ontology.noun.Noun;
@@ -29,7 +29,7 @@ public class ThingWithNameTemplate0 implements Template {
             Assert.verify(constraints.containsKey(HasName.class.getSimpleName()));
 //            System.out.println("ThingWithNameTemplate: "+constraints);
             Assert.verify(constraints.keySet().size() == 2);
-            nounClass = OntologyRegistry.thingNameMap.get((String) constraints.get("class"));
+            nounClass = Ontology.thingNameMap.get((String) constraints.get("class"));
             Assert.verify(Noun.class.isAssignableFrom(nounClass) || UnknownThingWithRoles.class.equals(nounClass));
         } catch (Assert.AssertException e){
             return new HashMap<>();
@@ -41,7 +41,7 @@ public class ThingWithNameTemplate0 implements Template {
         String entityURI = ReferenceResolution.resolveReference(yodaEnvironment, constraints, false).getTopHypothesis();
 
         // generate for the top resolution hypothesis
-        JSONObject wrappedEntity = SemanticsModel.parseJSON(OntologyRegistry.webResourceWrap(entityURI));
+        JSONObject wrappedEntity = SemanticsModel.parseJSON(Ontology.webResourceWrap(entityURI));
         return yodaEnvironment.nlg.generateAll(wrappedEntity, yodaEnvironment, remainingDepth);
     }
 }

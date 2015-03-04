@@ -3,7 +3,7 @@ package edu.cmu.sv.dialog_management;
 import com.google.common.collect.Iterables;
 import edu.cmu.sv.database.dialog_task.ReferenceResolution;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
-import edu.cmu.sv.ontology.OntologyRegistry;
+import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.ontology.Thing;
 import edu.cmu.sv.ontology.ThingWithRoles;
 import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
@@ -57,7 +57,7 @@ public class ActionAnalysis {
 
         SemanticsModel groundedMeaning = discourseUnit.getGroundInterpretation();
         String verb = (String) groundedMeaning.newGetSlotPathFiller("verb.class");
-        Class<? extends Verb> verbClass = OntologyRegistry.verbNameMap.get(verb);
+        Class<? extends Verb> verbClass = Ontology.verbNameMap.get(verb);
 
         try {
             Verb verbInstance = verbClass.newInstance();
@@ -80,26 +80,26 @@ public class ActionAnalysis {
                     Class<? extends TransientQuality> requestedQualityClass;
                     if (dialogActString.equals(WHQuestion.class.getSimpleName())) {
                         requestedQualityClass = (Class<? extends TransientQuality>)
-                                OntologyRegistry.thingNameMap.get(
+                                Ontology.thingNameMap.get(
                                         (String) groundedMeaning.newGetSlotPathFiller("verb.Patient.HasValue.class"));
                     } else {
                         Set<Object> patientRoles = ((JSONObject) groundedMeaning.newGetSlotPathFiller("verb.Patient")).keySet();
                         Class<? extends Role> suggestedRole = null;
                         for (Object role : patientRoles) {
-                            if (OntologyRegistry.roleNameMap.containsKey(role) &&
-                                    HasQualityRole.class.isAssignableFrom(OntologyRegistry.roleNameMap.get(role))) {
-                                suggestedRole = OntologyRegistry.roleNameMap.get(role);
+                            if (Ontology.roleNameMap.containsKey(role) &&
+                                    HasQualityRole.class.isAssignableFrom(Ontology.roleNameMap.get(role))) {
+                                suggestedRole = Ontology.roleNameMap.get(role);
                                 break;
                             }
                         }
                         if (suggestedRole == null) {
                             throw new Error("no role has been suggested");
                         }
-                        requestedQualityClass = OntologyRegistry.qualityInRolesRange(suggestedRole);
+                        requestedQualityClass = Ontology.qualityInRolesRange(suggestedRole);
                     }
 
 
-                    List<Class<? extends Thing>> qualityArguments = OntologyRegistry.qualityArguments(requestedQualityClass);
+                    List<Class<? extends Thing>> qualityArguments = Ontology.qualityArguments(requestedQualityClass);
                     if (qualityArguments.size() != 0)
                         throw new Error("the requested quality isn't an adjective");
 
@@ -109,7 +109,7 @@ public class ActionAnalysis {
                     boolean dontKnow = false;
                     StringDistribution adjectiveScores = new StringDistribution();
                     Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> descriptor =
-                            OntologyRegistry.qualityDescriptors(requestedQualityClass);
+                            Ontology.qualityDescriptors(requestedQualityClass);
                     for (Class<? extends ThingWithRoles> adjectiveClass : descriptor.getRight()) {
                         Double degreeOfMatch = yodaEnvironment.db.
                                 evaluateQualityDegree(fullArgumentList, adjectiveClass);
@@ -122,7 +122,7 @@ public class ActionAnalysis {
                     }
 
                     if (!dontKnow) {
-                        Class<? extends Thing> adjectiveClass = OntologyRegistry.thingNameMap.get(adjectiveScores.getTopHypothesis());
+                        Class<? extends Thing> adjectiveClass = Ontology.thingNameMap.get(adjectiveScores.getTopHypothesis());
                         if (adjectiveClass == null) {
                             responseStatement.put("dialogAct", DontKnow.class.getSimpleName());
                         } else {
@@ -130,7 +130,7 @@ public class ActionAnalysis {
                             SemanticsModel.wrap(description, UnknownThingWithRoles.class.getSimpleName(),
                                     descriptor.getLeft().getSimpleName());
                             responseStatement.put("dialogAct", Statement.class.getSimpleName());
-                            responseStatement.put("verb.Agent", SemanticsModel.parseJSON(OntologyRegistry.webResourceWrap(entityURI)));
+                            responseStatement.put("verb.Agent", SemanticsModel.parseJSON(Ontology.webResourceWrap(entityURI)));
                             responseStatement.put("verb.Patient", description);
                         }
                     }
@@ -145,7 +145,7 @@ public class ActionAnalysis {
                         JSONObject responseDescription = SemanticsModel.parseJSON(searchDescription.toJSONString());
                         responseDescription.put("refType", "indefinite");
                         responseStatement.put("dialogAct", Statement.class.getSimpleName());
-                        responseStatement.put("verb.Agent", SemanticsModel.parseJSON(OntologyRegistry.webResourceWrap(bestRecommendation)));
+                        responseStatement.put("verb.Agent", SemanticsModel.parseJSON(Ontology.webResourceWrap(bestRecommendation)));
                         responseStatement.put("verb.Patient", responseDescription);
 //                    System.out.println("ActionAnalysis: response statement:\n" + responseStatement);
                     }
