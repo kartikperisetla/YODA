@@ -6,20 +6,20 @@ import edu.cmu.sv.database.StringSimilarity;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.dialog_state_tracking.Utils;
-import edu.cmu.sv.ontology.Ontology;
-import edu.cmu.sv.ontology.Thing;
-import edu.cmu.sv.ontology.adjective.Adjective;
-import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
-import edu.cmu.sv.ontology.misc.WebResource;
-import edu.cmu.sv.ontology.noun.Noun;
-import edu.cmu.sv.ontology.preposition.Preposition;
-import edu.cmu.sv.ontology.quality.TransientQuality;
-import edu.cmu.sv.ontology.role.HasName;
-import edu.cmu.sv.ontology.role.HasURI;
-import edu.cmu.sv.ontology.role.InRelationTo;
-import edu.cmu.sv.ontology.role.Role;
-import edu.cmu.sv.ontology.role.has_quality_subroles.HasQualityRole;
-import edu.cmu.sv.ontology.verb.Verb;
+import edu.cmu.sv.database.Ontology;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.WebResource;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.preposition.Preposition;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasName;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasURI;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.InRelationTo;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.has_quality_subroles.HasQualityRole;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.HypothesisSetManagement;
 import edu.cmu.sv.utils.StringDistribution;
@@ -59,7 +59,7 @@ public class ReferenceResolution {
 
             yodaEnvironment.db.log(queryString);
             Database.getLogger().info(MongoLogHandler.createSimpleRecord("role inference query", queryString).toJSONString());
-//            Database.getLogger().info("Role inference query:\n"+queryString);
+//            Database.getLogger().info("role inference query:\n"+queryString);
             try {
                 TupleQuery query = yodaEnvironment.db.connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
                 TupleQueryResult result = query.evaluate();
@@ -81,7 +81,7 @@ public class ReferenceResolution {
             e.printStackTrace();
             System.exit(0);
         }
-//        System.out.printf("Role inference marginal:" + ans);
+//        System.out.printf("role inference marginal:" + ans);
         return ans;
     }
 
@@ -285,7 +285,7 @@ public class ReferenceResolution {
                         slope = adjective.getSlope();
                         qualityClass = adjective.getQuality();
                     } else {
-                        throw new Error("degreeClass is neither an Adjective nor a Preposition class");
+                        throw new Error("degreeClass is neither an adjective nor a Preposition class");
                     }
                     entityURIs.add("?transient_quality"+tmpVarIndex);
                     queryString += qualityClass.newInstance().getQualityCalculatorSPARQLQuery().apply(entityURIs) +

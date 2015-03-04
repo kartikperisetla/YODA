@@ -1,8 +1,8 @@
 package edu.cmu.sv.dialog_state_tracking;
 
-import edu.cmu.sv.ontology.Ontology;
-import edu.cmu.sv.ontology.Thing;
-import edu.cmu.sv.ontology.role.Role;
+import edu.cmu.sv.database.Ontology;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.StringDistribution;
 import org.json.simple.JSONObject;

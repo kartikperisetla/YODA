@@ -1,20 +1,22 @@
 package edu.cmu.sv.domain.yoda_skeleton;
 
 import edu.cmu.sv.domain.OntologyRegistry;
-import edu.cmu.sv.ontology.Thing;
-import edu.cmu.sv.ontology.adjective.Adjective;
-import edu.cmu.sv.ontology.misc.*;
-import edu.cmu.sv.ontology.noun.Noun;
-import edu.cmu.sv.ontology.noun.Person;
-import edu.cmu.sv.ontology.noun.PointOfInterest;
-import edu.cmu.sv.ontology.noun.Time;
-import edu.cmu.sv.ontology.preposition.Preposition;
-import edu.cmu.sv.ontology.quality.TransientQuality;
-import edu.cmu.sv.ontology.role.*;
-import edu.cmu.sv.ontology.verb.Create;
-import edu.cmu.sv.ontology.verb.Exist;
-import edu.cmu.sv.ontology.verb.HasProperty;
-import edu.cmu.sv.ontology.verb.Verb;
+import edu.cmu.sv.domain.yelp_phoenix.ontology.role.Destination;
+import edu.cmu.sv.domain.yelp_phoenix.ontology.role.Origin;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.*;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Person;
+import edu.cmu.sv.domain.yelp_phoenix.ontology.noun.PointOfInterest;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Time;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.preposition.Preposition;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.*;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Create;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Exist;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.HasProperty;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
 
 import java.util.HashSet;
 import java.util.Set;

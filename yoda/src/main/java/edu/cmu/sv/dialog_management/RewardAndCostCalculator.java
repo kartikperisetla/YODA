@@ -2,9 +2,9 @@ package edu.cmu.sv.dialog_management;
 
 import com.google.common.primitives.Doubles;
 import edu.cmu.sv.dialog_state_tracking.*;
-import edu.cmu.sv.ontology.misc.WebResource;
-import edu.cmu.sv.ontology.role.HasURI;
-import edu.cmu.sv.ontology.verb.HasProperty;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.WebResource;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasURI;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.HasProperty;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.*;

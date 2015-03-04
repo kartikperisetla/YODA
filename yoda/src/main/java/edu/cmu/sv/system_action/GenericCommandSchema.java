@@ -1,6 +1,6 @@
 package edu.cmu.sv.system_action;
 
-import edu.cmu.sv.ontology.verb.Verb;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import org.json.simple.JSONObject;

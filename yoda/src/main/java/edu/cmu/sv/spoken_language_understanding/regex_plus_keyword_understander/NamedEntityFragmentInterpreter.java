@@ -1,6 +1,6 @@
 package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander;
 
-import edu.cmu.sv.ontology.Thing;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;

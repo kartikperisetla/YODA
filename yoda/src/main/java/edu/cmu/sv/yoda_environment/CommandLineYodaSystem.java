@@ -1,16 +1,15 @@
 package edu.cmu.sv.yoda_environment;
 
+import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.domain.DomainSpec;
-import edu.cmu.sv.ontology.Ontology;
+import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander.RegexPlusKeywordUnderstander;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by David Cohen on 11/21/14.
@@ -30,7 +29,8 @@ public class CommandLineYodaSystem {
             yodaEnvironment.loadDomain(spec);
         }
         Ontology.finalizeOntology();
-        ((RegexPlusKeywordUnderstander)yodaEnvironment.slu).constructTemplates();
+        DialogRegistry.finalizeDialogRegistry();
+                ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).constructTemplates();
         System.err.println("done loading domain");
 
         Thread dstThread = new Thread(yodaEnvironment.dst);

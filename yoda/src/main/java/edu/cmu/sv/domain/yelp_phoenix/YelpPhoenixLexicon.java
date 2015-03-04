@@ -1,21 +1,21 @@
 package edu.cmu.sv.domain.yelp_phoenix;
 
 import edu.cmu.sv.natural_language_generation.Lexicon;
-import edu.cmu.sv.ontology.adjective.Cheap;
-import edu.cmu.sv.ontology.adjective.Expensive;
-import edu.cmu.sv.ontology.adjective.Good;
-import edu.cmu.sv.ontology.adjective.Popular;
-import edu.cmu.sv.ontology.noun.poi_types.*;
-import edu.cmu.sv.ontology.preposition.IsCloseTo;
-import edu.cmu.sv.ontology.quality.unary_quality.Expensiveness;
-import edu.cmu.sv.ontology.quality.unary_quality.Goodness;
-import edu.cmu.sv.ontology.role.Agent;
-import edu.cmu.sv.ontology.role.Destination;
-import edu.cmu.sv.ontology.role.Origin;
-import edu.cmu.sv.ontology.role.Patient;
-import edu.cmu.sv.ontology.verb.GiveDirections;
-import edu.cmu.sv.ontology.verb.HasProperty;
-import edu.cmu.sv.ontology.verb.MakeReservation;
+import edu.cmu.sv.domain.yelp_phoenix.ontology.adjective.Cheap;
+import edu.cmu.sv.domain.yelp_phoenix.ontology.adjective.Expensive;
+import edu.cmu.sv.domain.yelp_phoenix.ontology.adjective.Good;
+import edu.cmu.sv.domain.yelp_phoenix.ontology.adjective.Popular;
+import edu.cmu.sv.domain.yelp_phoenix.ontology.noun.poi_types.*;
+import edu.cmu.sv.domain.yelp_phoenix.ontology.preposition.IsCloseTo;
+import edu.cmu.sv.domain.yelp_phoenix.ontology.quality.unary_quality.Expensiveness;
+import edu.cmu.sv.domain.yelp_phoenix.ontology.quality.unary_quality.Goodness;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Agent;
+import edu.cmu.sv.domain.yelp_phoenix.ontology.role.Destination;
+import edu.cmu.sv.domain.yelp_phoenix.ontology.role.Origin;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Patient;
+import edu.cmu.sv.domain.yelp_phoenix.ontology.verb.GiveDirections;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.HasProperty;
+import edu.cmu.sv.domain.yelp_phoenix.ontology.verb.MakeReservation;
 
 /**
  * Created by David Cohen on 3/3/15.

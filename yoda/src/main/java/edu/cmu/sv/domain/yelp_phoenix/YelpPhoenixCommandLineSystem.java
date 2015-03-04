@@ -5,7 +5,6 @@ import edu.cmu.sv.domain.DomainSpec;
 import edu.cmu.sv.domain.NonDialogTaskRegistry;
 import edu.cmu.sv.domain.yoda_skeleton.YODASkeletonOntologyRegistry;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonLexicon;
-import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.yoda_environment.CommandLineYodaSystem;
 
 /**

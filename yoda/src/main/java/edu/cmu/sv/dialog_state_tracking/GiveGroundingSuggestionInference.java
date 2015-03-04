@@ -1,7 +1,7 @@
 package edu.cmu.sv.dialog_state_tracking;
 
-import edu.cmu.sv.ontology.misc.Suggested;
-import edu.cmu.sv.ontology.role.HasValue;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.Suggested;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasValue;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestConfirmValue;
 import edu.cmu.sv.utils.Assert;

@@ -2,17 +2,16 @@ package edu.cmu.sv.database;
 
 
 import edu.cmu.sv.domain.DatabaseRegistry;
-import edu.cmu.sv.ontology.Ontology;
 import edu.cmu.sv.yoda_environment.MongoLogHandler;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
-import edu.cmu.sv.ontology.Thing;
-import edu.cmu.sv.ontology.ThingWithRoles;
-import edu.cmu.sv.ontology.adjective.Adjective;
-import edu.cmu.sv.ontology.noun.Noun;
-import edu.cmu.sv.ontology.quality.TransientQuality;
-import edu.cmu.sv.ontology.preposition.Preposition;
-import edu.cmu.sv.ontology.verb.Verb;
-import edu.cmu.sv.ontology.role.Role;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.ThingWithRoles;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.preposition.Preposition;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openrdf.model.Value;
@@ -384,7 +383,7 @@ public class Database {
                 slope = adjective.getSlope();
                 qualityClass = adjective.getQuality();
             } else {
-                throw new Error("degreeClass is neither an Adjective nor a Preposition class:" + degreeClass.getSimpleName());
+                throw new Error("degreeClass is neither an adjective nor a Preposition class:" + degreeClass.getSimpleName());
             }
 
             List<String> params = entityURIs.stream().map(x -> "<"+x+">").collect(Collectors.toList());

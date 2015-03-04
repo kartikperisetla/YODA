@@ -2,9 +2,9 @@ package edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts;
 
 import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
-import edu.cmu.sv.ontology.Ontology;
-import edu.cmu.sv.ontology.Thing;
-import edu.cmu.sv.ontology.noun.Noun;
+import edu.cmu.sv.database.Ontology;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.StringDistribution;
 

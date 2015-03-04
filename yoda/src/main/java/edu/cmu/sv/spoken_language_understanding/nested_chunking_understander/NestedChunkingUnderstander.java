@@ -1,9 +1,9 @@
 package edu.cmu.sv.spoken_language_understanding.nested_chunking_understander;
 
-import edu.cmu.sv.ontology.Ontology;
-import edu.cmu.sv.ontology.role.HasName;
-import edu.cmu.sv.ontology.role.HasURI;
-import edu.cmu.sv.ontology.role.has_quality_subroles.HasQualityRole;
+import edu.cmu.sv.database.Ontology;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasName;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasURI;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.has_quality_subroles.HasQualityRole;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.spoken_language_understanding.SpokenLanguageUnderstander;
 import edu.cmu.sv.utils.StringDistribution;

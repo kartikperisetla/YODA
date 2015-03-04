@@ -10,7 +10,7 @@ import edu.cmu.sv.dialog_state_tracking.Turn;
 import edu.cmu.sv.domain.DomainSpec;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
-import edu.cmu.sv.ontology.Ontology;
+import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.spoken_language_understanding.SpokenLanguageUnderstander;
 import edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander.RegexPlusKeywordUnderstander;
 import edu.cmu.sv.system_action.CommandLineExecutor;

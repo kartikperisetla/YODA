@@ -1,6 +1,6 @@
 package edu.cmu.sv.natural_language_generation;
 
-import edu.cmu.sv.ontology.Thing;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.utils.Combination;
 
 import java.util.HashMap;

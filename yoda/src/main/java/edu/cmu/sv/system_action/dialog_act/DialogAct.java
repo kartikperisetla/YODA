@@ -2,7 +2,7 @@ package edu.cmu.sv.system_action.dialog_act;
 
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
-import edu.cmu.sv.ontology.Thing;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.SystemAction;
 

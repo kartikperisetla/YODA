@@ -1,7 +1,7 @@
 package edu.cmu.sv.natural_language_generation.top_level_templates;
 
 import edu.cmu.sv.natural_language_generation.Template;
-import edu.cmu.sv.ontology.role.Role;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.json.simple.JSONObject;

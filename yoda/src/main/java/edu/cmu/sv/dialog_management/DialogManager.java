@@ -3,7 +3,7 @@ package edu.cmu.sv.dialog_management;
 import edu.cmu.sv.database.dialog_task.ActionEnumeration;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
-import edu.cmu.sv.ontology.verb.HasProperty;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.HasProperty;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.ActionSchema;
 import edu.cmu.sv.system_action.SystemAction;

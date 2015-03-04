@@ -1,12 +1,12 @@
 package edu.cmu.sv.domain;
 
-import edu.cmu.sv.ontology.Thing;
-import edu.cmu.sv.ontology.adjective.Adjective;
-import edu.cmu.sv.ontology.noun.Noun;
-import edu.cmu.sv.ontology.preposition.Preposition;
-import edu.cmu.sv.ontology.quality.TransientQuality;
-import edu.cmu.sv.ontology.role.Role;
-import edu.cmu.sv.ontology.verb.Verb;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.preposition.Preposition;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
 
 import java.util.Set;
 

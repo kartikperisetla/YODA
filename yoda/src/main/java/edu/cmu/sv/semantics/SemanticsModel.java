@@ -1,10 +1,10 @@
 package edu.cmu.sv.semantics;
 
 
-import edu.cmu.sv.ontology.Ontology;
-import edu.cmu.sv.ontology.Thing;
-import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
-import edu.cmu.sv.ontology.misc.WebResource;
+import edu.cmu.sv.database.Ontology;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.WebResource;
 import edu.cmu.sv.spoken_language_understanding.Tokenizer;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;

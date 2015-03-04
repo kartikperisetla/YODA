@@ -2,8 +2,8 @@ package edu.cmu.sv;
 
 import com.google.common.collect.*;
 import edu.cmu.sv.natural_language_generation.CorpusGeneration;
-import edu.cmu.sv.ontology.Ontology;
-import edu.cmu.sv.ontology.role.has_quality_subroles.HasQualityRole;
+import edu.cmu.sv.database.Ontology;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.has_quality_subroles.HasQualityRole;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.spoken_language_understanding.nested_chunking_understander.Chunker;
 import edu.cmu.sv.spoken_language_understanding.nested_chunking_understander.ChunkingProblem;

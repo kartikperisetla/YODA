@@ -2,11 +2,11 @@ package edu.cmu.sv.natural_language_generation.internal_templates;
 
 import edu.cmu.sv.database.dialog_task.ReferenceResolution;
 import edu.cmu.sv.natural_language_generation.Template;
-import edu.cmu.sv.ontology.Ontology;
-import edu.cmu.sv.ontology.Thing;
-import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
-import edu.cmu.sv.ontology.noun.Noun;
-import edu.cmu.sv.ontology.role.HasName;
+import edu.cmu.sv.database.Ontology;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasName;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;

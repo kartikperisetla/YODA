@@ -1,10 +1,10 @@
 package edu.cmu.sv.domain.yoda_skeleton;
 
 import edu.cmu.sv.natural_language_generation.Lexicon;
-import edu.cmu.sv.ontology.noun.Noun;
-import edu.cmu.sv.ontology.noun.Person;
-import edu.cmu.sv.ontology.noun.PointOfInterest;
-import edu.cmu.sv.ontology.noun.Time;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Person;
+import edu.cmu.sv.domain.yelp_phoenix.ontology.noun.PointOfInterest;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Time;
 
 /**
  * Created by David Cohen on 3/3/15.

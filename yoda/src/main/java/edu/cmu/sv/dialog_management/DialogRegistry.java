@@ -2,10 +2,7 @@ package edu.cmu.sv.dialog_management;
 
 import com.google.common.collect.Iterables;
 import edu.cmu.sv.domain.NonDialogTaskRegistry;
-import edu.cmu.sv.ontology.verb.GiveDirections;
-import edu.cmu.sv.ontology.verb.MakeReservation;
 import edu.cmu.sv.system_action.ActionSchema;
-import edu.cmu.sv.system_action.GenericCommandSchema;
 import edu.cmu.sv.system_action.SystemAction;
 import edu.cmu.sv.system_action.dialog_act.*;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.*;
@@ -15,8 +12,6 @@ import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestConfirmV
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestFixMisunderstanding;
 import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestRole;
 import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestRoleGivenRole;
-import edu.cmu.sv.system_action.non_dialog_task.GiveDirectionsTask;
-import edu.cmu.sv.system_action.non_dialog_task.MakeReservationTask;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 
 import java.util.*;
@@ -66,14 +61,17 @@ public class DialogRegistry {
             dialogActNameMap.put(cls.getSimpleName(), cls);
         }
 
-        for (Class<? extends SystemAction> cls : Iterables.concat(discourseUnitDialogActs, argumentationDialogActs,
-                userOnlyDialogActs, clarificationDialogActs, Arrays.asList(Fragment.class), nonDialogTasks)) {
-            actionNameMap.put(cls.getSimpleName(), cls);
-        }
     }
 
     public static void registerNonDialogTasks(NonDialogTaskRegistry registry){
         nonDialogTasks.addAll(registry.nonDialogTasks);
         actionSchemata.addAll(registry.actionSchemata);
+    }
+
+    public static void finalizeDialogRegistry(){
+        for (Class<? extends SystemAction> cls : Iterables.concat(discourseUnitDialogActs, argumentationDialogActs,
+                userOnlyDialogActs, clarificationDialogActs, Arrays.asList(Fragment.class), nonDialogTasks)) {
+            actionNameMap.put(cls.getSimpleName(), cls);
+        }
     }
 }

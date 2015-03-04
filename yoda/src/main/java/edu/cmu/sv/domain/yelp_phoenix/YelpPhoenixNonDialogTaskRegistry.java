@@ -1,8 +1,8 @@
 package edu.cmu.sv.domain.yelp_phoenix;
 
 import edu.cmu.sv.domain.NonDialogTaskRegistry;
-import edu.cmu.sv.ontology.verb.GiveDirections;
-import edu.cmu.sv.ontology.verb.MakeReservation;
+import edu.cmu.sv.domain.yelp_phoenix.ontology.verb.GiveDirections;
+import edu.cmu.sv.domain.yelp_phoenix.ontology.verb.MakeReservation;
 import edu.cmu.sv.system_action.GenericCommandSchema;
 import edu.cmu.sv.system_action.non_dialog_task.GiveDirectionsTask;
 import edu.cmu.sv.system_action.non_dialog_task.MakeReservationTask;

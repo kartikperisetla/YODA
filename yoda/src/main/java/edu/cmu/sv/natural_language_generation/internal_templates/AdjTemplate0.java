@@ -1,14 +1,14 @@
 package edu.cmu.sv.natural_language_generation.internal_templates;
 
 import edu.cmu.sv.natural_language_generation.Lexicon;
-import edu.cmu.sv.ontology.Ontology;
+import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
 import edu.cmu.sv.natural_language_generation.Template;
-import edu.cmu.sv.ontology.Thing;
-import edu.cmu.sv.ontology.adjective.Adjective;
-import edu.cmu.sv.ontology.misc.UnknownThingWithRoles;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.semantics.SemanticsModel;
 import org.json.simple.JSONObject;
 

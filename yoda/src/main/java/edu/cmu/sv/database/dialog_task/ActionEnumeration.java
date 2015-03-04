@@ -2,10 +2,10 @@ package edu.cmu.sv.database.dialog_task;
 
 import edu.cmu.sv.database.Database;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
-import edu.cmu.sv.ontology.Ontology;
-import edu.cmu.sv.ontology.Thing;
-import edu.cmu.sv.ontology.role.Role;
-import edu.cmu.sv.ontology.verb.Verb;
+import edu.cmu.sv.database.Ontology;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.utils.Assert;
@@ -116,7 +116,7 @@ public class ActionEnumeration {
         if (contextDiscourseUnit!=null)
             verbConstraint = (String) contextDiscourseUnit.getFromInitiator("verb.class");
 
-//        Set<Class<? extends Verb>> verbClassSet;
+//        Set<Class<? extends verb>> verbClassSet;
 //        if (enumerationType.equals(ENUMERATION_TYPE.SAMPLED)){
 //            verbClassSet = Combination.randomSubset(Ontology.verbClasses, maxOntologyBindings);
 //        } else {

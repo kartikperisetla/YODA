@@ -1,9 +1,9 @@
 package edu.cmu.sv.dialog_state_tracking;
 
 import edu.cmu.sv.database.dialog_task.ReferenceResolution;
-import edu.cmu.sv.ontology.misc.Requested;
-import edu.cmu.sv.ontology.misc.Suggested;
-import edu.cmu.sv.ontology.role.HasValue;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.Requested;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.Suggested;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasValue;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.utils.Assert;

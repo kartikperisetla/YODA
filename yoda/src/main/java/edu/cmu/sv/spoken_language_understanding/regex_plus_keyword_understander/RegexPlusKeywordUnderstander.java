@@ -1,11 +1,11 @@
 package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander;
 
 import edu.cmu.sv.dialog_state_tracking.Turn;
-import edu.cmu.sv.ontology.Ontology;
-import edu.cmu.sv.ontology.adjective.Adjective;
-import edu.cmu.sv.ontology.noun.PointOfInterest;
-import edu.cmu.sv.ontology.quality.TransientQuality;
-import edu.cmu.sv.ontology.verb.Verb;
+import edu.cmu.sv.database.Ontology;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
+import edu.cmu.sv.domain.yelp_phoenix.ontology.noun.PointOfInterest;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.spoken_language_understanding.SpokenLanguageUnderstander;
 import edu.cmu.sv.utils.StringDistribution;
