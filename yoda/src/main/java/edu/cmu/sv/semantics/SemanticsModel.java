@@ -480,7 +480,7 @@ public class SemanticsModel {
                 continue;
             boolean inDomain = false;
             if (!Ontology.roleNameMap.containsKey(slot))
-                throw new Error("thing description's class not in registry: "+description);
+                throw new Error("thing description's class not in registry: "+slot+","+description);
             for (Class<? extends Thing> domainMember : Ontology.roleNameMap.get(slot).newInstance().getDomain()){
                 if (domainMember.isAssignableFrom(cls)) {
                     inDomain = true;

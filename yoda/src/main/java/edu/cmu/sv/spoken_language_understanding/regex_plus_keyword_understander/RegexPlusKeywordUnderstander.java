@@ -52,6 +52,9 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
 
     public RegexPlusKeywordUnderstander(YodaEnvironment yodaEnvironment) {
         this.yodaEnvironment = yodaEnvironment;
+    }
+
+    public void constructTemplates(){
         nounPhraseInterpreter = new NounPhraseInterpreter(yodaEnvironment);
 
         // add regex interpreters

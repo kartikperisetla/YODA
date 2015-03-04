@@ -49,7 +49,7 @@ public class Ontology {
     }
 
 
-    static{
+    public static void finalizeOntology(){
         // recursively register parents
         recursivelyRegisterParents(verbClasses);
         recursivelyRegisterParents(nounClasses);
