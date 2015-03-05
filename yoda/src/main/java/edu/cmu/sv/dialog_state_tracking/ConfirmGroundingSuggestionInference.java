@@ -31,6 +31,7 @@ public class ConfirmGroundingSuggestionInference extends DialogStateUpdateInfere
         if (turn.speaker.equals("user")) {
             for (String sluHypothesisID : turn.hypothesisDistribution.keySet()) {
                 SemanticsModel hypModel = turn.hypotheses.get(sluHypothesisID);
+                Double sluScore = turn.hypothesisDistribution.get(sluHypothesisID);
                 String dialogAct = hypModel.getSlotPathFiller("dialogAct");
                 if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(Accept.class)) {
                     for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
@@ -57,7 +58,7 @@ public class ConfirmGroundingSuggestionInference extends DialogStateUpdateInfere
 
                         // collect the result
                         resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
-                        Double score = (duAnalysis.groundMatch ? 1.0 : penaltyForNonGroundedMatch) *
+                        Double score = (duAnalysis.groundMatch ? 1.0 : penaltyForNonGroundedMatch) * sluScore *
                                 Utils.discourseUnitContextProbability(newDialogState, predecessor);
 //                        System.out.println("ConfirmGroundingSuggestion: groundmatch:"+ duAnalysis.groundMatch);
                         resultDistribution.put(newDialogStateHypothesisID, score);

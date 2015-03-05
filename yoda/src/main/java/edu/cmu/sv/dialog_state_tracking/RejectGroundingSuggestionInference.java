@@ -30,6 +30,7 @@ public class RejectGroundingSuggestionInference extends DialogStateUpdateInferen
         if (turn.speaker.equals("user")) {
             for (String sluHypothesisID : turn.hypothesisDistribution.keySet()) {
                 SemanticsModel hypModel = turn.hypotheses.get(sluHypothesisID);
+                Double sluScore = turn.hypothesisDistribution.get(sluHypothesisID);
                 String dialogAct = hypModel.getSlotPathFiller("dialogAct");
                 if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(Reject.class)) {
                     for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
@@ -55,7 +56,7 @@ public class RejectGroundingSuggestionInference extends DialogStateUpdateInferen
 
                         // collect the result
                         resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
-                        Double score = (duAnalysis.groundMatch ? penaltyForNonGroundedMatch : 1.0) *
+                        Double score = (duAnalysis.groundMatch ? penaltyForNonGroundedMatch : 1.0) * sluScore *
                                 Utils.discourseUnitContextProbability(newDialogState, predecessor);
                         resultDistribution.put(newDialogStateHypothesisID, score);
                     }

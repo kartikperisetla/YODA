@@ -31,6 +31,7 @@ public class ElaborateInference extends DialogStateUpdateInference {
         if (turn.speaker.equals("user")) {
             for (String sluHypothesisID : turn.hypothesisDistribution.keySet()) {
                 SemanticsModel hypModel = turn.hypotheses.get(sluHypothesisID);
+                Double sluScore = turn.hypothesisDistribution.get(sluHypothesisID);
                 String dialogAct = hypModel.getSlotPathFiller("dialogAct");
                 if (DialogRegistry.discourseUnitDialogActs.contains(DialogRegistry.dialogActNameMap.get(dialogAct))) {
                     // todo: implement non-fragment case
@@ -67,7 +68,7 @@ public class ElaborateInference extends DialogStateUpdateInference {
                             newDialogState.misunderstandingCounter = 0;
 
                             currentDu.actionAnalysis.update(yodaEnvironment, currentDu);
-                            Double score = Utils.discourseUnitContextProbability(newDialogState, currentDu) *
+                            Double score = Utils.discourseUnitContextProbability(newDialogState, currentDu) * sluScore *
                                     groundedHypotheses.getRight().get(groundedDuKey);
                             resultDistribution.put(newDialogStateHypothesisID, score);
                             resultHypotheses.put(newDialogStateHypothesisID, newDialogState);

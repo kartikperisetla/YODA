@@ -49,7 +49,7 @@ public class RewardAndCostCalculator {
                                              Map<String, DialogState> dialogStateHypotheses,
                                              StringDistribution dialogStateDistribution){
 
-        System.out.println("task:" + task);
+//        System.out.println("task:" + task);
         // find the probability that an equivalent task is being requested
         Double probabilityTaskAppropriate = 0.0;
         for (String dialogStateHypothesisId : dialogStateHypotheses.keySet()){
@@ -69,7 +69,7 @@ public class RewardAndCostCalculator {
             probabilityTaskAppropriate += probabilityTaskAppropriateInDialogState * dialogStateDistribution.get(dialogStateHypothesisId);
         }
         probabilityTaskAppropriate = Doubles.min(1.0, probabilityTaskAppropriate);
-        System.out.println("pAppropriate:" + probabilityTaskAppropriate);
+//        System.out.println("pAppropriate:" + probabilityTaskAppropriate);
 
         NonDialogTaskPreferences preferences = task.getPreferences();
         return preferences.rewardForCorrectExecution * probabilityTaskAppropriate -

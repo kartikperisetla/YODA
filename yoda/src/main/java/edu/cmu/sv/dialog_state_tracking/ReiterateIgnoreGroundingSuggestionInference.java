@@ -35,6 +35,7 @@ public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpda
         if (turn.speaker.equals("user")) {
             for (String sluHypothesisID : turn.hypothesisDistribution.keySet()) {
                 SemanticsModel hypModel = turn.hypotheses.get(sluHypothesisID);
+                Double sluScore = turn.hypothesisDistribution.get(sluHypothesisID);
                 String dialogAct = hypModel.getSlotPathFiller("dialogAct");
                 if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(Fragment.class)) {
                     for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
@@ -76,7 +77,7 @@ public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpda
                             currentDu.actionAnalysis.update(yodaEnvironment, currentDu);
                             resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
                             Double score = groundedHypotheses.getRight().get(groundedDuKey) *
-                                    penaltyForThisInference *
+                                    penaltyForThisInference * sluScore *
                                     Utils.discourseUnitContextProbability(newDialogState, currentDu);
                             resultDistribution.put(newDialogStateHypothesisID, score);
                         }

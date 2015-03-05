@@ -32,12 +32,15 @@ public class TurnOnTask extends NonDialogTask {
     @Override
     public void execute(YodaEnvironment yodaEnvironment) {
         super.execute(yodaEnvironment);
-        String uri = (String) new SemanticsModel(taskSpec.toJSONString()).newGetSlotPathFiller("verb.Patient");
+        System.out.println("task spec:"+taskSpec);
+        String uri = (String) new SemanticsModel(taskSpec.toJSONString()).newGetSlotPathFiller("Component.HasURI");
+        System.out.println("Turning on component:" + uri);
 
         synchronized (yodaEnvironment.db.connection) {
             // clear existing power state
-            String deleteString = Database.prefixes + "DELETE {";
-            deleteString += "<" + uri + "> base:power_state ?y . }";
+            String deleteString = Database.prefixes;
+            deleteString += "DELETE {<" + uri + "> base:power_state ?y }";
+            deleteString += "WHERE {<" + uri + "> base:power_state ?y }";
             Database.getLogger().info(MongoLogHandler.createSimpleRecord("clear appliance power state", deleteString).toJSONString());
             try {
                 Update update = yodaEnvironment.db.connection.prepareUpdate(

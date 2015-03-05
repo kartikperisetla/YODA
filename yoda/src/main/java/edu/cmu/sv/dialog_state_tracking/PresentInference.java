@@ -31,6 +31,7 @@ public class PresentInference extends DialogStateUpdateInference {
         int newHypothesisCounter = 0;
         if (turn.speaker.equals("user")){
             for (String sluHypothesisID : turn.hypothesisDistribution.keySet()){
+                Double sluScore = turn.hypothesisDistribution.get(sluHypothesisID);
                 String dialogAct = turn.hypotheses.get(sluHypothesisID).getSlotPathFiller("dialogAct");
 
                 // if the DA is one of the discourseUnitDialogActs, leave it alone
@@ -52,7 +53,7 @@ public class PresentInference extends DialogStateUpdateInference {
                         newDialogState.getDiscourseUnitHypothesisMap().
                                 put("du_" + newDialogState.discourseUnitCounter, currentDu);
                         currentDu.actionAnalysis.update(yodaEnvironment, currentDu);
-                        resultDistribution.put(newDialogStateHypothesisID, groundedHypotheses.getRight().get(groundedDuKey));
+                        resultDistribution.put(newDialogStateHypothesisID, groundedHypotheses.getRight().get(groundedDuKey)*sluScore);
                         resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
                     }
 
