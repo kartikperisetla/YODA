@@ -14,3 +14,5 @@ public class Off extends PowerStateAdjective {
         return 100;
     }
 }
+
+
