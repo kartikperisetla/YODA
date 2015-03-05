@@ -74,6 +74,23 @@ public class ActionEnumeration {
                     }
                     ans.add(binding);
                 }
+
+
+//                queryString = Database.prefixes + "SELECT DISTINCT ?x WHERE { ?x rdf:type base:Noun .}";
+//                query = yodaEnvironment.db.connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+//                result = query.evaluate();
+//
+//                while (result.hasNext()) {
+//                    Map<String, Object> binding = new HashMap<>();
+//                    BindingSet bindings = result.next();
+//                    for (String variable : bindings.getBindingNames()) {
+//                        binding.put(variable, bindings.getValue(variable).stringValue());
+//                    }
+//                    ans.add(binding);
+//                }
+//
+//
+//                System.out.println("lenght of ans:"+ans.size());
                 result.close();
             } catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {
                 e.printStackTrace();

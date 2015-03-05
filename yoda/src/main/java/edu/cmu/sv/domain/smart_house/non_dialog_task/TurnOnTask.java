@@ -32,9 +32,7 @@ public class TurnOnTask extends NonDialogTask {
     @Override
     public void execute(YodaEnvironment yodaEnvironment) {
         super.execute(yodaEnvironment);
-        System.out.println("task spec:"+taskSpec);
         String uri = (String) new SemanticsModel(taskSpec.toJSONString()).newGetSlotPathFiller("Component.HasURI");
-        System.out.println("Turning on component:" + uri);
 
         synchronized (yodaEnvironment.db.connection) {
             // clear existing power state

@@ -146,35 +146,6 @@ public class RewardAndCostCalculator {
     }
 
 
-
-
-
-
-    /*
-    * To compute the clarificationReward for a clarification dialog act,
-    * estimate the improvement in clarificationReward to all possible dialog and non-dialog tasks
-    * that relate to all the available DU hypotheses.
-    * */
-    public static Double clarificationDialogActReward(StringDistribution dialogStateDistribution,
-                                                      Map<String, DialogState> dialogStateHypotheses,
-                                                      StringDistribution predictedRelativeConfidenceGainIfConfirmed) {
-        Double totalExpectedReward = 0.0;
-        // sum up the predicted rewards supposing that each current hypothesis is true,
-        // weighting the predicted clarificationReward by the current belief that the hypothesis is true.
-        for (String dialogStateHypothesisID : dialogStateHypotheses.keySet()){
-            DialogState dialogState = dialogStateHypotheses.get(dialogStateHypothesisID);
-            Double currentConfidence = dialogStateDistribution.get(dialogStateHypothesisID);
-            Double predictedConfidence = currentConfidence + (1-currentConfidence)*
-                    predictedRelativeConfidenceGainIfConfirmed.get(dialogStateHypothesisID);
-
-            Double predictedReward = 0.0;
-            predictedReward += predictedConfidence * rewardForCorrectDialogTaskExecution;
-            predictedReward -= (1 - predictedConfidence) * penaltyForIncorrectDialogTaskExecution;
-            totalExpectedReward += currentConfidence * predictedReward;
-        }
-        return totalExpectedReward;
-    }
-
     public static Double heuristicClarificationReward(StringDistribution dialogStateDistribution,
                                                       Map<String, DialogState> dialogStateHypotheses,
                                                       String valueURI){

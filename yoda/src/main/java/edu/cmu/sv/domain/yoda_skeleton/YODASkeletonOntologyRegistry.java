@@ -6,10 +6,8 @@ import edu.cmu.sv.domain.yelp_phoenix.ontology.role.Origin;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.*;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Person;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.*;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.noun.PointOfInterest;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Time;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.preposition.Preposition;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.*;
@@ -70,6 +68,8 @@ public class YODASkeletonOntologyRegistry extends OntologyRegistry{
         verbClasses.add(Exist.class);
 
         nounClasses.add(Noun.class);
+        nounClasses.add(PhysicalNoun.class);
+        nounClasses.add(NonPhysicalNoun.class);
         nounClasses.add(Person.class);
         nounClasses.add(Time.class);
         nounClasses.add(PointOfInterest.class);

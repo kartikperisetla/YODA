@@ -166,6 +166,8 @@ public class DialogManager implements Runnable {
                 ClarificationDialogAct dialogActInstance = dialogActClass.newInstance();
                 Set<Map<String, Object>> possibleBindings = ActionEnumeration.
                         getPossibleIndividualBindings(dialogActInstance, yodaEnvironment);
+//                System.out.println("enumerating for dialogAct:" + dialogActClass);
+//                System.out.println("possible enumerated bindings for individual:" + possibleBindings);
                 for (Map<String, Object> binding : possibleBindings) {
                     ClarificationDialogAct newDialogActInstance = dialogActClass.newInstance();
                     newDialogActInstance.bindVariables(binding);
