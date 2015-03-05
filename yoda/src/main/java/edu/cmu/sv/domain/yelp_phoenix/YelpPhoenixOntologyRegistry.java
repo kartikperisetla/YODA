@@ -5,25 +5,26 @@ import edu.cmu.sv.domain.yelp_phoenix.ontology.adjective.Cheap;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.adjective.Expensive;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.adjective.Good;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.adjective.Popular;
-import edu.cmu.sv.domain.yelp_phoenix.ontology.noun.PointOfInterest;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.*;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.*;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.noun.poi_types.*;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.preposition.IsCloseTo;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.preposition.Preposition;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.quality.binary_quality.Distance;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.quality.unary_quality.Expensiveness;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.quality.unary_quality.Goodness;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.quality.unary_quality.Popularity;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.role.has_quality_subroles.HasDistance;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.role.has_quality_subroles.HasExpensiveness;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.role.has_quality_subroles.HasGoodness;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.role.has_quality_subroles.HasPopularity;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.verb.GiveDirections;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.verb.MakeReservation;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Email;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Meeting;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.preposition.Preposition;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
 
 import java.util.HashSet;
@@ -75,11 +76,8 @@ public class YelpPhoenixOntologyRegistry extends OntologyRegistry{
         verbClasses.add(GiveDirections.class);
         verbClasses.add(MakeReservation.class);
 
-        nounClasses.add(Person.class);
         nounClasses.add(Email.class);
         nounClasses.add(Meeting.class);
-        nounClasses.add(Time.class);
-        nounClasses.add(PointOfInterest.class);
 
         nounClasses.add(Restaurants.class);
         nounClasses.add(Food.class);
