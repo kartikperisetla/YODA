@@ -487,8 +487,8 @@ public class SemanticsModel {
                     break;
                 }
             }
-            if (!inDomain)
-                throw new Error("Class is not in slot's domain: "+description+", "+slot);
+//            if (!inDomain)
+//                throw new Error("Class is not in slot's domain: "+description+", "+slot);
         }
 
         // check all children

@@ -70,6 +70,7 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
             languageInterpreters.add(new CommandKeywordInterpreter(verbClass, yodaEnvironment));
         }
         languageInterpreters.add(new NamedEntityFragmentInterpreter(PointOfInterest.class));
+        languageInterpreters.add(new NounPhraseFragmentInterpreter(nounPhraseInterpreter));
 
         // add simple string match interpreters
         languageInterpreters.add(
@@ -82,7 +83,7 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
                         new HashSet(Arrays.asList("no", "nope", "negative", "i don't think so", "wrong", "not really", "not")),
                         1.0));
 
-        // add keyword interpreters
+
     }
 
 

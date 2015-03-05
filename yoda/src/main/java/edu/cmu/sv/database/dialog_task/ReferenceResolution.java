@@ -383,7 +383,6 @@ public class ReferenceResolution {
                             map(x -> "verb." + x.getSimpleName()).
                             collect(Collectors.toSet()));
 
-
             Map<String, StringDistribution> resolutionMarginals = new HashMap<>();
             for (String slotPathToResolve : slotPathsToResolve) {
                 resolutionMarginals.put(slotPathToResolve,

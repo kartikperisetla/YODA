@@ -1,5 +1,7 @@
-package edu.cmu.sv.system_action.non_dialog_task;
+package edu.cmu.sv.domain.yelp_phoenix.non_dialog_task;
 
+import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
+import edu.cmu.sv.system_action.non_dialog_task.NonDialogTaskPreferences;
 import org.json.simple.JSONObject;
 
 import java.util.Arrays;

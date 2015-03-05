@@ -8,7 +8,7 @@ import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonLexicon;
 import edu.cmu.sv.yoda_environment.CommandLineYodaSystem;
 
 /**
- * Created by David Cohen on 3/3/15.
+ * Created by David Cohen on 3/4/15.
  */
 public class SmartHouseCommandLineSystem extends CommandLineYodaSystem {
     static {
@@ -28,3 +28,5 @@ public class SmartHouseCommandLineSystem extends CommandLineYodaSystem {
                 new SmartHouseDatabaseRegistry()));
     }
 }
+
+

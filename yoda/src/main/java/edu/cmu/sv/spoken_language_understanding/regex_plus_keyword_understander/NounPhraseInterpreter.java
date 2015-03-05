@@ -1,19 +1,18 @@
 package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander;
 
 import com.google.common.primitives.Doubles;
-import edu.cmu.sv.natural_language_generation.Grammar;
-import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.ThingWithRoles;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
-import edu.cmu.sv.domain.yelp_phoenix.ontology.noun.PointOfInterest;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.preposition.Preposition;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasName;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.InRelationTo;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
+import edu.cmu.sv.natural_language_generation.Grammar;
+import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -152,14 +151,14 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
             String uri = yodaEnvironment.db.insertValue(entity1String);
             JSONObject namedEntity = SemanticsModel.parseJSON(Ontology.webResourceWrap(uri));
             if (!entity1JSON.containsKey("class"))
-                entity1JSON.put("class", PointOfInterest.class.getSimpleName());
+                entity1JSON.put("class", Noun.class.getSimpleName());
             entity1JSON.put(HasName.class.getSimpleName(), namedEntity);
         }
         if (entity2String!=null && (entity2JSON.isEmpty() || entity2CoverageScore < .75)){
             String uri = yodaEnvironment.db.insertValue(entity2String);
             JSONObject namedEntity = SemanticsModel.parseJSON(Ontology.webResourceWrap(uri));
             if (!entity2JSON.containsKey("class"))
-                entity2JSON.put("class", PointOfInterest.class.getSimpleName());
+                entity2JSON.put("class", Noun.class.getSimpleName());
             entity2JSON.put(HasName.class.getSimpleName(), namedEntity);
         }
 

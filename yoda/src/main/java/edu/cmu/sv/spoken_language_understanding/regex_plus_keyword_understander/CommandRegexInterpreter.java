@@ -12,6 +12,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -29,10 +30,12 @@ public class CommandRegexInterpreter implements MiniLanguageInterpreter {
     public CommandRegexInterpreter(Class<? extends Verb> verbClass, YodaEnvironment yodaEnvironment) {
         this.verbClass = verbClass;
         this.yodaEnvironment = yodaEnvironment;
+        Set<String> verbNounStrings = new HashSet<>();
         try {
-            Set<String> verbNounStrings = this.yodaEnvironment.lex.getPOSForClass(verbClass, Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true);
+            verbNounStrings.addAll(this.yodaEnvironment.lex.getPOSForClass(verbClass, Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true));
+        } catch (Lexicon.NoLexiconEntryException e) {}
+        try{
             verbNounStrings.addAll(this.yodaEnvironment.lex.getPOSForClass(verbClass, Lexicon.LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true));
-            this.verbRegexString = "("+String.join("|",verbNounStrings)+")";
         } catch (Lexicon.NoLexiconEntryException e) {}
         for (Class<? extends Role> roleClass : Ontology.roleClasses) {
             if (Ontology.inDomain(roleClass, verbClass)) {

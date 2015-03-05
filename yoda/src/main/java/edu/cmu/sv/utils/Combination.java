@@ -51,7 +51,9 @@ public class Combination {
         S key = new LinkedList<>(keysAndValues.keySet()).get(0);
         Set<T> values = keysAndValues.get(key);
         keysAndValues.remove(key);
+//        System.out.println("Combination.possibleBindings: key, values" + key + ", " + values);
         for (Map<S, T> partialBinding : possibleBindings(keysAndValues)){
+//            System.out.println("nested partial binding returned" + partialBinding);
             for (T value : values){
                 Map<S, T> extendedBinding = new HashMap<>(partialBinding);
                 extendedBinding.put(key, value);

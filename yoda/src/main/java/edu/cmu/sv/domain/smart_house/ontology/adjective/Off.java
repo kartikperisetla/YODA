@@ -6,7 +6,7 @@ package edu.cmu.sv.domain.smart_house.ontology.adjective;
 public class Off extends PowerStateAdjective {
     @Override
     public double getCenter() {
-        return 1;
+        return 0;
     }
 
     @Override

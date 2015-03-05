@@ -51,7 +51,7 @@ public class CommandLineExecutor implements Executor {
             taskSemantics.put("verb", SemanticsModel.parseJSON(((NonDialogTask) systemAction).getTaskSpec().toJSONString()));
 
             SemanticsModel taskSemanticModel = new SemanticsModel(taskSemantics);
-            ((NonDialogTask) systemAction).execute();
+            ((NonDialogTask) systemAction).execute(yodaEnvironment);
             Turn systemTurn = new Turn("system", taskSemanticModel.deepCopy(), taskSemanticModel, null, null);
 
             Calendar calendar = Calendar.getInstance();

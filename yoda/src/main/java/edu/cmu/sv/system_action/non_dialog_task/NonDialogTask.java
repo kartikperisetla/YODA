@@ -1,6 +1,7 @@
 package edu.cmu.sv.system_action.non_dialog_task;
 
 import edu.cmu.sv.system_action.SystemAction;
+import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.json.simple.JSONObject;
 
 /**
@@ -25,7 +26,7 @@ public abstract class NonDialogTask extends SystemAction {
     // interpret result as the probability that the taskSpec can be executed (must be 0-1)
     public abstract double assessExecutability();
 
-    public void execute(){
+    public void execute(YodaEnvironment yodaEnvironment){
         System.out.println("executing non-dialog task:"+this.getClass().getSimpleName()+" "+taskSpec);
     }
 
