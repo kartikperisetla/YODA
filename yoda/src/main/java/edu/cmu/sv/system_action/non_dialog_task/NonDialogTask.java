@@ -33,3 +33,4 @@ public abstract class NonDialogTask extends SystemAction {
     public abstract TaskStatus status(String taskID);
 
 }
+

@@ -17,5 +17,5 @@ public class YelpPhoenixNonDialogTaskRegistry extends NonDialogTaskRegistry {
         actionSchemata.add(new GenericCommandSchema(GiveDirections.class, GiveDirectionsTask.class));
         actionSchemata.add(new GenericCommandSchema(MakeReservation.class, MakeReservationTask.class));
     }
-
 }
+

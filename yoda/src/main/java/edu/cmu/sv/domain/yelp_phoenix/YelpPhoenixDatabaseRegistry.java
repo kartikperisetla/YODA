@@ -8,9 +8,6 @@ import edu.cmu.sv.domain.DatabaseRegistry;
 public class YelpPhoenixDatabaseRegistry extends DatabaseRegistry {
     public YelpPhoenixDatabaseRegistry() {
         turtleDatabaseSources.add("./src/resources/yelp_business.turtle");
-
-        nonOntologyRelations.add("gps_lon");
-        nonOntologyRelations.add("gps_lat");
-        nonOntologyRelations.add("expensiveness");
     }
 }
+
