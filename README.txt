@@ -19,11 +19,15 @@
 # along with YODA.  If not, see <http://www.gnu.org/licenses/>.
 # -------------------------------------------------------------
 
-(README last updated Dec. 13, 2014)
+README last updated on Mar 5, 2015
 
-Running current code:
-This project is structured as a maven project which is supported by all the major IDEs by importing the yoda/yoda/pom.xml file .
-It requires the Java 8 language level and SDK.
+YODA requires the Java 8 language level and SDK.
+I'm currently experiencing issues using maven to build executables and run them from the command line.
+Until then, I suggest opening the project in an IDE and using the IDE's 'play' button.
+I have used Intellij IDEA 14, I import the pom.xml file as a Maven project, and I can run both of the demo systems.
+
+To run the old version of the Yelp system from the command line, do:
+> git checkout 9b14c44
 
 To build, go to yoda/yoda/ and run:
 > mvn compile
@@ -37,11 +41,3 @@ SLF4J: Defaulting to no-operation (NOP) logger implementation
 SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
 
 But you can ignore them and proceed to type your utterances into the command line.
-
-
-
-
-
-Installing Theano:
-follow directions for your operating system on Theano website.
-For recent Ubuntu, http://deeplearning.net/software/theano/install_ubuntu.html#install-ubuntu
