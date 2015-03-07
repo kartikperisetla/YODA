@@ -1,5 +1,6 @@
 package edu.cmu.sv.dialog_state_tracking;
 
+import edu.cmu.sv.database.Sensor;
 import edu.cmu.sv.database.dialog_task.ReferenceResolution;
 import edu.cmu.sv.yoda_environment.MongoLogHandler;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -176,6 +177,9 @@ public class DialogStateTracker implements Runnable {
     @Override
     public void run() {
         while (true){
+            for (Sensor sensor : yodaEnvironment.db.sensors){
+                sensor.sense(yodaEnvironment);
+            }
             try {
                 Pair<Turn, Long> DstInput = yodaEnvironment.DstInputQueue.poll(100, TimeUnit.MILLISECONDS);
                 if (DstInput!=null) {

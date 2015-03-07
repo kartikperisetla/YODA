@@ -56,6 +56,7 @@ public class Database {
     }
 
     public YodaEnvironment yodaEnvironment;
+    public Set<Sensor> sensors = new HashSet<>();
     // a counter used to create new URIs
     private long URICounter = 0;
     public final RepositoryConnection connection;
@@ -104,6 +105,8 @@ public class Database {
 
             // load the non-ontology relations
             addNonOntologyProperties(registry.nonOntologyRelations);
+
+            sensors.addAll(registry.sensors);
 
         } catch (UpdateExecutionException | RDFParseException | RepositoryException | UnsupportedEncodingException | MalformedQueryException e) {
             e.printStackTrace();

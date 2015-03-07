@@ -1,17 +1,12 @@
 package edu.cmu.sv.domain.smart_house.non_dialog_task;
 
 import edu.cmu.sv.database.Database;
+import edu.cmu.sv.domain.smart_house.HouseSimulation;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTaskPreferences;
-import edu.cmu.sv.yoda_environment.MongoLogHandler;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.json.simple.JSONObject;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.Update;
-import org.openrdf.query.UpdateExecutionException;
-import org.openrdf.repository.RepositoryException;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,35 +28,13 @@ public class TurnOnTask extends NonDialogTask {
     public void execute(YodaEnvironment yodaEnvironment) {
         super.execute(yodaEnvironment);
         String uri = (String) new SemanticsModel(taskSpec.toJSONString()).newGetSlotPathFiller("Component.HasURI");
-
-        synchronized (yodaEnvironment.db.connection) {
-            // clear existing power state
-            String deleteString = Database.prefixes;
-            deleteString += "DELETE {<" + uri + "> base:power_state ?y }";
-            deleteString += "WHERE {<" + uri + "> base:power_state ?y }";
-            Database.getLogger().info(MongoLogHandler.createSimpleRecord("clear appliance power state", deleteString).toJSONString());
-            try {
-                Update update = yodaEnvironment.db.connection.prepareUpdate(
-                        QueryLanguage.SPARQL, deleteString, Database.dstFocusURI);
-                update.execute();
-            } catch (RepositoryException | UpdateExecutionException | MalformedQueryException e) {
-                e.printStackTrace();
-                System.exit(0);
-            }
-
-            // set new power state
-            String insertString = Database.prefixes + "INSERT DATA {";
-            insertString += "<" + uri + "> base:power_state \"on\"^^xsd:string.\n";
-            insertString += "}";
-            Database.getLogger().info(MongoLogHandler.createSimpleRecord("Turn on appliance", insertString).toJSONString());
-            try {
-                Update update = yodaEnvironment.db.connection.prepareUpdate(
-                        QueryLanguage.SPARQL, insertString, Database.dstFocusURI);
-                update.execute();
-            } catch (RepositoryException | UpdateExecutionException | MalformedQueryException e) {
-                e.printStackTrace();
-                System.exit(0);
-            }
+        if (uri.equals(Database.baseURI+"POI_0000")){
+            HouseSimulation.POI_0000_powerState = "on";
+        } else if (uri.equals(Database.baseURI+"POI_0001")){
+            HouseSimulation.POI_0001_powerState = "on";
+        } else {
+            System.out.println("ERROR: unknown URI:"+uri);
+            System.exit(0);
         }
     }
 
