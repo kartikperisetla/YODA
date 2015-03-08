@@ -3,10 +3,7 @@ package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander
 import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.dialog_state_tracking.Turn;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.noun.PointOfInterest;
-import edu.cmu.sv.domain.yelp_phoenix.ontology.noun.poi_types.Bars;
-import edu.cmu.sv.domain.yelp_phoenix.ontology.noun.poi_types.Mexican;
-import edu.cmu.sv.domain.yelp_phoenix.ontology.noun.poi_types.Restaurants;
-import edu.cmu.sv.domain.yelp_phoenix.ontology.noun.poi_types.Thai;
+import edu.cmu.sv.domain.yelp_phoenix.ontology.noun.poi_types.*;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
@@ -194,6 +191,14 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
                 patientObject.put("class", Mexican.class.getSimpleName());
             else if (poiClass.equals("thai"))
                 patientObject.put("class", Thai.class.getSimpleName());
+            else if (poiClass.equals("cafe"))
+                patientObject.put("class", Cafes.class.getSimpleName());
+            else if (poiClass.equals("mediterranean"))
+                patientObject.put("class", Mediterranean.class.getSimpleName());
+            else if (poiClass.equals("burger"))
+                patientObject.put("class", Burgers.class.getSimpleName());
+            else if (poiClass.equals("pizza"))
+                patientObject.put("class", Pizza.class.getSimpleName());
             else if (poiClass.equals("bar"))
                 patientObject.put("class", Bars.class.getSimpleName());
             else
@@ -210,7 +215,7 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
 
         }
         // 3 <ADJ> rest: ynq: is NE rest ADJ?
-        else if (words.size() > 3 && words.get(0).equals("3")) {
+        else if (words.size() > 0 && words.get(0).equals("3")) {
             String adjClass = words.get(1);
             System.out.println(adjClass);
             String rest = String.join(" ", words.subList(2, words.size()));
@@ -250,7 +255,7 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
             hypothesisDistribution.put("hyp" + hypothesisId, 1.0);
         }
         // 3b quality rest: whq: how quality is NE(rest)?
-        else if (words.size() > 3 && words.get(0).equals("3b")) {
+        else if (words.size() > 0 && words.get(0).equals("3b")) {
             String qualityClass = words.get(1);
             System.out.println(qualityClass);
             String rest = String.join(" ", words.subList(2, words.size()));
