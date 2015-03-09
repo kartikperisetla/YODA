@@ -17,7 +17,7 @@ import java.util.List;
  * Command line interface to yoda dialog system
  *
  */
-public class CommandLineYodaSystem {
+public abstract class CommandLineYodaSystem {
 
     public static List<DomainSpec> domainSpecs = new LinkedList<>();
 
