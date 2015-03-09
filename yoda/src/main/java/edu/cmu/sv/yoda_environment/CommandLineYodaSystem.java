@@ -20,6 +20,7 @@ import java.util.List;
 public abstract class CommandLineYodaSystem {
 
     public static List<DomainSpec> domainSpecs = new LinkedList<>();
+    public static List<Runnable> simultaneousLaunch = new LinkedList<>();
 
     public static void main(String[] args) throws IOException {
         YodaEnvironment yodaEnvironment = YodaEnvironment.dialogTestingEnvironment();
@@ -32,6 +33,11 @@ public abstract class CommandLineYodaSystem {
         DialogRegistry.finalizeDialogRegistry();
                 ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).constructTemplates();
         System.err.println("done loading domain");
+
+        for (Runnable runnable : simultaneousLaunch){
+            Thread t = new Thread(runnable);
+            t.start();
+        }
 
         Thread dstThread = new Thread(yodaEnvironment.dst);
         dstThread.start();

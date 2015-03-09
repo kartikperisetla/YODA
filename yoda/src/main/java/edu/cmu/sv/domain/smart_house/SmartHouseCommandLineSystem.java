@@ -26,6 +26,9 @@ public class SmartHouseCommandLineSystem extends CommandLineYodaSystem {
                 new SmartHouseOntologyRegistry(),
                 new SmartHouseNonDialogTaskRegistry(),
                 new SmartHouseDatabaseRegistry()));
+
+        // TODO: add GUI to the simultaneous launch runnable list
+        //        simultaneousLaunch.add(new simulatorGUI());
     }
 }
 
