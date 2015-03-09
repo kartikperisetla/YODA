@@ -51,7 +51,7 @@ public class JsonExecutor implements Executor {
             taskSemantics.put("verb", SemanticsModel.parseJSON(((NonDialogTask) systemAction).getTaskSpec().toJSONString()));
 
             SemanticsModel taskSemanticModel = new SemanticsModel(taskSemantics);
-
+            ((NonDialogTask) systemAction).execute(yodaEnvironment);
 
             JSONObject outputContent = SemanticsModel.parseJSON(
                     "{\"messageType\":\""+systemAction.getClass().getSimpleName()+"\", " +

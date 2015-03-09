@@ -27,7 +27,7 @@ public abstract class NonDialogTask extends SystemAction {
     public abstract double assessExecutability();
 
     public void execute(YodaEnvironment yodaEnvironment){
-        System.out.println("executing non-dialog task:"+this.getClass().getSimpleName()+" "+taskSpec);
+        System.err.println("executing non-dialog task:"+this.getClass().getSimpleName()+" "+taskSpec);
     }
 
     // return the string status indicator for the taskID
