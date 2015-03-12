@@ -18,7 +18,6 @@ import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,7 +58,7 @@ public class TestRegexPlusKeywordUnderstander {
 
 
         SLUDataset tmp = new YelpPhoenixSLUDataset();
-        System.out.println(tmp.dataSet.size());
+        System.out.println(tmp.getDataSet().size());
         System.exit(0);
 
         List<String> testUtterances = new LinkedList<>();

@@ -1,20 +1,21 @@
 package edu.cmu.sv.spoken_language_understanding.domain_tensor_understander;
 
 import edu.cmu.sv.database.Ontology;
-import edu.cmu.sv.domain.OntologyRegistry;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
 import edu.cmu.sv.natural_language_generation.Grammar;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.spoken_language_understanding.SpokenLanguageUnderstander;
-import edu.cmu.sv.utils.Combination;
 import edu.cmu.sv.utils.HypothesisSetManagement;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by David Cohen on 3/11/15.
@@ -61,13 +62,13 @@ public class DomainTensorUnderstander implements SpokenLanguageUnderstander{
 
     ///// The following transforms are for tagging a single word with a role
 
-    public Class<? extends Role> roleTransform(List<Double> outputVector, String token){
-
-    }
-
-    public List<Double> inverseRTransform(Class<? extends Role> roleClass, String token){
-
-    }
+//    public Class<? extends Role> roleTransform(List<Double> outputVector, String token){
+//
+//    }
+//
+//    public List<Double> inverseRTransform(Class<? extends Role> roleClass, String token){
+//
+//    }
 
 
     ///// The following transforms are for classifying a role with a corresponding concept

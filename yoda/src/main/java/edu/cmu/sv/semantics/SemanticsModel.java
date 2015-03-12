@@ -2,6 +2,7 @@ package edu.cmu.sv.semantics;
 
 
 import edu.cmu.sv.database.Ontology;
+import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.WebResource;
@@ -448,6 +449,8 @@ public class SemanticsModel {
         // there must be a dialog act
         if (getSlotPathFiller("dialogAct")==null)
             throw new Error("no dialog act in SLU model");
+        if (!DialogRegistry.dialogActNameMap.containsKey(getSlotPathFiller("dialogAct")))
+            throw new Error("this dialog act isn't in the dialog registry:" + getSlotPathFiller("dialogAct"));
         // there is a specific set of permitted slots in the top level
         if (getSlotsAtPath("").stream().
                 anyMatch(x -> !x.equals("dialogAct") && !x.equals("verb") && !x.equals("topic")))

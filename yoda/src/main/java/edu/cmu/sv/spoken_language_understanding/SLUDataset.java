@@ -3,10 +3,8 @@ package edu.cmu.sv.spoken_language_understanding;
 import edu.cmu.sv.semantics.SemanticsModel;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by David Cohen on 3/11/15.
@@ -19,5 +17,14 @@ import java.util.Map;
  *
  */
 public class SLUDataset {
-    public List<Pair<String, SemanticsModel>> dataSet = new LinkedList<>();
+    private List<Pair<String, SemanticsModel>> dataSet = new LinkedList<>();
+
+    public void add(Pair<String, SemanticsModel> sample){
+        dataSet.add(sample);
+        sample.getRight().validateSLUHypothesis();
+    }
+
+    public List<Pair<String, SemanticsModel>> getDataSet() {
+        return dataSet;
+    }
 }
