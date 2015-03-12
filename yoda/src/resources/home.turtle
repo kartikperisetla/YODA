@@ -6,5 +6,7 @@ base:POI_0000 rdf:type base:AirConditioner .
 base:POI_0000 base:power_state "off"^^xsd:string .
 base:POI_0001 rdf:type base:SecuritySystem .
 base:POI_0001 base:power_state "off"^^xsd:string .
+base:POI_0000 rdf:type base:Microwave .
+base:POI_0000 base:power_state "off"^^xsd:string .
 
 
