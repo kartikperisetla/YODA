@@ -1,8 +1,11 @@
 package edu.cmu.sv.spoken_language_understanding;
 
 import edu.cmu.sv.semantics.SemanticsModel;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,5 +19,5 @@ import java.util.Map;
  *
  */
 public class SLUDataset {
-    Map<String, SemanticsModel> dataSet = new HashMap<>();
+    public List<Pair<String, SemanticsModel>> dataSet = new LinkedList<>();
 }
