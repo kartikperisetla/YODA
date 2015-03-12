@@ -147,20 +147,10 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         }
 
         // check for named entities
-        if (entity1JSON.isEmpty() || entity1CoverageScore < .75){
-            String uri = yodaEnvironment.db.insertValue(entity1String);
-            JSONObject namedEntity = SemanticsModel.parseJSON(Ontology.webResourceWrap(uri));
-            if (!entity1JSON.containsKey("class"))
-                entity1JSON.put("class", Noun.class.getSimpleName());
-            entity1JSON.put(HasName.class.getSimpleName(), namedEntity);
-        }
-        if (entity2String!=null && (entity2JSON.isEmpty() || entity2CoverageScore < .75)){
-            String uri = yodaEnvironment.db.insertValue(entity2String);
-            JSONObject namedEntity = SemanticsModel.parseJSON(Ontology.webResourceWrap(uri));
-            if (!entity2JSON.containsKey("class"))
-                entity2JSON.put("class", Noun.class.getSimpleName());
-            entity2JSON.put(HasName.class.getSimpleName(), namedEntity);
-        }
+        if (entity1JSON.isEmpty() || entity1CoverageScore < .75)
+            entity1JSON.put(HasName.class.getSimpleName(), entity1String);
+        if (entity2String!=null && (entity2JSON.isEmpty() || entity2CoverageScore < .75))
+            entity2JSON.put(HasName.class.getSimpleName(), entity2String);
 
         // default to UnknownThingWithRoles
         if (!entity1JSON.containsKey("class")){

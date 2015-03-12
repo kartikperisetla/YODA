@@ -179,10 +179,8 @@ public class ReferenceResolution {
                     ans += "FILTER(?score"+tmpVarIndex+" > "+.5+")\n";
                 } else if (HasName.class.equals(Ontology.roleNameMap.get((String) key))) {
                     ans += "?x" + referenceIndex + " rdfs:label ?tmp" + tmpVarIndex + " . \n" +
-                            "base:" + ((JSONObject)reference.get(HasName.class.getSimpleName())).
-                            get(HasURI.class.getSimpleName()) + " rdf:value ?tmpV" + tmpVarIndex + " . \n" +
                             "BIND(base:" + StringSimilarity.class.getSimpleName() +
-                            "(?tmp" + tmpVarIndex + ", ?tmpV" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
+                            "(?tmp" + tmpVarIndex + ", \""+ reference.get(HasName.class.getSimpleName())+ "\") AS ?score" + tmpVarIndex + ")\n";
                     scoresToAccumulate.add("?score"+tmpVarIndex);
                 } else {
                     throw new Error("this role isn't handled:" + key);
@@ -293,10 +291,8 @@ public class ReferenceResolution {
                     scoresToAccumulate.add("?score"+tmpVarIndex);
                 } else if (HasName.class.equals(Ontology.roleNameMap.get((String) key))) {
                     queryString += "<"+individualURI+"> rdfs:label ?tmp" + tmpVarIndex + " . \n" +
-                            "base:" + ((JSONObject)description.get(HasName.class.getSimpleName())).
-                            get(HasURI.class.getSimpleName()) + " rdf:value ?tmpV" + tmpVarIndex + " . \n" +
                             "BIND(base:" + StringSimilarity.class.getSimpleName() +
-                            "(?tmp" + tmpVarIndex + ", ?tmpV" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
+                            "(?tmp" + tmpVarIndex + ", \"" + description.get(HasName.class.getSimpleName()) + "\") AS ?score" + tmpVarIndex + ")\n";
                     scoresToAccumulate.add("?score"+tmpVarIndex);
                 }
                 tmpVarIndex++;
