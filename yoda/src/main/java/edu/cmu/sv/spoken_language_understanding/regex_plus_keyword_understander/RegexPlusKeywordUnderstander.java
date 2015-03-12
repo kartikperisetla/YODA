@@ -1,13 +1,15 @@
 package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander;
 
-import edu.cmu.sv.dialog_state_tracking.Turn;
 import edu.cmu.sv.database.Ontology;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
+import edu.cmu.sv.dialog_state_tracking.Turn;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.noun.PointOfInterest;
+import edu.cmu.sv.domain.yelp_phoenix.ontology.noun.poi_types.*;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.spoken_language_understanding.SpokenLanguageUnderstander;
+import edu.cmu.sv.spoken_language_understanding.Tokenizer;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.MongoLogHandler;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -97,14 +99,230 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
         StringDistribution hypothesisDistribution = new StringDistribution();
         int hypothesisId = 0;
 
-        // incorporate regex templates
-        for (MiniLanguageInterpreter miniLanguageInterpreter : languageInterpreters){
-            Pair<JSONObject, Double> interpretation = miniLanguageInterpreter.interpret(asrResult, yodaEnvironment);
-            if (interpretation==null)
-                continue;
+
+        List<String> words = Tokenizer.tokenize(asrResult);
+        // 0: command give directions to rest (named entity)
+        if (words.size() > 0 && words.get(0).equals("0")) {
+            String rest = String.join(" ", words.subList(1, words.size()));
+            String uri = yodaEnvironment.db.insertValue(rest);
+            JSONObject namedEntity = SemanticsModel.parseJSON(Ontology.webResourceWrap(uri));
+            SemanticsModel.wrap(namedEntity, "Noun", "HasName");
+            JSONObject ans = SemanticsModel.parseJSON("{\"dialogAct\":\"Command\",\"verb\":{\"Destination\":" +
+                    namedEntity.toJSONString() +
+                    ",\"class\":\"GiveDirections\"}}");
+            hypotheses.put("hyp" + hypothesisId, new SemanticsModel(ans));
+            hypothesisDistribution.put("hyp" + hypothesisId, 1.0);
+        }
+        // give directions there
+        else if (words.size() > 0 && words.get(0).equals("0b")) {
+            JSONObject ans = SemanticsModel.parseJSON("{\"dialogAct\":\"Command\",\"verb\":{\"Destination\":{\"refType\":\"pronoun\",\"class\":\"PointOfInterest\"},\"class\":\"GiveDirections\"}}");
+            hypotheses.put("hyp" + hypothesisId, new SemanticsModel(ans));
+            hypothesisDistribution.put("hyp" + hypothesisId, 1.0);
+        }
+        // give directions
+        else if (words.size() > 0 && words.get(0).equals("0c")) {
+            JSONObject ans = SemanticsModel.parseJSON("{\"dialogAct\":\"Command\",\"verb\":{\"class\":\"GiveDirections\"}}");
+            hypotheses.put("hyp" + hypothesisId, new SemanticsModel(ans));
+            hypothesisDistribution.put("hyp" + hypothesisId, 1.0);
+        }
+        // 1: command make reservation to rest (named entity)
+        else if (words.size() > 0 && words.get(0).equals("1")) {
+            String rest = String.join(" ", words.subList(1, words.size()));
+            String uri = yodaEnvironment.db.insertValue(rest);
+            JSONObject namedEntity = SemanticsModel.parseJSON(Ontology.webResourceWrap(uri));
+            SemanticsModel.wrap(namedEntity, "Noun", "HasName");
+            JSONObject ans = SemanticsModel.parseJSON("{\"dialogAct\":\"Command\",\"verb\":{\"Destination\":" +
+                    namedEntity.toJSONString() +
+                    ",\"class\":\"MakeReservation\"}}");
+            hypotheses.put("hyp" + hypothesisId, new SemanticsModel(ans));
+            hypothesisDistribution.put("hyp" + hypothesisId, 1.0);
+        }
+        // 1b: command make reservation there
+        else if (words.size() > 0 && words.get(0).equals("1b")) {
+            JSONObject ans = SemanticsModel.parseJSON("{\"dialogAct\":\"Command\",\"verb\":{\"Destination\":{\"refType\":\"pronoun\",\"class\":\"PointOfInterest\"},\"class\":\"MakeReservation\"}}");
+            hypotheses.put("hyp" + hypothesisId, new SemanticsModel(ans));
+            hypothesisDistribution.put("hyp" + hypothesisId, 1.0);
+        }
+        // 1c: command make reservation
+        else if (words.size() > 0 && words.get(0).equals("1c")) {
+            JSONObject ans = SemanticsModel.parseJSON("{\"dialogAct\":\"Command\",\"verb\":{\"class\":\"MakeReservation\"}}");
+            hypotheses.put("hyp" + hypothesisId, new SemanticsModel(ans));
+            hypothesisDistribution.put("hyp" + hypothesisId, 1.0);
+        }
+        // 2 <ADJ> <CLS> rest: search for a ADJ / Cls near rest
+        else if (words.size() > 0 && words.get(0).equals("2")) {
+            String adjClass = words.get(1);
+            String poiClass = words.get(2);
+            String rest = String.join(" ", words.subList(3, words.size()));
+
+            JSONObject ans = SemanticsModel.parseJSON("{}");
+            ans.put("dialogAct", "YNQuestion");
+
+            JSONObject verbObject = SemanticsModel.parseJSON("{}");
+            verbObject.put("class", "Exist");
+
+            JSONObject nearToObject = SemanticsModel.parseJSON("{}");
+            if (rest.equals("it")) {
+                nearToObject.put("class", "Noun");
+                nearToObject.put("refType", "pronoun");
+            } else {
+                String uri = yodaEnvironment.db.insertValue(rest);
+                JSONObject namedEntity = SemanticsModel.parseJSON(Ontology.webResourceWrap(uri));
+                SemanticsModel.wrap(namedEntity, "Noun", "HasName");
+                nearToObject = namedEntity;
+            }
+
+            JSONObject patientObject = SemanticsModel.parseJSON("{}");
+            patientObject.put("class", "UnknownThingWithRoles");
+            if (adjClass.equals("good"))
+                patientObject.put("HasGoodness", SemanticsModel.parseJSON("{\"class\":\"Good\"}"));
+            else if (adjClass.equals("cheap"))
+                patientObject.put("HasExpensiveness", SemanticsModel.parseJSON("{\"class\":\"Cheap\"}"));
+            else if (adjClass.equals("expensive"))
+                patientObject.put("HasExpensiveness", SemanticsModel.parseJSON("{\"class\":\"Expensive\"}"));
+            else if (adjClass.equals("none")) {
+                // do nothing
+            } else
+                throw new Error();
+
+            if (poiClass.equals("restaurants"))
+                patientObject.put("class", Restaurants.class.getSimpleName());
+            else if (poiClass.equals("mexican"))
+                patientObject.put("class", Mexican.class.getSimpleName());
+            else if (poiClass.equals("thai"))
+                patientObject.put("class", Thai.class.getSimpleName());
+            else if (poiClass.equals("cafe"))
+                patientObject.put("class", Cafes.class.getSimpleName());
+            else if (poiClass.equals("mediterranean"))
+                patientObject.put("class", Mediterranean.class.getSimpleName());
+            else if (poiClass.equals("burger"))
+                patientObject.put("class", Burgers.class.getSimpleName());
+            else if (poiClass.equals("pizza"))
+                patientObject.put("class", Pizza.class.getSimpleName());
+            else if (poiClass.equals("bar"))
+                patientObject.put("class", Bars.class.getSimpleName());
+            else
+                throw new Error();
+
+            patientObject.put("HasDistance", SemanticsModel.parseJSON("{\"class\":\"IsCloseTo\", \"InRelationTo\":" +
+                    nearToObject.toJSONString() + "}"));
+
+            verbObject.put("Agent", patientObject);
+            ans.put("verb", verbObject);
+
+            hypotheses.put("hyp" + hypothesisId, new SemanticsModel(ans));
+            hypothesisDistribution.put("hyp" + hypothesisId, 1.0);
+
+        }
+        // 3 <ADJ> rest: ynq: is NE rest ADJ?
+        else if (words.size() > 0 && words.get(0).equals("3")) {
+            String adjClass = words.get(1);
+            System.out.println(adjClass);
+            String rest = String.join(" ", words.subList(2, words.size()));
+
+            JSONObject ans = SemanticsModel.parseJSON("{}");
+            ans.put("dialogAct", "YNQuestion");
+            JSONObject verbObject = SemanticsModel.parseJSON("{}");
+            verbObject.put("class", "HasProperty");
+
+            JSONObject agentObject = SemanticsModel.parseJSON("{}");
+            if (rest.equals("it")) {
+                agentObject.put("class", "Noun");
+                agentObject.put("refType", "pronoun");
+            } else {
+                String uri = yodaEnvironment.db.insertValue(rest);
+                JSONObject namedEntity = SemanticsModel.parseJSON(Ontology.webResourceWrap(uri));
+                SemanticsModel.wrap(namedEntity, "Noun", "HasName");
+                agentObject = namedEntity;
+            }
+
+            JSONObject patientObject = SemanticsModel.parseJSON("{}");
+            patientObject.put("class", "UnknownThingWithRoles");
+            if (adjClass.equals("good"))
+                patientObject.put("HasGoodness", SemanticsModel.parseJSON("{\"class\":\"Good\"}"));
+            else if (adjClass.equals("cheap"))
+                patientObject.put("HasExpensiveness", SemanticsModel.parseJSON("{\"class\":\"Cheap\"}"));
+            else if (adjClass.equals("expensive"))
+                patientObject.put("HasExpensiveness", SemanticsModel.parseJSON("{\"class\":\"Expensive\"}"));
+            else
+                throw new Error();
+
+            verbObject.put("Agent", agentObject);
+            verbObject.put("Patient", patientObject);
+            ans.put("verb", verbObject);
+
+            hypotheses.put("hyp" + hypothesisId, new SemanticsModel(ans));
+            hypothesisDistribution.put("hyp" + hypothesisId, 1.0);
+        }
+        // 3b quality rest: whq: how quality is NE(rest)?
+        else if (words.size() > 0 && words.get(0).equals("3b")) {
+            String qualityClass = words.get(1);
+            System.out.println(qualityClass);
+            String rest = String.join(" ", words.subList(2, words.size()));
+
+            JSONObject ans = SemanticsModel.parseJSON("{}");
+            ans.put("dialogAct", "WHQuestion");
+            JSONObject verbObject = SemanticsModel.parseJSON("{}");
+            verbObject.put("class", "HasProperty");
+
+            JSONObject agentObject = SemanticsModel.parseJSON("{}");
+            if (rest.equals("it")) {
+                agentObject.put("class", "Noun");
+                agentObject.put("refType", "pronoun");
+            } else {
+                String uri = yodaEnvironment.db.insertValue(rest);
+                JSONObject namedEntity = SemanticsModel.parseJSON(Ontology.webResourceWrap(uri));
+                SemanticsModel.wrap(namedEntity, "Noun", "HasName");
+                agentObject = namedEntity;
+            }
+
+            JSONObject patientObject = SemanticsModel.parseJSON("{}");
+            patientObject.put("class", "Requested");
+            if (qualityClass.equals("good"))
+                patientObject.put("HasValue", SemanticsModel.parseJSON("{\"class\":\"Goodness\"}"));
+            else if (qualityClass.equals("cheap"))
+                patientObject.put("HasValue", SemanticsModel.parseJSON("{\"class\":\"Expensiveness\"}"));
+            else
+                throw new Error();
+
+            verbObject.put("Agent", agentObject);
+            verbObject.put("Patient", patientObject);
+            ans.put("verb", verbObject);
+
+            hypotheses.put("hyp" + hypothesisId, new SemanticsModel(ans));
+            hypothesisDistribution.put("hyp" + hypothesisId, 1.0);
+        }
+
+
+        // 4 rest : NP fragment
+        else if (words.size() > 0 && words.get(0).equals("4")) {
+            String rest = String.join(" ", words.subList(1, words.size()));
+            Pair<JSONObject, Double> interpretation = new NounPhraseFragmentInterpreter(nounPhraseInterpreter).
+                    interpret(rest, yodaEnvironment);
             hypotheses.put("hyp" + hypothesisId, new SemanticsModel(interpretation.getKey()));
-            hypothesisDistribution.put("hyp" + hypothesisId, interpretation.getRight());
-            hypothesisId++;
+            hypothesisDistribution.put("hyp" + hypothesisId, 1.0);
+        }
+        // 5: np fragment including name
+        else if (words.size() > 0 && words.get(0).equals("5")) {
+            String rest = String.join(" ", words.subList(1, words.size()));
+            Pair<JSONObject, Double> npInterpretation = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
+                    nounPhraseInterpreter.interpret(rest, yodaEnvironment);
+            String jsonString = "{\"dialogAct\":\"Fragment\"}";
+            JSONObject ans = SemanticsModel.parseJSON(jsonString);
+            ans.put("topic", npInterpretation.getLeft());
+            hypotheses.put("hyp" + hypothesisId, new SemanticsModel(ans));
+            hypothesisDistribution.put("hyp" + hypothesisId, 1.0);
+        }
+        else {
+            // incorporate regex templates
+            for (MiniLanguageInterpreter miniLanguageInterpreter : languageInterpreters) {
+                Pair<JSONObject, Double> interpretation = miniLanguageInterpreter.interpret(asrResult, yodaEnvironment);
+                if (interpretation == null)
+                    continue;
+                hypotheses.put("hyp" + hypothesisId, new SemanticsModel(interpretation.getKey()));
+                hypothesisDistribution.put("hyp" + hypothesisId, interpretation.getRight());
+                hypothesisId++;
+            }
         }
 
         // create a turn and update the DST
@@ -119,6 +337,7 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
         outputRecord.put("hypothesis_distribution", hypothesisDistribution.getInternalDistribution());
         outputRecord.put("hypotheses", new JSONObject(JSONHypotheses));
         logger.info(outputRecord.toJSONString());
+
     }
 
     @Override

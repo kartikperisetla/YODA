@@ -20,9 +20,8 @@ public class NamedEntityFragmentInterpreter implements MiniLanguageInterpreter {
     @Override
     public Pair<JSONObject, Double> interpret(String utterance, YodaEnvironment yodaEnvironment) {
         String namedEntityString = utterance;
-        String uri = yodaEnvironment.db.insertValue(namedEntityString);
-        String jsonString = "{\"dialogAct\":\"Fragment\",\"topic\":{\"HasName\":{\"HasURI\":\"" +
-                uri + "\",\"class\":\"WebResource\"},\"class\":\""+thingClass.getSimpleName()+"\"}}";
+        String jsonString = "{\"dialogAct\":\"Fragment\",\"topic\":{\"HasName\":\""+namedEntityString+"\","+
+                "\"class\":\""+thingClass.getSimpleName()+"\"}}";
         return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), 0.1);
     }
 }
