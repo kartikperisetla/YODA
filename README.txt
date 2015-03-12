@@ -1,7 +1,7 @@
 # -------------------------------------------------------------
 # README.txt
 # Yetanother Ontological Dialog Architecture - YODA
-# Copyright (c) David Cohen, 2014
+# Copyright (c) David Cohen, 2015
 # david.cohen@sv.cmu.edu
 # This file is part of Yetanother Ontological Dialog Architecture (YODA).
 
@@ -19,24 +19,32 @@
 # along with YODA.  If not, see <http://www.gnu.org/licenses/>.
 # -------------------------------------------------------------
 
-README last updated on Mar 6, 2015
+README last updated on Mar 9, 2015
 
 YODA requires the Java 8 language level and SDK.
 YODA uses Maven to manage its dependencies.
 It can be opened in most IDEs by importing the pom.xml file as a Maven project.
 
-To run in the command line, from yoda/yoda/:
+
+To compile and build executables (this will be slow the first time, and Maven requires an internet connection), from yoda/yoda/ run:
 
 > mvn clean
 > mvn compile
 > mvn package
 > mvn dependency:copy-dependencies
 
+To run in the command line, from yoda/yoda/:
+
 > java -cp target/yoda-1.0-SNAPSHOT.jar:target/dependency/* edu.cmu.sv.domain.smart_house.SmartHouseCommandLineSystem
-
 or
-
 > java -cp target/yoda-1.0-SNAPSHOT.jar:target/dependency/* edu.cmu.sv.domain.yelp_phoenix.YelpPhoenixCommandLineSystem
+
+To run the subProcess systems (for integration into a complete SDS), run from yoda/yoda/:
+
+> java -cp target/yoda-1.0-SNAPSHOT.jar:target/dependency/* edu.cmu.sv.domain.smart_house.SmartHouseSubprocessSystem
+or
+> java -cp target/yoda-1.0-SNAPSHOT.jar:target/dependency/* edu.cmu.sv.domain.yelp_phoenix.YelpPhoenixSubprocessSystem
+
 
 You may see messages such as:
 SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
