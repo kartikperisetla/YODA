@@ -24,6 +24,26 @@ public class Turn {
         this.speaker = speaker;
     }
 
+    public Map<String, SemanticsModel> getHypotheses() {
+        return hypotheses;
+    }
+
+    public StringDistribution getHypothesisDistribution() {
+        return hypothesisDistribution;
+    }
+
+    public String getSpeaker() {
+        return speaker;
+    }
+
+    public SemanticsModel getSystemUtterance() {
+        return systemUtterance;
+    }
+
+    public SemanticsModel getGroundedSystemMeaning() {
+        return groundedSystemMeaning;
+    }
+
     @Override
     public String toString() {
         return "Turn{" +
