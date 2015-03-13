@@ -92,5 +92,10 @@
           <artifactId>json-simple</artifactId>
           <version>1.1.1</version>
       </dependency>
-    </dependencies>
+      <dependency>
+          <groupId>edu.mit</groupId>
+          <artifactId>jwi</artifactId>
+          <version>2.2.3</version>
+      </dependency>
+  </dependencies>
 </project>
