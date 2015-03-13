@@ -3,7 +3,7 @@ package edu.cmu.sv.domain.yelp_phoenix;
 import edu.cmu.sv.domain.DatabaseRegistry;
 import edu.cmu.sv.domain.DomainSpec;
 import edu.cmu.sv.domain.NonDialogTaskRegistry;
-import edu.cmu.sv.domain.yoda_skeleton.YODASkeletonOntologyRegistry;
+import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonLexicon;
 import edu.cmu.sv.yoda_environment.SubprocessYodaSystem;
 
@@ -16,7 +16,7 @@ public class YelpPhoenixSubprocessSystem extends SubprocessYodaSystem {
         domainSpecs.add(new DomainSpec(
                 "YODA skeleton domain",
                 new YodaSkeletonLexicon(),
-                new YODASkeletonOntologyRegistry(),
+                new YodaSkeletonOntologyRegistry(),
                 new NonDialogTaskRegistry(),
                 new DatabaseRegistry()));
         // yelp phoenix domain

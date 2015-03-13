@@ -22,7 +22,7 @@ import java.util.Set;
 /**
  * Created by David Cohen on 3/3/15.
  */
-public class YODASkeletonOntologyRegistry extends OntologyRegistry{
+public class YodaSkeletonOntologyRegistry extends OntologyRegistry{
 
     public Set<Class <? extends Verb>> verbClasses = new HashSet<>();
     public Set<Class <? extends Noun>> nounClasses = new HashSet<>();
@@ -60,7 +60,7 @@ public class YODASkeletonOntologyRegistry extends OntologyRegistry{
         return miscClasses;
     }
 
-    public YODASkeletonOntologyRegistry() {
+    public YodaSkeletonOntologyRegistry() {
         // register classes
         verbClasses.add(Verb.class);
         verbClasses.add(Create.class);
