@@ -1,3 +1,5 @@
+package edu.cmu.sv.domain.smart_house.GUI;
+
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 

@@ -6,13 +6,9 @@ import java.util.ArrayList;
 public class GUIPerson extends GUIThing {
 	private String gender;
 	
-	public GUIPerson(String name, String gender, GUIRoom room) {
-		super(name, room);
+	public GUIPerson(String name, String gender, GUIRoom room, String correspondingURI) {
+		super(name, room, correspondingURI);
 		this.gender = gender;
-	}
-
-	public String gender() {
-		return gender;
 	}
 	
 	@Override

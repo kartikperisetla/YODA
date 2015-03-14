@@ -2,11 +2,10 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix base: <http://sv.cmu.edu/yoda#> .
-base:POI_0000 rdf:type base:AirConditioner .
-base:POI_0000 base:power_state "off"^^xsd:string .
-base:POI_0001 rdf:type base:SecuritySystem .
-base:POI_0001 base:power_state "off"^^xsd:string .
-base:POI_0000 rdf:type base:Microwave .
-base:POI_0000 base:power_state "off"^^xsd:string .
+base:0000 rdf:type base:AirConditioner .
+base:0001 rdf:type base:SecuritySystem .
+base:0000 rdf:type base:Microwave .
+
+
 
 

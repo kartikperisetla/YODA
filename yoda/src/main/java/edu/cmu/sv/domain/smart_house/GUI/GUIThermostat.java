@@ -5,8 +5,8 @@ import java.util.ArrayList;
 
 public class GUIThermostat extends GUIElectronic {
 
-	public GUIThermostat(String name, GUIRoom room, boolean state) {
-		super(name, room, state);
+	public GUIThermostat(String name, GUIRoom room, boolean state, String correspondingURI) {
+		super(name, room, state, correspondingURI);
 	}
 
 	@Override

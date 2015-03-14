@@ -62,17 +62,18 @@ public class MainFrame extends JFrame {
 		detailsPanel.add(detailsTextArea, BorderLayout.CENTER);
 		
 		Container pane = this.getContentPane();
+
 		pane.add(itemsPanel, BorderLayout.WEST);
 		pane.add(detailsPanel, BorderLayout.CENTER);
-        pane.add();
 	}
 
 	public void refreshGUI() {
 		List<String> detailsInfo = thingBeingDisplayed.provideDetails();
 		StringBuilder detailsBuffer = new StringBuilder();
-		for(String s : detailsInfo) {
-			detailsBuffer.append(s);
-		}
+        detailsInfo.stream().forEach((s) -> detailsBuffer.append(s));
+//		for(String s : detailsInfo) {
+//			detailsBuffer.append(s);
+//		}
 		detailsTextArea.setText(detailsBuffer.toString());
 		if(thingBeingDisplayed instanceof GUIElectronic) {
 			String btnDisplay = detailsInfo.get(2).toString().equals("ON") ? "Turn Off" : "Turn On";

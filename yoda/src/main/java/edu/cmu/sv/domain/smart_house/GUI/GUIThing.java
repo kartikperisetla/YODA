@@ -5,13 +5,19 @@ import java.util.ArrayList;
 public abstract class GUIThing {
 	private String name;
 	private GUIRoom room;
-	
-	public GUIThing(String name, GUIRoom room) {
-		this.name = name;
-		this.room = room;
-	}
-	
-	public String getName() {
+    private String correspondingURI;
+
+    public GUIThing(String name, GUIRoom room, String correspondingURI) {
+        this.name = name;
+        this.room = room;
+        this.correspondingURI = correspondingURI;
+    }
+
+    public String getCorrespondingURI() {
+        return correspondingURI;
+    }
+
+    public String getName() {
 		return name;
 	}
 	

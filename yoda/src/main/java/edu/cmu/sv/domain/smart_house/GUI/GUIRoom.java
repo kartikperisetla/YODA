@@ -5,8 +5,8 @@ import java.util.ArrayList;
 
 public class GUIRoom extends GUIThing {
 	
-	public GUIRoom(String name) {
-		super(name, null);
+	public GUIRoom(String name, String correspondingURI) {
+		super(name, null, correspondingURI);
 	}
 
 	@Override
