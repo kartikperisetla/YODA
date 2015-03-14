@@ -38,9 +38,6 @@ public class MainFrame extends JFrame {
 		
 		button = new JButton("Toggle");
 
-//		for(GUIThing thing : Simulator.getThings()) {
-//            listSelectionModel.addElement(thing);
-//        }
         Simulator.getThings().stream().forEach((thing) -> listSelectionModel.addElement(thing));
 		
 		//Items list
@@ -51,6 +48,8 @@ public class MainFrame extends JFrame {
 		list.setFixedCellWidth(150);
 		itemsPanel.add(list);
 		itemsPanel.add(scroller);
+        list.setSelectedIndex(0);
+        thingBeingDisplayed = list.getSelectedValue();
 
 		ListenForList lForList = new ListenForList();
 		list.addListSelectionListener(lForList);
@@ -65,15 +64,13 @@ public class MainFrame extends JFrame {
 
 		pane.add(itemsPanel, BorderLayout.WEST);
 		pane.add(detailsPanel, BorderLayout.CENTER);
+        refreshGUI();
 	}
 
 	public void refreshGUI() {
 		List<String> detailsInfo = thingBeingDisplayed.provideDetails();
 		StringBuilder detailsBuffer = new StringBuilder();
         detailsInfo.stream().forEach((s) -> detailsBuffer.append(s));
-//		for(String s : detailsInfo) {
-//			detailsBuffer.append(s);
-//		}
 		detailsTextArea.setText(detailsBuffer.toString());
 		if(thingBeingDisplayed instanceof GUIElectronic) {
 			String btnDisplay = detailsInfo.get(2).toString().equals("ON") ? "Turn Off" : "Turn On";

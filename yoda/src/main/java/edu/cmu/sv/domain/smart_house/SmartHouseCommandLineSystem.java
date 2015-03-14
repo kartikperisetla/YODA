@@ -31,18 +31,16 @@ public class SmartHouseCommandLineSystem extends CommandLineYodaSystem {
                 new SmartHouseNonDialogTaskRegistry(),
                 new SmartHouseDatabaseRegistry()));
 
-        // TODO: add GUI to the simultaneous launch runnable list
-        //        simultaneousLaunch.add(new simulatorGUI());
-        Runnable guiThread = new Runnable() {
+        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 frame = new MainFrame("Smart Home");
-                frame.setSize(500, 400);
-                frame.setLocationRelativeTo(null);
+                frame.setSize(300, 400);
+                frame.setLocation(950, 150);
+//                frame.setLocationRelativeTo(null);
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setVisible(true);
             }
-        };
-        SwingUtilities.invokeLater(guiThread);
+        });
     }
 }
 

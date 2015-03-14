@@ -49,9 +49,9 @@ public class SmartHouseDatabaseRegistry extends DatabaseRegistry {
 
 
                     // set new power state
-
+                    String powerState = ((GUIElectronic) thing).getState() ? "on" : "off";
                     String insertString = Database.prefixes + "INSERT DATA {";
-                    insertString += "<" + thing.getCorrespondingURI() + "> base:power_state \"" + ((GUIElectronic) thing).getState() + "\"^^xsd:string.\n";
+                    insertString += "<" + thing.getCorrespondingURI() + "> base:power_state \"" + powerState + "\"^^xsd:string.\n";
                     insertString += "}";
                     Database.getLogger().info(MongoLogHandler.createSimpleRecord("Turn on appliance", insertString).toJSONString());
                     try {

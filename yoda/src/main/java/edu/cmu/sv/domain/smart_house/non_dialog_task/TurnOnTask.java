@@ -30,17 +30,21 @@ public class TurnOnTask extends NonDialogTask {
 
     @Override
     public void execute(YodaEnvironment yodaEnvironment) {
-
         super.execute(yodaEnvironment);
         String uri = (String) new SemanticsModel(taskSpec.toJSONString()).newGetSlotPathFiller("Component.HasURI");
+        boolean itemFound = false;
         for(GUIThing thing : Simulator.getThings()) {
             if(thing.getCorrespondingURI().equals(uri)) {
-                ((GUIElectronic)thing).toggleSwitch();
-            } else {
-                System.out.println("ERROR: unknown URI:"+uri);
-                System.exit(0);
+                ((GUIElectronic) thing).toggleSwitch();
+                itemFound = true;
+                break;
             }
         }
+        if(!itemFound) {
+            System.out.println("ERROR: unknown URI:"+uri);
+            System.exit(0);
+        }
+
 
 //        if (uri.equals(Database.baseURI+"0000")){
 //            HouseSimulation.POI_0000_powerState = "on";
