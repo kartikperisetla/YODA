@@ -7,8 +7,6 @@ import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonLexicon;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.yoda_environment.CommandLineYodaSystem;
 
-import javax.swing.*;
-
 /**
  * Created by David Cohen on 3/4/15.
  */

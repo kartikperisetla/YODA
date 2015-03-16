@@ -1,5 +1,6 @@
 package edu.cmu.sv.domain.scotty;
 
+import edu.cmu.sv.domain.scotty.ontology.nouns.poi_types.*;
 import edu.cmu.sv.domain.smart_house.ontology.adjective.Off;
 import edu.cmu.sv.domain.smart_house.ontology.adjective.On;
 import edu.cmu.sv.domain.smart_house.ontology.noun.*;
@@ -12,90 +13,131 @@ import edu.cmu.sv.natural_language_generation.Lexicon;
  */
 public class ScottyLexicon extends Lexicon {
     public ScottyLexicon() {
-        //// Lexicon for nouns
-        {
-            {
-                LexicalEntry entry = new LexicalEntry();
-                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "security system");
-                entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "security systems");
-                add(SecuritySystem.class, entry, false);
-            }
-            {
-                LexicalEntry entry = new LexicalEntry();
-                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "air conditioner");
-                entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "air conditioners");
-                add(AirConditioner.class, entry, false);
-            }
-            {
-                LexicalEntry entry = new LexicalEntry();
-                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "room");
-                entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "rooms");
-                add(Room.class, entry, false);
-            }
-            {
-                LexicalEntry entry = new LexicalEntry();
-                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "person");
-                entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "people");
-                add(Person.class, entry, false);
-            }
-            {
-                LexicalEntry entry = new LexicalEntry();
-                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "thermostat");
-                entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "thermostats");
-                add(Thermostat.class, entry, false);
-            }
-            {
-                LexicalEntry entry = new LexicalEntry();
-                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "microwave");
-                entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "microwaves");
-                add(Microwave.class, entry, false);
-            }
-        }
+        //// Lexicon for points of interest
 
-        //// Lexicon for adjectives
         {
-            {
-                LexicalEntry entry = new LexicalEntry();
-                entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "on");
-                entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "turned on");
-                add(On.class, entry, false);
-            }
-            {
-                LexicalEntry entry = new LexicalEntry();
-                entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "off");
-                entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "turned off");
-                add(Off.class, entry, false);
-            }
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "restaurant");
+            add(Restaurant.class, entry, false);
         }
-
-        //// Lexicon for transitive qualities
         {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "bank");
+            add(Bank.class, entry, false);
         }
-        //// Lexicon for verbs
         {
-            {
-                LexicalEntry entry = new LexicalEntry();
-                entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "turn on");
-                entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "power on");
-                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "turn on");
-                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "power on");
-                add(TurnOnAppliance.class, entry, false);
-            }
-            {
-                LexicalEntry entry = new LexicalEntry();
-                entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "power up");
-                add(TurnOnAppliance.class, entry, true);
-            }
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "bar");
+            add(Bar.class, entry, false);
         }
-
-        //// Lexicon for roles
         {
-            {
-                LexicalEntry entry = new LexicalEntry();
-                entry.add(LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, "");
-                add(Component.class, entry, false);
-            }
-
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "bench");
+            add(Bench.class, entry, false);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "bicycle parking");
+            add(BicycleParking.class, entry, false);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "cafe");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "coffee shop");
+            add(Cafe.class, entry, false);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "fast food restaurant");
+            add(FastFood.class, entry, false);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "garbage can");
+            add(GarbageCan.class, entry, false);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "gas station");
+            add(GasStation.class, entry, false);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "graveyard");
+            add(GraveYard.class, entry, false);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "hospital");
+            add(Hospital.class, entry, false);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "kindergarten");
+            add(Kindergarten.class, entry, false);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "mail box");
+            add(MailBox.class, entry, false);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "parking lot");
+            add(Parking.class, entry, false);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "pharmacy");
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "drug store");
+            add(Pharmacy.class, entry, false);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "place of worship");
+            add(PlaceOfWorship.class, entry, false);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "post office");
+            add(PostOffice.class, entry, false);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "public building");
+            add(PublicBuilding.class, entry, false);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "public telephone");
+            add(PublicTelephone.class, entry, false);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "recycling");
+            add(Recycling.class, entry, false);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "restaurant");
+            entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "restaurants");
+            add(Restaurant.class, entry, false);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "restroom");
+            entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "restrooms");
+            add(Restroom.class, entry, false);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "school");
+            add(School.class, entry, false);
+        }
+        {
+            LexicalEntry entry = new LexicalEntry();
+            entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "shelter");
+            add(Shelter.class, entry, false);
         }
 
     }

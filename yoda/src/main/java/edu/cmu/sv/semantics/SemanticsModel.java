@@ -147,6 +147,8 @@ public class SemanticsModel {
             filter.validateSLUHypothesis();
             testCase.validateSLUHypothesis();
         } catch (Error e){
+            System.out.println(filter);
+            System.out.println(testCase);
             System.out.println("SM.anySLUTopLevelConflicts: invalid filter or test case");
             return true;
         }
