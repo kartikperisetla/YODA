@@ -1,12 +1,8 @@
-package edu.cmu.sv.database.dialog_task;
+package edu.cmu.sv.database;
 
-import edu.cmu.sv.database.Database;
-import edu.cmu.sv.database.Product;
-import edu.cmu.sv.database.StringSimilarity;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.dialog_state_tracking.Utils;
-import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;

@@ -1,6 +1,6 @@
 package edu.cmu.sv.natural_language_generation.internal_templates;
 
-import edu.cmu.sv.database.dialog_task.ReferenceResolution;
+import edu.cmu.sv.database.ReferenceResolution;
 import edu.cmu.sv.natural_language_generation.Template;
 import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;

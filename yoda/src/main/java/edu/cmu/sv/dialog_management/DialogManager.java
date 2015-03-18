@@ -1,11 +1,10 @@
 package edu.cmu.sv.dialog_management;
 
-import edu.cmu.sv.database.dialog_task.ActionEnumeration;
+import edu.cmu.sv.database.ActionEnumeration;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.HasProperty;
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.system_action.ActionSchema;
 import edu.cmu.sv.system_action.SystemAction;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Statement;
@@ -178,29 +177,28 @@ public class DialogManager implements Runnable {
 
             // enumerate non-dialog tasks
             Set<NonDialogTask> enumeratedNonDialogTasks = new HashSet<>();
-            for (ActionSchema actionSchema : DialogRegistry.actionSchemata) {
-                for (String dialogStateHypothesisId : dialogStateHypotheses.keySet()) {
-                    DialogState currentDialogState = dialogStateHypotheses.get(dialogStateHypothesisId);
-                    for (String discourseUnitHypothesisId : currentDialogState.getDiscourseUnitHypothesisMap().
-                            keySet()) {
-                        DiscourseUnit contextDiscourseUnit = currentDialogState.
-                                getDiscourseUnitHypothesisMap().get(discourseUnitHypothesisId);
-                        for (NonDialogTask localEnumeratedTask : contextDiscourseUnit.actionAnalysis.enumeratedNonDialogTasks){
-                            boolean alreadyFound = false;
-                            for (NonDialogTask existingTask : enumeratedNonDialogTasks) {
-                                if (localEnumeratedTask.evaluationMatch(existingTask)) {
-                                    alreadyFound = true;
-                                    break;
-                                }
+            for (String dialogStateHypothesisId : dialogStateHypotheses.keySet()) {
+                DialogState currentDialogState = dialogStateHypotheses.get(dialogStateHypothesisId);
+                for (String discourseUnitHypothesisId : currentDialogState.getDiscourseUnitHypothesisMap().
+                        keySet()) {
+                    DiscourseUnit contextDiscourseUnit = currentDialogState.
+                            getDiscourseUnitHypothesisMap().get(discourseUnitHypothesisId);
+                    for (NonDialogTask localEnumeratedTask : contextDiscourseUnit.actionAnalysis.enumeratedNonDialogTasks) {
+                        boolean alreadyFound = false;
+                        for (NonDialogTask existingTask : enumeratedNonDialogTasks) {
+                            if (localEnumeratedTask.evaluationMatch(existingTask)) {
+                                alreadyFound = true;
+                                break;
                             }
-                            if (!alreadyFound){
-                                enumeratedNonDialogTasks.add(localEnumeratedTask);
-                            }
-
                         }
+                        if (!alreadyFound) {
+                            enumeratedNonDialogTasks.add(localEnumeratedTask);
+                        }
+
                     }
                 }
             }
+
 
             // evaluate non-dialog tasks
             for (NonDialogTask task : enumeratedNonDialogTasks){

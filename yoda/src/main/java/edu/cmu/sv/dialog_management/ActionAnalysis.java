@@ -1,7 +1,7 @@
 package edu.cmu.sv.dialog_management;
 
 import com.google.common.collect.Iterables;
-import edu.cmu.sv.database.dialog_task.ReferenceResolution;
+import edu.cmu.sv.database.ReferenceResolution;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;

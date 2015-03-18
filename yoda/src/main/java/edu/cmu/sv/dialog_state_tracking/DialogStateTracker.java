@@ -1,7 +1,7 @@
 package edu.cmu.sv.dialog_state_tracking;
 
 import edu.cmu.sv.database.Sensor;
-import edu.cmu.sv.database.dialog_task.ReferenceResolution;
+import edu.cmu.sv.database.ReferenceResolution;
 import edu.cmu.sv.yoda_environment.MongoLogHandler;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.semantics.SemanticsModel;

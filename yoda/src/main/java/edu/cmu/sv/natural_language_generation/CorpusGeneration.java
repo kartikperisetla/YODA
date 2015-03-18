@@ -1,6 +1,6 @@
 package edu.cmu.sv.natural_language_generation;
 
-import edu.cmu.sv.database.dialog_task.ActionEnumeration;
+import edu.cmu.sv.database.ActionEnumeration;
 import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.ThingWithRoles;
