@@ -1,5 +1,7 @@
 package edu.cmu.sv.domain.yoda_skeleton;
 
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Agent;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Patient;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Person;
@@ -45,6 +47,22 @@ public class YodaSkeletonLexicon extends Lexicon {
                 entry.add(LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, "that time");
                 entry.add(LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, "this time");
                 add(Time.class, entry, false);
+            }
+        }
+
+        //// Entries for Roles
+        {
+            {
+                // directions from X, directions <...> from X
+                LexicalEntry entry = new LexicalEntry();
+                entry.add(LexicalEntry.PART_OF_SPEECH.AS_SUBJECT_PREFIX, "");
+                add(Agent.class, entry, false);
+            }
+            {
+                // directions from X, directions <...> from X
+                LexicalEntry entry = new LexicalEntry();
+                entry.add(LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, "");
+                add(Patient.class, entry, false);
             }
         }
     }
