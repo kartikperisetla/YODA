@@ -1,6 +1,7 @@
 package edu.cmu.sv.domain.yelp_phoenix.non_dialog_task;
 
 import edu.cmu.sv.database.Database;
+import edu.cmu.sv.domain.yelp_phoenix.ontology.verb.GiveDirections;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTaskPreferences;
@@ -63,7 +64,12 @@ public class GiveDirectionsTask extends NonDialogTask {
                 System.exit(0);
             }
         }
-        System.out.println(destinationName+", "+gps_lat+", "+gps_lon);
+
+        JSONObject content = new JSONObject();
+        content.put("destinationName", destinationName);
+        content.put("gps_lat", gps_lat);
+        content.put("gps_lon", gps_lon);
+        taskSpec = content;
     }
 
 
