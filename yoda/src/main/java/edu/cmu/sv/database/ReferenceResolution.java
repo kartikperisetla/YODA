@@ -147,7 +147,9 @@ public class ReferenceResolution {
                 if (key.equals("class")) {
                     continue;
                 } else if (key.equals(HasURI.class.getSimpleName())){
-                    ans += "FILTER (?x"+referenceIndex+" = <"+reference.get(HasURI.class.getSimpleName())+"> ) .\n";
+//                    ans += "FILTER (?x"+referenceIndex+" = <"+reference.get(HasURI.class.getSimpleName())+"> ) .\n";
+//                    ans += "FILTER ( sameTerm (?x"+referenceIndex+", <"+reference.get(HasURI.class.getSimpleName())+">) ) .\n";
+//                    ans += "BIND (<"+reference.get(HasURI.class.getSimpleName())+"> AS ?x"+referenceIndex+")\n";
                 } else if (key.equals("refType")){
                     if (reference.get(key).equals("pronoun")){
                         ans += "?x rdf:type dst:InFocus . \n";
@@ -212,24 +214,35 @@ public class ReferenceResolution {
                         slope = preposition.getSlope();
                         qualityClass = preposition.getQuality();
                         //recursively resolveDiscourseUnit the child to this PP, add the child's variable to entityURIs
-                        tmpVarIndex++;
-                        entityURIs.add("?x" + tmpVarIndex);
-                        scoresToAccumulate.add("?score" + tmpVarIndex);
-                        Pair<String, Integer> updates = referenceResolutionHelper(
-                                (JSONObject) ((JSONObject) reference.get(key)).get(InRelationTo.class.getSimpleName()),
-                                tmpVarIndex);
-                        ans += "{\nSELECT DISTINCT ?x" + tmpVarIndex + " ?score" + tmpVarIndex + " WHERE {\n";
-                        ans += updates.getKey();
-                        ans += "}\nORDER BY DESC(?score" + tmpVarIndex+ ")\n" + "LIMIT 5\n} .\n";
-                        tmpVarIndex = updates.getRight();
+                        JSONObject nestedNP = (JSONObject) ((JSONObject) reference.get(key)).get(InRelationTo.class.getSimpleName());
+                        if (nestedNP.containsKey(HasURI.class.getSimpleName())){
+                            String nestedUri = (String) nestedNP.get(HasURI.class.getSimpleName());
+                            tmpVarIndex++;
+//                            entityURIs.add("?x" + tmpVarIndex);
+                            entityURIs.add("<"+nestedUri+">");
+                            entityURIs.add("?transient_quality" + tmpVarIndex);
+                            scoresToAccumulate.add("?score" + tmpVarIndex);
+                            ans += qualityClass.newInstance().getQualityCalculatorSPARQLQuery().apply(entityURIs) +
+                                    "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
+                            ans += "FILTER(?score"+tmpVarIndex+" > "+.5+")\n";
+                        } else {
+                            tmpVarIndex++;
+                            entityURIs.add("?x" + tmpVarIndex);
+                            scoresToAccumulate.add("?score" + tmpVarIndex);
+                            Pair<String, Integer> updates = referenceResolutionHelper(nestedNP,tmpVarIndex);
+                            ans += "{\nSELECT DISTINCT ?x" + tmpVarIndex + " ?score" + tmpVarIndex + " WHERE {\n";
+                            ans += updates.getKey();
+                            ans += "}\nORDER BY DESC(?score" + tmpVarIndex+ ")\n" + "LIMIT 5\n} .\n";
+                            tmpVarIndex = updates.getRight();
+                            scoresToAccumulate.add("?score" + tmpVarIndex);
+                            entityURIs.add("?transient_quality" + tmpVarIndex);
+                            ans += qualityClass.newInstance().getQualityCalculatorSPARQLQuery().apply(entityURIs) +
+                                    "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
+                            ans += "FILTER(?score"+tmpVarIndex+" > "+.5+")\n";
+                        }
                     } else {
                         continue;
                     }
-                    scoresToAccumulate.add("?score" + tmpVarIndex);
-                    entityURIs.add("?transient_quality" + tmpVarIndex);
-                    ans += qualityClass.newInstance().getQualityCalculatorSPARQLQuery().apply(entityURIs) +
-                            "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
-                    ans += "FILTER(?score"+tmpVarIndex+" > "+.5+")\n";
                 }
                 tmpVarIndex++;
             }

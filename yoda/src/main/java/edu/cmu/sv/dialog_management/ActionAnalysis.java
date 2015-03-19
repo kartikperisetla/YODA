@@ -136,8 +136,9 @@ public class ActionAnalysis {
                     }
                 } else if (verbClass.equals(Exist.class)){
                     JSONObject searchDescription = (JSONObject) groundedMeaning.newGetSlotPathFiller("verb.Agent");
+//                    System.err.println("grounded meaning:" + groundedMeaning);
                     StringDistribution recommendations = ReferenceResolution.resolveReference(yodaEnvironment, searchDescription, false);
-//                    System.out.println(recommendations);
+//                    System.err.println("recommendations:" + recommendations);
                     String bestRecommendation = recommendations.getTopHypothesis();
                     if (bestRecommendation==null){
                         responseStatement.put("dialogAct", DontKnow.class.getSimpleName());
