@@ -146,6 +146,8 @@ public class ReferenceResolution {
             for (Object key : reference.keySet()) {
                 if (key.equals("class")) {
                     continue;
+                } else if (key.equals(HasURI.class.getSimpleName())){
+                    ans += "FILTER (?x"+referenceIndex+" = <"+reference.get(HasURI.class.getSimpleName())+"> ) .\n";
                 } else if (key.equals("refType")){
                     if (reference.get(key).equals("pronoun")){
                         ans += "?x rdf:type dst:InFocus . \n";
@@ -174,9 +176,18 @@ public class ReferenceResolution {
                             "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
                     ans += "FILTER(?score"+tmpVarIndex+" > "+.5+")\n";
                 } else if (HasName.class.equals(Ontology.roleNameMap.get((String) key))) {
+                    String similarityString = null;
+                    if (!(reference.get(HasName.class.getSimpleName()) instanceof String)){
+                        ans += "base:" + ((JSONObject)reference.get(HasName.class.getSimpleName())).
+                                get(HasURI.class.getSimpleName()) + " rdf:value ?tmpV" + tmpVarIndex + " . \n";
+                        similarityString = "?tmpV"+tmpVarIndex;
+                    } else {
+                        similarityString = (String)reference.get(HasName.class.getSimpleName());
+                    }
+
                     ans += "?x" + referenceIndex + " rdfs:label ?tmp" + tmpVarIndex + " . \n" +
                             "BIND(base:" + StringSimilarity.class.getSimpleName() +
-                            "(?tmp" + tmpVarIndex + ", \""+ reference.get(HasName.class.getSimpleName())+ "\") AS ?score" + tmpVarIndex + ")\n";
+                            "(?tmp" + tmpVarIndex + ", \""+ similarityString + "\") AS ?score" + tmpVarIndex + ")\n";
                     scoresToAccumulate.add("?score"+tmpVarIndex);
                 } else {
                     throw new Error("this role isn't handled:" + key);
@@ -185,7 +196,7 @@ public class ReferenceResolution {
             }
 
             for (Object key : reference.keySet()) {
-                if (key.equals("class") || key.equals("refType"))
+                if (key.equals("class") || key.equals("refType") || key.equals(HasURI.class.getSimpleName()))
                     continue;
                 if (HasQualityRole.class.isAssignableFrom(Ontology.roleNameMap.get((String) key))) {
                     double center;
@@ -286,9 +297,18 @@ public class ReferenceResolution {
                             "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
                     scoresToAccumulate.add("?score"+tmpVarIndex);
                 } else if (HasName.class.equals(Ontology.roleNameMap.get((String) key))) {
+                    String similarityString = null;
+                    if (!(description.get(HasName.class.getSimpleName()) instanceof String)){
+                        queryString += "base:" + ((JSONObject)description.get(HasName.class.getSimpleName())).
+                                get(HasURI.class.getSimpleName()) + " rdf:value ?tmpV" + tmpVarIndex + " . \n";
+                        similarityString = "?tmpV"+tmpVarIndex;
+                    } else {
+                        similarityString = (String)description.get(HasName.class.getSimpleName());
+                    }
+
                     queryString += "<"+individualURI+"> rdfs:label ?tmp" + tmpVarIndex + " . \n" +
                             "BIND(base:" + StringSimilarity.class.getSimpleName() +
-                            "(?tmp" + tmpVarIndex + ", \"" + description.get(HasName.class.getSimpleName()) + "\") AS ?score" + tmpVarIndex + ")\n";
+                            "(?tmp" + tmpVarIndex + ", \"" + similarityString + "\") AS ?score" + tmpVarIndex + ")\n";
                     scoresToAccumulate.add("?score"+tmpVarIndex);
                 }
                 tmpVarIndex++;
@@ -348,32 +368,51 @@ public class ReferenceResolution {
         Class<? extends Verb> verbClass = Ontology.verbNameMap.get(verb);
 
         try {
+            Set<Class <? extends Role>> requiredDescriptions = verbClass.newInstance().getRequiredDescriptions();
+            Set<Class <? extends Role>> requiredGroundedRoles = verbClass.newInstance().getRequiredGroundedRoles();
+
+
             for (String path : targetDiscourseUnit.getSpokenByThem().getAllInternalNodePaths().stream().
-                    sorted((x,y) -> Integer.compare(x.length(), y.length())).collect(Collectors.toList())){
+                    sorted((x,y) -> Integer.compare(x.length(), y.length())).collect(Collectors.toList())) {
                 if (slotPathsToResolve.contains(path)
                         || Arrays.asList("", "dialogAct", "verb").contains(path)
                         || slotPathsToResolve.stream().anyMatch(x -> path.startsWith(x)))
                     continue;
                 if (!Noun.class.isAssignableFrom(Ontology.thingNameMap.get(((JSONObject)spokenByThem.newGetSlotPathFiller(path)).get("class"))))
                     continue;
+                if (currentGroundedInterpretation!=null && currentGroundedInterpretation.newGetSlotPathFiller(path)!= null)
+                    continue;
+                if (requiredDescriptions.stream().map(x -> "verb."+x.getSimpleName()).collect(Collectors.toList()).contains(path))
+                    continue;
                 slotPathsToResolve.add(path);
+
             }
 
-            // keep only the slot paths that haven't already been resolved
-            Set<String> alreadyGroundedPaths;
+//            for (String path : targetDiscourseUnit.getSpokenByThem().getAllInternalNodePaths().stream().
+//                    sorted((x,y) -> Integer.compare(x.length(), y.length())).collect(Collectors.toList())){
+//                if (slotPathsToResolve.contains(path)
+//                        || Arrays.asList("", "dialogAct", "verb").contains(path)
+//                        || slotPathsToResolve.stream().anyMatch(x -> path.startsWith(x)))
+//                    continue;
+//                if (!Noun.class.isAssignableFrom(Ontology.thingNameMap.get(((JSONObject)spokenByThem.newGetSlotPathFiller(path)).get("class"))))
+//                    continue;
+//                slotPathsToResolve.add(path);
+//            }
+
+            // collect the paths that have already been resolved
+            Set<String> alreadyResolvedPaths;
             if (currentGroundedInterpretation!=null) {
-                alreadyGroundedPaths = slotPathsToResolve.stream().filter(x -> currentGroundedInterpretation.newGetSlotPathFiller(x) != null).collect(Collectors.toSet());
+                alreadyResolvedPaths = slotPathsToResolve.stream().filter(x -> currentGroundedInterpretation.newGetSlotPathFiller(x) != null).collect(Collectors.toSet());
             } else {
-                alreadyGroundedPaths = new HashSet<>();
+                alreadyResolvedPaths = new HashSet<>();
             }
-            slotPathsToResolve.removeAll(alreadyGroundedPaths);
+//            slotPathsToResolve.removeAll(alreadyResolvedPaths);
 
-            // do not try to resolve slots for which the verb only requires descriptions
-            Set<Class <? extends Role>> requiredDescriptions = verbClass.newInstance().getRequiredDescriptions();
-            slotPathsToResolve.removeAll(
-                    requiredDescriptions.stream().
-                            map(x -> "verb." + x.getSimpleName()).
-                            collect(Collectors.toSet()));
+//            // do not try to resolve slots for which the verb only requires descriptions
+//            slotPathsToResolve.removeAll(
+//                    requiredDescriptions.stream().
+//                            map(x -> "verb." + x.getSimpleName()).
+//                            collect(Collectors.toSet()));
 
             Map<String, StringDistribution> resolutionMarginals = new HashMap<>();
             for (String slotPathToResolve : slotPathsToResolve) {
@@ -385,9 +424,9 @@ public class ReferenceResolution {
 
             // add inferred required roles to reference marginals
             //todo: add roles missing from prepositions
-            List<String> pathsToInfer = verbClass.newInstance().getRequiredGroundedRoles().stream().
+            List<String> pathsToInfer = requiredGroundedRoles.stream().
                     map(x -> "verb." + x.getSimpleName()).
-                    filter(x -> !alreadyGroundedPaths.contains(x)).
+                    filter(x -> !alreadyResolvedPaths.contains(x)).
                     filter(x -> !slotPathsToResolve.contains(x)).
                     collect(Collectors.toList());
             for (String pathToInfer : pathsToInfer){
@@ -418,7 +457,7 @@ public class ReferenceResolution {
                     }
                 }
                 // include previously grounded paths
-                for (String path : alreadyGroundedPaths){
+                for (String path : alreadyResolvedPaths){
                     SemanticsModel.overwrite((JSONObject) groundedModel.newGetSlotPathFiller(path),
                             (JSONObject) currentGroundedInterpretation.newGetSlotPathFiller(path));
                 }
