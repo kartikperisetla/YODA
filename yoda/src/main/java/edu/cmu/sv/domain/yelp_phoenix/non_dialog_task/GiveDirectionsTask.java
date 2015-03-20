@@ -1,7 +1,6 @@
 package edu.cmu.sv.domain.yelp_phoenix.non_dialog_task;
 
 import edu.cmu.sv.database.Database;
-import edu.cmu.sv.domain.yelp_phoenix.ontology.verb.GiveDirections;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTaskPreferences;
@@ -35,8 +34,8 @@ public class GiveDirectionsTask extends NonDialogTask {
         super.execute(yodaEnvironment);
         String destinationUri = (String) new SemanticsModel(taskSpec.toJSONString()).newGetSlotPathFiller("Destination.HasURI");
         String destinationName = null;
-        Double gps_lat = null;
-        Double gps_lon = null;
+        String gps_lat = null;
+        String gps_lon = null;
         String queryString = Database.prefixes + "SELECT DISTINCT ?name ?gps_lat ?gps_lon WHERE {\n";
         queryString += "<" + destinationUri + "> rdfs:label ?name .\n";
         queryString += "<" + destinationUri + "> base:gps_lat ?gps_lat .\n";
@@ -51,8 +50,8 @@ public class GiveDirectionsTask extends NonDialogTask {
                 if (result.hasNext()){
                     BindingSet bindings = result.next();
                     destinationName = bindings.getValue("name").stringValue();
-                    gps_lat = Double.parseDouble(bindings.getValue("gps_lat").stringValue());
-                    gps_lon = Double.parseDouble(bindings.getValue("gps_lon").stringValue());
+                    gps_lat = bindings.getValue("gps_lat").stringValue();
+                    gps_lon = bindings.getValue("gps_lon").stringValue();
                     result.close();
                 }
                 else {
