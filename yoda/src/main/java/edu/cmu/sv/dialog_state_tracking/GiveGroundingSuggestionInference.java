@@ -9,10 +9,13 @@ import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.json.simple.JSONObject;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by David Cohen on 10/17/14.
@@ -45,14 +48,27 @@ public class GiveGroundingSuggestionInference extends DialogStateUpdateInference
                         continue;
                     }
 
+
                     JSONObject daContent = (JSONObject) hypModel.newGetSlotPathFiller("topic");
                     JSONObject groundedDaContent = (JSONObject) groundedHypModel.newGetSlotPathFiller("topic");
-                    StringDistribution attachmentPoints = Utils.findPossiblePointsOfAttachment(
-                            predecessor, daContent);
+
+
+                    Triple<Set<String>, Set<String>, Set<String>> resolutionInformation = Utils.resolutionInformation(predecessor);
+                    Set<String> slotPathsToResolve = resolutionInformation.getLeft();
+                    Set<String> slotPathsToInfer = resolutionInformation.getMiddle();
+                    Set<String> alreadyResolvedPaths = resolutionInformation.getRight();
+
+                    Set<String> possiblePointsOfAttachment = new HashSet<>();
+                    possiblePointsOfAttachment.addAll(slotPathsToResolve);
+                    possiblePointsOfAttachment.addAll(slotPathsToInfer);
+                    possiblePointsOfAttachment.addAll(alreadyResolvedPaths);
+                    Set<String> attachmentPaths = Utils.filterSlotPathsByRangeClass(possiblePointsOfAttachment,
+                            (String)daContent.get("class"));
+
                     SemanticsModel suggestion = new SemanticsModel(daContent.toJSONString());
                     SemanticsModel groundedSuggestion = new SemanticsModel(groundedDaContent.toJSONString());
 
-                    for (String attachmentPoint : attachmentPoints.keySet()) {
+                    for (String attachmentPoint : attachmentPaths) {
                         String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
                         DialogState newDialogState = currentState.deepCopy();
                         DiscourseUnit updatedPredecessor = newDialogState.discourseUnitHypothesisMap.get(predecessorId);
@@ -86,8 +102,7 @@ public class GiveGroundingSuggestionInference extends DialogStateUpdateInference
 
                         Utils.unground(updatedPredecessor, newSpokenByMeHypothesis, newGroundTruth, timeStamp);
                         resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
-                        Double score = attachmentPoints.get(attachmentPoint) *
-                                Utils.discourseUnitContextProbability(newDialogState, updatedPredecessor);
+                        Double score = Utils.discourseUnitContextProbability(newDialogState, updatedPredecessor);
                         resultDistribution.put(newDialogStateHypothesisID, score);
                     }
                 }

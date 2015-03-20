@@ -15,7 +15,6 @@ import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasURI;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.InRelationTo;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.has_quality_subroles.HasQualityRole;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.HypothesisSetManagement;
 import edu.cmu.sv.utils.StringDistribution;
@@ -23,6 +22,7 @@ import edu.cmu.sv.yoda_environment.MongoLogHandler;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.json.simple.JSONObject;
 import org.openrdf.query.*;
 import org.openrdf.repository.RepositoryException;
@@ -374,117 +374,62 @@ public class ReferenceResolution {
     }
 
     private static Pair<Map<String, DiscourseUnit>, StringDistribution> resolveDiscourseUnitHelper(DiscourseUnit targetDiscourseUnit, YodaEnvironment yodaEnvironment) {
-        List<String> slotPathsToResolve = new LinkedList<>();
-        SemanticsModel spokenByThem = targetDiscourseUnit.getSpokenByThem();
+
+        Triple<Set<String>, Set<String>, Set<String>> resolutionInformation = Utils.resolutionInformation(targetDiscourseUnit);
+        Set<String> slotPathsToResolve = resolutionInformation.getLeft();
+        Set<String> slotPathsToInfer = resolutionInformation.getMiddle();
+        Set<String> alreadyResolvedPaths = resolutionInformation.getRight();
+
         SemanticsModel currentGroundedInterpretation = targetDiscourseUnit.getGroundInterpretation();
-        String verb = (String)spokenByThem.newGetSlotPathFiller("verb.class");
-        Class<? extends Verb> verbClass = Ontology.verbNameMap.get(verb);
 
-        try {
-            Set<Class <? extends Role>> requiredDescriptions = verbClass.newInstance().getRequiredDescriptions();
-            Set<Class <? extends Role>> requiredGroundedRoles = verbClass.newInstance().getRequiredGroundedRoles();
-
-
-            for (String path : targetDiscourseUnit.getSpokenByThem().getAllInternalNodePaths().stream().
-                    sorted((x,y) -> Integer.compare(x.length(), y.length())).collect(Collectors.toList())) {
-                if (slotPathsToResolve.contains(path)
-                        || Arrays.asList("", "dialogAct", "verb").contains(path)
-                        || slotPathsToResolve.stream().anyMatch(x -> path.startsWith(x)))
-                    continue;
-                if (!Noun.class.isAssignableFrom(Ontology.thingNameMap.get(((JSONObject)spokenByThem.newGetSlotPathFiller(path)).get("class"))))
-                    continue;
-                if (currentGroundedInterpretation!=null && currentGroundedInterpretation.newGetSlotPathFiller(path)!= null)
-                    continue;
-                if (requiredDescriptions.stream().map(x -> "verb."+x.getSimpleName()).collect(Collectors.toList()).contains(path))
-                    continue;
-                slotPathsToResolve.add(path);
-
-            }
-
-//            for (String path : targetDiscourseUnit.getSpokenByThem().getAllInternalNodePaths().stream().
-//                    sorted((x,y) -> Integer.compare(x.length(), y.length())).collect(Collectors.toList())){
-//                if (slotPathsToResolve.contains(path)
-//                        || Arrays.asList("", "dialogAct", "verb").contains(path)
-//                        || slotPathsToResolve.stream().anyMatch(x -> path.startsWith(x)))
-//                    continue;
-//                if (!Noun.class.isAssignableFrom(Ontology.thingNameMap.get(((JSONObject)spokenByThem.newGetSlotPathFiller(path)).get("class"))))
-//                    continue;
-//                slotPathsToResolve.add(path);
-//            }
-
-            // collect the paths that have already been resolved
-            Set<String> alreadyResolvedPaths;
-            if (currentGroundedInterpretation!=null) {
-                alreadyResolvedPaths = slotPathsToResolve.stream().filter(x -> currentGroundedInterpretation.newGetSlotPathFiller(x) != null).collect(Collectors.toSet());
-            } else {
-                alreadyResolvedPaths = new HashSet<>();
-            }
-//            slotPathsToResolve.removeAll(alreadyResolvedPaths);
-
-//            // do not try to resolve slots for which the verb only requires descriptions
-//            slotPathsToResolve.removeAll(
-//                    requiredDescriptions.stream().
-//                            map(x -> "verb." + x.getSimpleName()).
-//                            collect(Collectors.toSet()));
-
-            Map<String, StringDistribution> resolutionMarginals = new HashMap<>();
-            for (String slotPathToResolve : slotPathsToResolve) {
-                resolutionMarginals.put(slotPathToResolve,
-                        resolveReference(yodaEnvironment,
-                                (JSONObject) targetDiscourseUnit.getSpokenByThem().newGetSlotPathFiller(slotPathToResolve),
-                                false));
-            }
-
-            // add inferred required roles to reference marginals
-            //todo: add roles missing from prepositions
-            List<String> pathsToInfer = requiredGroundedRoles.stream().
-                    map(x -> "verb." + x.getSimpleName()).
-                    filter(x -> !alreadyResolvedPaths.contains(x)).
-                    filter(x -> !slotPathsToResolve.contains(x)).
-                    collect(Collectors.toList());
-            for (String pathToInfer : pathsToInfer){
-                resolutionMarginals.put(pathToInfer,
-                        inferRole(yodaEnvironment,
-                                Ontology.roleNameMap.get(pathToInfer.split("\\.")[pathToInfer.split("\\.").length - 1])));
-            }
-
-
-            Pair<StringDistribution, Map<String, Map<String, String>>> resolutionJoint =
-                    HypothesisSetManagement.getJointFromMarginals(resolutionMarginals, 10);
-            Map<String, DiscourseUnit> discourseUnits = new HashMap<>();
-
-            for (String jointHypothesisID : resolutionJoint.getKey().keySet()){
-                DiscourseUnit groundedDiscourseUnit = targetDiscourseUnit.deepCopy();
-                SemanticsModel groundedModel = targetDiscourseUnit.getSpokenByThem().deepCopy();
-                Map<String, String> assignment = resolutionJoint.getValue().get(jointHypothesisID);
-                // add new bindings
-                for (String slotPathVariable : assignment.keySet()){
-                    if (assignment.get(slotPathVariable).equals(unfilledJunkString))
-                        continue;
-                    if (groundedModel.newGetSlotPathFiller(slotPathVariable)==null){
-                        SemanticsModel.putAtPath(groundedModel.getInternalRepresentation(), slotPathVariable,
-                                SemanticsModel.parseJSON(Ontology.webResourceWrap(assignment.get(slotPathVariable))));
-                    } else {
-                        SemanticsModel.overwrite((JSONObject) groundedModel.newGetSlotPathFiller(slotPathVariable),
-                                SemanticsModel.parseJSON(Ontology.webResourceWrap(assignment.get(slotPathVariable))));
-                    }
-                }
-                // include previously grounded paths
-                for (String path : alreadyResolvedPaths){
-                    SemanticsModel.overwrite((JSONObject) groundedModel.newGetSlotPathFiller(path),
-                            (JSONObject) currentGroundedInterpretation.newGetSlotPathFiller(path));
-                }
-                groundedDiscourseUnit.setGroundInterpretation(groundedModel);
-                discourseUnits.put(jointHypothesisID, groundedDiscourseUnit);
-            }
-
-            return new ImmutablePair<>(discourseUnits, resolutionJoint.getLeft());
-
-        } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
-            System.exit(0);
+        Map<String, StringDistribution> resolutionMarginals = new HashMap<>();
+        for (String slotPathToResolve : slotPathsToResolve) {
+            resolutionMarginals.put(slotPathToResolve,
+                    resolveReference(yodaEnvironment,
+                            (JSONObject) targetDiscourseUnit.getSpokenByThem().newGetSlotPathFiller(slotPathToResolve),
+                            false));
         }
-        return null;
+
+        // add inferred required roles to reference marginals
+        for (String pathToInfer : slotPathsToInfer) {
+            resolutionMarginals.put(pathToInfer,
+                    inferRole(yodaEnvironment,
+                            Ontology.roleNameMap.get(pathToInfer.split("\\.")[pathToInfer.split("\\.").length - 1])));
+        }
+
+
+        Pair<StringDistribution, Map<String, Map<String, String>>> resolutionJoint =
+                HypothesisSetManagement.getJointFromMarginals(resolutionMarginals, 10);
+        Map<String, DiscourseUnit> discourseUnits = new HashMap<>();
+
+        for (String jointHypothesisID : resolutionJoint.getKey().keySet()) {
+            DiscourseUnit groundedDiscourseUnit = targetDiscourseUnit.deepCopy();
+            SemanticsModel groundedModel = targetDiscourseUnit.getSpokenByThem().deepCopy();
+            Map<String, String> assignment = resolutionJoint.getValue().get(jointHypothesisID);
+            // add new bindings
+            for (String slotPathVariable : assignment.keySet()) {
+                if (assignment.get(slotPathVariable).equals(unfilledJunkString))
+                    continue;
+                if (groundedModel.newGetSlotPathFiller(slotPathVariable) == null) {
+                    SemanticsModel.putAtPath(groundedModel.getInternalRepresentation(), slotPathVariable,
+                            SemanticsModel.parseJSON(Ontology.webResourceWrap(assignment.get(slotPathVariable))));
+                } else {
+                    SemanticsModel.overwrite((JSONObject) groundedModel.newGetSlotPathFiller(slotPathVariable),
+                            SemanticsModel.parseJSON(Ontology.webResourceWrap(assignment.get(slotPathVariable))));
+                }
+            }
+            // include previously grounded paths
+            for (String path : alreadyResolvedPaths) {
+                SemanticsModel.overwrite((JSONObject) groundedModel.newGetSlotPathFiller(path),
+                        (JSONObject) currentGroundedInterpretation.newGetSlotPathFiller(path));
+            }
+            groundedDiscourseUnit.setGroundInterpretation(groundedModel);
+            discourseUnits.put(jointHypothesisID, groundedDiscourseUnit);
+        }
+
+        return new ImmutablePair<>(discourseUnits, resolutionJoint.getLeft());
+
+
     }
 
     public static void updateSalience(YodaEnvironment yodaEnvironment, StringDistribution dialogStateDistribution,
