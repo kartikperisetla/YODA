@@ -53,8 +53,6 @@ public class Grammar {
         grammar1.add(NounClassTemplate.class);
         grammar1.add(ThingWithNameTemplate0.class);
         grammar1.add(IndefiniteDescriptionTemplate0.class);
-        grammar1_roots.add(FragmentTemplate0.class);
-        grammar1_roots.add(CommandTemplate0.class);
         grammar1_roots.add(HasPropertyYNQTemplate0.class);
         grammar1_roots.add(HasPropertyWHQTemplate0.class);
         grammar1_roots.add(HasPropertyStatementTemplate0.class);

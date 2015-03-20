@@ -1,6 +1,6 @@
 package edu.cmu.sv.dialog_state_tracking;
 
-import edu.cmu.sv.database.dialog_task.ReferenceResolution;
+import edu.cmu.sv.database.ReferenceResolution;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.Requested;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.Suggested;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasValue;
@@ -97,6 +97,8 @@ public class DiscourseAnalysis {
             groundedSuggestionIndividual = (JSONObject) discourseUnit.groundTruth.
                     newGetSlotPathFiller(suggestionPath);
         }
+        Assert.verify(suggestedContent!=null);
+        Assert.verify(groundedSuggestionIndividual!=null);
         descriptionMatch = ReferenceResolution.descriptionMatch(yodaEnvironment,
                 groundedSuggestionIndividual, suggestedContent);
         if (descriptionMatch==null)

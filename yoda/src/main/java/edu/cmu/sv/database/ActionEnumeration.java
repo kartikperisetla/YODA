@@ -1,4 +1,4 @@
-package edu.cmu.sv.database.dialog_task;
+package edu.cmu.sv.database;
 
 import edu.cmu.sv.database.Database;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;

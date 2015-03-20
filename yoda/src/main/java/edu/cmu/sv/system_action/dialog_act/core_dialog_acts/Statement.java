@@ -61,7 +61,6 @@ public class Statement extends DialogAct {
     @Override
     public Double reward(DialogState dialogState, DiscourseUnit discourseUnit) {
         double statementReward = RewardAndCostCalculator.discourseIndependentStatementReward(this, discourseUnit);
-//        double probabilityInterpretedCorrectly = RewardAndCostCalculator.probabilityInterpretedCorrectly(discourseUnit, dialogState, this);
         double probabilityInterpretedCorrectly = Utils.discourseUnitContextProbability(dialogState, discourseUnit);
         boolean answerObliged = RewardAndCostCalculator.answerObliged(discourseUnit);
         boolean answerNotProvided = !RewardAndCostCalculator.answerAlreadyProvided(discourseUnit, dialogState);

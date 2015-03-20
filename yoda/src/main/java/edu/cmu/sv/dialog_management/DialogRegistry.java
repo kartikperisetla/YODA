@@ -31,6 +31,7 @@ public class DialogRegistry {
     public static Set<Class <? extends ClarificationDialogAct>> clarificationDialogActs = new HashSet<>();
     public static Set<Class <? extends DialogAct>> userOnlyDialogActs = new HashSet<>();
     public static Set<Class <? extends DialogAct>> argumentationDialogActs = new HashSet<>();
+    public static Set<Class <? extends DialogAct>> simpleDialogActs = new HashSet<>();
     public static Set<Class <? extends DialogAct>> slotFillingDialogActs = new HashSet<>();
     public static Set<Class <? extends DialogAct>> discourseUnitDialogActs = new HashSet<>();
     public static Set<Class< ? extends NonDialogTask>> nonDialogTasks = new HashSet<>();
@@ -38,13 +39,17 @@ public class DialogRegistry {
     public static Set<ActionSchema> actionSchemata = new HashSet<>();
 
     static{
+
+        //todo: re-do enumeration grouping: add Statement
+
         clarificationDialogActs.add(ConfirmValueSuggestion.class);
         clarificationDialogActs.add(RequestConfirmValue.class);
 
         argumentationDialogActs.add(DontKnow.class);
-        // these are not really argumentation dialog acts, but reward is scored like one
-        argumentationDialogActs.add(RequestFixMisunderstanding.class);
-        argumentationDialogActs.add(InformDialogLost.class);
+        argumentationDialogActs.add(Statement.class);
+
+        simpleDialogActs.add(RequestFixMisunderstanding.class);
+        simpleDialogActs.add(InformDialogLost.class);
 
         slotFillingDialogActs.add(RequestRoleGivenRole.class);
         slotFillingDialogActs.add(RequestRole.class);
@@ -57,7 +62,7 @@ public class DialogRegistry {
         userOnlyDialogActs.add(Reject.class);
 
         for (Class<? extends DialogAct> cls : Iterables.concat(discourseUnitDialogActs, argumentationDialogActs,
-                userOnlyDialogActs, clarificationDialogActs, Arrays.asList(Fragment.class))) {
+                userOnlyDialogActs, clarificationDialogActs, simpleDialogActs, Arrays.asList(Fragment.class))) {
             dialogActNameMap.put(cls.getSimpleName(), cls);
         }
 

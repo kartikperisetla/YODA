@@ -76,9 +76,6 @@ public class YelpPhoenixOntologyRegistry extends OntologyRegistry{
         verbClasses.add(GiveDirections.class);
         verbClasses.add(MakeReservation.class);
 
-        nounClasses.add(Email.class);
-        nounClasses.add(Meeting.class);
-
         nounClasses.add(Restaurants.class);
         nounClasses.add(Food.class);
         nounClasses.add(Bars.class);
