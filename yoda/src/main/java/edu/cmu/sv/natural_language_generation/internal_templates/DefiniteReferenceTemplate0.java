@@ -1,6 +1,6 @@
 package edu.cmu.sv.natural_language_generation.internal_templates;
 
-import edu.cmu.sv.database.dialog_task.ReferenceResolution;
+import edu.cmu.sv.database.ReferenceResolution;
 import edu.cmu.sv.natural_language_generation.*;
 import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.utils.Assert;
@@ -106,9 +106,9 @@ public class DefiniteReferenceTemplate0 implements Template {
 //                        System.out.println("definite reference template: full argument list:" + fullArgumentList);
                         if (adjectiveClass==null)
                             continue;
-                        double degreeOfMatch = yodaEnvironment.db.
+                        Double degreeOfMatch = yodaEnvironment.db.
                                 evaluateQualityDegree(fullArgumentList, adjectiveClass);
-                        if (degreeOfMatch > 0.5) {
+                        if (degreeOfMatch!=null && degreeOfMatch > 0.5) {
                             Set<String> adjStrings;
                             try {
                                 adjStrings = yodaEnvironment.lex.getPOSForClass(adjectiveClass,
@@ -163,10 +163,10 @@ public class DefiniteReferenceTemplate0 implements Template {
                                 if (prepositionUsageCounter.get(prepositionClass) == yodaEnvironment.nlg.grammarPreferences.maxPhrasesPerPreposition)
                                     continue;
                                 Map<String, JSONObject> ppChunks = new HashMap<>();
-                                double degreeOfMatch = yodaEnvironment.db.
+                                Double degreeOfMatch = yodaEnvironment.db.
                                         evaluateQualityDegree(fullArgumentList, prepositionClass);
 
-                                if (degreeOfMatch > 0.5) {
+                                if (degreeOfMatch!=null && degreeOfMatch > 0.5) {
 
                                     if (childContent==null){
                                         childContent = SemanticsModel.parseJSON(

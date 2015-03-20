@@ -1,6 +1,6 @@
 package edu.cmu.sv.dialog_state_tracking;
 
-import edu.cmu.sv.database.dialog_task.ReferenceResolution;
+import edu.cmu.sv.database.ReferenceResolution;
 import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * Created by David Cohen on 10/18/14.
  *
- * Elaborating is adding in additional details to an existing discourse unit
+ * Elaborating is adding in additional details to an existing discourse unit by the original presenter
  *
  */
 public class ElaborateInference extends DialogStateUpdateInference {

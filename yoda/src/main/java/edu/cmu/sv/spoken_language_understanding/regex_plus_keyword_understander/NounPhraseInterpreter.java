@@ -152,6 +152,12 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         if (entity2String!=null && (entity2JSON.isEmpty() || entity2CoverageScore < .75))
             entity2JSON.put(HasName.class.getSimpleName(), entity2String);
 
+        // if a named entity has no class, give it the Noun class
+        if (entity1JSON.containsKey(HasName.class.getSimpleName()) && !entity1JSON.containsKey("class"))
+            entity1JSON.put("class", Noun.class.getSimpleName());
+        if (entity2JSON.containsKey(HasName.class.getSimpleName()) && !entity2JSON.containsKey("class"))
+            entity2JSON.put("class", Noun.class.getSimpleName());
+
         // default to UnknownThingWithRoles
         if (!entity1JSON.containsKey("class")){
             entity1JSON.put("class", UnknownThingWithRoles.class.getSimpleName());

@@ -1,12 +1,8 @@
-package edu.cmu.sv.database.dialog_task;
+package edu.cmu.sv.database;
 
-import edu.cmu.sv.database.Database;
-import edu.cmu.sv.database.Product;
-import edu.cmu.sv.database.StringSimilarity;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.dialog_state_tracking.Utils;
-import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
@@ -19,7 +15,6 @@ import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasURI;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.InRelationTo;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.has_quality_subroles.HasQualityRole;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.HypothesisSetManagement;
 import edu.cmu.sv.utils.StringDistribution;
@@ -27,6 +22,7 @@ import edu.cmu.sv.yoda_environment.MongoLogHandler;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.json.simple.JSONObject;
 import org.openrdf.query.*;
 import org.openrdf.repository.RepositoryException;
@@ -150,6 +146,10 @@ public class ReferenceResolution {
             for (Object key : reference.keySet()) {
                 if (key.equals("class")) {
                     continue;
+                } else if (key.equals(HasURI.class.getSimpleName())){
+//                    ans += "FILTER (?x"+referenceIndex+" = <"+reference.get(HasURI.class.getSimpleName())+"> ) .\n";
+//                    ans += "FILTER ( sameTerm (?x"+referenceIndex+", <"+reference.get(HasURI.class.getSimpleName())+">) ) .\n";
+//                    ans += "BIND (<"+reference.get(HasURI.class.getSimpleName())+"> AS ?x"+referenceIndex+")\n";
                 } else if (key.equals("refType")){
                     if (reference.get(key).equals("pronoun")){
                         ans += "?x rdf:type dst:InFocus . \n";
@@ -178,9 +178,18 @@ public class ReferenceResolution {
                             "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
                     ans += "FILTER(?score"+tmpVarIndex+" > "+.5+")\n";
                 } else if (HasName.class.equals(Ontology.roleNameMap.get((String) key))) {
+                    String similarityString = null;
+                    if (!(reference.get(HasName.class.getSimpleName()) instanceof String)){
+                        ans += "base:" + ((JSONObject)reference.get(HasName.class.getSimpleName())).
+                                get(HasURI.class.getSimpleName()) + " rdf:value ?tmpV" + tmpVarIndex + " . \n";
+                        similarityString = "?tmpV"+tmpVarIndex;
+                    } else {
+                        similarityString = (String)reference.get(HasName.class.getSimpleName());
+                    }
+
                     ans += "?x" + referenceIndex + " rdfs:label ?tmp" + tmpVarIndex + " . \n" +
                             "BIND(base:" + StringSimilarity.class.getSimpleName() +
-                            "(?tmp" + tmpVarIndex + ", \""+ reference.get(HasName.class.getSimpleName())+ "\") AS ?score" + tmpVarIndex + ")\n";
+                            "(?tmp" + tmpVarIndex + ", \""+ similarityString + "\") AS ?score" + tmpVarIndex + ")\n";
                     scoresToAccumulate.add("?score"+tmpVarIndex);
                 } else {
                     throw new Error("this role isn't handled:" + key);
@@ -189,7 +198,7 @@ public class ReferenceResolution {
             }
 
             for (Object key : reference.keySet()) {
-                if (key.equals("class") || key.equals("refType"))
+                if (key.equals("class") || key.equals("refType") || key.equals(HasURI.class.getSimpleName()))
                     continue;
                 if (HasQualityRole.class.isAssignableFrom(Ontology.roleNameMap.get((String) key))) {
                     double center;
@@ -205,24 +214,35 @@ public class ReferenceResolution {
                         slope = preposition.getSlope();
                         qualityClass = preposition.getQuality();
                         //recursively resolveDiscourseUnit the child to this PP, add the child's variable to entityURIs
-                        tmpVarIndex++;
-                        entityURIs.add("?x" + tmpVarIndex);
-                        scoresToAccumulate.add("?score" + tmpVarIndex);
-                        Pair<String, Integer> updates = referenceResolutionHelper(
-                                (JSONObject) ((JSONObject) reference.get(key)).get(InRelationTo.class.getSimpleName()),
-                                tmpVarIndex);
-                        ans += "{\nSELECT DISTINCT ?x" + tmpVarIndex + " ?score" + tmpVarIndex + " WHERE {\n";
-                        ans += updates.getKey();
-                        ans += "}\nORDER BY DESC(?score" + tmpVarIndex+ ")\n" + "LIMIT 5\n} .\n";
-                        tmpVarIndex = updates.getRight();
+                        JSONObject nestedNP = (JSONObject) ((JSONObject) reference.get(key)).get(InRelationTo.class.getSimpleName());
+                        if (nestedNP.containsKey(HasURI.class.getSimpleName())){
+                            String nestedUri = (String) nestedNP.get(HasURI.class.getSimpleName());
+                            tmpVarIndex++;
+//                            entityURIs.add("?x" + tmpVarIndex);
+                            entityURIs.add("<"+nestedUri+">");
+                            entityURIs.add("?transient_quality" + tmpVarIndex);
+                            scoresToAccumulate.add("?score" + tmpVarIndex);
+                            ans += qualityClass.newInstance().getQualityCalculatorSPARQLQuery().apply(entityURIs) +
+                                    "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
+                            ans += "FILTER(?score"+tmpVarIndex+" > "+.5+")\n";
+                        } else {
+                            tmpVarIndex++;
+                            entityURIs.add("?x" + tmpVarIndex);
+                            scoresToAccumulate.add("?score" + tmpVarIndex);
+                            Pair<String, Integer> updates = referenceResolutionHelper(nestedNP,tmpVarIndex);
+                            ans += "{\nSELECT DISTINCT ?x" + tmpVarIndex + " ?score" + tmpVarIndex + " WHERE {\n";
+                            ans += updates.getKey();
+                            ans += "}\nORDER BY DESC(?score" + tmpVarIndex+ ")\n" + "LIMIT 5\n} .\n";
+                            tmpVarIndex = updates.getRight();
+                            scoresToAccumulate.add("?score" + tmpVarIndex);
+                            entityURIs.add("?transient_quality" + tmpVarIndex);
+                            ans += qualityClass.newInstance().getQualityCalculatorSPARQLQuery().apply(entityURIs) +
+                                    "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
+                            ans += "FILTER(?score"+tmpVarIndex+" > "+.5+")\n";
+                        }
                     } else {
                         continue;
                     }
-                    scoresToAccumulate.add("?score" + tmpVarIndex);
-                    entityURIs.add("?transient_quality" + tmpVarIndex);
-                    ans += qualityClass.newInstance().getQualityCalculatorSPARQLQuery().apply(entityURIs) +
-                            "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
-                    ans += "FILTER(?score"+tmpVarIndex+" > "+.5+")\n";
                 }
                 tmpVarIndex++;
             }
@@ -290,9 +310,18 @@ public class ReferenceResolution {
                             "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
                     scoresToAccumulate.add("?score"+tmpVarIndex);
                 } else if (HasName.class.equals(Ontology.roleNameMap.get((String) key))) {
+                    String similarityString = null;
+                    if (!(description.get(HasName.class.getSimpleName()) instanceof String)){
+                        queryString += "base:" + ((JSONObject)description.get(HasName.class.getSimpleName())).
+                                get(HasURI.class.getSimpleName()) + " rdf:value ?tmpV" + tmpVarIndex + " . \n";
+                        similarityString = "?tmpV"+tmpVarIndex;
+                    } else {
+                        similarityString = (String)description.get(HasName.class.getSimpleName());
+                    }
+
                     queryString += "<"+individualURI+"> rdfs:label ?tmp" + tmpVarIndex + " . \n" +
                             "BIND(base:" + StringSimilarity.class.getSimpleName() +
-                            "(?tmp" + tmpVarIndex + ", \"" + description.get(HasName.class.getSimpleName()) + "\") AS ?score" + tmpVarIndex + ")\n";
+                            "(?tmp" + tmpVarIndex + ", \"" + similarityString + "\") AS ?score" + tmpVarIndex + ")\n";
                     scoresToAccumulate.add("?score"+tmpVarIndex);
                 }
                 tmpVarIndex++;
@@ -345,98 +374,62 @@ public class ReferenceResolution {
     }
 
     private static Pair<Map<String, DiscourseUnit>, StringDistribution> resolveDiscourseUnitHelper(DiscourseUnit targetDiscourseUnit, YodaEnvironment yodaEnvironment) {
-        List<String> slotPathsToResolve = new LinkedList<>();
-        SemanticsModel spokenByThem = targetDiscourseUnit.getSpokenByThem();
+
+        Triple<Set<String>, Set<String>, Set<String>> resolutionInformation = Utils.resolutionInformation(targetDiscourseUnit);
+        Set<String> slotPathsToResolve = resolutionInformation.getLeft();
+        Set<String> slotPathsToInfer = resolutionInformation.getMiddle();
+        Set<String> alreadyResolvedPaths = resolutionInformation.getRight();
+
         SemanticsModel currentGroundedInterpretation = targetDiscourseUnit.getGroundInterpretation();
-        String verb = (String)spokenByThem.newGetSlotPathFiller("verb.class");
-        Class<? extends Verb> verbClass = Ontology.verbNameMap.get(verb);
 
-        try {
-            for (String path : targetDiscourseUnit.getSpokenByThem().getAllInternalNodePaths().stream().
-                    sorted((x,y) -> Integer.compare(x.length(), y.length())).collect(Collectors.toList())){
-                if (slotPathsToResolve.contains(path)
-                        || Arrays.asList("", "dialogAct", "verb").contains(path)
-                        || slotPathsToResolve.stream().anyMatch(x -> path.startsWith(x)))
-                    continue;
-                if (!Noun.class.isAssignableFrom(Ontology.thingNameMap.get(((JSONObject)spokenByThem.newGetSlotPathFiller(path)).get("class"))))
-                    continue;
-                slotPathsToResolve.add(path);
-            }
-
-            // keep only the slot paths that haven't already been resolved
-            Set<String> alreadyGroundedPaths;
-            if (currentGroundedInterpretation!=null) {
-                alreadyGroundedPaths = slotPathsToResolve.stream().filter(x -> currentGroundedInterpretation.newGetSlotPathFiller(x) != null).collect(Collectors.toSet());
-            } else {
-                alreadyGroundedPaths = new HashSet<>();
-            }
-            slotPathsToResolve.removeAll(alreadyGroundedPaths);
-
-            // do not try to resolve slots for which the verb only requires descriptions
-            Set<Class <? extends Role>> requiredDescriptions = verbClass.newInstance().getRequiredDescriptions();
-            slotPathsToResolve.removeAll(
-                    requiredDescriptions.stream().
-                            map(x -> "verb." + x.getSimpleName()).
-                            collect(Collectors.toSet()));
-
-            Map<String, StringDistribution> resolutionMarginals = new HashMap<>();
-            for (String slotPathToResolve : slotPathsToResolve) {
-                resolutionMarginals.put(slotPathToResolve,
-                        resolveReference(yodaEnvironment,
-                                (JSONObject) targetDiscourseUnit.getSpokenByThem().newGetSlotPathFiller(slotPathToResolve),
-                                false));
-            }
-
-            // add inferred required roles to reference marginals
-            //todo: add roles missing from prepositions
-            List<String> pathsToInfer = verbClass.newInstance().getRequiredGroundedRoles().stream().
-                    map(x -> "verb." + x.getSimpleName()).
-                    filter(x -> !alreadyGroundedPaths.contains(x)).
-                    filter(x -> !slotPathsToResolve.contains(x)).
-                    collect(Collectors.toList());
-            for (String pathToInfer : pathsToInfer){
-                resolutionMarginals.put(pathToInfer,
-                        inferRole(yodaEnvironment,
-                                Ontology.roleNameMap.get(pathToInfer.split("\\.")[pathToInfer.split("\\.").length - 1])));
-            }
-
-
-            Pair<StringDistribution, Map<String, Map<String, String>>> resolutionJoint =
-                    HypothesisSetManagement.getJointFromMarginals(resolutionMarginals, 10);
-            Map<String, DiscourseUnit> discourseUnits = new HashMap<>();
-
-            for (String jointHypothesisID : resolutionJoint.getKey().keySet()){
-                DiscourseUnit groundedDiscourseUnit = targetDiscourseUnit.deepCopy();
-                SemanticsModel groundedModel = targetDiscourseUnit.getSpokenByThem().deepCopy();
-                Map<String, String> assignment = resolutionJoint.getValue().get(jointHypothesisID);
-                // add new bindings
-                for (String slotPathVariable : assignment.keySet()){
-                    if (assignment.get(slotPathVariable).equals(unfilledJunkString))
-                        continue;
-                    if (groundedModel.newGetSlotPathFiller(slotPathVariable)==null){
-                        SemanticsModel.putAtPath(groundedModel.getInternalRepresentation(), slotPathVariable,
-                                SemanticsModel.parseJSON(Ontology.webResourceWrap(assignment.get(slotPathVariable))));
-                    } else {
-                        SemanticsModel.overwrite((JSONObject) groundedModel.newGetSlotPathFiller(slotPathVariable),
-                                SemanticsModel.parseJSON(Ontology.webResourceWrap(assignment.get(slotPathVariable))));
-                    }
-                }
-                // include previously grounded paths
-                for (String path : alreadyGroundedPaths){
-                    SemanticsModel.overwrite((JSONObject) groundedModel.newGetSlotPathFiller(path),
-                            (JSONObject) currentGroundedInterpretation.newGetSlotPathFiller(path));
-                }
-                groundedDiscourseUnit.setGroundInterpretation(groundedModel);
-                discourseUnits.put(jointHypothesisID, groundedDiscourseUnit);
-            }
-
-            return new ImmutablePair<>(discourseUnits, resolutionJoint.getLeft());
-
-        } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
-            System.exit(0);
+        Map<String, StringDistribution> resolutionMarginals = new HashMap<>();
+        for (String slotPathToResolve : slotPathsToResolve) {
+            resolutionMarginals.put(slotPathToResolve,
+                    resolveReference(yodaEnvironment,
+                            (JSONObject) targetDiscourseUnit.getSpokenByThem().newGetSlotPathFiller(slotPathToResolve),
+                            false));
         }
-        return null;
+
+        // add inferred required roles to reference marginals
+        for (String pathToInfer : slotPathsToInfer) {
+            resolutionMarginals.put(pathToInfer,
+                    inferRole(yodaEnvironment,
+                            Ontology.roleNameMap.get(pathToInfer.split("\\.")[pathToInfer.split("\\.").length - 1])));
+        }
+
+
+        Pair<StringDistribution, Map<String, Map<String, String>>> resolutionJoint =
+                HypothesisSetManagement.getJointFromMarginals(resolutionMarginals, 10);
+        Map<String, DiscourseUnit> discourseUnits = new HashMap<>();
+
+        for (String jointHypothesisID : resolutionJoint.getKey().keySet()) {
+            DiscourseUnit groundedDiscourseUnit = targetDiscourseUnit.deepCopy();
+            SemanticsModel groundedModel = targetDiscourseUnit.getSpokenByThem().deepCopy();
+            Map<String, String> assignment = resolutionJoint.getValue().get(jointHypothesisID);
+            // add new bindings
+            for (String slotPathVariable : assignment.keySet()) {
+                if (assignment.get(slotPathVariable).equals(unfilledJunkString))
+                    continue;
+                if (groundedModel.newGetSlotPathFiller(slotPathVariable) == null) {
+                    SemanticsModel.putAtPath(groundedModel.getInternalRepresentation(), slotPathVariable,
+                            SemanticsModel.parseJSON(Ontology.webResourceWrap(assignment.get(slotPathVariable))));
+                } else {
+                    SemanticsModel.overwrite((JSONObject) groundedModel.newGetSlotPathFiller(slotPathVariable),
+                            SemanticsModel.parseJSON(Ontology.webResourceWrap(assignment.get(slotPathVariable))));
+                }
+            }
+            // include previously grounded paths
+            for (String path : alreadyResolvedPaths) {
+                SemanticsModel.overwrite((JSONObject) groundedModel.newGetSlotPathFiller(path),
+                        (JSONObject) currentGroundedInterpretation.newGetSlotPathFiller(path));
+            }
+            groundedDiscourseUnit.setGroundInterpretation(groundedModel);
+            discourseUnits.put(jointHypothesisID, groundedDiscourseUnit);
+        }
+
+        return new ImmutablePair<>(discourseUnits, resolutionJoint.getLeft());
+
+
     }
 
     public static void updateSalience(YodaEnvironment yodaEnvironment, StringDistribution dialogStateDistribution,

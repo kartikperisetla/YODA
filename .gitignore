@@ -8,5 +8,8 @@
 *.jar
 *.iml
 *.idea
+.classpath
+.project
+.settings
 yoda/target
 WordNet-3.0

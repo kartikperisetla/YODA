@@ -1,6 +1,5 @@
 package edu.cmu.sv.domain.yelp_phoenix;
 
-import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.adjective.Cheap;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.adjective.Expensive;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.adjective.Good;
@@ -9,13 +8,12 @@ import edu.cmu.sv.domain.yelp_phoenix.ontology.noun.poi_types.*;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.preposition.IsCloseTo;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.quality.unary_quality.Expensiveness;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.quality.unary_quality.Goodness;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Agent;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.role.Destination;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.role.Origin;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Patient;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.verb.GiveDirections;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.HasProperty;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.verb.MakeReservation;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.HasProperty;
+import edu.cmu.sv.natural_language_generation.Lexicon;
 
 /**
  * Created by David Cohen on 3/3/15.
@@ -1019,18 +1017,6 @@ public class YelpPhoenixLexicon extends Lexicon {
                 entry.add(LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, "from");
                 entry.add(LexicalEntry.PART_OF_SPEECH.AS_OBJECT2_PREFIX, "from");
                 add(Origin.class, entry, false);
-            }
-            {
-                // directions from X, directions <...> from X
-                LexicalEntry entry = new LexicalEntry();
-                entry.add(LexicalEntry.PART_OF_SPEECH.AS_SUBJECT_PREFIX, "");
-                add(Agent.class, entry, false);
-            }
-            {
-                // directions from X, directions <...> from X
-                LexicalEntry entry = new LexicalEntry();
-                entry.add(LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, "");
-                add(Patient.class, entry, false);
             }
         }
 

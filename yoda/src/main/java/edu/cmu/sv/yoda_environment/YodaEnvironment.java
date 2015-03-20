@@ -1,7 +1,7 @@
 package edu.cmu.sv.yoda_environment;
 
 import edu.cmu.sv.database.Database;
-import edu.cmu.sv.database.dialog_task.ActionEnumeration;
+import edu.cmu.sv.database.ActionEnumeration;
 import edu.cmu.sv.dialog_management.DialogManager;
 import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.dialog_state_tracking.DialogState;

@@ -33,6 +33,7 @@ public abstract class CommandLineYodaSystem {
                 ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).constructTemplates();
         System.err.println("done loading domain");
 
+
         Thread dstThread = new Thread(yodaEnvironment.dst);
         dstThread.start();
         Thread dmThread = new Thread(yodaEnvironment.dm);
