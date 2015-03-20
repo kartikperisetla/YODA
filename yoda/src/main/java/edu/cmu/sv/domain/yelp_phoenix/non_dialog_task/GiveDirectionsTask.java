@@ -68,6 +68,7 @@ public class GiveDirectionsTask extends NonDialogTask {
         content.put("destinationName", destinationName);
         content.put("gps_lat", gps_lat);
         content.put("gps_lon", gps_lon);
+        content.put("mode", "");
         taskSpec = content;
     }
 
