@@ -1,17 +1,14 @@
 package edu.cmu.sv.domain.smart_house.non_dialog_task;
 
-import edu.cmu.sv.database.Database;
-import edu.cmu.sv.domain.smart_house.GUI.Simulator;
-import edu.cmu.sv.domain.smart_house.HouseSimulation;
-import edu.cmu.sv.domain.smart_house.GUI.GUIThing;
 import edu.cmu.sv.domain.smart_house.GUI.GUIElectronic;
+import edu.cmu.sv.domain.smart_house.GUI.GUIThing;
+import edu.cmu.sv.domain.smart_house.GUI.Simulator;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTaskPreferences;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.json.simple.JSONObject;
 
-import javax.xml.crypto.Data;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
