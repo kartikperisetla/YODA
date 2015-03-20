@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * Created by David Cohen on 10/18/14.
  *
- * Elaborating is adding in additional details to an existing discourse unit
+ * Elaborating is adding in additional details to an existing discourse unit by the original presenter
  *
  */
 public class ElaborateInference extends DialogStateUpdateInference {

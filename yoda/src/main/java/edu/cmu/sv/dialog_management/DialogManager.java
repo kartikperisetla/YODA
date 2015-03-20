@@ -7,6 +7,7 @@ import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.HasProperty;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.SystemAction;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.DontKnow;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Statement;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ClarificationDialogAct;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
@@ -81,6 +82,7 @@ public class DialogManager implements Runnable {
         try {
 
             Map<SystemAction, Double> actionExpectedReward = new HashMap<>();
+            Set<NonDialogTask> enumeratedNonDialogTasks = new HashSet<>();
 
             //// add the null action
             actionExpectedReward.put(null,
@@ -88,74 +90,73 @@ public class DialogManager implements Runnable {
                             RewardAndCostCalculator.outstandingGroundingRequest(dialogStateDistribution, dialogStateHypotheses, "user") *
                                     RewardAndCostCalculator.penaltyForSpeakingOutOfTurn);
 
-            // enumerate and evaluate actions that can be evaluated by summing marginals across the dialog state distribution
+            // enumerate and evaluate actions that can be evaluated by summing marginals across
+            // the dialog state distribution
+            // + the discourse unit contexts per dialog state
             for (String dialogStateHypothesisId : dialogStateHypotheses.keySet()) {
                 DialogState currentDialogState = dialogStateHypotheses.get(dialogStateHypothesisId);
-                for (Class<? extends DialogAct> dialogActClass : DialogRegistry.argumentationDialogActs) {
-                    DialogAct dialogActInstance = dialogActClass.newInstance();
-                    Set<Map<String, Object>> possibleBindings = ActionEnumeration.
-                            getPossibleIndividualBindings(dialogActInstance, yodaEnvironment);
-                    for (Map<String, Object> binding : possibleBindings) {
-                        for (String discourseUnitHypothesisId : currentDialogState.getDiscourseUnitHypothesisMap().
-                                keySet()) {
-                            DiscourseUnit contextDiscourseUnit = currentDialogState.
-                                    getDiscourseUnitHypothesisMap().get(discourseUnitHypothesisId);
-                            DialogAct newDialogActInstance = dialogActClass.newInstance();
-                            newDialogActInstance.bindVariables(binding);
-                            Double currentReward = newDialogActInstance.reward(
-                                    currentDialogState, contextDiscourseUnit) *
-                                    dialogStateDistribution.get(dialogStateHypothesisId);
-//                            if (newDialogActInstance instanceof DontKnow)
-//                                System.out.println("enumerated act:"+newDialogActInstance+"\nreward:"+currentReward);
-                            accumulateReward(actionExpectedReward, newDialogActInstance, currentReward);
-                        }
-                    }
-                }
-
-
-                // actions that are enumerated from action analysis:
                 for (String discourseUnitHypothesisId : currentDialogState.getDiscourseUnitHypothesisMap().
                         keySet()) {
                     DiscourseUnit contextDiscourseUnit = currentDialogState.
                             getDiscourseUnitHypothesisMap().get(discourseUnitHypothesisId);
-                    if (contextDiscourseUnit.actionAnalysis.responseStatement.isEmpty())
-                        continue;
-                    if (contextDiscourseUnit.actionAnalysis.responseStatement.get("dialogAct").equals(Statement.class.getSimpleName())){
-                        Statement s = new Statement();
+
+
+                    // simple dialog acts
+                    for (Class<? extends DialogAct> dialogActClass : DialogRegistry.simpleDialogActs) {
+                        DialogAct dialogActInstance = dialogActClass.newInstance();
+                        Double currentReward = dialogActInstance.reward(currentDialogState, contextDiscourseUnit) *
+                                dialogStateDistribution.get(dialogStateHypothesisId);
+                        accumulateReward(actionExpectedReward, dialogActInstance, currentReward);
+                    }
+
+                    // actions that are enumerated from action analysis:
+                    if (!contextDiscourseUnit.actionAnalysis.responseStatement.isEmpty() &&
+                            contextDiscourseUnit.actionAnalysis.responseStatement.get("dialogAct").equals(Statement.class.getSimpleName())) {
+                        Statement enumeratedStatement = new Statement();
                         Map<String, Object> bindings = new HashMap<>();
                         bindings.put("verb_class", HasProperty.class.getSimpleName());
                         bindings.put("topic_individual",
                                 ((JSONObject) contextDiscourseUnit.actionAnalysis.responseStatement.get("verb.Agent")).get("HasURI"));
                         bindings.put("asserted_role_description",
                                 ((JSONObject) contextDiscourseUnit.actionAnalysis.responseStatement.get("verb.Patient")));
-                        s.bindVariables(bindings);
-//                        System.out.println("enumerated a statement:"+s);
-                        Double currentReward = s.reward(currentDialogState, contextDiscourseUnit) *
+                        enumeratedStatement.bindVariables(bindings);
+                        Double currentReward = enumeratedStatement.reward(currentDialogState, contextDiscourseUnit) *
                                 dialogStateDistribution.get(dialogStateHypothesisId);
-//                        System.out.println("reward: "+currentReward);
-                        accumulateReward(actionExpectedReward, s, currentReward);
-                    } else { // contextDiscourseUnit.actionAnalysis.responseStatement.get("dialogAct").equals(DontKnow.class.getSimpleName())){
-                        // todo: make sure DontKnow hasn't already been enumerated before re-enumerating
+                        accumulateReward(actionExpectedReward, enumeratedStatement, currentReward);
+                    } else if (!contextDiscourseUnit.actionAnalysis.responseStatement.isEmpty() &&
+                            contextDiscourseUnit.actionAnalysis.responseStatement.get("dialogAct").equals(DontKnow.class.getSimpleName())) {
+                        DontKnow enumeratedDontKnow = new DontKnow();
+                        Double currentReward = enumeratedDontKnow.reward(currentDialogState, contextDiscourseUnit) *
+                                dialogStateDistribution.get(dialogStateHypothesisId);
+                        accumulateReward(actionExpectedReward, enumeratedDontKnow, currentReward);
                     }
-                }
 
-                //// slot-filling dialog acts
-                for (Class<? extends DialogAct> dialogActClass : DialogRegistry.slotFillingDialogActs){
-                    DialogAct dialogActInstance = dialogActClass.newInstance();
-                    for (String discourseUnitHypothesisId : currentDialogState.getDiscourseUnitHypothesisMap().
-                            keySet()) {
-                        DiscourseUnit contextDiscourseUnit = currentDialogState.
-                                getDiscourseUnitHypothesisMap().get(discourseUnitHypothesisId);
+                    // slot-filling dialog acts
+                    for (Class<? extends DialogAct> dialogActClass : DialogRegistry.slotFillingDialogActs) {
+                        DialogAct dialogActInstance = dialogActClass.newInstance();
 //                        ActionEnumeration.getPossibleNonIndividualBindings(dialogActInstance, contextDiscourseUnit).forEach(System.out::println);
                         for (Map<String, Object> binding : ActionEnumeration.getPossibleNonIndividualBindings(
-                                dialogActInstance, contextDiscourseUnit)){
+                                dialogActInstance, contextDiscourseUnit)) {
                             DialogAct newDialogActInstance = dialogActClass.newInstance();
                             newDialogActInstance.bindVariables(binding);
                             Double currentReward = newDialogActInstance.reward(currentDialogState, contextDiscourseUnit) *
                                     dialogStateDistribution.get(dialogStateHypothesisId);
                             accumulateReward(actionExpectedReward, newDialogActInstance, currentReward);
                         }
+                    }
 
+                    // enumerate non-dialog tasks
+                    for (NonDialogTask localEnumeratedTask : contextDiscourseUnit.actionAnalysis.enumeratedNonDialogTasks) {
+                        boolean alreadyFound = false;
+                        for (NonDialogTask existingTask : enumeratedNonDialogTasks) {
+                            if (localEnumeratedTask.evaluationMatch(existingTask)) {
+                                alreadyFound = true;
+                                break;
+                            }
+                        }
+                        if (!alreadyFound) {
+                            enumeratedNonDialogTasks.add(localEnumeratedTask);
+                        }
                     }
                 }
             }
@@ -174,31 +175,6 @@ public class DialogManager implements Runnable {
                     accumulateReward(actionExpectedReward, newDialogActInstance, currentReward);
                 }
             }
-
-            // enumerate non-dialog tasks
-            Set<NonDialogTask> enumeratedNonDialogTasks = new HashSet<>();
-            for (String dialogStateHypothesisId : dialogStateHypotheses.keySet()) {
-                DialogState currentDialogState = dialogStateHypotheses.get(dialogStateHypothesisId);
-                for (String discourseUnitHypothesisId : currentDialogState.getDiscourseUnitHypothesisMap().
-                        keySet()) {
-                    DiscourseUnit contextDiscourseUnit = currentDialogState.
-                            getDiscourseUnitHypothesisMap().get(discourseUnitHypothesisId);
-                    for (NonDialogTask localEnumeratedTask : contextDiscourseUnit.actionAnalysis.enumeratedNonDialogTasks) {
-                        boolean alreadyFound = false;
-                        for (NonDialogTask existingTask : enumeratedNonDialogTasks) {
-                            if (localEnumeratedTask.evaluationMatch(existingTask)) {
-                                alreadyFound = true;
-                                break;
-                            }
-                        }
-                        if (!alreadyFound) {
-                            enumeratedNonDialogTasks.add(localEnumeratedTask);
-                        }
-
-                    }
-                }
-            }
-
 
             // evaluate non-dialog tasks
             for (NonDialogTask task : enumeratedNonDialogTasks){

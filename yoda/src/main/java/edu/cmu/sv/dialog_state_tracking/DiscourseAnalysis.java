@@ -97,6 +97,8 @@ public class DiscourseAnalysis {
             groundedSuggestionIndividual = (JSONObject) discourseUnit.groundTruth.
                     newGetSlotPathFiller(suggestionPath);
         }
+        Assert.verify(suggestedContent!=null);
+        Assert.verify(groundedSuggestionIndividual!=null);
         descriptionMatch = ReferenceResolution.descriptionMatch(yodaEnvironment,
                 groundedSuggestionIndividual, suggestedContent);
         if (descriptionMatch==null)
