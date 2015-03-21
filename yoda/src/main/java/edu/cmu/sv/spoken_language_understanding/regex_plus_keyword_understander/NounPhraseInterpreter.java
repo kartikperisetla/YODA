@@ -98,7 +98,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
             Matcher matcher = regexPattern.matcher(phrase);
             if (matcher.matches())
                 ans = Doubles.max(ans, matchingString.length() * 1.0 / adjustedLength);
-        }
+            }
         return Doubles.min(ans, 1.0);
     }
 

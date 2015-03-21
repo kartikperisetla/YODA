@@ -237,7 +237,9 @@ public class DefiniteReferenceTemplate0 implements Template {
                 }
             }
         }
-        return newAns;
+        if (newAns.size()>0)
+            return newAns;
+        return ans;
     }
 
     private static JSONObject compositionFunction(List<JSONObject> children){
