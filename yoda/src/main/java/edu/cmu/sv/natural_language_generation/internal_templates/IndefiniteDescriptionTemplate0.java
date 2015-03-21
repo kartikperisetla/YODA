@@ -46,7 +46,6 @@ public class IndefiniteDescriptionTemplate0 implements Template {
         } catch (Assert.AssertException e){
             return new HashMap<>();
         }
-
         List<Map<String, JSONObject>> chunks = new LinkedList<>();
         // if no noun class, leave out the determiner, make the class Unk
         if (nounClass!=null){
@@ -111,7 +110,6 @@ public class IndefiniteDescriptionTemplate0 implements Template {
                 chunks.add(andChunk);
             }
         }
-
 
         Map<String, JSONObject> ans = new HashMap<>();
         GenerationUtils.simpleOrderedCombinations(chunks, IndefiniteDescriptionTemplate0::compositionFunction,

@@ -9,6 +9,7 @@ import edu.cmu.sv.domain.smart_house.ontology.noun.Thermostat;
 import edu.cmu.sv.domain.smart_house.ontology.noun.Microwave;
 import edu.cmu.sv.domain.smart_house.ontology.noun.SecuritySystem;
 import edu.cmu.sv.domain.smart_house.ontology.role.Component;
+import edu.cmu.sv.domain.smart_house.ontology.verb.TurnOffAppliance;
 import edu.cmu.sv.domain.smart_house.ontology.verb.TurnOnAppliance;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 
@@ -91,6 +92,21 @@ public class SmartHouseLexicon extends Lexicon {
                 entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "power up");
                 add(TurnOnAppliance.class, entry, true);
             }
+
+            {
+                LexicalEntry entry = new LexicalEntry();
+                entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "turn off");
+                entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "power off");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "turn off");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "power off");
+                add(TurnOffAppliance.class, entry, false);
+            }
+            {
+                LexicalEntry entry = new LexicalEntry();
+                entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "power down");
+                add(TurnOffAppliance.class, entry, true);
+            }
+
         }
 
         //// Lexicon for roles

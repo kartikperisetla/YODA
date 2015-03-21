@@ -1,5 +1,6 @@
 package edu.cmu.sv.database;
 
+import com.google.common.primitives.Doubles;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.dialog_state_tracking.Utils;
@@ -106,8 +107,9 @@ public class ReferenceResolution {
                 BindingSet bindings = result.next();
                 if (bindings.getValue("score0")==null)
                     continue;
-                ans.put(bindings.getValue("x0").stringValue(),
-                        Double.parseDouble(bindings.getValue("score0").stringValue()));
+                String key = bindings.getValue("x0").stringValue();
+                Double score = Double.parseDouble(bindings.getValue("score0").stringValue());
+                ans.put(key, Doubles.max(score, ans.get(key)));
             }
             result.close();
 
@@ -246,9 +248,6 @@ public class ReferenceResolution {
                 }
                 tmpVarIndex++;
             }
-
-
-
 
             ans += "BIND(base:" + Product.class.getSimpleName() + "(";
             ans += String.join(", ", scoresToAccumulate);

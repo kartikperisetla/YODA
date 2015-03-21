@@ -3,13 +3,11 @@ package edu.cmu.sv.domain.smart_house;
 import edu.cmu.sv.domain.OntologyRegistry;
 import edu.cmu.sv.domain.smart_house.ontology.adjective.Off;
 import edu.cmu.sv.domain.smart_house.ontology.adjective.On;
-import edu.cmu.sv.domain.smart_house.ontology.noun.AirConditioner;
-import edu.cmu.sv.domain.smart_house.ontology.noun.Appliance;
-import edu.cmu.sv.domain.smart_house.ontology.noun.Room;
-import edu.cmu.sv.domain.smart_house.ontology.noun.SecuritySystem;
+import edu.cmu.sv.domain.smart_house.ontology.noun.*;
 import edu.cmu.sv.domain.smart_house.ontology.quality.PowerState;
 import edu.cmu.sv.domain.smart_house.ontology.role.Component;
 import edu.cmu.sv.domain.smart_house.ontology.role.HasPowerState;
+import edu.cmu.sv.domain.smart_house.ontology.verb.TurnOffAppliance;
 import edu.cmu.sv.domain.smart_house.ontology.verb.TurnOnAppliance;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
@@ -67,6 +65,8 @@ public class SmartHouseOntologyRegistry extends OntologyRegistry{
         nounClasses.add(Appliance.class);
         nounClasses.add(AirConditioner.class);
         nounClasses.add(SecuritySystem.class);
+        nounClasses.add(Thermostat.class);
+        nounClasses.add(Microwave.class);
         nounClasses.add(Room.class);
 
         roleClasses.add(HasPowerState.class);
@@ -76,6 +76,7 @@ public class SmartHouseOntologyRegistry extends OntologyRegistry{
         adjectiveClasses.add(Off.class);
 
         verbClasses.add(TurnOnAppliance.class);
+        verbClasses.add(TurnOffAppliance.class);
 
         qualityClasses.add(PowerState.class);
     }
