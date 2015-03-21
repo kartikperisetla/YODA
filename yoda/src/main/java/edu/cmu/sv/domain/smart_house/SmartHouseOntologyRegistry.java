@@ -7,6 +7,7 @@ import edu.cmu.sv.domain.smart_house.ontology.noun.*;
 import edu.cmu.sv.domain.smart_house.ontology.quality.PowerState;
 import edu.cmu.sv.domain.smart_house.ontology.role.Component;
 import edu.cmu.sv.domain.smart_house.ontology.role.HasPowerState;
+import edu.cmu.sv.domain.smart_house.ontology.verb.TurnOffAppliance;
 import edu.cmu.sv.domain.smart_house.ontology.verb.TurnOnAppliance;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
@@ -75,6 +76,7 @@ public class SmartHouseOntologyRegistry extends OntologyRegistry{
         adjectiveClasses.add(Off.class);
 
         verbClasses.add(TurnOnAppliance.class);
+        verbClasses.add(TurnOffAppliance.class);
 
         qualityClasses.add(PowerState.class);
     }

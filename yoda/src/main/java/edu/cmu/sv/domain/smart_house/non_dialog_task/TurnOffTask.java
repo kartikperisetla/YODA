@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * Created by David Cohen on 12/19/14.
  */
-public class TurnOnTask extends NonDialogTask {
+public class TurnOffTask extends NonDialogTask {
     private static Map<String, TaskStatus> executionStatus = new HashMap<>();
     private static NonDialogTaskPreferences preferences =
             new NonDialogTaskPreferences(false, 1, 20, 15,
@@ -31,8 +31,8 @@ public class TurnOnTask extends NonDialogTask {
         boolean itemFound = false;
         for(GUIThing thing : Simulator.getThings()) {
             if(thing.getCorrespondingURI().equals(uri)) {
-                if (((GUIElectronic)thing).getState()){
-                    // do nothing if the electronic piece is already on
+                if (!((GUIElectronic)thing).getState()){
+                    // do nothing if the electronic piece is already off
                 } else {
                     ((GUIElectronic) thing).toggleSwitch();
                 }
