@@ -2,12 +2,7 @@ package edu.cmu.sv.domain.smart_house;
 
 import edu.cmu.sv.domain.smart_house.ontology.adjective.Off;
 import edu.cmu.sv.domain.smart_house.ontology.adjective.On;
-import edu.cmu.sv.domain.smart_house.ontology.noun.AirConditioner;
-import edu.cmu.sv.domain.smart_house.ontology.noun.Room;
-import edu.cmu.sv.domain.smart_house.ontology.noun.Person;
-import edu.cmu.sv.domain.smart_house.ontology.noun.Thermostat;
-import edu.cmu.sv.domain.smart_house.ontology.noun.Microwave;
-import edu.cmu.sv.domain.smart_house.ontology.noun.SecuritySystem;
+import edu.cmu.sv.domain.smart_house.ontology.noun.*;
 import edu.cmu.sv.domain.smart_house.ontology.role.Component;
 import edu.cmu.sv.domain.smart_house.ontology.verb.TurnOffAppliance;
 import edu.cmu.sv.domain.smart_house.ontology.verb.TurnOnAppliance;
@@ -37,6 +32,18 @@ public class SmartHouseLexicon extends Lexicon {
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "room");
                 entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "rooms");
                 add(Room.class, entry, false);
+            }
+            {
+                LexicalEntry entry = new LexicalEntry();
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "kitchen");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "kitchens");
+                add(Kitchen.class, entry, false);
+            }
+            {
+                LexicalEntry entry = new LexicalEntry();
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "living room");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "living rooms");
+                add(LivingRoom.class, entry, false);
             }
             {
                 LexicalEntry entry = new LexicalEntry();

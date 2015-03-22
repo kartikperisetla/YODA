@@ -68,6 +68,8 @@ public class SmartHouseOntologyRegistry extends OntologyRegistry{
         nounClasses.add(Thermostat.class);
         nounClasses.add(Microwave.class);
         nounClasses.add(Room.class);
+        nounClasses.add(Kitchen.class);
+        nounClasses.add(LivingRoom.class);
 
         roleClasses.add(HasPowerState.class);
         roleClasses.add(Component.class);
