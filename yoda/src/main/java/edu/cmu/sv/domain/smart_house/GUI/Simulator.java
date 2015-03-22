@@ -2,14 +2,14 @@ package edu.cmu.sv.domain.smart_house.GUI;
 
 import edu.cmu.sv.database.Database;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Simulator {
 	private static Set<GUIThing> thingsInSimulation;
 	
 	static {
-        String prefix = "http://sv.cmu.edu/yoda#";
-        System.out.println(prefix);
+        String prefix = Database.baseURI;
 		thingsInSimulation = new HashSet<>();
 		GUIRoom room1 = new GUIRoom("Kitchen", prefix+"0000");
 		GUIRoom room2 = new GUIRoom("Living Room", prefix+"0001");
