@@ -1,6 +1,5 @@
 package edu.cmu.sv.domain.smart_house.GUI;
 import java.util.List;
-import java.util.ArrayList;
 
 public abstract class GUIThing {
 	private String name;
