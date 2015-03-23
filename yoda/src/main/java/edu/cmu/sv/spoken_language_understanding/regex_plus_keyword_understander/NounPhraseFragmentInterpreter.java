@@ -20,6 +20,7 @@ public class NounPhraseFragmentInterpreter implements MiniLanguageInterpreter {
     public Pair<JSONObject, Double> interpret(String utterance, YodaEnvironment yodaEnvironment) {
         Pair<JSONObject, Double> npInterpretation = ((RegexPlusKeywordUnderstander)yodaEnvironment.slu).
                 nounPhraseInterpreter.interpret(utterance, yodaEnvironment);
+//        System.err.println("NPFragment Interpreter: npInterpretation:" + npInterpretation.getLeft());
         if (npInterpretation.getKey().containsKey("HasName"))
             return null;
         String jsonString = "{\"dialogAct\":\"Fragment\"}";

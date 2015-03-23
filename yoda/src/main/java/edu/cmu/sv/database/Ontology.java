@@ -85,12 +85,16 @@ public class Ontology {
         addToNameMap(thingNameMap, miscClasses);
         addToNameMap(thingNameMap, qualityClasses);
 
+
+
         // register qualities for class
+        thingNameMap.values().stream().
+                filter(x -> !Modifier.isAbstract(x.getModifiers())).
+                filter(ThingWithRoles.class::isAssignableFrom).
+                forEach(x -> qualitiesForClass.put((Class < ? extends ThingWithRoles>)x, new HashSet<>()));
         for (Class<? extends TransientQuality> qualityClass : qualityClasses){
             Set<Class<? extends ThingWithRoles>> qualityDom = qualityDomain(qualityClass);
             for (Class<? extends ThingWithRoles> thingCls : qualityDom){
-                if (!qualitiesForClass.containsKey(thingCls))
-                    qualitiesForClass.put(thingCls, new HashSet<>());
                 qualitiesForClass.get(thingCls).add(qualityClass);
             }
         }

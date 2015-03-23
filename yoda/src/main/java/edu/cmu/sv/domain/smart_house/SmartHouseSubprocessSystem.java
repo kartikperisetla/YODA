@@ -19,7 +19,7 @@ public class SmartHouseSubprocessSystem extends SubprocessYodaSystem {
                 new YodaSkeletonOntologyRegistry(),
                 new NonDialogTaskRegistry(),
                 new DatabaseRegistry()));
-        // yelp phoenix domain
+        // smart house domain
         domainSpecs.add(new DomainSpec(
                 "Smart house domain",
                 new SmartHouseLexicon(),

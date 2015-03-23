@@ -1,14 +1,14 @@
 package edu.cmu.sv.domain.smart_house;
 
+import edu.cmu.sv.domain.smart_house.ontology.adjective.Clean;
+import edu.cmu.sv.domain.smart_house.ontology.adjective.Dirty;
 import edu.cmu.sv.domain.smart_house.ontology.adjective.Off;
 import edu.cmu.sv.domain.smart_house.ontology.adjective.On;
-import edu.cmu.sv.domain.smart_house.ontology.noun.AirConditioner;
-import edu.cmu.sv.domain.smart_house.ontology.noun.Room;
-import edu.cmu.sv.domain.smart_house.ontology.noun.Person;
-import edu.cmu.sv.domain.smart_house.ontology.noun.Thermostat;
-import edu.cmu.sv.domain.smart_house.ontology.noun.Microwave;
-import edu.cmu.sv.domain.smart_house.ontology.noun.SecuritySystem;
+import edu.cmu.sv.domain.smart_house.ontology.noun.*;
+import edu.cmu.sv.domain.smart_house.ontology.preposition.IsContainedBy;
 import edu.cmu.sv.domain.smart_house.ontology.role.Component;
+import edu.cmu.sv.domain.smart_house.ontology.role.HasRoom;
+import edu.cmu.sv.domain.smart_house.ontology.verb.CleanRoom;
 import edu.cmu.sv.domain.smart_house.ontology.verb.TurnOffAppliance;
 import edu.cmu.sv.domain.smart_house.ontology.verb.TurnOnAppliance;
 import edu.cmu.sv.natural_language_generation.Lexicon;
@@ -20,6 +20,12 @@ public class SmartHouseLexicon extends Lexicon {
     public SmartHouseLexicon() {
         //// Lexicon for nouns
         {
+            {
+                LexicalEntry entry = new LexicalEntry();
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "appliance");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "appliances");
+                add(Appliance.class, entry, false);
+            }
             {
                 LexicalEntry entry = new LexicalEntry();
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "security system");
@@ -40,9 +46,15 @@ public class SmartHouseLexicon extends Lexicon {
             }
             {
                 LexicalEntry entry = new LexicalEntry();
-                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "person");
-                entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "people");
-                add(Person.class, entry, false);
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "kitchen");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "kitchens");
+                add(Kitchen.class, entry, false);
+            }
+            {
+                LexicalEntry entry = new LexicalEntry();
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "living room");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "living rooms");
+                add(LivingRoom.class, entry, false);
             }
             {
                 LexicalEntry entry = new LexicalEntry();
@@ -56,9 +68,32 @@ public class SmartHouseLexicon extends Lexicon {
                 entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "microwaves");
                 add(Microwave.class, entry, false);
             }
+            {
+                LexicalEntry entry = new LexicalEntry();
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "roomba");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "vacuum robot");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "robot");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "vacuum cleaner robot");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "vacuum cleaner robots");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "vacuum robots");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "robots");
+                add(Roomba.class, entry, false);
+            }
         }
 
-        //// Lexicon for adjectives
+        //// Lexicon for prepositions
+        {
+            {
+                LexicalEntry entry = new LexicalEntry();
+                entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "in");
+                entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "inside");
+                entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "at");
+                add(IsContainedBy.class, entry, false);
+            }
+        }
+
+
+            //// Lexicon for adjectives
         {
             {
                 LexicalEntry entry = new LexicalEntry();
@@ -71,6 +106,18 @@ public class SmartHouseLexicon extends Lexicon {
                 entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "off");
                 entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "turned off");
                 add(Off.class, entry, false);
+            }
+            {
+                LexicalEntry entry = new LexicalEntry();
+                entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "clean");
+                entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "tidy");
+                add(Clean.class, entry, false);
+            }
+            {
+                LexicalEntry entry = new LexicalEntry();
+                entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "dirty");
+                entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "untidy");
+                add(Dirty.class, entry, false);
             }
         }
 
@@ -92,6 +139,19 @@ public class SmartHouseLexicon extends Lexicon {
                 entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "power up");
                 add(TurnOnAppliance.class, entry, true);
             }
+
+
+            {
+                LexicalEntry entry = new LexicalEntry();
+                entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "clean");
+                entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "vacuum");
+                entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "clean up");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "clean");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "vacuum");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "clean up");
+                add(CleanRoom.class, entry, false);
+            }
+
 
             {
                 LexicalEntry entry = new LexicalEntry();
@@ -115,6 +175,11 @@ public class SmartHouseLexicon extends Lexicon {
                 LexicalEntry entry = new LexicalEntry();
                 entry.add(LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, "");
                 add(Component.class, entry, false);
+            }
+            {
+                LexicalEntry entry = new LexicalEntry();
+                entry.add(LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, "");
+                add(HasRoom.class, entry, false);
             }
 
         }

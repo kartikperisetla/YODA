@@ -4,6 +4,7 @@ import edu.cmu.sv.database.Database;
 import edu.cmu.sv.database.Sensor;
 import edu.cmu.sv.domain.DatabaseRegistry;
 import edu.cmu.sv.domain.smart_house.GUI.GUIElectronic;
+import edu.cmu.sv.domain.smart_house.GUI.GUIRoom;
 import edu.cmu.sv.domain.smart_house.GUI.GUIThing;
 import edu.cmu.sv.domain.smart_house.GUI.Simulator;
 import edu.cmu.sv.yoda_environment.MongoLogHandler;
@@ -20,20 +21,107 @@ import org.openrdf.repository.RepositoryException;
 public class SmartHouseDatabaseRegistry extends DatabaseRegistry {
     public SmartHouseDatabaseRegistry() {
         turtleDatabaseSources.add("./src/resources/home.turtle");
-        sensors.add(new ApplianceSensor());
+        sensors.add(new RoomDustLevelSensor());
+        sensors.add(new AppliancePowerStateSensor());
+        sensors.add(new ThingLocationSensor());
     }
 
-    public class ApplianceSensor implements Sensor{
+
+    public class RoomDustLevelSensor implements Sensor{
         @Override
         public void sense(YodaEnvironment targetEnvironment) {
             synchronized (targetEnvironment.db.connection) {
+                for (GUIThing thing : Simulator.getThings()){
+                    if (!(thing instanceof GUIRoom))
+                        continue;
 
+                    // clear existing dust level
+                    String deleteString = Database.prefixes;
+                    deleteString += "DELETE {<" + thing.getCorrespondingURI() + "> base:dust_level ?y }";
+                    deleteString += "WHERE {<" + thing.getCorrespondingURI() + "> base:dust_level ?y }";
+                    Database.getLogger().info(MongoLogHandler.createSimpleRecord("clear room's dust level", deleteString).toJSONString());
+                    try {
+                        Update update = targetEnvironment.db.connection.prepareUpdate(
+                                QueryLanguage.SPARQL, deleteString, Database.dstFocusURI);
+                        update.execute();
+                    } catch (RepositoryException | UpdateExecutionException | MalformedQueryException e) {
+                        e.printStackTrace();
+                        System.exit(0);
+                    }
+
+                    // set new dust level
+                    int newDustLevel = ((GUIRoom) thing).getDustLevel();
+                    String insertString = Database.prefixes + "INSERT DATA {";
+                    insertString += "<" + thing.getCorrespondingURI() + "> base:dust_level " + newDustLevel + ".\n";
+                    insertString += "}";
+                    Database.getLogger().info(MongoLogHandler.createSimpleRecord("sensing room's dust level", insertString).toJSONString());
+                    try {
+                        Update update = targetEnvironment.db.connection.prepareUpdate(
+                                QueryLanguage.SPARQL, insertString, Database.dstFocusURI);
+                        update.execute();
+                    } catch (RepositoryException | UpdateExecutionException | MalformedQueryException e) {
+                        e.printStackTrace();
+                        System.exit(0);
+                    }
+
+                }
+            }
+        }
+    }
+
+
+    public class ThingLocationSensor implements Sensor{
+        @Override
+        public void sense(YodaEnvironment targetEnvironment) {
+            synchronized (targetEnvironment.db.connection) {
+                for (GUIThing thing : Simulator.getThings()){
+//                    if (thing.getPosition()==null)
+//                        continue;
+
+                    // clear existing room
+                    String deleteString = Database.prefixes;
+                    deleteString += "DELETE {<" + thing.getCorrespondingURI() + "> base:in_room ?y }";
+                    deleteString += "WHERE {<" + thing.getCorrespondingURI() + "> base:in_room ?y }";
+                    Database.getLogger().info(MongoLogHandler.createSimpleRecord("clear thing's room", deleteString).toJSONString());
+                    try {
+                        Update update = targetEnvironment.db.connection.prepareUpdate(
+                                QueryLanguage.SPARQL, deleteString, Database.dstFocusURI);
+                        update.execute();
+                    } catch (RepositoryException | UpdateExecutionException | MalformedQueryException e) {
+                        e.printStackTrace();
+                        System.exit(0);
+                    }
+
+
+                    // set new power state
+                    int newRoom = thing.getPosition();
+                    String insertString = Database.prefixes + "INSERT DATA {";
+                    insertString += "<" + thing.getCorrespondingURI() + "> base:in_room \"<" + newRoom + ">\"^^xsd:string.\n";
+                    insertString += "}";
+                    Database.getLogger().info(MongoLogHandler.createSimpleRecord("sensing thing's room", insertString).toJSONString());
+                    try {
+                        Update update = targetEnvironment.db.connection.prepareUpdate(
+                                QueryLanguage.SPARQL, insertString, Database.dstFocusURI);
+                        update.execute();
+                    } catch (RepositoryException | UpdateExecutionException | MalformedQueryException e) {
+                        e.printStackTrace();
+                        System.exit(0);
+                    }
+
+                }
+            }
+        }
+    }
+
+    public class AppliancePowerStateSensor implements Sensor{
+        @Override
+        public void sense(YodaEnvironment targetEnvironment) {
+            synchronized (targetEnvironment.db.connection) {
                 for (GUIThing thing : Simulator.getThings()){
                     if (!(thing instanceof GUIElectronic))
                         continue;
 
                     // clear existing power state
-
                     String deleteString = Database.prefixes;
                     deleteString += "DELETE {<" + thing.getCorrespondingURI() + "> base:power_state ?y }";
                     deleteString += "WHERE {<" + thing.getCorrespondingURI() + "> base:power_state ?y }";
@@ -46,7 +134,6 @@ public class SmartHouseDatabaseRegistry extends DatabaseRegistry {
                         e.printStackTrace();
                         System.exit(0);
                     }
-
 
                     // set new power state
                     String powerState = ((GUIElectronic) thing).getState() ? "on" : "off";
@@ -62,13 +149,8 @@ public class SmartHouseDatabaseRegistry extends DatabaseRegistry {
                         e.printStackTrace();
                         System.exit(0);
                     }
-
                 }
-
-
             }
-
-
         }
     }
 }

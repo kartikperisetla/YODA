@@ -30,7 +30,7 @@ public abstract class CommandLineYodaSystem {
         }
         Ontology.finalizeOntology();
         DialogRegistry.finalizeDialogRegistry();
-                ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).constructTemplates();
+        ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).constructTemplates();
         System.err.println("done loading domain");
 
 

@@ -13,7 +13,7 @@ public class GUISecuritySystem extends GUIElectronic {
 	public List<String> provideDetails() {
 		List<String> res = new ArrayList<>();
 		res.add("Name: " + this.getName() + "\n");
-		res.add("Room: " + this.getRoom().getName() + "\nCurrent State: ");
+		res.add("Room: " + this.getPosition() + "\nCurrent State: ");
 		if(getState())
 			res.add("ON");
 		else
