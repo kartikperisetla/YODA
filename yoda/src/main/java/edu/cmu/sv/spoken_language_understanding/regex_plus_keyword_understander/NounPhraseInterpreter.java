@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Created by David Cohen on 1/27/15.
@@ -42,6 +43,8 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
             try {
                 Set<String> relationalPhraseStrings = this.yodaEnvironment.lex.getPOSForClass(prepositionClass,
                         Lexicon.LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, false);
+                relationalPhraseStrings = relationalPhraseStrings.stream().
+                        map(x -> x.equals("") ? x : " "+x+" ").collect(Collectors.toSet());
                 String regexString = "(" + String.join("|", relationalPhraseStrings) + ")";
                 if (!regexString.equals("()"))
                     prepositionSeparatorRegexStringMap.put(prepositionClass, regexString);
