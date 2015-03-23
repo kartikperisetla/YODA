@@ -1,5 +1,6 @@
 package edu.cmu.sv.natural_language_generation.top_level_templates;
 
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasName;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
 import edu.cmu.sv.natural_language_generation.Template;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
@@ -59,6 +60,17 @@ public class HasPropertyStatementTemplate0 implements Template {
 
         Map<String, JSONObject> agentChunks = yodaEnvironment.nlg.
                 generateAll(agentConstraint, yodaEnvironment, yodaEnvironment.nlg.grammarPreferences.maxNounPhraseDepth);
+
+        // if any of the agent chunks contains a named entity, keep only that option
+        Map<String, JSONObject> agentChunksWithName = new HashMap<>();
+        for (String key : agentChunks.keySet()){
+            JSONObject chunk = agentChunks.get(key);
+            if (chunk.containsKey(HasName.class.getSimpleName()))
+                agentChunksWithName.put(key, chunk);
+        }
+        if (agentChunksWithName.size()>0)
+            agentChunks = agentChunksWithName;
+
         Map<String, JSONObject> patientChunks = yodaEnvironment.nlg.
                 generateAll(patientConstraint, yodaEnvironment, yodaEnvironment.nlg.grammarPreferences.maxNounPhraseDepth);
 

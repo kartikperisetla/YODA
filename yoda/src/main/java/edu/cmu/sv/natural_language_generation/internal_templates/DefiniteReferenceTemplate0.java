@@ -1,12 +1,7 @@
 package edu.cmu.sv.natural_language_generation.internal_templates;
 
-import edu.cmu.sv.database.ReferenceResolution;
-import edu.cmu.sv.natural_language_generation.*;
 import edu.cmu.sv.database.Ontology;
-import edu.cmu.sv.utils.Assert;
-import edu.cmu.sv.utils.StringDistribution;
-import edu.cmu.sv.yoda_environment.YodaEnvironment;
-import edu.cmu.sv.database.Database;
+import edu.cmu.sv.database.ReferenceResolution;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.ThingWithRoles;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
@@ -15,13 +10,19 @@ import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasURI;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.InRelationTo;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
+import edu.cmu.sv.natural_language_generation.GenerationUtils;
+import edu.cmu.sv.natural_language_generation.Lexicon;
+import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
+import edu.cmu.sv.natural_language_generation.Template;
 import edu.cmu.sv.semantics.SemanticsModel;
+import edu.cmu.sv.utils.Assert;
+import edu.cmu.sv.utils.StringDistribution;
+import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by David Cohen on 11/3/14.
@@ -67,23 +68,35 @@ public class DefiniteReferenceTemplate0 implements Template {
         detChunks.put("the", new SemanticsModel("{}").getInternalRepresentation());
 
         // collect class name chunks
-        for (String clsName : classNames.stream().map(Database::getLocalName).
-                collect(Collectors.toList())) {
-            if (!Ontology.thingNameMap.containsKey(clsName))
-                continue;
-            Set<String> singularNounForms;
-            try {
-                singularNounForms = yodaEnvironment.lex.getPOSForClass(Ontology.thingNameMap.get(clsName),
-                        Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, yodaEnvironment.nlg.grammarPreferences, false);
-            } catch (Lexicon.NoLexiconEntryException e) {
-                singularNounForms = new HashSet<>();
-            }
-            for (String singularNounForm : singularNounForms) {
-                clsChunks.put(singularNounForm, SemanticsModel.parseJSON("{\"class\":\"" + clsName + "\"}"));
-            }
+        String mostSpecificClass = yodaEnvironment.db.mostSpecificClass(entityURI);
+        Set<String> singularNounForms;
+        try {
+            singularNounForms = yodaEnvironment.lex.getPOSForClass(Ontology.thingNameMap.get(mostSpecificClass),
+                    Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, yodaEnvironment.nlg.grammarPreferences, false);
+        } catch (Lexicon.NoLexiconEntryException e) {
+            singularNounForms = new HashSet<>();
+        }
+        for (String singularNounForm : singularNounForms) {
+            clsChunks.put(singularNounForm, SemanticsModel.parseJSON("{\"class\":\"" + mostSpecificClass + "\"}"));
         }
 
-        String mostSpecificClass = yodaEnvironment.db.mostSpecificClass(entityURI);
+
+//        for (String clsName : classNames.stream().map(Database::getLocalName).
+//                collect(Collectors.toList())) {
+//            if (!Ontology.thingNameMap.containsKey(clsName))
+//                continue;
+//            Set<String> singularNounForms;
+//            try {
+//                singularNounForms = yodaEnvironment.lex.getPOSForClass(Ontology.thingNameMap.get(clsName),
+//                        Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, yodaEnvironment.nlg.grammarPreferences, false);
+//            } catch (Lexicon.NoLexiconEntryException e) {
+//                singularNounForms = new HashSet<>();
+//            }
+//            for (String singularNounForm : singularNounForms) {
+//                clsChunks.put(singularNounForm, SemanticsModel.parseJSON("{\"class\":\"" + clsName + "\"}"));
+//            }
+//        }
+
         if (Ontology.thingNameMap.containsKey(mostSpecificClass) &&
                 ThingWithRoles.class.isAssignableFrom(Ontology.thingNameMap.get(mostSpecificClass))) {
 
