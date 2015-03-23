@@ -3,6 +3,7 @@ package edu.cmu.sv.domain.smart_house;
 import edu.cmu.sv.domain.smart_house.ontology.adjective.Off;
 import edu.cmu.sv.domain.smart_house.ontology.adjective.On;
 import edu.cmu.sv.domain.smart_house.ontology.noun.*;
+import edu.cmu.sv.domain.smart_house.ontology.preposition.IsContainedBy;
 import edu.cmu.sv.domain.smart_house.ontology.role.Component;
 import edu.cmu.sv.domain.smart_house.ontology.verb.TurnOffAppliance;
 import edu.cmu.sv.domain.smart_house.ontology.verb.TurnOnAppliance;
@@ -15,6 +16,12 @@ public class SmartHouseLexicon extends Lexicon {
     public SmartHouseLexicon() {
         //// Lexicon for nouns
         {
+            {
+                LexicalEntry entry = new LexicalEntry();
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "appliance");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "appliances");
+                add(Appliance.class, entry, false);
+            }
             {
                 LexicalEntry entry = new LexicalEntry();
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "security system");
@@ -65,7 +72,19 @@ public class SmartHouseLexicon extends Lexicon {
             }
         }
 
-        //// Lexicon for adjectives
+        //// Lexicon for prepositions
+        {
+            {
+                LexicalEntry entry = new LexicalEntry();
+                entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "in");
+                entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "inside");
+                entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "at");
+                add(IsContainedBy.class, entry, false);
+            }
+        }
+
+
+            //// Lexicon for adjectives
         {
             {
                 LexicalEntry entry = new LexicalEntry();

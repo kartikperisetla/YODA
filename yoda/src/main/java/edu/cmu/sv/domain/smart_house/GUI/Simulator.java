@@ -11,8 +11,8 @@ public class Simulator {
 	static {
         String prefix = Database.baseURI;
 		thingsInSimulation = new HashSet<>();
-		GUIRoom room1 = new GUIRoom("Kitchen", prefix+"0000");
-		GUIRoom room2 = new GUIRoom("Living Room", prefix+"0001");
+		GUIRoom room1 = new GUIRoom("Kitchen", 1, prefix+"0000");
+		GUIRoom room2 = new GUIRoom("Living Room", 2, prefix+"0001");
 		GUIPerson jane = new GUIPerson("Jane", "F", room1, prefix+"0002");
 		GUIPerson john = new GUIPerson("John", "M", room2, prefix+"0003");
 		GUIMicrowave sonyMicrowave = new GUIMicrowave("Sony Microwave", room1, true, prefix+"0004");

@@ -112,6 +112,7 @@ public class ReferenceResolution {
                 ans.put(key, Doubles.max(score, ans.get(key)));
             }
             result.close();
+            System.err.println(ans);
 
         } catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {
             e.printStackTrace();

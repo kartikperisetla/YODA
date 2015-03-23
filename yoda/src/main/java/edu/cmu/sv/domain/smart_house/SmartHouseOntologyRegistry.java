@@ -4,8 +4,11 @@ import edu.cmu.sv.domain.OntologyRegistry;
 import edu.cmu.sv.domain.smart_house.ontology.adjective.Off;
 import edu.cmu.sv.domain.smart_house.ontology.adjective.On;
 import edu.cmu.sv.domain.smart_house.ontology.noun.*;
+import edu.cmu.sv.domain.smart_house.ontology.preposition.IsContainedBy;
+import edu.cmu.sv.domain.smart_house.ontology.quality.ContainedBy;
 import edu.cmu.sv.domain.smart_house.ontology.quality.PowerState;
 import edu.cmu.sv.domain.smart_house.ontology.role.Component;
+import edu.cmu.sv.domain.smart_house.ontology.role.HasContainedByState;
 import edu.cmu.sv.domain.smart_house.ontology.role.HasPowerState;
 import edu.cmu.sv.domain.smart_house.ontology.verb.TurnOffAppliance;
 import edu.cmu.sv.domain.smart_house.ontology.verb.TurnOnAppliance;
@@ -72,15 +75,19 @@ public class SmartHouseOntologyRegistry extends OntologyRegistry{
         nounClasses.add(LivingRoom.class);
 
         roleClasses.add(HasPowerState.class);
+        roleClasses.add(HasContainedByState.class);
         roleClasses.add(Component.class);
 
         adjectiveClasses.add(On.class);
         adjectiveClasses.add(Off.class);
 
+        prepositionClasses.add(IsContainedBy.class);
+
         verbClasses.add(TurnOnAppliance.class);
         verbClasses.add(TurnOffAppliance.class);
 
         qualityClasses.add(PowerState.class);
+        qualityClasses.add(ContainedBy.class);
     }
 
 }
