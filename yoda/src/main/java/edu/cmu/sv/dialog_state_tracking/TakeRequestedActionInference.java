@@ -34,6 +34,7 @@ public class TakeRequestedActionInference extends DialogStateUpdateInference {
                 for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
                     DiscourseUnit predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId);
 
+
                     try {
                         boolean anyMatchingSchema = false;
                         NonDialogTask thisTask = ((Class<? extends NonDialogTask>)

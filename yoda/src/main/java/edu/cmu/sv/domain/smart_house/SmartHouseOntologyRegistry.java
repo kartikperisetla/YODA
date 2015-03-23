@@ -1,15 +1,17 @@
 package edu.cmu.sv.domain.smart_house;
 
 import edu.cmu.sv.domain.OntologyRegistry;
+import edu.cmu.sv.domain.smart_house.ontology.adjective.Clean;
+import edu.cmu.sv.domain.smart_house.ontology.adjective.Dirty;
 import edu.cmu.sv.domain.smart_house.ontology.adjective.Off;
 import edu.cmu.sv.domain.smart_house.ontology.adjective.On;
 import edu.cmu.sv.domain.smart_house.ontology.noun.*;
 import edu.cmu.sv.domain.smart_house.ontology.preposition.IsContainedBy;
+import edu.cmu.sv.domain.smart_house.ontology.quality.Cleanliness;
 import edu.cmu.sv.domain.smart_house.ontology.quality.ContainedBy;
 import edu.cmu.sv.domain.smart_house.ontology.quality.PowerState;
-import edu.cmu.sv.domain.smart_house.ontology.role.Component;
-import edu.cmu.sv.domain.smart_house.ontology.role.HasContainedByState;
-import edu.cmu.sv.domain.smart_house.ontology.role.HasPowerState;
+import edu.cmu.sv.domain.smart_house.ontology.role.*;
+import edu.cmu.sv.domain.smart_house.ontology.verb.CleanRoom;
 import edu.cmu.sv.domain.smart_house.ontology.verb.TurnOffAppliance;
 import edu.cmu.sv.domain.smart_house.ontology.verb.TurnOnAppliance;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
@@ -76,18 +78,24 @@ public class SmartHouseOntologyRegistry extends OntologyRegistry{
         nounClasses.add(LivingRoom.class);
 
         roleClasses.add(HasPowerState.class);
+        roleClasses.add(HasCleanliness.class);
         roleClasses.add(HasContainedByState.class);
         roleClasses.add(Component.class);
+        roleClasses.add(HasRoom.class);
 
         adjectiveClasses.add(On.class);
         adjectiveClasses.add(Off.class);
+        adjectiveClasses.add(Clean.class);
+        adjectiveClasses.add(Dirty.class);
 
         prepositionClasses.add(IsContainedBy.class);
 
         verbClasses.add(TurnOnAppliance.class);
         verbClasses.add(TurnOffAppliance.class);
+        verbClasses.add(CleanRoom.class);
 
         qualityClasses.add(PowerState.class);
+        qualityClasses.add(Cleanliness.class);
         qualityClasses.add(ContainedBy.class);
     }
 

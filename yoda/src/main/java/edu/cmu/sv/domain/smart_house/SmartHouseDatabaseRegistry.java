@@ -52,7 +52,7 @@ public class SmartHouseDatabaseRegistry extends DatabaseRegistry {
                     // set new dust level
                     int newDustLevel = ((GUIRoom) thing).getDustLevel();
                     String insertString = Database.prefixes + "INSERT DATA {";
-                    insertString += "<" + thing.getCorrespondingURI() + "> base:dust_level \"<" + newDustLevel + ">\"^^xsd:string.\n";
+                    insertString += "<" + thing.getCorrespondingURI() + "> base:dust_level " + newDustLevel + ".\n";
                     insertString += "}";
                     Database.getLogger().info(MongoLogHandler.createSimpleRecord("sensing room's dust level", insertString).toJSONString());
                     try {

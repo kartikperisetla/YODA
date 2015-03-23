@@ -15,6 +15,10 @@ public class GUIRoom extends GUIThing {
         return dustLevel;
     }
 
+    public void setDustLevel(int dustLevel) {
+        this.dustLevel = dustLevel;
+    }
+
     @Override
 	public List<String> provideDetails() {
 		List<String> ans = new ArrayList<>();
