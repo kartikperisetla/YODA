@@ -445,6 +445,7 @@ public class ReferenceResolution {
                     double salienceBoost = dialogStateDistribution.get(dsIdentifier) *
                             Utils.discourseUnitContextProbability(currentDialogState, currentDiscourseUnit);
                     Set<String> individualsInGroundedDiscourseUnit = new HashSet<>();
+                    Set<String> agentsInGroundedDiscourseUnit = new HashSet<>();
                     if (currentDiscourseUnit.getGroundInterpretation() != null) {
                         Set<String> pathsToGroundedIndividuals =
                                 currentDiscourseUnit.getGroundInterpretation().findAllPathsToClass(WebResource.class.getSimpleName());
@@ -452,6 +453,12 @@ public class ReferenceResolution {
                                 individualsInGroundedDiscourseUnit.add((String) currentDiscourseUnit.
                                         getGroundInterpretation().
                                         newGetSlotPathFiller(x + "." + HasURI.class.getSimpleName())));
+
+                        pathsToGroundedIndividuals.stream().filter(x -> x.contains("Agent")).
+                                forEach(x -> agentsInGroundedDiscourseUnit.add((String) currentDiscourseUnit.
+                                        getGroundInterpretation().
+                                        newGetSlotPathFiller(x + "." + HasURI.class.getSimpleName())));
+
                     }
                     if (currentDiscourseUnit.getGroundTruth() != null) {
                         Set<String> pathsToGroundedIndividuals =
@@ -460,11 +467,22 @@ public class ReferenceResolution {
                                 individualsInGroundedDiscourseUnit.add((String) currentDiscourseUnit.
                                         getGroundTruth().
                                         newGetSlotPathFiller(x + "." + HasURI.class.getSimpleName())));
+
+                        pathsToGroundedIndividuals.stream().filter(x -> x.contains("Agent")).
+                                forEach(x -> agentsInGroundedDiscourseUnit.add((String) currentDiscourseUnit.
+                                        getGroundTruth().
+                                        newGetSlotPathFiller(x + "." + HasURI.class.getSimpleName())));
+
                     }
                     for (String key : individualsInGroundedDiscourseUnit) {
                         if (!salienceFromDialogState.containsKey(key))
                             salienceFromDialogState.put(key, 0.0);
-                        salienceFromDialogState.put(key, salienceFromDialogState.get(key) + salienceBoost);
+                        salienceFromDialogState.put(key, salienceFromDialogState.get(key) + .5*salienceBoost);
+                    }
+                    for (String key : agentsInGroundedDiscourseUnit) {
+                        if (!salienceFromDialogState.containsKey(key))
+                            salienceFromDialogState.put(key, 0.0);
+                        salienceFromDialogState.put(key, salienceFromDialogState.get(key) + .5*salienceBoost);
                     }
 
                 }
