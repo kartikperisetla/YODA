@@ -12,3 +12,4 @@ base:0004 rdf:type base:Microwave .
 base:0005 rdf:type base:Thermostat .
 base:0006 rdf:type base:SecuritySystem .
 base:0007 rdf:type base:AirConditioner .
+base:0008 rdf:type base:Roomba .

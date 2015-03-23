@@ -4,12 +4,18 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class GUIRoom extends GUIThing {
-	
-	public GUIRoom(String name, int position, String correspondingURI) {
+	private int dustLevel;
+
+	public GUIRoom(String name, int position, String correspondingURI, int dustLevel) {
 		super(name, position, correspondingURI);
+        this.dustLevel = dustLevel;
 	}
 
-	@Override
+    public int getDustLevel() {
+        return dustLevel;
+    }
+
+    @Override
 	public List<String> provideDetails() {
 		List<String> ans = new ArrayList<>();
 		ans.add(this.getName() + " entities: \n");

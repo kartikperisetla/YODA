@@ -54,12 +54,6 @@ public class SmartHouseLexicon extends Lexicon {
             }
             {
                 LexicalEntry entry = new LexicalEntry();
-                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "person");
-                entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "people");
-                add(Person.class, entry, false);
-            }
-            {
-                LexicalEntry entry = new LexicalEntry();
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "thermostat");
                 entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "thermostats");
                 add(Thermostat.class, entry, false);
@@ -69,6 +63,17 @@ public class SmartHouseLexicon extends Lexicon {
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "microwave");
                 entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "microwaves");
                 add(Microwave.class, entry, false);
+            }
+            {
+                LexicalEntry entry = new LexicalEntry();
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "roomba");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "vacuum robot");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "robot");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "vacuum cleaner robot");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "vacuum cleaner robots");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "vacuum robots");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "robots");
+                add(Roomba.class, entry, false);
             }
         }
 
