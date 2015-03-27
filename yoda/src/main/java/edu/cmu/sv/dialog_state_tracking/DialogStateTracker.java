@@ -2,6 +2,8 @@ package edu.cmu.sv.dialog_state_tracking;
 
 import edu.cmu.sv.database.Sensor;
 import edu.cmu.sv.database.ReferenceResolution;
+import edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences.*;
+import edu.cmu.sv.utils.NBestDistribution;
 import edu.cmu.sv.yoda_environment.MongoLogHandler;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.semantics.SemanticsModel;
@@ -62,15 +64,16 @@ public class DialogStateTracker implements Runnable {
     }
 
     YodaEnvironment yodaEnvironment;
-    Map<String, DialogState> hypothesisMap;
-    StringDistribution hypothesisDistribution;
+    NBestDistribution<DialogState> dialogStateNBestDistribution;
+//    Map<String, DialogState> hypothesisMap;
+//    StringDistribution hypothesisDistribution;
 
     public DialogStateTracker(YodaEnvironment yodaEnvironment){
         this.yodaEnvironment = yodaEnvironment;
-        hypothesisDistribution = new StringDistribution();
-        hypothesisMap = new HashMap<>();
-        hypothesisDistribution.put("initial_dialog_state_hypothesis", 1.0);
-        hypothesisMap.put("initial_dialog_state_hypothesis", new DialogState());
+        dialogStateNBestDistribution = new NBestDistribution<>();
+//        hypothesisDistribution = new StringDistribution();
+//        hypothesisMap = new HashMap<>();
+        dialogStateNBestDistribution.put(new DialogState(), 1.0);
         this.yodaEnvironment.DmInputQueue.add(new ImmutablePair<>(hypothesisMap, hypothesisDistribution));
     }
 
@@ -86,79 +89,68 @@ public class DialogStateTracker implements Runnable {
                     sm.validateSLUHypothesis();
                 }
             }
-            int newDialogStateHypothesisCounter = 0;
-            StringDistribution newHypothesisDistribution = new StringDistribution();
-            Map<String, DialogState> newHypotheses = new HashMap<>();
 
-            for (String currentDialogStateHypothesisID : hypothesisMap.keySet()) {
-                // perform dialog state update inferences
-                {
-                    for (Class<? extends DialogStateUpdateInference> updateInferenceClass : updateInferences) {
-                        Pair<Map<String, DialogState>, StringDistribution> inferredUpdatedState =
-                                updateInferenceClass.newInstance().applyAll(
-                                        yodaEnvironment, hypothesisMap.get(currentDialogStateHypothesisID), turn, timeStamp);
-                        for (String tmpNewDstHypothesisId : inferredUpdatedState.getRight().keySet()) {
-                            String newDstHypothesisId = "dialog_state_hyp_" + newDialogStateHypothesisCounter++;
-                            newHypothesisDistribution.put(newDstHypothesisId,
-                                    inferredUpdatedState.getRight().get(tmpNewDstHypothesisId) *
-                                            hypothesisDistribution.get(currentDialogStateHypothesisID));
-                            newHypotheses.put(newDstHypothesisId, inferredUpdatedState.getLeft().get(tmpNewDstHypothesisId));
-                        }
+            NBestDistribution<DialogState> newDialogStateDistribution = new NBestDistribution<>();
+//            int newDialogStateHypothesisCounter = 0;
+//            StringDistribution newHypothesisDistribution = new StringDistribution();
+//            Map<String, DialogState> newHypotheses = new HashMap<>();
+
+            for (DialogState currentDialogState : dialogStateNBestDistribution.keySet()){
+                for (Class<? extends DialogStateUpdateInference> updateInferenceClass : updateInferences) {
+                    NBestDistribution<DialogState> inferredUpdatedState = updateInferenceClass.newInstance().
+                            applyAll(yodaEnvironment, currentDialogState, turn, timeStamp);
+                    for (DialogState newDialogState : inferredUpdatedState.keySet()){
+                        newDialogStateDistribution.put(newDialogState, inferredUpdatedState.get(newDialogState) *
+                                dialogStateNBestDistribution.get(currentDialogState));
                     }
                 }
             }
 
-//            hypothesisDistribution = HypothesisSetManagement.keepRatioDistribution(newHypothesisDistribution, .05, 10);
-            hypothesisDistribution = HypothesisSetManagement.keepRatioDistribution(newHypothesisDistribution, .05, 5);
-
-            hypothesisMap = new HashMap<>();
-            for (String key : hypothesisDistribution.keySet()) {
-                hypothesisMap.put(key, newHypotheses.get(key));
-            }
-            hypothesisDistribution.normalize();
+            dialogStateNBestDistribution = HypothesisSetManagement.keepRatioDistribution(newDialogStateDistribution, .05, 5);
+            dialogStateNBestDistribution.normalize();
             ReferenceResolution.updateSalience(yodaEnvironment, hypothesisDistribution, hypothesisMap);
 
-            // generate log record
-            JSONObject loopCompleteRecord = MongoLogHandler.createEventRecord("dst_loop_complete");
-            loopCompleteRecord.put("n_hypotheses", hypothesisMap.size());
-            loopCompleteRecord.put("hypothesis_distribution", new JSONObject(hypothesisDistribution.getInternalDistribution()));
-
-            JSONObject dialogStateHypothesesJSON = new JSONObject();
-            for (String key : hypothesisMap.keySet()){
-                DialogState hypothesisState = hypothesisMap.get(key);
-                JSONObject dialogStateHypothesisJSON = new JSONObject();
-
-                JSONObject discourseUnitsJSON = new JSONObject();
-                Map<String, DiscourseUnit> discourseUnitMap = hypothesisState.getDiscourseUnitHypothesisMap();
-                for (String duKey : discourseUnitMap.keySet()){
-                    DiscourseUnit discourseUnit = discourseUnitMap.get(duKey);
-                    JSONObject discourseUnitJSON = new JSONObject();
-                    discourseUnitJSON.put("initiator", discourseUnit.getInitiator());
-                    if (discourseUnit.getSpokenByThem()!=null) {
-                        discourseUnitJSON.put("spoken_by_them", discourseUnit.getSpokenByThem().getInternalRepresentation());
-                        discourseUnitJSON.put("ground_interpretation", discourseUnit.getGroundInterpretation().getInternalRepresentation());
-                    }
-                    if (discourseUnit.getSpokenByMe()!=null) {
-                        discourseUnitJSON.put("spoken_by_me", discourseUnit.getSpokenByMe().getInternalRepresentation());
-                        discourseUnitJSON.put("ground_truth", discourseUnit.getGroundTruth().getInternalRepresentation());
-                    }
-                    discourseUnitsJSON.put(duKey, discourseUnitJSON);
-                }
-
-                JSONArray argumentationLinks = new JSONArray();
-                for (DialogState.ArgumentationLink link : hypothesisState.argumentationLinks){
-                    JSONObject argumentationLinkJSON = new JSONObject();
-                    argumentationLinkJSON.put("predecessor", link.getPredecessor());
-                    argumentationLinkJSON.put("successor", link.getSuccessor());
-                    argumentationLinks.add(argumentationLinkJSON);
-                }
-
-                    dialogStateHypothesisJSON.put("discourse_units", discourseUnitsJSON);
-                dialogStateHypothesisJSON.put("argumentation_links", argumentationLinks);
-                dialogStateHypothesesJSON.put(key, dialogStateHypothesisJSON);
-            }
-            loopCompleteRecord.put("hypotheses", dialogStateHypothesesJSON);
-            logger.info(loopCompleteRecord.toJSONString());
+//            // generate log record
+//            JSONObject loopCompleteRecord = MongoLogHandler.createEventRecord("dst_loop_complete");
+//            loopCompleteRecord.put("n_hypotheses", hypothesisMap.size());
+//            loopCompleteRecord.put("hypothesis_distribution", new JSONObject(hypothesisDistribution.getInternalDistribution()));
+//
+//            JSONObject dialogStateHypothesesJSON = new JSONObject();
+//            for (String key : hypothesisMap.keySet()){
+//                DialogState hypothesisState = hypothesisMap.get(key);
+//                JSONObject dialogStateHypothesisJSON = new JSONObject();
+//
+//                JSONObject discourseUnitsJSON = new JSONObject();
+//                Map<String, DiscourseUnit> discourseUnitMap = hypothesisState.getDiscourseUnitHypothesisMap();
+//                for (String duKey : discourseUnitMap.keySet()){
+//                    DiscourseUnit discourseUnit = discourseUnitMap.get(duKey);
+//                    JSONObject discourseUnitJSON = new JSONObject();
+//                    discourseUnitJSON.put("initiator", discourseUnit.getInitiator());
+//                    if (discourseUnit.getSpokenByThem()!=null) {
+//                        discourseUnitJSON.put("spoken_by_them", discourseUnit.getSpokenByThem().getInternalRepresentation());
+//                        discourseUnitJSON.put("ground_interpretation", discourseUnit.getGroundInterpretation().getInternalRepresentation());
+//                    }
+//                    if (discourseUnit.getSpokenByMe()!=null) {
+//                        discourseUnitJSON.put("spoken_by_me", discourseUnit.getSpokenByMe().getInternalRepresentation());
+//                        discourseUnitJSON.put("ground_truth", discourseUnit.getGroundTruth().getInternalRepresentation());
+//                    }
+//                    discourseUnitsJSON.put(duKey, discourseUnitJSON);
+//                }
+//
+//                JSONArray argumentationLinks = new JSONArray();
+//                for (DialogState.ArgumentationLink link : hypothesisState.argumentationLinks){
+//                    JSONObject argumentationLinkJSON = new JSONObject();
+//                    argumentationLinkJSON.put("predecessor", link.getPredecessor());
+//                    argumentationLinkJSON.put("successor", link.getSuccessor());
+//                    argumentationLinks.add(argumentationLinkJSON);
+//                }
+//
+//                    dialogStateHypothesisJSON.put("discourse_units", discourseUnitsJSON);
+//                dialogStateHypothesisJSON.put("argumentation_links", argumentationLinks);
+//                dialogStateHypothesesJSON.put(key, dialogStateHypothesisJSON);
+//            }
+//            loopCompleteRecord.put("hypotheses", dialogStateHypothesesJSON);
+//            logger.info(loopCompleteRecord.toJSONString());
 
             yodaEnvironment.DmInputQueue.add(new ImmutablePair<>(hypothesisMap, hypothesisDistribution));
             if (turn.speaker.equals("system"))

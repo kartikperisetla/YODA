@@ -1,6 +1,11 @@
-package edu.cmu.sv.dialog_state_tracking;
+package edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences;
 
 import edu.cmu.sv.dialog_management.DialogRegistry;
+import edu.cmu.sv.dialog_state_tracking.DialogState;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
+import edu.cmu.sv.dialog_state_tracking.Turn;
+import edu.cmu.sv.dialog_state_tracking.Utils;
+import edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences.DialogStateUpdateInference;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.ActionSchema;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;

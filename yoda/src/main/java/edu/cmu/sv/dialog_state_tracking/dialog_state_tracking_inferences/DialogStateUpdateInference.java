@@ -1,10 +1,9 @@
-package edu.cmu.sv.dialog_state_tracking;
+package edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences;
 
-import edu.cmu.sv.utils.StringDistribution;
+import edu.cmu.sv.dialog_state_tracking.DialogState;
+import edu.cmu.sv.dialog_state_tracking.Turn;
+import edu.cmu.sv.utils.NBestDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
-import org.apache.commons.lang3.tuple.Pair;
-
-import java.util.Map;
 
 /*
  * Created by David Cohen on 9/19/14.
@@ -17,7 +16,7 @@ public abstract class DialogStateUpdateInference {
     * The returned values won't replace the previous hypotheses, but its hypotheses will
     * be weighted by the assumed hypothesis' prior and collected to create the new tracking state
     * */
-    public abstract Pair<Map<String, DialogState>, StringDistribution> applyAll(
+    public abstract NBestDistribution<DialogState> applyAll(
             YodaEnvironment yodaEnvironment, DialogState currentState, Turn turn, long timeStamp);
 
 }

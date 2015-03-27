@@ -56,6 +56,14 @@ public class HypothesisSetManagement {
         return ans;
     }
 
+    public static <T> NBestDistribution keepRatioDistribution(NBestDistribution<T> fullSet, double ratio, int maxBeamSize){
+        List<Pair<T, Double>> nBest = keepRatioBeam(fullSet.getInternalDistribution(), ratio, maxBeamSize);
+        NBestDistribution<T> ans = new NBestDistribution<>();
+        nBest.forEach(x -> ans.put(x.getLeft(), x.getRight()));
+        return ans;
+    }
+
+
     public static StringDistribution keepRatioDistribution(StringDistribution fullSet, double ratio, int maxBeamSize){
         List<Pair<String, Double>> nBest = keepRatioBeam(fullSet.getInternalDistribution(), ratio, maxBeamSize);
         StringDistribution ans = new StringDistribution();
