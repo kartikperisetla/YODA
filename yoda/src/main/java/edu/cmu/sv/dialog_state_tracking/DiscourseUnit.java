@@ -9,13 +9,13 @@ import edu.cmu.sv.semantics.SemanticsModel;
  * Created by David Cohen on 9/17/14.
  */
 public class DiscourseUnit {
-    SemanticsModel spokenByMe;
-    SemanticsModel spokenByThem;
-    Long timeOfLastActByThem;
-    Long timeOfLastActByMe;
-    String initiator;
-    SemanticsModel groundTruth; // if self-initiated
-    SemanticsModel groundInterpretation; // if other-initiated
+    public SemanticsModel spokenByMe;
+    public SemanticsModel spokenByThem;
+    public Long timeOfLastActByThem;
+    public Long timeOfLastActByMe;
+    public String initiator;
+    public SemanticsModel groundTruth; // if self-initiated
+    public SemanticsModel groundInterpretation; // if other-initiated
 
     public ActionAnalysis actionAnalysis = new ActionAnalysis();
 

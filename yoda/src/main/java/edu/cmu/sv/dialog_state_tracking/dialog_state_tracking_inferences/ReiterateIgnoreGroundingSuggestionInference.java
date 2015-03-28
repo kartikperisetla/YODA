@@ -1,7 +1,9 @@
-package edu.cmu.sv.dialog_state_tracking;
+package edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences;
 
 import edu.cmu.sv.database.ReferenceResolution;
 import edu.cmu.sv.dialog_management.DialogRegistry;
+import edu.cmu.sv.dialog_state_tracking.*;
+import edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences.DialogStateUpdateInference;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestConfirmValue;

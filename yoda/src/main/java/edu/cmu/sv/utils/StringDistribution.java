@@ -38,28 +38,6 @@ public class StringDistribution{
        internalDistribution.remove(key);
     }
 
-    /*
-    * Set a key to value, and adjust the other values so that the result is normalized
-    * */
-    public void setAndNormalize(String key, Double value){
-        assert value >= 0 && value <= 1.0;
-        if (value==1.0) {
-            internalDistribution = new HashMap<>();
-            internalDistribution.put(key, value);
-            return;
-        } else if (value==0){
-            internalDistribution.remove(key);
-            normalize();
-            return;
-        }
-
-        if (internalDistribution.containsKey(key))
-            internalDistribution.remove(key);
-        Double sumBefore = internalDistribution.values().stream().reduce(0.0, (x,y) -> x+y);
-        internalDistribution.put(key, value*sumBefore/(1-value));
-        normalize();
-    }
-
     public String getTopHypothesis(){
         String ans = null;
         Double maxProb = -1.0;
@@ -85,15 +63,6 @@ public class StringDistribution{
     public void normalize(){
         Double total = internalDistribution.values().stream().reduce(0.0, (x, y) -> x + y);
         if (total!=1.0) {
-            for (String key : internalDistribution.keySet()) {
-                internalDistribution.put(key, internalDistribution.get(key) / total);
-            }
-        }
-    }
-
-    public void normalizeIfTooLarge(){
-        Double total = internalDistribution.values().stream().reduce(0.0, (x, y) -> x + y);
-        if (total>1.0) {
             for (String key : internalDistribution.keySet()) {
                 internalDistribution.put(key, internalDistribution.get(key) / total);
             }

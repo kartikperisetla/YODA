@@ -9,10 +9,10 @@ import java.util.Set;
  * Created by David Cohen on 12/1/14.
  */
 public class DialogState {
-    Map<String, DiscourseUnit> discourseUnitHypothesisMap = new HashMap<>();
-    Set<ArgumentationLink> argumentationLinks = new HashSet<>();
-    long discourseUnitCounter = 0;
-    int misunderstandingCounter = 0;
+    public Map<String, DiscourseUnit> discourseUnitHypothesisMap = new HashMap<>();
+    public Set<ArgumentationLink> argumentationLinks = new HashSet<>();
+    public long discourseUnitCounter = 0;
+    public int misunderstandingCounter = 0;
 
     public static class ArgumentationLink{
         public ArgumentationLink(String predecessor, String successor) {

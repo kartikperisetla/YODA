@@ -1,5 +1,7 @@
-package edu.cmu.sv.dialog_state_tracking;
+package edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences;
 
+import edu.cmu.sv.dialog_state_tracking.*;
+import edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences.DialogStateUpdateInference;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.Suggested;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasValue;
 import edu.cmu.sv.semantics.SemanticsModel;
