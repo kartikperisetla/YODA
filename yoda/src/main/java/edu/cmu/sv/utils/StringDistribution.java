@@ -92,6 +92,10 @@ public class StringDistribution{
         internalDistribution.put(key,value);
     }
 
+    public void increment(String key, Double value){
+        internalDistribution.put(key, internalDistribution.get(key) + value);
+    }
+
     public Map<String, Double> getInternalDistribution() {
         return internalDistribution;
     }
