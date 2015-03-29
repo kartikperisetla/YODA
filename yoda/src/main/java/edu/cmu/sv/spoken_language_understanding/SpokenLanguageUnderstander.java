@@ -21,6 +21,10 @@ public interface SpokenLanguageUnderstander {
         int numDialogActCorrect = 0;
         int numVerbOrTopicClassCorrect = 0;
 
+
+        int numTotalCorrectPresent = 0;
+        int numDialogActCorrectPresent = 0;
+        int numVerbOrTopicClassCorrectPresent = 0;
         double weightTotalCorrect = 0.0;
         double weightDialogActCorrect = 0.0;
         double weightVerbOrTopicClassCorrect = 0.0;
@@ -51,22 +55,36 @@ public interface SpokenLanguageUnderstander {
                 numVerbOrTopicClassCorrect++;
 
             // evaluate the n-best list
+            boolean totalCorrectPresent = false;
+            boolean dialogActCorrectPresent = false;
+            boolean verbOrTopicCorrectPresent = false;
             for (String key : sluDistribution.keySet()) {
                 double thisWeight = sluDistribution.get(key);
                 SemanticsModel thisHypothesis = sluHypotheses.get(key);
-                if (SemanticsModel.contentEqual(thisHypothesis, sample.getRight()))
-                    weightTotalCorrect+=thisWeight;
-                if (thisHypothesis.newGetSlotPathFiller("dialogAct").equals(sample.getRight().newGetSlotPathFiller("dialogAct")))
-                    weightDialogActCorrect+=thisWeight;
+                if (SemanticsModel.contentEqual(thisHypothesis, sample.getRight())) {
+                    weightTotalCorrect += thisWeight;
+                    totalCorrectPresent = true;
+                }
+                if (thisHypothesis.newGetSlotPathFiller("dialogAct").equals(sample.getRight().newGetSlotPathFiller("dialogAct"))) {
+                    weightDialogActCorrect += thisWeight;
+                    dialogActCorrectPresent = true;
+                }
                 if (thisHypothesis.newGetSlotPathFiller("verb.class") != null &&
                         sample.getRight().newGetSlotPathFiller("verb.class") != null &&
-                        thisHypothesis.newGetSlotPathFiller("verb.class").equals(sample.getRight().newGetSlotPathFiller("verb.class")))
-                    weightVerbOrTopicClassCorrect+=thisWeight;
+                        thisHypothesis.newGetSlotPathFiller("verb.class").equals(sample.getRight().newGetSlotPathFiller("verb.class"))) {
+                    weightVerbOrTopicClassCorrect += thisWeight;
+                    verbOrTopicCorrectPresent = true;
+                }
                 if (thisHypothesis.newGetSlotPathFiller("topic.class") != null &&
                         sample.getRight().newGetSlotPathFiller("topic.class") != null &&
-                        thisHypothesis.newGetSlotPathFiller("topic.class").equals(sample.getRight().newGetSlotPathFiller("topic.class")))
-                    weightVerbOrTopicClassCorrect+=thisWeight;
+                        thisHypothesis.newGetSlotPathFiller("topic.class").equals(sample.getRight().newGetSlotPathFiller("topic.class"))) {
+                    weightVerbOrTopicClassCorrect += thisWeight;
+                    verbOrTopicCorrectPresent = true;
+                }
             }
+            numTotalCorrectPresent += totalCorrectPresent ? 1 : 0;
+            numDialogActCorrectPresent += dialogActCorrectPresent ? 1 : 0;
+            numVerbOrTopicClassCorrectPresent += verbOrTopicCorrectPresent ? 1 : 0;
         }
 
 
@@ -80,6 +98,11 @@ public interface SpokenLanguageUnderstander {
         System.out.println();
         System.out.println("N-best list result evaluation");
         System.out.println("Total number of test cases:" + numTestCases);
+        System.out.println("Number of times completely correct answer is present:" + numTotalCorrectPresent + " ("+1.0*numTotalCorrectPresent/numTestCases + ")");
+        System.out.println("Number of times dialog act correct answer is present:" + numDialogActCorrectPresent + " ("+1.0*numDialogActCorrectPresent/numTestCases + ")");
+        System.out.println("Number of times verb/topic class correct answer is present:" + numVerbOrTopicClassCorrectPresent + " ("+1.0*numVerbOrTopicClassCorrectPresent/numTestCases + ")");
+
+
         System.out.println("Weight given to completely correct answers:" + weightTotalCorrect + " ("+1.0*weightTotalCorrect/numTestCases + ")");
         System.out.println("Weight given to dialog act correct answers:" + weightDialogActCorrect + " ("+1.0*weightDialogActCorrect/numTestCases + ")");
         System.out.println("Weight given to verb/topic class correct answers:" + weightVerbOrTopicClassCorrect + " ("+1.0*weightVerbOrTopicClassCorrect/numTestCases + ")");

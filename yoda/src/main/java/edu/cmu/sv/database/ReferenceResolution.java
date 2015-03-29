@@ -18,6 +18,7 @@ import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.has_quality_subroles.HasQualityRole;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.HypothesisSetManagement;
+import edu.cmu.sv.utils.NBestDistribution;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.MongoLogHandler;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -432,17 +433,16 @@ public class ReferenceResolution {
 
     }
 
-    public static void updateSalience(YodaEnvironment yodaEnvironment, StringDistribution dialogStateDistribution,
-                                      Map<String, DialogState> dialogStateHypotheses){
+    public static void updateSalience(YodaEnvironment yodaEnvironment,
+                                      NBestDistribution<DialogState> dialogStateDistribution){
         synchronized (yodaEnvironment.db.connection) {
             // compute salience from the active dialog state hypotheses
             Map<String, Double> salienceFromDialogState = new HashMap<>();
-            for (String dsIdentifier : dialogStateDistribution.keySet()) {
-                DialogState currentDialogState = dialogStateHypotheses.get(dsIdentifier);
+            for (DialogState currentDialogState : dialogStateDistribution.keySet()) {
                 Map<String, DiscourseUnit> discourseUnits = currentDialogState.getDiscourseUnitHypothesisMap();
                 for (String duIdentifier : discourseUnits.keySet()) {
                     DiscourseUnit currentDiscourseUnit = discourseUnits.get(duIdentifier);
-                    double salienceBoost = dialogStateDistribution.get(dsIdentifier) *
+                    double salienceBoost = dialogStateDistribution.get(currentDialogState) *
                             Utils.discourseUnitContextProbability(currentDialogState, currentDiscourseUnit);
                     Set<String> individualsInGroundedDiscourseUnit = new HashSet<>();
                     Set<String> agentsInGroundedDiscourseUnit = new HashSet<>();

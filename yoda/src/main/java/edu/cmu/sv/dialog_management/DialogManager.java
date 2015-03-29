@@ -12,7 +12,7 @@ import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Statement;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ClarificationDialogAct;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.utils.HypothesisSetManagement;
-import edu.cmu.sv.utils.StringDistribution;
+import edu.cmu.sv.utils.NBestDistribution;
 import edu.cmu.sv.yoda_environment.MongoLogHandler;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.Pair;
@@ -56,8 +56,7 @@ public class DialogManager implements Runnable {
 
 
     YodaEnvironment yodaEnvironment;
-    StringDistribution dialogStateDistribution = new StringDistribution();
-    Map<String, DialogState> dialogStateHypotheses = new HashMap<>();
+    NBestDistribution<DialogState> dialogStateDistribution = new NBestDistribution<>();
 
     public void detectSystemAction(){
         outstandingSystemAction = false;
@@ -87,14 +86,13 @@ public class DialogManager implements Runnable {
             //// add the null action
             actionExpectedReward.put(null,
                     RewardAndCostCalculator.penaltyForSpeaking +
-                            RewardAndCostCalculator.outstandingGroundingRequest(dialogStateDistribution, dialogStateHypotheses, "user") *
+                            RewardAndCostCalculator.outstandingGroundingRequest(dialogStateDistribution, "user") *
                                     RewardAndCostCalculator.penaltyForSpeakingOutOfTurn);
 
             // enumerate and evaluate actions that can be evaluated by summing marginals across
             // the dialog state distribution
             // + the discourse unit contexts per dialog state
-            for (String dialogStateHypothesisId : dialogStateHypotheses.keySet()) {
-                DialogState currentDialogState = dialogStateHypotheses.get(dialogStateHypothesisId);
+            for (DialogState currentDialogState : dialogStateDistribution.keySet()) {
                 for (String discourseUnitHypothesisId : currentDialogState.getDiscourseUnitHypothesisMap().
                         keySet()) {
                     DiscourseUnit contextDiscourseUnit = currentDialogState.
@@ -105,7 +103,7 @@ public class DialogManager implements Runnable {
                     for (Class<? extends DialogAct> dialogActClass : DialogRegistry.simpleDialogActs) {
                         DialogAct dialogActInstance = dialogActClass.newInstance();
                         Double currentReward = dialogActInstance.reward(currentDialogState, contextDiscourseUnit) *
-                                dialogStateDistribution.get(dialogStateHypothesisId);
+                                dialogStateDistribution.get(currentDialogState);
                         accumulateReward(actionExpectedReward, dialogActInstance, currentReward);
                     }
 
@@ -121,13 +119,13 @@ public class DialogManager implements Runnable {
                                 ((JSONObject) contextDiscourseUnit.actionAnalysis.responseStatement.get("verb.Patient")));
                         enumeratedStatement.bindVariables(bindings);
                         Double currentReward = enumeratedStatement.reward(currentDialogState, contextDiscourseUnit) *
-                                dialogStateDistribution.get(dialogStateHypothesisId);
+                                dialogStateDistribution.get(currentDialogState);
                         accumulateReward(actionExpectedReward, enumeratedStatement, currentReward);
                     } else if (!contextDiscourseUnit.actionAnalysis.responseStatement.isEmpty() &&
                             contextDiscourseUnit.actionAnalysis.responseStatement.get("dialogAct").equals(DontKnow.class.getSimpleName())) {
                         DontKnow enumeratedDontKnow = new DontKnow();
                         Double currentReward = enumeratedDontKnow.reward(currentDialogState, contextDiscourseUnit) *
-                                dialogStateDistribution.get(dialogStateHypothesisId);
+                                dialogStateDistribution.get(currentDialogState);
                         accumulateReward(actionExpectedReward, enumeratedDontKnow, currentReward);
                     }
 
@@ -140,7 +138,7 @@ public class DialogManager implements Runnable {
                             DialogAct newDialogActInstance = dialogActClass.newInstance();
                             newDialogActInstance.bindVariables(binding);
                             Double currentReward = newDialogActInstance.reward(currentDialogState, contextDiscourseUnit) *
-                                    dialogStateDistribution.get(dialogStateHypothesisId);
+                                    dialogStateDistribution.get(currentDialogState);
                             accumulateReward(actionExpectedReward, newDialogActInstance, currentReward);
                         }
                     }
@@ -171,14 +169,14 @@ public class DialogManager implements Runnable {
                 for (Map<String, Object> binding : possibleBindings) {
                     ClarificationDialogAct newDialogActInstance = dialogActClass.newInstance();
                     newDialogActInstance.bindVariables(binding);
-                    Double currentReward = newDialogActInstance.clarificationReward(dialogStateDistribution, dialogStateHypotheses);
+                    Double currentReward = newDialogActInstance.clarificationReward(dialogStateDistribution);
                     accumulateReward(actionExpectedReward, newDialogActInstance, currentReward);
                 }
             }
 
             // evaluate non-dialog tasks
             for (NonDialogTask task : enumeratedNonDialogTasks){
-                Double currentReward = RewardAndCostCalculator.nonDialogTaskReward(task, dialogStateHypotheses, dialogStateDistribution);
+                Double currentReward = RewardAndCostCalculator.nonDialogTaskReward(task, dialogStateDistribution);
                 accumulateReward(actionExpectedReward, task, currentReward);
             }
 
@@ -211,10 +209,10 @@ public class DialogManager implements Runnable {
         while (true){
             try {
                 if (!outstandingSystemAction) {
-                    Pair<Map<String, DialogState>, StringDistribution> DmInput = null;
+                    NBestDistribution<DialogState> DmInput = null;
                     // empty out the queue to get the most recent dialog state
                     while (true) {
-                        Pair<Map<String, DialogState>, StringDistribution> tmp;
+                        NBestDistribution<DialogState> tmp;
                         tmp = yodaEnvironment.DmInputQueue.poll(100, TimeUnit.MILLISECONDS);
                         if (tmp == null)
                             break;
@@ -222,8 +220,7 @@ public class DialogManager implements Runnable {
                             DmInput = tmp;
                     }
                     if (DmInput != null) {
-                        dialogStateHypotheses = DmInput.getLeft();
-                        dialogStateDistribution = DmInput.getRight();
+                        dialogStateDistribution = DmInput;
                     }
                     List<Pair<SystemAction, Double>> rankedActions = enumerateAndScorePossibleActions();
 

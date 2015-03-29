@@ -6,7 +6,7 @@ import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.utils.StringDistribution;
+import edu.cmu.sv.utils.NBestDistribution;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +40,7 @@ public class RequestConfirmValue extends ClarificationDialogAct {
     }
 
     @Override
-    public Double clarificationReward(StringDistribution dialogStateDistribution, Map<String, DialogState> dialogStateHypotheses) {
+    public Double clarificationReward(NBestDistribution<DialogState> dialogStateDistribution) {
         Double clarificationReward = RewardAndCostCalculator.heuristicClarificationReward(
                 dialogStateDistribution, dialogStateHypotheses, (String) getBoundIndividuals().get("topic_individual"));
         Double probabilityOutstandingGroundingRequest =

@@ -12,6 +12,7 @@ import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.*;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTaskPreferences;
+import edu.cmu.sv.utils.NBestDistribution;
 import edu.cmu.sv.utils.StringDistribution;
 import org.json.simple.JSONObject;
 
@@ -48,14 +49,12 @@ public class RewardAndCostCalculator {
     }
 
     public static Double nonDialogTaskReward(NonDialogTask task,
-                                             Map<String, DialogState> dialogStateHypotheses,
-                                             StringDistribution dialogStateDistribution){
+                                             NBestDistribution<DialogState> dialogStateDistribution){
 
 //        System.out.println("task:" + task);
         // find the probability that an equivalent task is being requested
         Double probabilityTaskAppropriate = 0.0;
-        for (String dialogStateHypothesisId : dialogStateHypotheses.keySet()){
-            DialogState currentDialogState = dialogStateHypotheses.get(dialogStateHypothesisId);
+        for (DialogState currentDialogState : dialogStateDistribution.keySet()){
             Double probabilityTaskAppropriateInDialogState = 0.0;
             for (String contextDiscourseUnitId : currentDialogState.getDiscourseUnitHypothesisMap().keySet()){
                 DiscourseUnit contextDiscourseUnit = currentDialogState.getDiscourseUnitHypothesisMap().get(contextDiscourseUnitId);
@@ -68,7 +67,7 @@ public class RewardAndCostCalculator {
                                 Utils.discourseUnitContextProbability(currentDialogState, contextDiscourseUnit) :
                                 0);
             }
-            probabilityTaskAppropriate += probabilityTaskAppropriateInDialogState * dialogStateDistribution.get(dialogStateHypothesisId);
+            probabilityTaskAppropriate += probabilityTaskAppropriateInDialogState * dialogStateDistribution.get(currentDialogState);
         }
         probabilityTaskAppropriate = Doubles.min(1.0, probabilityTaskAppropriate);
 //        System.out.println("pAppropriate:" + probabilityTaskAppropriate);
@@ -122,24 +121,20 @@ public class RewardAndCostCalculator {
     * Return the probability that there is an outstanding clarification request on a discourse unit initiated by
     * initiator
     * */
-    public static Double outstandingGroundingRequest(StringDistribution dialogStateDistribution,
-                                                     Map<String, DialogState> dialogStateHypotheses,
+    public static Double outstandingGroundingRequest(NBestDistribution<DialogState> dialogStateDistribution,
                                                      String initiator){
         Double ans = 0.0;
-        for (String dialogStateHypothesisId : dialogStateDistribution.keySet()){
-            for (DiscourseUnit discourseUnit : dialogStateHypotheses.get(dialogStateHypothesisId).
-                    getDiscourseUnitHypothesisMap().values()){
-                Double probabilityActive = Utils.discourseUnitContextProbability(
-                        dialogStateHypotheses.get(dialogStateHypothesisId),
-                        discourseUnit);
+        for (DialogState currentDialogState : dialogStateDistribution.keySet()){
+            for (DiscourseUnit discourseUnit : currentDialogState.getDiscourseUnitHypothesisMap().values()){
+                Double probabilityActive = Utils.discourseUnitContextProbability(currentDialogState, discourseUnit);
                 if (!discourseUnit.getInitiator().equals(initiator))
                     continue;
                 if (initiator.equals("system")) {
                     if (discourseUnit.getSpokenByThem()!=null)
-                        ans += probabilityActive * dialogStateDistribution.get(dialogStateHypothesisId);
+                        ans += probabilityActive * dialogStateDistribution.get(currentDialogState);
                 } else { // initiator = "user"
                     if (discourseUnit.getSpokenByMe()!=null)
-                        ans += probabilityActive * dialogStateDistribution.get(dialogStateHypothesisId);
+                        ans += probabilityActive * dialogStateDistribution.get(currentDialogState);
                 }
             }
         }

@@ -1,21 +1,19 @@
 package edu.cmu.sv.dialog_state_tracking;
 
-import edu.cmu.sv.database.Sensor;
 import edu.cmu.sv.database.ReferenceResolution;
+import edu.cmu.sv.database.Sensor;
 import edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences.*;
+import edu.cmu.sv.semantics.SemanticsModel;
+import edu.cmu.sv.utils.HypothesisSetManagement;
 import edu.cmu.sv.utils.NBestDistribution;
 import edu.cmu.sv.yoda_environment.MongoLogHandler;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
-import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.utils.HypothesisSetManagement;
-import edu.cmu.sv.utils.StringDistribution;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
@@ -74,7 +72,7 @@ public class DialogStateTracker implements Runnable {
 //        hypothesisDistribution = new StringDistribution();
 //        hypothesisMap = new HashMap<>();
         dialogStateNBestDistribution.put(new DialogState(), 1.0);
-        this.yodaEnvironment.DmInputQueue.add(new ImmutablePair<>(hypothesisMap, hypothesisDistribution));
+        this.yodaEnvironment.DmInputQueue.add(dialogStateNBestDistribution);
     }
 
     private void updateDialogState(Turn turn, long timeStamp){
@@ -108,7 +106,7 @@ public class DialogStateTracker implements Runnable {
 
             dialogStateNBestDistribution = HypothesisSetManagement.keepRatioDistribution(newDialogStateDistribution, .05, 5);
             dialogStateNBestDistribution.normalize();
-            ReferenceResolution.updateSalience(yodaEnvironment, hypothesisDistribution, hypothesisMap);
+            ReferenceResolution.updateSalience(yodaEnvironment, dialogStateNBestDistribution);
 
 //            // generate log record
 //            JSONObject loopCompleteRecord = MongoLogHandler.createEventRecord("dst_loop_complete");
@@ -152,7 +150,7 @@ public class DialogStateTracker implements Runnable {
 //            loopCompleteRecord.put("hypotheses", dialogStateHypothesesJSON);
 //            logger.info(loopCompleteRecord.toJSONString());
 
-            yodaEnvironment.DmInputQueue.add(new ImmutablePair<>(hypothesisMap, hypothesisDistribution));
+            yodaEnvironment.DmInputQueue.add(dialogStateNBestDistribution);
             if (turn.speaker.equals("system"))
                 yodaEnvironment.dm.detectSystemAction();
 

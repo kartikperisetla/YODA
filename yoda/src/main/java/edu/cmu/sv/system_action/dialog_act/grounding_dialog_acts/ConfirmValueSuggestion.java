@@ -2,7 +2,7 @@ package edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts;
 
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
-import edu.cmu.sv.utils.StringDistribution;
+import edu.cmu.sv.utils.NBestDistribution;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +35,7 @@ public class ConfirmValueSuggestion extends ClarificationDialogAct {
     }
 
     @Override
-    public Double clarificationReward(StringDistribution dialogStateDistribution, Map<String, DialogState> dialogStateHypotheses) {
+    public Double clarificationReward(NBestDistribution<DialogState> dialogStateDistribution) {
         return -1.0;
     }
 }

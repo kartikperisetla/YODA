@@ -1,7 +1,8 @@
 package edu.cmu.sv.yoda_environment;
 
-import edu.cmu.sv.database.Database;
 import edu.cmu.sv.database.ActionEnumeration;
+import edu.cmu.sv.database.Database;
+import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.dialog_management.DialogManager;
 import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
@@ -10,16 +11,14 @@ import edu.cmu.sv.dialog_state_tracking.Turn;
 import edu.cmu.sv.domain.DomainSpec;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
-import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.spoken_language_understanding.SpokenLanguageUnderstander;
 import edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander.RegexPlusKeywordUnderstander;
 import edu.cmu.sv.system_action.CommandLineExecutor;
 import edu.cmu.sv.system_action.Executor;
 import edu.cmu.sv.system_action.JsonExecutor;
-import edu.cmu.sv.utils.StringDistribution;
+import edu.cmu.sv.utils.NBestDistribution;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.logging.ConsoleHandler;
@@ -61,7 +60,7 @@ public class YodaEnvironment {
     // turn + time stamp of DST input
     public BlockingQueue<Pair<Turn, Long>> DstInputQueue = new LinkedBlockingDeque<>();
     // DM input
-    public BlockingQueue<Pair<Map<String, DialogState>, StringDistribution>> DmInputQueue = new LinkedBlockingDeque<>();
+    public BlockingQueue<NBestDistribution<DialogState>> DmInputQueue = new LinkedBlockingDeque<>();
 
 
     public void loadDomain(DomainSpec domainSpec){
