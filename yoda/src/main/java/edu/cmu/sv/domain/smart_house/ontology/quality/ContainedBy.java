@@ -20,10 +20,16 @@ public class ContainedBy extends TransientQuality {
 
     @Override
     public java.util.function.Function<List<String>, String> getQualityCalculatorSPARQLQuery() {
+
         java.util.function.Function<List<String>, String> queryGen = (List<String> entityURIs) ->
-            entityURIs.get(0) + " base:in_room ?i_in_room . " +
-            entityURIs.get(1) + " base:in_room ?j_in_room . " +
-            "BIND ( IF (?i_in_room = ?j_in_room, 1.0, 0.0) AS "+entityURIs.get(2)+")";
+        "{\n"+
+        entityURIs.get(0) + " base:in_room "+ entityURIs.get(1)+" .\n"+
+        "BIND (1.0 AS "+entityURIs.get(2)+") \n"+
+        "} UNION {\n"+
+        "?x rdf:type base:Noun ."+
+        "FILTER NOT EXISTS {"+entityURIs.get(0)+" base:in_room "+entityURIs.get(1)+" }\n"+
+        "BIND (0.0 AS "+entityURIs.get(2)+")\n}";
+
         return queryGen;
     }
 }

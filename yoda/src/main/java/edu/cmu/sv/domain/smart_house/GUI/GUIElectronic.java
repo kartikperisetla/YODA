@@ -6,7 +6,7 @@ public abstract class GUIElectronic extends GUIThing {
 	private boolean state; // true -> on, false -> off
 	
 	public GUIElectronic(String name, GUIRoom room, boolean state, String correspondingURI) {
-		super(name, room.getPosition(), correspondingURI);
+		super(name, room, correspondingURI);
 		this.state = state;
 	}
 

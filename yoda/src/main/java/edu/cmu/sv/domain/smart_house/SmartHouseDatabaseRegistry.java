@@ -75,8 +75,8 @@ public class SmartHouseDatabaseRegistry extends DatabaseRegistry {
         public void sense(YodaEnvironment targetEnvironment) {
             synchronized (targetEnvironment.db.connection) {
                 for (GUIThing thing : Simulator.getThings()){
-//                    if (thing.getPosition()==null)
-//                        continue;
+                    if (thing.getRoom()==null)
+                        continue;
 
                     // clear existing room
                     String deleteString = Database.prefixes;
@@ -92,11 +92,9 @@ public class SmartHouseDatabaseRegistry extends DatabaseRegistry {
                         System.exit(0);
                     }
 
-
-                    // set new power state
-                    int newRoom = thing.getPosition();
+                    // set new room
                     String insertString = Database.prefixes + "INSERT DATA {";
-                    insertString += "<" + thing.getCorrespondingURI() + "> base:in_room \"<" + newRoom + ">\"^^xsd:string.\n";
+                    insertString += "<" + thing.getCorrespondingURI() + "> base:in_room <" + thing.getRoom().getCorrespondingURI() + "> .\n";
                     insertString += "}";
                     Database.getLogger().info(MongoLogHandler.createSimpleRecord("sensing thing's room", insertString).toJSONString());
                     try {

@@ -3,12 +3,12 @@ import java.util.List;
 
 public abstract class GUIThing {
 	private String name;
-	private int position;
+	private GUIRoom room;
     private String correspondingURI;
 
-    public GUIThing(String name, int room, String correspondingURI) {
+    public GUIThing(String name, GUIRoom room, String correspondingURI) {
         this.name = name;
-        this.position = room;
+        this.room = room;
         this.correspondingURI = correspondingURI;
     }
 
@@ -22,8 +22,8 @@ public abstract class GUIThing {
 	
 	public abstract List<String> provideDetails();
 	
-	public int getPosition() {
-		return position;
+	public GUIRoom getRoom() {
+		return room;
 	}
 	
 	@Override

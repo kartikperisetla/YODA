@@ -7,7 +7,7 @@ public class GUIPerson extends GUIThing {
 	private String gender;
 	
 	public GUIPerson(String name, String gender, GUIRoom room, String correspondingURI) {
-		super(name, room.getPosition(), correspondingURI);
+		super(name, room, correspondingURI);
 		this.gender = gender;
 	}
 	
@@ -15,7 +15,7 @@ public class GUIPerson extends GUIThing {
 	public List<String> provideDetails() {
 		List<String> ans = new ArrayList<>();
 		ans.add("Name: " + this.getName() + "\n");
-		ans.add("Room: " + this.getPosition() + "\n");
+		ans.add("Room: " + this.getRoom() + "\n");
 		ans.add("Gender: " + this.gender);
 		return ans;
 	}

@@ -6,8 +6,8 @@ import java.util.ArrayList;
 public class GUIRoom extends GUIThing {
 	private int dustLevel;
 
-	public GUIRoom(String name, int position, String correspondingURI, int dustLevel) {
-		super(name, position, correspondingURI);
+	public GUIRoom(String name, String correspondingURI, int dustLevel) {
+		super(name, null, correspondingURI);
         this.dustLevel = dustLevel;
 	}
 
@@ -24,7 +24,7 @@ public class GUIRoom extends GUIThing {
 		List<String> ans = new ArrayList<>();
 		ans.add(this.getName() + " entities: \n");
 		for(GUIThing o : Simulator.getThings()) {
-			if(o.getPosition() == this.getPosition()) {  // check primitive comparison
+			if(o.getRoom() == this.getRoom()) {  // check primitive comparison
 				ans.add(o.getName() + "\n");
 			}
 		}

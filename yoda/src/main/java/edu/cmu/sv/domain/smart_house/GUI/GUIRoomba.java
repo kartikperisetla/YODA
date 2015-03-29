@@ -13,7 +13,7 @@ public class GUIRoomba extends GUIElectronic {
 	public List<String> provideDetails() {
 		List<String> ans = new ArrayList<>();
 		ans.add("Name: " + this.getName() + "\n");
-		ans.add("Room: " + this.getPosition() + "\n");
+		ans.add("Room: " + this.getRoom() + "\n");
         if(getState())
             ans.add("ON");
         else
