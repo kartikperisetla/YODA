@@ -8,6 +8,7 @@ import edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences.DialogS
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
 import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.semantics.SemanticsModel;
+import edu.cmu.sv.utils.NBestDistribution;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -26,13 +27,11 @@ public class PresentInference extends DialogStateUpdateInference {
     private final static double penaltyForReinterpretingFragment = .5;
 
     @Override
-    public Pair<Map<String, DialogState>, StringDistribution> applyAll(
+    public NBestDistribution<DialogState> applyAll(
             YodaEnvironment yodaEnvironment, DialogState currentState, Turn turn, long timeStamp) {
 
-        StringDistribution resultDistribution = new StringDistribution();
-        Map<String, DialogState> resultHypotheses = new HashMap<>();
+        NBestDistribution<DialogState> resultHypotheses = new NBestDistribution<>();
 
-        int newHypothesisCounter = 0;
         if (turn.speaker.equals("user")){
             for (String sluHypothesisID : turn.hypothesisDistribution.keySet()){
                 Double sluScore = turn.hypothesisDistribution.get(sluHypothesisID);
@@ -49,7 +48,6 @@ public class PresentInference extends DialogStateUpdateInference {
                     Pair<Map<String, DiscourseUnit>, StringDistribution> groundedHypotheses =
                             ReferenceResolution.resolveDiscourseUnit(newDUHypothesis, yodaEnvironment);
                     for (String groundedDuKey: groundedHypotheses.getRight().keySet()){
-                        String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
                         DialogState newDialogState = currentState.deepCopy();
                         DiscourseUnit currentDu = groundedHypotheses.getLeft().get(groundedDuKey);
                         newDialogState.discourseUnitCounter += 1;
@@ -57,8 +55,7 @@ public class PresentInference extends DialogStateUpdateInference {
                         newDialogState.getDiscourseUnitHypothesisMap().
                                 put("du_" + newDialogState.discourseUnitCounter, currentDu);
                         currentDu.actionAnalysis.update(yodaEnvironment, currentDu);
-                        resultDistribution.put(newDialogStateHypothesisID, groundedHypotheses.getRight().get(groundedDuKey)*sluScore);
-                        resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
+                        resultHypotheses.put(newDialogState, groundedHypotheses.getRight().get(groundedDuKey)*sluScore);
                     }
 
                 } else if (dialogAct.equals(Fragment.class.getSimpleName())){
@@ -70,7 +67,6 @@ public class PresentInference extends DialogStateUpdateInference {
         } else { // if turn.speaker.equals("system")
             String dialogAct = turn.systemUtterance.getSlotPathFiller("dialogAct");
             if (DialogRegistry.discourseUnitDialogActs.contains(DialogRegistry.dialogActNameMap.get(dialogAct))) {
-                String newDialogStateHypothesisID = "dialog_state_hyp_0";
                 DiscourseUnit newDUHypothesis = new DiscourseUnit();
                 SemanticsModel newSpokenByMeHypothesis = turn.systemUtterance.deepCopy();
                 newDUHypothesis.timeOfLastActByMe = timeStamp;
@@ -82,11 +78,10 @@ public class PresentInference extends DialogStateUpdateInference {
                 newDialogState.discourseUnitCounter += 1;
                 newDialogState.getDiscourseUnitHypothesisMap().
                         put("du_" + newDialogState.discourseUnitCounter, newDUHypothesis);
-                resultDistribution.put(newDialogStateHypothesisID, 1.0);
-                resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
+                resultHypotheses.put(newDialogState, 1.0);
             }
         }
 
-        return new ImmutablePair<>(resultHypotheses, resultDistribution);
+        return resultHypotheses;
     }
 }

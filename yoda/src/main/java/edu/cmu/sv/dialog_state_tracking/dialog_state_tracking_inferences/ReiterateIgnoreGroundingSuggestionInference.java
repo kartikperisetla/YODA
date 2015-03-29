@@ -8,6 +8,7 @@ import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestConfirmValue;
 import edu.cmu.sv.utils.Assert;
+import edu.cmu.sv.utils.NBestDistribution;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -28,12 +29,10 @@ public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpda
     static double penaltyForNonGroundedMatch = .1;
 
     @Override
-    public Pair<Map<String, DialogState>, StringDistribution> applyAll(
+    public NBestDistribution<DialogState> applyAll(
             YodaEnvironment yodaEnvironment, DialogState currentState, Turn turn, long timeStamp) {
-        StringDistribution resultDistribution = new StringDistribution();
-        Map<String, DialogState> resultHypotheses = new HashMap<>();
+        NBestDistribution<DialogState> resultHypotheses = new NBestDistribution<>();
 
-        int newHypothesisCounter = 0;
         if (turn.speaker.equals("user")) {
             for (String sluHypothesisID : turn.hypothesisDistribution.keySet()) {
                 SemanticsModel hypModel = turn.hypotheses.get(sluHypothesisID);
@@ -71,24 +70,23 @@ public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpda
                         Pair<Map<String, DiscourseUnit>, StringDistribution> groundedHypotheses =
                                 ReferenceResolution.resolveDiscourseUnit(predecessor, yodaEnvironment);
                         for (String groundedDuKey: groundedHypotheses.getRight().keySet()) {
-                            String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
                             DiscourseUnit currentDu = groundedHypotheses.getLeft().get(groundedDuKey);
                             DialogState newDialogState = currentState.deepCopy();
                             newDialogState.getDiscourseUnitHypothesisMap().put(predecessorId, currentDu);
 
                             currentDu.actionAnalysis.update(yodaEnvironment, currentDu);
-                            resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
+
                             Double score = groundedHypotheses.getRight().get(groundedDuKey) *
                                     penaltyForThisInference * sluScore *
                                     Utils.discourseUnitContextProbability(newDialogState, currentDu);
-                            resultDistribution.put(newDialogStateHypothesisID, score);
+                            resultHypotheses.put(newDialogState, score);
                         }
                     }
                 }
             }
         } else { // if turn.speaker.equals("system")
         }
-        return new ImmutablePair<>(resultHypotheses, resultDistribution);
+        return resultHypotheses;
     }
 
 }
