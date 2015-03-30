@@ -1,10 +1,13 @@
-package edu.cmu.sv.dialog_state_tracking;
+package edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences;
 
+import edu.cmu.sv.dialog_state_tracking.*;
+import edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences.DialogStateUpdateInference;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.Suggested;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasValue;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestConfirmValue;
 import edu.cmu.sv.utils.Assert;
+import edu.cmu.sv.utils.NBestDistribution;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -22,13 +25,11 @@ import java.util.Set;
  */
 public class GiveGroundingSuggestionInference extends DialogStateUpdateInference {
     @Override
-    public Pair<Map<String, DialogState>, StringDistribution> applyAll(YodaEnvironment yodaEnvironment,
+    public NBestDistribution<DialogState> applyAll(YodaEnvironment yodaEnvironment,
                                                                                  DialogState currentState,
                                                                                  Turn turn, long timeStamp) {
-        StringDistribution resultDistribution = new StringDistribution();
-        Map<String, DialogState> resultHypotheses = new HashMap<>();
+        NBestDistribution<DialogState> resultHypotheses = new NBestDistribution<>();
 
-        int newHypothesisCounter = 0;
         if (turn.speaker.equals("user")){
 
         } else { // if turn.speaker.equals("system")
@@ -69,7 +70,6 @@ public class GiveGroundingSuggestionInference extends DialogStateUpdateInference
                     SemanticsModel groundedSuggestion = new SemanticsModel(groundedDaContent.toJSONString());
 
                     for (String attachmentPoint : attachmentPaths) {
-                        String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
                         DialogState newDialogState = currentState.deepCopy();
                         DiscourseUnit updatedPredecessor = newDialogState.discourseUnitHypothesisMap.get(predecessorId);
 
@@ -101,13 +101,12 @@ public class GiveGroundingSuggestionInference extends DialogStateUpdateInference
 //                                Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
 
                         Utils.unground(updatedPredecessor, newSpokenByMeHypothesis, newGroundTruth, timeStamp);
-                        resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
                         Double score = Utils.discourseUnitContextProbability(newDialogState, updatedPredecessor);
-                        resultDistribution.put(newDialogStateHypothesisID, score);
+                        resultHypotheses.put(newDialogState, score);
                     }
                 }
             }
         }
-        return new ImmutablePair<>(resultHypotheses, resultDistribution);
+        return resultHypotheses;
     }
 }

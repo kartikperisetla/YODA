@@ -1,10 +1,9 @@
-package edu.cmu.sv.dialog_state_tracking;
+package edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences;
 
-import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Accept;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.DontKnow;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Reject;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.YNQuestion;
+import edu.cmu.sv.dialog_state_tracking.DialogState;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
+import edu.cmu.sv.dialog_state_tracking.Turn;
+import edu.cmu.sv.dialog_state_tracking.Utils;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestFixMisunderstanding;
 import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.utils.StringDistribution;
@@ -12,7 +11,6 @@ import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 

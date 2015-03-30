@@ -10,11 +10,11 @@ import java.util.Map;
  * Turn contains an SLU result / SLU ground truth for a single user/system turn
  */
 public class Turn {
-    Map<String, SemanticsModel> hypotheses;
-    SemanticsModel systemUtterance;
-    SemanticsModel groundedSystemMeaning;
-    StringDistribution hypothesisDistribution;
-    String speaker;
+    public Map<String, SemanticsModel> hypotheses;
+    public SemanticsModel systemUtterance;
+    public SemanticsModel groundedSystemMeaning;
+    public StringDistribution hypothesisDistribution;
+    public String speaker;
 
     public Turn(String speaker, SemanticsModel systemUtterance, SemanticsModel groundedSystemMeaning, Map<String, SemanticsModel> hypotheses, StringDistribution hypothesisDistribution) {
         this.hypotheses = hypotheses;

@@ -1,14 +1,18 @@
-package edu.cmu.sv.dialog_state_tracking;
+package edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences;
 
+import edu.cmu.sv.dialog_state_tracking.*;
+import edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences.DialogStateUpdateInference;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.Requested;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestRole;
 import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestRoleGivenRole;
 import edu.cmu.sv.utils.Assert;
+import edu.cmu.sv.utils.NBestDistribution;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.math3.distribution.NormalDistribution;
 import org.json.simple.JSONObject;
 
 import java.util.*;
@@ -18,13 +22,11 @@ import java.util.*;
  */
 public class RequestSlotInference extends DialogStateUpdateInference {
     @Override
-    public Pair<Map<String, DialogState>, StringDistribution> applyAll(YodaEnvironment yodaEnvironment,
+    public NBestDistribution<DialogState> applyAll(YodaEnvironment yodaEnvironment,
                                                                                  DialogState currentState,
                                                                                  Turn turn, long timeStamp) {
-        StringDistribution resultDistribution = new StringDistribution();
-        Map<String, DialogState> resultHypotheses = new HashMap<>();
+        NBestDistribution<DialogState> resultHypotheses = new NBestDistribution<>();
 
-        int newHypothesisCounter = 0;
         if (turn.speaker.equals("user")){
             // todo: implement to understand slot requests from the user
         } else { // if turn.speaker.equals("system")
@@ -71,7 +73,6 @@ public class RequestSlotInference extends DialogStateUpdateInference {
                     // copy spokenByThem
                     // insert Requested object at appropriate path
 
-                    String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
                     DialogState newDialogState = currentState.deepCopy();
                     DiscourseUnit updatedPredecessor = newDialogState.discourseUnitHypothesisMap.get(predecessorId);
 
@@ -81,14 +82,13 @@ public class RequestSlotInference extends DialogStateUpdateInference {
                             SemanticsModel.parseJSON("{\"class\":\""+Requested.class.getSimpleName()+"\"}"));
 
                     Utils.unground(updatedPredecessor, newSpokenByMeHypothesis, turn.groundedSystemMeaning, timeStamp);
-                    resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
                     Double score = givenMatch *
                             Utils.discourseUnitContextProbability(newDialogState, updatedPredecessor);
-                    resultDistribution.put(newDialogStateHypothesisID, score);
+                    resultHypotheses.put(newDialogState, score);
 
                 }
             }
         }
-        return new ImmutablePair<>(resultHypotheses, resultDistribution);
+        return resultHypotheses;
     }
 }

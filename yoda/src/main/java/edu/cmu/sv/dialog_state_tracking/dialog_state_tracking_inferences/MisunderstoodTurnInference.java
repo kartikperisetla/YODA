@@ -1,6 +1,11 @@
-package edu.cmu.sv.dialog_state_tracking;
+package edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences;
 
+import edu.cmu.sv.dialog_state_tracking.DialogState;
+import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
+import edu.cmu.sv.dialog_state_tracking.Turn;
+import edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences.DialogStateUpdateInference;
 import edu.cmu.sv.semantics.SemanticsModel;
+import edu.cmu.sv.utils.NBestDistribution;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -20,11 +25,10 @@ public class MisunderstoodTurnInference extends DialogStateUpdateInference {
     public static final String duString = "Misunderstood";
 
     @Override
-    public Pair<Map<String, DialogState>, StringDistribution> applyAll(
+    public NBestDistribution<DialogState> applyAll(
             YodaEnvironment yodaEnvironment, DialogState currentState, Turn turn, long timeStamp) {
 
-        StringDistribution resultDistribution = new StringDistribution();
-        Map<String, DialogState> resultHypotheses = new HashMap<>();
+        NBestDistribution<DialogState> resultHypotheses = new NBestDistribution<>();
 
         if (turn.speaker.equals("user")) {
             DiscourseUnit newDUHypothesis = new DiscourseUnit();
@@ -33,7 +37,6 @@ public class MisunderstoodTurnInference extends DialogStateUpdateInference {
             newDUHypothesis.spokenByThem = newSpokenByThemHypothesis;
             newDUHypothesis.groundInterpretation = newSpokenByThemHypothesis;
             newDUHypothesis.initiator = turn.speaker;
-            String newDialogStateHypothesisID = "dialog_state_hyp_0";
             DialogState newDialogState = currentState.deepCopy();
             newDialogState.discourseUnitCounter += 1;
             newDialogState.getDiscourseUnitHypothesisMap().
@@ -41,9 +44,8 @@ public class MisunderstoodTurnInference extends DialogStateUpdateInference {
 
 //            newDUHypothesis.actionAnalysis.update(yodaEnvironment, newDUHypothesis);
             newDialogState.misunderstandingCounter ++;
-            resultDistribution.put(newDialogStateHypothesisID, probabilityUserTurnMisunderstood);
-            resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
+            resultHypotheses.put(newDialogState, probabilityUserTurnMisunderstood);
         }
-        return new ImmutablePair<>(resultHypotheses, resultDistribution);
+        return resultHypotheses;
     }
 }
