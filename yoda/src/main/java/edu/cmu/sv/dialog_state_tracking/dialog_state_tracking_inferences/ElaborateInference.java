@@ -7,6 +7,7 @@ import edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences.DialogS
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
 import edu.cmu.sv.utils.Assert;
+import edu.cmu.sv.utils.NBestDistribution;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -24,12 +25,10 @@ import java.util.Map;
  */
 public class ElaborateInference extends DialogStateUpdateInference {
     @Override
-    public Pair<Map<String, DialogState>, StringDistribution> applyAll(
+    public NBestDistribution<DialogState> applyAll(
             YodaEnvironment yodaEnvironment, DialogState currentState, Turn turn, long timeStamp) {
-        StringDistribution resultDistribution = new StringDistribution();
-        Map<String, DialogState> resultHypotheses = new HashMap<>();
+        NBestDistribution<DialogState> resultHypotheses = new NBestDistribution<>();
 
-        int newHypothesisCounter = 0;
         if (turn.speaker.equals("user")) {
             for (String sluHypothesisID : turn.hypothesisDistribution.keySet()) {
                 SemanticsModel hypModel = turn.hypotheses.get(sluHypothesisID);
@@ -63,7 +62,6 @@ public class ElaborateInference extends DialogStateUpdateInference {
                                 ReferenceResolution.resolveDiscourseUnit(predecessor, yodaEnvironment);
 
                         for (String groundedDuKey: groundedHypotheses.getRight().keySet()) {
-                            String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
                             DialogState newDialogState = currentState.deepCopy();
                             DiscourseUnit currentDu = groundedHypotheses.getLeft().get(groundedDuKey);
                             newDialogState.getDiscourseUnitHypothesisMap().put(predecessorId, currentDu);
@@ -72,8 +70,7 @@ public class ElaborateInference extends DialogStateUpdateInference {
                             currentDu.actionAnalysis.update(yodaEnvironment, currentDu);
                             Double score = Utils.discourseUnitContextProbability(newDialogState, currentDu) * sluScore *
                                     groundedHypotheses.getRight().get(groundedDuKey);
-                            resultDistribution.put(newDialogStateHypothesisID, score);
-                            resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
+                            resultHypotheses.put(newDialogState, score);
                         }
                     }
                 }
@@ -81,7 +78,7 @@ public class ElaborateInference extends DialogStateUpdateInference {
         } else { // if turn.speaker.equals("system")
             //todo: implement
         }
-        return new ImmutablePair<>(resultHypotheses, resultDistribution);
+        return resultHypotheses;
     }
 
 }

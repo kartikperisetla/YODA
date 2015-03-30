@@ -10,6 +10,7 @@ import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.ActionSchema;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.utils.Assert;
+import edu.cmu.sv.utils.NBestDistribution;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -24,13 +25,11 @@ import java.util.Map;
  */
 public class TakeRequestedActionInference extends DialogStateUpdateInference {
     @Override
-    public Pair<Map<String, DialogState>, StringDistribution> applyAll(YodaEnvironment yodaEnvironment,
+    public NBestDistribution<DialogState> applyAll(YodaEnvironment yodaEnvironment,
                                                                        DialogState currentState,
                                                                        Turn turn, long timeStamp) {
-        StringDistribution resultDistribution = new StringDistribution();
-        Map<String, DialogState> resultHypotheses = new HashMap<>();
+        NBestDistribution<DialogState> resultHypotheses = new NBestDistribution<>();
 
-        int newHypothesisCounter = 0;
         if (turn.speaker.equals("user")){
 
         } else { // if turn.speaker.equals("system")
@@ -63,8 +62,6 @@ public class TakeRequestedActionInference extends DialogStateUpdateInference {
                         continue;
                     }
 
-                    String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
-
                     DialogState newDialogState = currentState.deepCopy();
                     DiscourseUnit newDUHypothesis = new DiscourseUnit();
                     SemanticsModel newSpokenByMeHypothesis = turn.systemUtterance.deepCopy();
@@ -79,15 +76,13 @@ public class TakeRequestedActionInference extends DialogStateUpdateInference {
                             put(newDiscourseUnitId, newDUHypothesis);
                     newDialogState.getArgumentationLinks().add(
                             new DialogState.ArgumentationLink(predecessorId, newDiscourseUnitId));
-                    resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
-                    resultDistribution.put(newDialogStateHypothesisID,
-                            Utils.discourseUnitContextProbability(newDialogState, predecessor));
+                    resultHypotheses.put(newDialogState, Utils.discourseUnitContextProbability(newDialogState, predecessor));
                 }
 
             }
 
         }
 
-        return new ImmutablePair<>(resultHypotheses, resultDistribution);
+        return resultHypotheses;
     }
 }
