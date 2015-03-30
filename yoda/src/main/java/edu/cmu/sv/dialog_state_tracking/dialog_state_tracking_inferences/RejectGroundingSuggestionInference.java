@@ -2,20 +2,14 @@ package edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences;
 
 import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.dialog_state_tracking.*;
-import edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences.DialogStateUpdateInference;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasValue;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Reject;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestConfirmValue;
 import edu.cmu.sv.utils.Assert;
-import edu.cmu.sv.utils.StringDistribution;
+import edu.cmu.sv.utils.NBestDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by David Cohen on 10/18/14.
@@ -23,10 +17,10 @@ import java.util.Map;
 public class RejectGroundingSuggestionInference extends DialogStateUpdateInference {
     static double penaltyForNonGroundedMatch = .1;
     @Override
-    public Pair<Map<String, DialogState>, StringDistribution> applyAll(
+    public NBestDistribution<DialogState> applyAll(
             YodaEnvironment yodaEnvironment, DialogState currentState, Turn turn, long timeStamp) {
-        StringDistribution resultDistribution = new StringDistribution();
-        Map<String, DialogState> resultHypotheses = new HashMap<>();
+
+        NBestDistribution<DialogState> ans = new NBestDistribution<>();
 
         int newHypothesisCounter = 0;
         if (turn.speaker.equals("user")) {
@@ -57,17 +51,16 @@ public class RejectGroundingSuggestionInference extends DialogStateUpdateInferen
                         Utils.returnToGround(predecessor, newSpokenByThemHypothesis, timeStamp);
 
                         // collect the result
-                        resultHypotheses.put(newDialogStateHypothesisID, newDialogState);
                         Double score = (duAnalysis.groundMatch ? penaltyForNonGroundedMatch : 1.0) * sluScore *
                                 Utils.discourseUnitContextProbability(newDialogState, predecessor);
-                        resultDistribution.put(newDialogStateHypothesisID, score);
+                        ans.put(newDialogState, score);
                     }
 
                 }
             }
         } else { // if turn.speaker.equals("system")
         }
-        return new ImmutablePair<>(resultHypotheses, resultDistribution);
+        return ans;
     }
 
 }

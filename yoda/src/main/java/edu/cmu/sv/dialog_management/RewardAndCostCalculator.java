@@ -143,20 +143,18 @@ public class RewardAndCostCalculator {
     }
 
 
-    public static Double heuristicClarificationReward(StringDistribution dialogStateDistribution,
-                                                      Map<String, DialogState> dialogStateHypotheses,
+    public static Double heuristicClarificationReward(NBestDistribution<DialogState> dialogStateDistribution,
                                                       String valueURI){
-        StringDistribution futureStateDistributionIfConfirmed = new StringDistribution();
-        StringDistribution futureStateDistributionIfRejected = new StringDistribution();
+        NBestDistribution<DialogState> futureStateDistributionIfConfirmed = new NBestDistribution<>();
+        NBestDistribution<DialogState> futureStateDistributionIfRejected = new NBestDistribution<>();
 
         Double probabilityOfValue = 0.0;
         Double probabilityClarificationRequestAppropriate = 0.0;
 
-        for (String dialogStateHypothesisId : dialogStateDistribution.keySet()){
-            futureStateDistributionIfConfirmed.put(dialogStateHypothesisId, 0.0);
-            futureStateDistributionIfRejected.put(dialogStateHypothesisId, 0.0);
+        for (DialogState dialogState : dialogStateDistribution.keySet()){
+            futureStateDistributionIfConfirmed.put(dialogState, 0.0);
+            futureStateDistributionIfRejected.put(dialogState, 0.0);
 
-            DialogState dialogState = dialogStateHypotheses.get(dialogStateHypothesisId);
             for (DiscourseUnit contextDiscourseUnit : dialogState.getDiscourseUnitHypothesisMap().values()){
                 if (contextDiscourseUnit.getInitiator().equals("system"))
                     continue;
@@ -169,14 +167,14 @@ public class RewardAndCostCalculator {
                     }
                 }
                 if (anyMatches) {
-                    futureStateDistributionIfConfirmed.put(dialogStateHypothesisId,
-                            futureStateDistributionIfConfirmed.get(dialogStateHypothesisId) +
-                            discourseUnitConfidence * dialogStateDistribution.get(dialogStateHypothesisId));
-                    probabilityOfValue += discourseUnitConfidence * dialogStateDistribution.get(dialogStateHypothesisId);
+                    futureStateDistributionIfConfirmed.put(dialogState,
+                            futureStateDistributionIfConfirmed.get(dialogState) +
+                            discourseUnitConfidence * dialogStateDistribution.get(dialogState));
+                    probabilityOfValue += discourseUnitConfidence * dialogStateDistribution.get(dialogState);
                 } else {
-                    futureStateDistributionIfRejected.put(dialogStateHypothesisId,
-                            futureStateDistributionIfRejected.get(dialogStateHypothesisId) +
-                                    discourseUnitConfidence * dialogStateDistribution.get(dialogStateHypothesisId));
+                    futureStateDistributionIfRejected.put(dialogState,
+                            futureStateDistributionIfRejected.get(dialogState) +
+                                    discourseUnitConfidence * dialogStateDistribution.get(dialogState));
                 }
 
                 probabilityClarificationRequestAppropriate += answerObliged(contextDiscourseUnit) &&
@@ -186,8 +184,8 @@ public class RewardAndCostCalculator {
 
         probabilityOfValue = 1 - probabilityOfValue <= .00001 ? .99999 : probabilityOfValue;
         probabilityOfValue = probabilityOfValue <= .00001 ? .00001 : probabilityOfValue;
-        futureStateDistributionIfConfirmed.put("XYZ", MisunderstoodTurnInference.probabilityUserTurnMisunderstood);
-        futureStateDistributionIfRejected.put("XYZ", MisunderstoodTurnInference.probabilityUserTurnMisunderstood);
+        futureStateDistributionIfConfirmed.put(new DialogState(), MisunderstoodTurnInference.probabilityUserTurnMisunderstood);
+        futureStateDistributionIfRejected.put(new DialogState(), MisunderstoodTurnInference.probabilityUserTurnMisunderstood);
         futureStateDistributionIfConfirmed.normalize();
         futureStateDistributionIfRejected.normalize();
 
