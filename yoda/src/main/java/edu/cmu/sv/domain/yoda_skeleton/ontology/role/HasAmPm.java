@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * Created by David Cohen on 9/20/14.
  */
-public class HasHour extends Role {
+public class HasAmPm extends Role {
     static Set<Class <? extends ThingWithRoles>> domain = new HashSet<>(Arrays.asList(Time.class));
     static Set<Class <? extends Thing>> range = new HashSet<>(Arrays.asList(WebResource.class));
 

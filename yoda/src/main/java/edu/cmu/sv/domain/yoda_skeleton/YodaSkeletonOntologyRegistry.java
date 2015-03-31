@@ -1,13 +1,13 @@
 package edu.cmu.sv.domain.yoda_skeleton;
 
 import edu.cmu.sv.domain.OntologyRegistry;
+import edu.cmu.sv.domain.yelp_phoenix.ontology.noun.PointOfInterest;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.role.Destination;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.role.Origin;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.*;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.*;
-import edu.cmu.sv.domain.yelp_phoenix.ontology.noun.PointOfInterest;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.preposition.Preposition;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.*;
@@ -77,15 +77,20 @@ public class YodaSkeletonOntologyRegistry extends OntologyRegistry{
         roleClasses.add(Role.class);
         roleClasses.add(Agent.class);
         roleClasses.add(Patient.class);
+        roleClasses.add(Origin.class);
+        roleClasses.add(Destination.class);
+
         roleClasses.add(HasAtTime.class);
         roleClasses.add(HasHour.class);
+        roleClasses.add(HasTenMinute.class);
+        roleClasses.add(HasSingleMinute.class);
+        roleClasses.add(HasAmPm.class);
+
         roleClasses.add(HasName.class);
         roleClasses.add(HasValues.class);
         roleClasses.add(HasValue.class);
         roleClasses.add(HasURI.class);
         roleClasses.add(InRelationTo.class);
-        roleClasses.add(Origin.class);
-        roleClasses.add(Destination.class);
 
         miscClasses.add(NonHearing.class);
         miscClasses.add(NonUnderstanding.class);

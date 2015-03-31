@@ -19,8 +19,6 @@ import edu.cmu.sv.domain.yelp_phoenix.ontology.verb.GiveDirections;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.verb.MakeReservation;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Email;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Meeting;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.preposition.Preposition;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;

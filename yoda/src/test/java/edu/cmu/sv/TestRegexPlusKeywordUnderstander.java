@@ -17,6 +17,7 @@ import edu.cmu.sv.domain.yelp_phoenix.YelpPhoenixOntologyRegistry;
 import edu.cmu.sv.domain.yelp_phoenix.data.YelpPhoenixSLUDataset;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonLexicon;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
+import edu.cmu.sv.domain.yoda_skeleton.data.YodaSkeletonSLUDataset;
 import edu.cmu.sv.spoken_language_understanding.SLUDataset;
 import edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander.RegexPlusKeywordUnderstander;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -40,10 +41,38 @@ public class TestRegexPlusKeywordUnderstander {
     * */
     @Test
     public void Test() throws FileNotFoundException, UnsupportedEncodingException {
-        testYelpPhoenixSLU();
+        testYodaSkeletonSLU();
+//        testYelpPhoenixSLU();
 //        testSmartHouseSLU();
 //        runUnderstander();
     }
+
+
+    public void testYodaSkeletonSLU() throws FileNotFoundException, UnsupportedEncodingException {
+        YodaEnvironment yodaEnvironment = YodaEnvironment.dialogTestingEnvironment();
+
+        List<DomainSpec> domainSpecs = new LinkedList<>();
+        domainSpecs.add(new DomainSpec(
+                "YODA skeleton domain",
+                new YodaSkeletonLexicon(),
+                new YodaSkeletonOntologyRegistry(),
+                new NonDialogTaskRegistry(),
+                new DatabaseRegistry()));
+
+        for (DomainSpec spec : domainSpecs) {
+            System.err.println("loading domain spec ..." + spec.getDomainName());
+            yodaEnvironment.loadDomain(spec);
+        }
+        Ontology.finalizeOntology();
+        DialogRegistry.finalizeDialogRegistry();
+        ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).constructTemplates();
+        System.err.println("done loading domain");
+
+        SLUDataset tmp = new YodaSkeletonSLUDataset();
+        yodaEnvironment.slu.evaluate(yodaEnvironment, tmp);
+    }
+
+
 
     public void testYelpPhoenixSLU() throws FileNotFoundException, UnsupportedEncodingException {
         YodaEnvironment yodaEnvironment = YodaEnvironment.dialogTestingEnvironment();

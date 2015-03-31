@@ -17,14 +17,15 @@ public interface SpokenLanguageUnderstander {
 
     public default void evaluate(YodaEnvironment yodaEnvironment, SLUDataset dataset){
         int numTestCases = dataset.getDataSet().size();
+
         int numTotalCorrect = 0;
         int numDialogActCorrect = 0;
         int numVerbOrTopicClassCorrect = 0;
 
-
         int numTotalCorrectPresent = 0;
         int numDialogActCorrectPresent = 0;
         int numVerbOrTopicClassCorrectPresent = 0;
+
         double weightTotalCorrect = 0.0;
         double weightDialogActCorrect = 0.0;
         double weightVerbOrTopicClassCorrect = 0.0;
@@ -41,8 +42,11 @@ public interface SpokenLanguageUnderstander {
             // evaluate the best hypothesis
             SemanticsModel bestHypothesis = sluHypotheses.get(sluDistribution.getTopHypothesis());
 
-            if (SemanticsModel.contentEqual(bestHypothesis, sample.getRight()))
+            Pair<Boolean, String> contentComparisonReport = SemanticsModel.contentEquivalenceComparisonAndReport(bestHypothesis, sample.getRight());
+            if (contentComparisonReport.getLeft())
                 numTotalCorrect++;
+            else
+                System.err.println(contentComparisonReport.getRight());
             if (bestHypothesis.newGetSlotPathFiller("dialogAct").equals(sample.getRight().newGetSlotPathFiller("dialogAct")))
                 numDialogActCorrect++;
             if (bestHypothesis.newGetSlotPathFiller("verb.class")!=null &&
@@ -61,7 +65,8 @@ public interface SpokenLanguageUnderstander {
             for (String key : sluDistribution.keySet()) {
                 double thisWeight = sluDistribution.get(key);
                 SemanticsModel thisHypothesis = sluHypotheses.get(key);
-                if (SemanticsModel.contentEqual(thisHypothesis, sample.getRight())) {
+                contentComparisonReport = SemanticsModel.contentEquivalenceComparisonAndReport(bestHypothesis, sample.getRight());
+                if (contentComparisonReport.getLeft()) {
                     weightTotalCorrect += thisWeight;
                     totalCorrectPresent = true;
                 }

@@ -349,14 +349,17 @@ public class SemanticsModel {
     }
 
     // TODO: deal with conjunctions
-    private Set<String> getAllInternalNodePathsHelper(JSONObject currentPoint){
+    private Set<String> getAllNodePathsHelper(JSONObject currentPoint, boolean internalPathsOnly){
         Set<String> ans = new HashSet<>();
         for (Object key : currentPoint.keySet()) {
-            if (currentPoint.get(key) instanceof JSONObject){
+            if (currentPoint.get(key) instanceof JSONObject) {
                 ans.add((String) key);
-                for (String childAns : getAllInternalNodePathsHelper((JSONObject) currentPoint.get(key))){
-                    ans.add(((String)key)+"."+childAns);
+                for (String childAns : getAllNodePathsHelper((JSONObject) currentPoint.get(key), internalPathsOnly)) {
+                    ans.add(((String) key) + "." + childAns);
                 }
+            }
+            if (!internalPathsOnly){
+                ans.add((String) key);
             }
         }
         return ans;
@@ -438,10 +441,17 @@ public class SemanticsModel {
     * Return all the slot paths that point to JSONObjects
     * */
     public Set<String> getAllInternalNodePaths(){
-        Set<String> ans = getAllInternalNodePathsHelper(internalRepresentation);
+        Set<String> ans = getAllNodePathsHelper(internalRepresentation, true);
         ans.add("");
         return ans;
     }
+
+    public Set<String> getAllNodePaths(){
+        Set<String> ans = getAllNodePathsHelper(internalRepresentation, false);
+        ans.add("");
+        return ans;
+    }
+
 
     /*
     * Throws an error if the SLU hypothesis model is invalid
@@ -564,36 +574,46 @@ public class SemanticsModel {
         return extractChunk((JSONObject)structure.get(thisFiller), currentString, remainingSlotPath);
     }
 
-
-    public static Pair<Integer, Integer> getChunkingIndices(JSONObject sourceObject) {
-        if (sourceObject.containsKey("chunk-start")) {
-
-            Integer start;
-            if (sourceObject.get("chunk-start") instanceof Long) {
-                start = (int) (long) sourceObject.get("chunk-start");
-            } else
-                start = (Integer) sourceObject.get("chunk-start");
-            Integer end;
-            if (sourceObject.get("chunk-end") instanceof Long) {
-                end = (int) (long) sourceObject.get("chunk-end");
-            } else
-                end = (Integer) sourceObject.get("chunk-end");
-            return new ImmutablePair<>(start, end);
-        }
-        return null;
-    }
-
     /*
     * Return whether the two Semantic models objects contain identical content
+    * TODO: This function is completely broken, it compares JSON objects in an unreasonable way.
+    * TODO: use contentEquivalenceComparisonAndReport instead
     * */
     public static boolean contentEqual(SemanticsModel sm1, SemanticsModel sm2){
         Set<String> internalPaths = sm1.getAllInternalNodePaths();
+//        System.err.println("SM.contentQual: internalPaths:" + internalPaths);
         internalPaths.addAll(sm2.getAllInternalNodePaths());
         for (String path : internalPaths){
             if (!sm1.newGetSlotPathFiller(path).equals(sm2.newGetSlotPathFiller(path)))
                 return false;
         }
         return true;
+    }
+
+    public static Pair<Boolean, String> contentEquivalenceComparisonAndReport(SemanticsModel sm1, SemanticsModel sm2){
+        Set<String> internalPaths = sm1.getAllNodePaths();
+        internalPaths.addAll(sm2.getAllNodePaths());
+//        System.err.println("SM.contentEqualIncludingLeaves: internalPaths:" + internalPaths);
+
+        for (String path : internalPaths){
+            String report = "";
+            report += "path:" + path + "\n";
+            report += "sm1:" + sm1.newGetSlotPathFiller(path) + "\n";
+            report += "sm2:" + sm2.newGetSlotPathFiller(path);
+//            System.err.println(report);
+
+            // if the path is listed, one of the SM's must have had a non-null value
+            if (sm1.newGetSlotPathFiller(path)==null || sm2.newGetSlotPathFiller(path)==null)
+                return new ImmutablePair<>(false, "=== SM Comparison Error Report ===\n"+ report);
+
+            if (sm1.newGetSlotPathFiller(path) instanceof JSONObject &&
+                    sm2.newGetSlotPathFiller(path) instanceof JSONObject)
+                continue;
+
+            if (!sm1.newGetSlotPathFiller(path).equals(sm2.newGetSlotPathFiller(path)))
+                return new ImmutablePair<>(false, "=== SM Comparison Error Report ===\n"+ report);
+        }
+        return new ImmutablePair<>(true, null);
     }
 
     @Override

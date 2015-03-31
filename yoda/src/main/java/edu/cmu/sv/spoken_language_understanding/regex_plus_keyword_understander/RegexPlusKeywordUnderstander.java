@@ -30,6 +30,7 @@ import java.util.logging.SimpleFormatter;
  */
 public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
     public NounPhraseInterpreter nounPhraseInterpreter;
+    public TimeInterpreter timeInterpreter;
     YodaEnvironment yodaEnvironment;
     Set<MiniLanguageInterpreter> languageInterpreters = new HashSet<>();
 
@@ -38,6 +39,7 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
     public static final double regexInterpreterWeight = 0.5;
     public static final double namedEntityFragmentWeight = 0.1;
     public static final double nounPhraseInterpreterWeight = 1.0;
+    public static final double timeInterpreterWeight = 1.0;
     public static final double simpleStringMatchInterpreterWeight = 1.0;
     public static final double secondaryRegexMatchWeight = 0.3;
 
@@ -66,6 +68,7 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
 
     public void constructTemplates(){
         nounPhraseInterpreter = new NounPhraseInterpreter(yodaEnvironment);
+        timeInterpreter = new TimeInterpreter(yodaEnvironment);
 
         // add regex interpreters
         languageInterpreters.add(new YnqExistRegexInterpreter());
@@ -81,6 +84,7 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
         }
         languageInterpreters.add(new NamedEntityFragmentInterpreter(PointOfInterest.class));
         languageInterpreters.add(new NounPhraseFragmentInterpreter(nounPhraseInterpreter));
+        languageInterpreters.add(new TimeFragmentInterpreter(timeInterpreter));
 
         // add simple string match interpreters
         languageInterpreters.add(
