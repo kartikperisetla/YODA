@@ -14,19 +14,17 @@ import java.util.Set;
 public class SimpleStringMatchInterpreter implements MiniLanguageInterpreter {
     String jsonString;
     Set<String> matches;
-    double score;
 
-    public SimpleStringMatchInterpreter(String jsonString, Set<String> matches, double score) {
+    public SimpleStringMatchInterpreter(String jsonString, Set<String> matches) {
         this.jsonString = jsonString;
         this.matches = matches;
-        this.score = score;
     }
 
     @Override
     public Pair<JSONObject, Double> interpret(String utterance, YodaEnvironment yodaEnvironment) {
         for (String match : matches){
             if (utterance.equals(match)) {
-                return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), score);
+                return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), RegexPlusKeywordUnderstander.simpleStringMatchInterpreterWeight);
             }
         }
         return null;

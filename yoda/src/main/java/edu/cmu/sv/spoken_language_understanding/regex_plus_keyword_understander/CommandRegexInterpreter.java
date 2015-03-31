@@ -70,7 +70,7 @@ public class CommandRegexInterpreter implements MiniLanguageInterpreter {
                         String jsonString = "{\"dialogAct\":\"Command\",\"verb\":{\"class\":\"" + verbClass.getSimpleName() + "\"}}";
                         JSONObject ans = SemanticsModel.parseJSON(jsonString);
                         ((JSONObject) ans.get("verb")).put(roleClass.getSimpleName(), npInterpretation.getKey());
-                        return new ImmutablePair<>(ans, 1.0);
+                        return new ImmutablePair<>(ans, RegexPlusKeywordUnderstander.regexInterpreterWeight);
                     }
                 }
 

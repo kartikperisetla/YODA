@@ -168,7 +168,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         if (entity2String!=null && !entity2JSON.containsKey("class")){
             entity2JSON.put("class", UnknownThingWithRoles.class.getSimpleName());
         }
-        return new ImmutablePair<>(entity1JSON, 1.0);
+        return new ImmutablePair<>(entity1JSON, RegexPlusKeywordUnderstander.nounPhraseInterpreterWeight);
     }
 
     private Pair<Map<String, Object>, Double> getClassAndAdjectives(String entityString){

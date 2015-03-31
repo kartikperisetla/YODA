@@ -19,7 +19,9 @@ public class YnqExistRegexInterpreter implements MiniLanguageInterpreter {
     public Pair<JSONObject, Double> interpret(String utterance, YodaEnvironment yodaEnvironment) {
         Pattern regexPattern = Pattern.compile(startingPolitenessRegexString + ynqExistsPrefixRegexString + "(.+)" + endingPolitenessRegexString);
         Matcher matcher = regexPattern.matcher(utterance);
-        double matchQuality = utterance.startsWith("i want ") || utterance.startsWith("get ") ? 0.3 : 1.0;
+        double matchQuality = utterance.startsWith("i want ") || utterance.startsWith("get ") ?
+                RegexPlusKeywordUnderstander.secondaryRegexMatchWeight :
+                RegexPlusKeywordUnderstander.regexInterpreterWeight;
         if (matcher.matches()) {
             String npString = matcher.group(3);
             Pair<JSONObject, Double> npInterpretation =
@@ -41,7 +43,7 @@ public class YnqExistRegexInterpreter implements MiniLanguageInterpreter {
                 return null;
             String jsonString = "{\"dialogAct\":\"YNQuestion\",\"verb\":{\"Agent\":" +
                     npInterpretation.getKey().toJSONString() + ",\"class\":\"Exist\"}}";
-            return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), .3);
+            return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), RegexPlusKeywordUnderstander.secondaryRegexMatchWeight);
         }
 
         return null;

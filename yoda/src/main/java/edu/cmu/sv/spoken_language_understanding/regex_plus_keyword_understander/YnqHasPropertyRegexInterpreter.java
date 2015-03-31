@@ -57,7 +57,8 @@ public class YnqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
                         ",\"Patient\":{\"class\":\"UnknownThingWithRoles\",\"" +
                         hasQualityRole.getSimpleName()+
                         "\":{\"class\":\"" + adjectiveClass.getSimpleName() + "\"}},\"class\":\"HasProperty\"}}";
-                return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), 1.0);
+                return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString),
+                        RegexPlusKeywordUnderstander.regexInterpreterWeight);
             }
         }
         return null;

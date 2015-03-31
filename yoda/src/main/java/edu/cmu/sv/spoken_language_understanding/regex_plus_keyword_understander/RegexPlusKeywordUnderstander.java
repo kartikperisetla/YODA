@@ -3,13 +3,11 @@ package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander
 import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.dialog_state_tracking.Turn;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.noun.PointOfInterest;
-import edu.cmu.sv.domain.yelp_phoenix.ontology.noun.poi_types.*;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.spoken_language_understanding.SpokenLanguageUnderstander;
-import edu.cmu.sv.spoken_language_understanding.Tokenizer;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.MongoLogHandler;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -33,6 +31,15 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
     public NounPhraseInterpreter nounPhraseInterpreter;
     YodaEnvironment yodaEnvironment;
     Set<MiniLanguageInterpreter> languageInterpreters = new HashSet<>();
+
+    // define parameters for the SLU component
+    public static final double keywordInterpreterWeight = 0.5;
+    public static final double regexInterpreterWeight = 0.5;
+    public static final double namedEntityFragmentWeight = 0.1;
+    public static final double nounPhraseInterpreterWeight = 1.0;
+    public static final double simpleStringMatchInterpreterWeight = 1.0;
+    public static final double secondaryRegexMatchWeight = 0.3;
+
 
     private static Logger logger = Logger.getLogger("yoda.spoken_language_understanding.RegexPlusKeywordUnderstander");
     static {
@@ -77,13 +84,11 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
         // add simple string match interpreters
         languageInterpreters.add(
                 new SimpleStringMatchInterpreter("{\"dialogAct\":\"Accept\"}",
-                        new HashSet(Arrays.asList("yes","yeah","yep","right","correct","yup","yes sir","sure","uh huh")),
-                        1.0));
+                        new HashSet(Arrays.asList("yes","yeah","yep","right","correct","yup","yes sir","sure","uh huh"))));
 
         languageInterpreters.add(
                 new SimpleStringMatchInterpreter("{\"dialogAct\":\"Reject\"}",
-                        new HashSet(Arrays.asList("no", "nope", "negative", "i don't think so", "wrong", "not really", "not")),
-                        1.0));
+                        new HashSet(Arrays.asList("no", "nope", "negative", "i don't think so", "wrong", "not really", "not"))));
 
 
     }

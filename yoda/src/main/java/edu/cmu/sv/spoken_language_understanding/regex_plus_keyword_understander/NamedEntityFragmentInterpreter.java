@@ -22,6 +22,6 @@ public class NamedEntityFragmentInterpreter implements MiniLanguageInterpreter {
         String namedEntityString = utterance;
         String jsonString = "{\"dialogAct\":\"Fragment\",\"topic\":{\"HasName\":\""+namedEntityString+"\","+
                 "\"class\":\""+thingClass.getSimpleName()+"\"}}";
-        return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), 0.1);
+        return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), RegexPlusKeywordUnderstander.namedEntityFragmentWeight);
     }
 }

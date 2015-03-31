@@ -70,7 +70,7 @@ public class WhqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
                         ",\"Patient\":" +
                         "{\"class\":\"Requested\",\"HasValue\":{\"class\":\"" +
                         qualityClass.getSimpleName() + "\"}},\"class\":\"HasProperty\"}}";
-                return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), 1.0);
+                return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), RegexPlusKeywordUnderstander.regexInterpreterWeight);
             }
         }
         if (!qualityNounRegexString.equals("()")) {
@@ -87,7 +87,7 @@ public class WhqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
                         npInterpretation.getKey().toJSONString()+", \"Patient\":" +
                         "{\"class\":\"Requested\",\"HasValue\":{\"class\":\"" +
                         qualityClass.getSimpleName() + "\"}},\"class\":\"HasProperty\"}}";
-                return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), 1.0);
+                return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), RegexPlusKeywordUnderstander.regexInterpreterWeight);
             }
         }
         return null;

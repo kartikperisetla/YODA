@@ -59,7 +59,7 @@ public class CommandKeywordInterpreter implements MiniLanguageInterpreter {
                 Matcher matcher = regexPattern.matcher(utterance);
                 if (matcher.matches()) {
                     String jsonString = "{\"dialogAct\":\"Command\",\"verb\":{\"class\":\""+verbClass.getSimpleName()+"\"}}";
-                    return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), 0.5);
+                    return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), RegexPlusKeywordUnderstander.keywordInterpreterWeight);
                 }
             }
         }

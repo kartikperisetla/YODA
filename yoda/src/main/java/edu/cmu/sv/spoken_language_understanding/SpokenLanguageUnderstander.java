@@ -89,20 +89,22 @@ public interface SpokenLanguageUnderstander {
 
 
 
-        System.out.println("1-best result evaluation:");
         System.out.println("Total number of test cases:" + numTestCases);
+
+        System.out.println();
+        System.out.println("1-best result evaluation:");
         System.out.println("Number completely correct:" + numTotalCorrect + " ("+1.0*numTotalCorrect/numTestCases + ")");
         System.out.println("Number dialog act correct:" + numDialogActCorrect + " ("+1.0*numDialogActCorrect/numTestCases + ")");
         System.out.println("Number verb/topic class correct:" + numVerbOrTopicClassCorrect + " ("+1.0*numVerbOrTopicClassCorrect/numTestCases + ")");
 
         System.out.println();
-        System.out.println("N-best list result evaluation");
-        System.out.println("Total number of test cases:" + numTestCases);
+        System.out.println("N-best list presence evaluation");
         System.out.println("Number of times completely correct answer is present:" + numTotalCorrectPresent + " ("+1.0*numTotalCorrectPresent/numTestCases + ")");
         System.out.println("Number of times dialog act correct answer is present:" + numDialogActCorrectPresent + " ("+1.0*numDialogActCorrectPresent/numTestCases + ")");
         System.out.println("Number of times verb/topic class correct answer is present:" + numVerbOrTopicClassCorrectPresent + " ("+1.0*numVerbOrTopicClassCorrectPresent/numTestCases + ")");
 
-
+        System.out.println();
+        System.out.println("N-best list probability evaluation");
         System.out.println("Weight given to completely correct answers:" + weightTotalCorrect + " ("+1.0*weightTotalCorrect/numTestCases + ")");
         System.out.println("Weight given to dialog act correct answers:" + weightDialogActCorrect + " ("+1.0*weightDialogActCorrect/numTestCases + ")");
         System.out.println("Weight given to verb/topic class correct answers:" + weightVerbOrTopicClassCorrect + " ("+1.0*weightVerbOrTopicClassCorrect/numTestCases + ")");

@@ -40,8 +40,8 @@ public class TestRegexPlusKeywordUnderstander {
     * */
     @Test
     public void Test() throws FileNotFoundException, UnsupportedEncodingException {
-//        testYelpPhoenixSLU();
-        testSmartHouseSLU();
+        testYelpPhoenixSLU();
+//        testSmartHouseSLU();
 //        runUnderstander();
     }
 
@@ -73,8 +73,6 @@ public class TestRegexPlusKeywordUnderstander {
         System.err.println("done loading domain");
 
         SLUDataset tmp = new YelpPhoenixSLUDataset();
-        System.out.println(tmp.getDataSet().size());
-
         yodaEnvironment.slu.evaluate(yodaEnvironment, tmp);
     }
 
@@ -106,8 +104,6 @@ public class TestRegexPlusKeywordUnderstander {
         System.err.println("done loading domain");
 
         SLUDataset tmp = new SmartHouseSLUDataset();
-        System.out.println(tmp.getDataSet().size());
-
         yodaEnvironment.slu.evaluate(yodaEnvironment, tmp);
     }
 
