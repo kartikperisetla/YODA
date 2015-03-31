@@ -11,7 +11,7 @@ public class Clean extends CleanlinessAdjective {
 
     @Override
     public double getSlope() {
-        return 1;
+        return 2;
     }
 }
 
