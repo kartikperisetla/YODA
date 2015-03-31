@@ -7,6 +7,8 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
+import java.util.List;
+
 /**
  * Created by David Cohen on 1/21/15.
  */
@@ -18,7 +20,8 @@ public class NamedEntityFragmentInterpreter implements MiniLanguageInterpreter {
     }
 
     @Override
-    public Pair<JSONObject, Double> interpret(String utterance, YodaEnvironment yodaEnvironment) {
+    public Pair<JSONObject, Double> interpret(List<String> tokens, YodaEnvironment yodaEnvironment) {
+        String utterance = String.join(" ", tokens);
         String namedEntityString = utterance;
         String jsonString = "{\"dialogAct\":\"Fragment\",\"topic\":{\"HasName\":\""+namedEntityString+"\","+
                 "\"class\":\""+thingClass.getSimpleName()+"\"}}";

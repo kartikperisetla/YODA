@@ -6,6 +6,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -21,7 +22,8 @@ public class SimpleStringMatchInterpreter implements MiniLanguageInterpreter {
     }
 
     @Override
-    public Pair<JSONObject, Double> interpret(String utterance, YodaEnvironment yodaEnvironment) {
+    public Pair<JSONObject, Double> interpret(List<String> tokens, YodaEnvironment yodaEnvironment) {
+        String utterance = String.join(" ", tokens);
         for (String match : matches){
             if (utterance.equals(match)) {
                 return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), RegexPlusKeywordUnderstander.simpleStringMatchInterpreterWeight);

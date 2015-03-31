@@ -6,6 +6,8 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
+import java.util.List;
+
 /**
  * Created by David Cohen on 1/21/15.
  */
@@ -17,9 +19,9 @@ public class NounPhraseFragmentInterpreter implements MiniLanguageInterpreter {
     }
 
     @Override
-    public Pair<JSONObject, Double> interpret(String utterance, YodaEnvironment yodaEnvironment) {
+    public Pair<JSONObject, Double> interpret(List<String> tokens, YodaEnvironment yodaEnvironment) {
         Pair<JSONObject, Double> npInterpretation = ((RegexPlusKeywordUnderstander)yodaEnvironment.slu).
-                nounPhraseInterpreter.interpret(utterance, yodaEnvironment);
+                nounPhraseInterpreter.interpret(tokens, yodaEnvironment);
 //        System.err.println("NPFragment Interpreter: npInterpretation:" + npInterpretation.getLeft());
         if (npInterpretation.getKey().containsKey("HasName"))
             return null;

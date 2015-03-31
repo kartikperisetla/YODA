@@ -8,6 +8,7 @@ import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.spoken_language_understanding.SpokenLanguageUnderstander;
+import edu.cmu.sv.spoken_language_understanding.Tokenizer;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.MongoLogHandler;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -106,7 +107,7 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
 
         // incorporate regex templates
         for (MiniLanguageInterpreter miniLanguageInterpreter : languageInterpreters) {
-            Pair<JSONObject, Double> interpretation = miniLanguageInterpreter.interpret(asrResult, yodaEnvironment);
+            Pair<JSONObject, Double> interpretation = miniLanguageInterpreter.interpret(Tokenizer.tokenize(asrResult), yodaEnvironment);
             if (interpretation == null)
                 continue;
             hypotheses.put("hyp" + hypothesisId, new SemanticsModel(interpretation.getKey()));

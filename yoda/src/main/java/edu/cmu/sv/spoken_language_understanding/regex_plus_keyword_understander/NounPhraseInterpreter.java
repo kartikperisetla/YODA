@@ -19,10 +19,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -106,7 +103,8 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
     }
 
     @Override
-    public Pair<JSONObject, Double> interpret(String utterance, YodaEnvironment yodaEnvironment) {
+    public Pair<JSONObject, Double> interpret(List<String> tokens, YodaEnvironment yodaEnvironment) {
+        String utterance = String.join(" ", tokens);
         String entity1String = utterance;
         String entity2String = null;
         JSONObject entity1JSON = SemanticsModel.parseJSON("{}");

@@ -6,15 +6,13 @@ import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
+import edu.cmu.sv.spoken_language_understanding.Tokenizer;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,7 +49,8 @@ public class CommandRegexInterpreter implements MiniLanguageInterpreter {
     }
 
     @Override
-    public Pair<JSONObject, Double> interpret(String utterance, YodaEnvironment yodaEnvironment) {
+    public Pair<JSONObject, Double> interpret(List<String> tokens, YodaEnvironment yodaEnvironment) {
+        String utterance = String.join(" ", tokens);
         if (!verbRegexString.equals("()")) {
             // command with one role as the obj1
 
@@ -66,7 +65,7 @@ public class CommandRegexInterpreter implements MiniLanguageInterpreter {
                     if (matcher2.matches()) {
                         String npString = matcher2.group(2);
                         Pair<JSONObject, Double> npInterpretation = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
-                                nounPhraseInterpreter.interpret(npString, yodaEnvironment);
+                                nounPhraseInterpreter.interpret(Tokenizer.tokenize(npString), yodaEnvironment);
                         String jsonString = "{\"dialogAct\":\"Command\",\"verb\":{\"class\":\"" + verbClass.getSimpleName() + "\"}}";
                         JSONObject ans = SemanticsModel.parseJSON(jsonString);
                         ((JSONObject) ans.get("verb")).put(roleClass.getSimpleName(), npInterpretation.getKey());

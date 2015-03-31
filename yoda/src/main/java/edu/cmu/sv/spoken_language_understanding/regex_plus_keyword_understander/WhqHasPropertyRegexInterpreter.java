@@ -8,12 +8,14 @@ import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
 import edu.cmu.sv.semantics.SemanticsModel;
+import edu.cmu.sv.spoken_language_understanding.Tokenizer;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -56,14 +58,15 @@ public class WhqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
     }
 
     @Override
-    public Pair<JSONObject, Double> interpret(String utterance, YodaEnvironment yodaEnvironment) {
+    public Pair<JSONObject, Double> interpret(List<String> tokens, YodaEnvironment yodaEnvironment) {
+        String utterance = String.join(" ", tokens);
         if (!adjectiveRegexString.equals("()")) {
             Pattern regexPattern = Pattern.compile("how " + adjectiveRegexString + "( is | are | )(.+)");
             Matcher matcher = regexPattern.matcher(utterance);
             if (matcher.matches()) {
                 String npString = matcher.group(3);
                 Pair<JSONObject, Double> npInterpretation =
-                        ((RegexPlusKeywordUnderstander)yodaEnvironment.slu).nounPhraseInterpreter.interpret(npString, yodaEnvironment);
+                        ((RegexPlusKeywordUnderstander)yodaEnvironment.slu).nounPhraseInterpreter.interpret(Tokenizer.tokenize(npString), yodaEnvironment);
 
                 String jsonString = "{\"dialogAct\":\"WHQuestion\",\"verb\":{\"Agent\":"+
                         npInterpretation.getKey().toJSONString()+
@@ -81,7 +84,7 @@ public class WhqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
             if (matcher.matches()) {
                 String npString = matcher.group(7);
                 Pair<JSONObject, Double> npInterpretation =
-                        ((RegexPlusKeywordUnderstander)yodaEnvironment.slu).nounPhraseInterpreter.interpret(npString, yodaEnvironment);
+                        ((RegexPlusKeywordUnderstander)yodaEnvironment.slu).nounPhraseInterpreter.interpret(Tokenizer.tokenize(npString), yodaEnvironment);
 
                 String jsonString = "{\"dialogAct\":\"WHQuestion\",\"verb\":{\"Agent\":"+
                         npInterpretation.getKey().toJSONString()+", \"Patient\":" +
