@@ -1,6 +1,7 @@
 package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander;
 
 import edu.cmu.sv.database.Ontology;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasAtTime;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
 import edu.cmu.sv.natural_language_generation.Grammar;
@@ -83,7 +84,7 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
                         verbRegexString + "(.+)" + MiniLanguageInterpreter.endingPolitenessRegexString);
                 Matcher matcher = regexPattern.matcher(utterance);
                 if (matcher.matches()) {
-                    String obj1String = matcher.group(6);
+                    String obj1String = matcher.group(6).trim();
                     for (Class<? extends Role> roleClass : r1HasBlankPrefix.keySet()) {
                         String rolePrefixRegexString = roleObj1PrefixPatterns.containsKey(roleClass) ? roleObj1PrefixPatterns.get(roleClass) : "()";
                         if (r1HasBlankPrefix.get(roleClass))
@@ -93,7 +94,12 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
                         Matcher matcher2 = obj1Pattern.matcher(obj1String);
                         if (matcher2.matches()) {
                             String npString = matcher2.group(2);
-                            Pair<JSONObject, Double> npInterpretation = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
+                            Pair<JSONObject, Double> npInterpretation;
+                            if (roleClass.equals(HasAtTime.class))
+                                npInterpretation = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
+                                        timeInterpreter.interpret(Tokenizer.tokenize(npString), yodaEnvironment);
+                            else
+                                npInterpretation = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
                                     nounPhraseInterpreter.interpret(Tokenizer.tokenize(npString), yodaEnvironment);
                             String jsonString = "{\"dialogAct\":\"Command\",\"verb\":{\"class\":\"" + verbClass.getSimpleName() + "\"}}";
                             JSONObject hyp = SemanticsModel.parseJSON(jsonString);
@@ -127,10 +133,25 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
 //                                }
                                 String objString1 = matcher2.group(2);
                                 String objString2 = matcher2.group(4);
-                                Pair<JSONObject, Double> npInterpretation1 = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
-                                        nounPhraseInterpreter.interpret(Tokenizer.tokenize(objString1), yodaEnvironment);
-                                Pair<JSONObject, Double> npInterpretation2 = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
-                                        nounPhraseInterpreter.interpret(Tokenizer.tokenize(objString2), yodaEnvironment);
+                                Pair<JSONObject, Double> npInterpretation1;
+                                if (roleClass1.equals(HasAtTime.class))
+                                    npInterpretation1 = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
+                                            timeInterpreter.interpret(Tokenizer.tokenize(objString1), yodaEnvironment);
+                                else
+                                    npInterpretation1 = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
+                                            nounPhraseInterpreter.interpret(Tokenizer.tokenize(objString1), yodaEnvironment);
+
+                                Pair<JSONObject, Double> npInterpretation2;
+                                if (roleClass2.equals(HasAtTime.class))
+                                    npInterpretation2 = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
+                                            timeInterpreter.interpret(Tokenizer.tokenize(objString2), yodaEnvironment);
+                                else
+                                    npInterpretation2 = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
+                                            nounPhraseInterpreter.interpret(Tokenizer.tokenize(objString2), yodaEnvironment);
+
+                                if (npInterpretation1==null || npInterpretation2==null)
+                                    continue;
+
                                 String jsonString = "{\"dialogAct\":\"Command\",\"verb\":{\"class\":\"" + verbClass.getSimpleName() + "\"}}";
                                 JSONObject hyp = SemanticsModel.parseJSON(jsonString);
                                 ((JSONObject) hyp.get("verb")).put(roleClass1.getSimpleName(), npInterpretation1.getKey());
