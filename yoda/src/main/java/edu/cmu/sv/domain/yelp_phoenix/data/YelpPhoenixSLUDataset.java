@@ -18,7 +18,7 @@ public class YelpPhoenixSLUDataset extends SLUDataset {
             add(new ImmutablePair<>("is there a bar near the preston fields hotel",
                     new SemanticsModel("{\"verb\": {\"class\":\"Exist\", \"Agent\" : {\"HasDistance\": {\"InRelationTo\": {\"class\": \"Hotels\", \"HasName\": \"preston fields hotel\"}, \"class\": \"IsCloseTo\"}, \"class\": \"Bars\"}}, \"dialogAct\": \"YNQuestion\"}")));
             add(new ImmutablePair<>("can i get directions from preston feels hotel to this restaurant",
-                    new SemanticsModel("{\"verb\": {\"Destination\": {\"refType\": \"pronoun\", \"class\": \"Restaurants\"}, \"Origin\" : {\"class\": \"Hotels\", \"HasName\": \"preston fields hotel\"}, \"class\": \"GiveDirections\"}, \"dialogAct\": \"Command\"}")));
+                    new SemanticsModel("{\"verb\": {\"Destination\": {\"refType\": \"pronoun\", \"class\": \"Restaurants\"}, \"Origin\" : {\"class\": \"Hotels\", \"HasName\": \"preston feels hotel\"}, \"class\": \"GiveDirections\"}, \"dialogAct\": \"Command\"}")));
             add(new ImmutablePair<>("make a reservation at burger meats buns",
                     new SemanticsModel("{\"verb\": {\"Destination\": {\"class\": \"UnknownThingWithRoles\", \"HasName\": \"burger meats buns\"}, \"class\": \"MakeReservation\"}, \"dialogAct\": \"Command\"}")));
             add(new ImmutablePair<>("the restaurant burger meats buns",
@@ -72,7 +72,7 @@ public class YelpPhoenixSLUDataset extends SLUDataset {
         // for these examples, the annotation scheme misses important information from the utterance
         {
             add(new ImmutablePair<>("can you make a reservation there for 8 p.m. tomorrow night",
-                    new SemanticsModel("{\"verb\": {\"Destination\": {\"refType\": \"pronoun\", \"class\": \"PointOfInterest\"}, \"class\": \"MakeReservation\"}, \"dialogAct\": \"Command\"}")));
+                    new SemanticsModel("{\"verb\": {\"Destination\": {\"refType\": \"pronoun\", \"class\": \"PointOfInterest\"}, \"HasAtTime\":{\"class\":\"Time\", \"HasHour\":8, \"HasAmPm\":\"PM\"} \"class\": \"MakeReservation\"}, \"dialogAct\": \"Command\"}")));
             add(new ImmutablePair<>("please give me a list of restaurants near the preston hotel",
                     new SemanticsModel("{\"verb\": {\"class\":\"Exist\", \"Agent\" : {\"refType\": \"pronoun\", \"HasDistance\": {\"InRelationTo\": {\"class\": \"Hotels\", \"HasName\": \"the preston hotel\"}, \"class\": \"IsCloseTo\"}, \"class\": \"Restaurants\"}}, \"dialogAct\": \"YNQuestion\"}")));
         }

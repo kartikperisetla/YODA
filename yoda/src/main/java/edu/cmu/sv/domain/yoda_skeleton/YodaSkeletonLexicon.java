@@ -73,6 +73,13 @@ public class YodaSkeletonLexicon extends Lexicon {
                 entry.add(LexicalEntry.PART_OF_SPEECH.AS_OBJECT2_PREFIX, "at");
                 add(HasAtTime.class, entry, false);
             }
+            {
+                // directions from X, directions <...> from X
+                LexicalEntry entry = new LexicalEntry();
+                entry.add(LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, "for");
+                entry.add(LexicalEntry.PART_OF_SPEECH.AS_OBJECT2_PREFIX, "for");
+                add(HasAtTime.class, entry, true);
+            }
         }
     }
 }

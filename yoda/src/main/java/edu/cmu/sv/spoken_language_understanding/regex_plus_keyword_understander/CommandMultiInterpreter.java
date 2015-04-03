@@ -24,6 +24,8 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
     String verbRegexString = "()";
     Map<Class<? extends Role>, String> roleObj1PrefixPatterns = new HashMap<>();
     Map<Class<? extends Role>, String> roleObj2PrefixPatterns = new HashMap<>();
+    Map<Class<? extends Role>, Boolean> r1HasBlankPrefix = new HashMap<>();
+    Map<Class<? extends Role>, Boolean> r2HasBlankPrefix = new HashMap<>();
     YodaEnvironment yodaEnvironment;
 
     public CommandMultiInterpreter(Class<? extends Verb> verbClass, YodaEnvironment yodaEnvironment) {
@@ -42,20 +44,14 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
                 try {
                     Set<String> roleObj1PrefixStrings = this.yodaEnvironment.lex.getPOSForClass(roleClass, Lexicon.LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true);
                     Set<String> roleObj2PrefixStrings = this.yodaEnvironment.lex.getPOSForClass(roleClass, Lexicon.LexicalEntry.PART_OF_SPEECH.AS_OBJECT2_PREFIX, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true);
+                    r1HasBlankPrefix.put(roleClass, roleObj1PrefixStrings.contains(""));
+                    r2HasBlankPrefix.put(roleClass, roleObj2PrefixStrings.contains(""));
                     roleObj1PrefixStrings.remove("");
                     roleObj2PrefixStrings.remove("");
-                    List<String> r1Strings = new LinkedList<>(roleObj1PrefixStrings);
-                    List<String> r2Strings = new LinkedList<>(roleObj2PrefixStrings);
-                    // make sure the empty role prefix is last so that regex will match it only if no other prefix is present
-                    // TODO: these actually need to be done as separate regex checks
-//                    if (r1Strings.contains(""))
-//                        r1Strings.remove(""); //r1Strings.add(r1Strings.size()-1, "");
-//                    if (r2Strings.contains(""))
-//                        r2Strings.remove(""); //r2Strings.add(r2Strings.size()-1, "");
-                    String regexString = "("+String.join("|",r1Strings)+")";
-                    String regexString2 = "("+String.join("|",r2Strings)+")";
-                    System.err.println(regexString);
-                    System.err.println(regexString2);
+                    String regexString = "("+String.join("|",roleObj1PrefixStrings)+")";
+                    String regexString2 = "("+String.join("|",roleObj2PrefixStrings)+")";
+//                    System.err.println(regexString);
+//                    System.err.println(regexString2);
                     if (roleObj1PrefixStrings.size() != 0)
                         roleObj1PrefixPatterns.put(roleClass, regexString);
                     if (roleObj2PrefixStrings.size() != 0)
@@ -64,8 +60,8 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
                 }
             }
         }
-        System.err.println("CommandMultiInterpreter: constructor: verb:"+verbClass.getSimpleName()+", roles in prefix patterns:" + roleObj1PrefixPatterns.keySet());
-        System.err.println("CommandMultiInterpreter: constructor: verb:"+verbClass.getSimpleName()+", roles in obj2 prefix patterns:" + roleObj2PrefixPatterns.keySet());
+//        System.err.println("CommandMultiInterpreter: constructor: verb:"+verbClass.getSimpleName()+", roles in prefix patterns:" + roleObj1PrefixPatterns.keySet());
+//        System.err.println("CommandMultiInterpreter: constructor: verb:"+verbClass.getSimpleName()+", roles in obj2 prefix patterns:" + roleObj2PrefixPatterns.keySet());
     }
 
     @Override
@@ -83,8 +79,11 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
                 Matcher matcher = regexPattern.matcher(utterance);
                 if (matcher.matches()) {
                     String obj1String = matcher.group(6);
-                    for (Class<? extends Role> roleClass : roleObj1PrefixPatterns.keySet()) {
-                        Pattern obj1Pattern = Pattern.compile(roleObj1PrefixPatterns.get(roleClass) + "(.+)");
+                    for (Class<? extends Role> roleClass : r1HasBlankPrefix.keySet()) {
+                        String rolePrefixRegexString = roleObj1PrefixPatterns.containsKey(roleClass) ? roleObj1PrefixPatterns.get(roleClass) : "()";
+                        if (r1HasBlankPrefix.get(roleClass))
+                            rolePrefixRegexString = new StringBuilder(rolePrefixRegexString).insert(rolePrefixRegexString.length()-2, "|").toString();
+                        Pattern obj1Pattern = Pattern.compile(rolePrefixRegexString + "(.+)");
                         Matcher matcher2 = obj1Pattern.matcher(obj1String);
                         if (matcher2.matches()) {
                             String npString = matcher2.group(2);
@@ -116,10 +115,10 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
                                     " (.+)");
                             Matcher matcher2 = multiRolePattern.matcher(twoRoleString);
                             if (matcher2.matches()) {
-                                System.err.println("Match groups:");
-                                for (int i = 0; i <= matcher2.groupCount(); i++) {
-                                    System.err.println(i + " : " + matcher2.group(i));
-                                }
+//                                System.err.println("Match groups:");
+//                                for (int i = 0; i <= matcher2.groupCount(); i++) {
+//                                    System.err.println(i + " : " + matcher2.group(i));
+//                                }
                                 String objString1 = matcher2.group(2);
                                 String objString2 = matcher2.group(4);
                                 Pair<JSONObject, Double> npInterpretation1 = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).

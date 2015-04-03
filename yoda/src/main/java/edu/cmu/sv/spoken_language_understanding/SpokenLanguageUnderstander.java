@@ -65,7 +65,7 @@ public interface SpokenLanguageUnderstander {
             for (String key : sluDistribution.keySet()) {
                 double thisWeight = sluDistribution.get(key);
                 SemanticsModel thisHypothesis = sluHypotheses.get(key);
-                contentComparisonReport = SemanticsModel.contentEquivalenceComparisonAndReport(bestHypothesis, sample.getRight());
+                contentComparisonReport = SemanticsModel.contentEquivalenceComparisonAndReport(thisHypothesis, sample.getRight());
                 if (contentComparisonReport.getLeft()) {
                     weightTotalCorrect += thisWeight;
                     totalCorrectPresent = true;
