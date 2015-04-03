@@ -9,6 +9,7 @@ import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.spoken_language_understanding.SpokenLanguageUnderstander;
 import edu.cmu.sv.spoken_language_understanding.Tokenizer;
+import edu.cmu.sv.utils.NBestDistribution;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.MongoLogHandler;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -29,10 +30,13 @@ import java.util.logging.SimpleFormatter;
  *
  */
 public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
+    public static boolean switchToMultiInterpretersWhenPossible = true;
+
     public NounPhraseInterpreter nounPhraseInterpreter;
     public TimeInterpreter timeInterpreter;
     YodaEnvironment yodaEnvironment;
     Set<MiniLanguageInterpreter> languageInterpreters = new HashSet<>();
+    Set<MiniMultiLanguageInterpreter> multiLanguageInterpreters = new HashSet<>();
 
     // define parameters for the SLU component
     public static final double keywordInterpreterWeight = 0.5;
@@ -42,6 +46,8 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
     public static final double timeInterpreterWeight = 1.0;
     public static final double simpleStringMatchInterpreterWeight = 1.0;
     public static final double secondaryRegexMatchWeight = 0.3;
+    public static final double requiredRoleWeight = 0.9;
+    public static final double optionalRoleWeight = 0.7;
 
 
     private static Logger logger = Logger.getLogger("yoda.spoken_language_understanding.RegexPlusKeywordUnderstander");
@@ -79,7 +85,10 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
             languageInterpreters.add(new WhqHasPropertyRegexInterpreter(qualityClass, yodaEnvironment));
         }
         for (Class<? extends Verb> verbClass : Ontology.verbClasses){
-            languageInterpreters.add(new CommandRegexInterpreter(verbClass, yodaEnvironment));
+            if (switchToMultiInterpretersWhenPossible)
+                multiLanguageInterpreters.add(new CommandMultiInterpreter(verbClass, yodaEnvironment));
+            else
+                languageInterpreters.add(new CommandRegexInterpreter(verbClass, yodaEnvironment));
             languageInterpreters.add(new CommandKeywordInterpreter(verbClass, yodaEnvironment));
         }
         languageInterpreters.add(new NamedEntityFragmentInterpreter(PointOfInterest.class));
@@ -109,7 +118,7 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
         StringDistribution hypothesisDistribution = new StringDistribution();
         int hypothesisId = 0;
 
-        // incorporate regex templates
+        // incorporate mini-interpreters
         for (MiniLanguageInterpreter miniLanguageInterpreter : languageInterpreters) {
             Pair<JSONObject, Double> interpretation = miniLanguageInterpreter.interpret(Tokenizer.tokenize(asrResult), yodaEnvironment);
             if (interpretation == null)
@@ -118,6 +127,20 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
             hypothesisDistribution.put("hyp" + hypothesisId, interpretation.getRight());
             hypothesisId++;
         }
+
+        // incorporate mini multi-interpreters
+        for (MiniMultiLanguageInterpreter multiLanguageInterpreter : multiLanguageInterpreters) {
+            NBestDistribution<JSONObject> interpretation = multiLanguageInterpreter.interpret(Tokenizer.tokenize(asrResult), yodaEnvironment);
+            if (interpretation == null)
+                continue;
+            for (JSONObject key : interpretation.keySet()){
+                hypotheses.put("hyp" + hypothesisId, new SemanticsModel(key));
+                hypothesisDistribution.put("hyp" + hypothesisId, interpretation.get(key));
+                hypothesisId++;
+            }
+        }
+
+
 
         // create a turn and update the DST
         hypothesisDistribution.normalize();
