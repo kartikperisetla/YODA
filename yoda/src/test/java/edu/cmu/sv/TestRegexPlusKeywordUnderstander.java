@@ -47,7 +47,6 @@ public class TestRegexPlusKeywordUnderstander {
 //        runUnderstander();
     }
 
-
     public void testYodaSkeletonSLU() throws FileNotFoundException, UnsupportedEncodingException {
         YodaEnvironment yodaEnvironment = YodaEnvironment.dialogTestingEnvironment();
 

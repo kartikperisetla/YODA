@@ -9,12 +9,10 @@ import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.WebResource;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Time;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.preposition.Preposition;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasName;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasURI;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.InRelationTo;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.*;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.has_quality_subroles.HasQualityRole;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.HypothesisSetManagement;
@@ -29,6 +27,11 @@ import org.json.simple.JSONObject;
 import org.openrdf.query.*;
 import org.openrdf.repository.RepositoryException;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.Temporal;
+import java.time.temporal.TemporalAdjuster;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -125,6 +128,55 @@ public class ReferenceResolution {
     }
 
 
+    private static class NextTimeAdjuster implements TemporalAdjuster {
+        JSONObject timeDescription;
+        String AmPm = null;
+        Long hour = null;
+        Long tenMinute = null;
+        Long singleMinute = null;
+        Long minuteOfHour = (long) 0;
+
+        public NextTimeAdjuster(JSONObject timeDescription) {
+            this.timeDescription = timeDescription;
+            if (timeDescription.containsKey(HasAmPm.class.getSimpleName()))
+                AmPm = (String) timeDescription.get(HasAmPm.class.getSimpleName());
+            if (timeDescription.containsKey(HasHour.class.getSimpleName()))
+                hour = (long) timeDescription.get(HasHour.class.getSimpleName());
+            if (timeDescription.containsKey(HasTenMinute.class.getSimpleName())) {
+                tenMinute = (long) timeDescription.get(HasTenMinute.class.getSimpleName());
+                minuteOfHour += 10*tenMinute;
+            }
+            if (timeDescription.containsKey(HasSingleMinute.class.getSimpleName())) {
+                singleMinute = (long) timeDescription.get(HasSingleMinute.class.getSimpleName());
+                minuteOfHour += singleMinute;
+            }
+
+        }
+
+        @Override
+        public Temporal adjustInto(Temporal temporal) {
+            Temporal ans = temporal.plus(0, ChronoUnit.SECONDS);
+
+            boolean incrementDay =
+                    (hour != null && temporal.get(ChronoField.HOUR_OF_AMPM) > hour);
+
+            boolean alternateAmPm =
+                    (hour != null && temporal.get(ChronoField.HOUR_OF_AMPM) > hour);
+
+
+
+            if (AmPm!=null)
+                ans = ans.with(ChronoField.AMPM_OF_DAY, AmPm.equals("AM") ? 0 : 1);
+            if (hour!=null) {
+                if (temporal.get(ChronoField.HOUR_OF_DAY) > 12*temporal.get(ChronoField.AMPM_OF_DAY))
+                ans = ans.with(ChronoField.HOUR_OF_AMPM, hour);
+
+            }
+            return temporal;
+        }
+    }
+
+
     /*
     * Return a partial query string and an updated tmpVarIndex for the reference JSONObject
     * tmpVarIndex is used so that temporary variables within the query don't have naming conflicts
@@ -135,6 +187,18 @@ public class ReferenceResolution {
             int referenceIndex = tmpVarIndex;
             tmpVarIndex ++;
             String ans = "";
+
+
+            // Time stamps are resolved with the Java 8 API, outside of SPARQL
+            if (Time.class.isAssignableFrom(Ontology.thingNameMap.get((String) reference.get("class")))){
+
+                LocalDateTime referencePoint = LocalDateTime.now();
+                referencePoint.with(new NextTimeAdjuster(reference));
+
+                //TODO: create a grounded time stamp and return it as a web resource
+
+            }
+
             if (Noun.class.isAssignableFrom(Ontology.thingNameMap.get((String) reference.get("class")))) {
                 ans += "?x" + referenceIndex + " rdf:type base:" + reference.get("class") + " .\n";
             }
