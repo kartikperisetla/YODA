@@ -150,29 +150,39 @@ public class ReferenceResolution {
                 singleMinute = (long) timeDescription.get(HasSingleMinute.class.getSimpleName());
                 minuteOfHour += singleMinute;
             }
-
         }
 
         @Override
         public Temporal adjustInto(Temporal temporal) {
             Temporal ans = temporal.plus(0, ChronoUnit.SECONDS);
 
-            boolean incrementDay =
-                    (hour != null && temporal.get(ChronoField.HOUR_OF_AMPM) > hour);
+            boolean alternateAmPm = false;
+            boolean incrementDay = false;
 
-            boolean alternateAmPm =
-                    (hour != null && temporal.get(ChronoField.HOUR_OF_AMPM) > hour);
-
-
-
-            if (AmPm!=null)
-                ans = ans.with(ChronoField.AMPM_OF_DAY, AmPm.equals("AM") ? 0 : 1);
-            if (hour!=null) {
-                if (temporal.get(ChronoField.HOUR_OF_DAY) > 12*temporal.get(ChronoField.AMPM_OF_DAY))
-                ans = ans.with(ChronoField.HOUR_OF_AMPM, hour);
-
+            if (AmPm == null) {
+                alternateAmPm =
+                        (hour != null && temporal.get(ChronoField.HOUR_OF_AMPM) > hour) ||
+                                (hour != null && temporal.get(ChronoField.HOUR_OF_AMPM) == hour && minuteOfHour != 0);
+                incrementDay = alternateAmPm && temporal.get(ChronoField.HOUR_OF_DAY) >= 12;
+            } else {
+                if (temporal.get(ChronoField.AMPM_OF_DAY) != (AmPm.equals("AM") ? 0 : 1))
+                    alternateAmPm = true;
+                if (temporal.get(ChronoField.AMPM_OF_DAY) > (AmPm.equals("AM") ? 0 : 1) ||
+                        (hour != null && temporal.get(ChronoField.HOUR_OF_AMPM) > hour) ||
+                        (hour != null && temporal.get(ChronoField.HOUR_OF_AMPM) == hour && minuteOfHour != 0)
+                )
+                    incrementDay = true;
             }
-            return temporal;
+
+            if (alternateAmPm)
+                ans = ans.with(ChronoField.AMPM_OF_DAY, temporal.get(ChronoField.AMPM_OF_DAY)==1 ? 0 : 1);
+            if (incrementDay)
+                ans = ans.with(ChronoField.EPOCH_DAY, temporal.get(ChronoField.EPOCH_DAY) + 1);
+            if (hour != null)
+                ans = ans.with(ChronoField.HOUR_OF_AMPM, hour);
+            ans = ans.with(ChronoField.MINUTE_OF_HOUR, minuteOfHour);
+
+            return ans;
         }
     }
 
@@ -193,8 +203,9 @@ public class ReferenceResolution {
             if (Time.class.isAssignableFrom(Ontology.thingNameMap.get((String) reference.get("class")))){
 
                 LocalDateTime referencePoint = LocalDateTime.now();
-                referencePoint.with(new NextTimeAdjuster(reference));
-
+                System.err.println("now:" + referencePoint.toString());
+                referencePoint = referencePoint.with(new NextTimeAdjuster(reference));
+                System.err.println("after time adjustment:" + referencePoint);
                 //TODO: create a grounded time stamp and return it as a web resource
 
             }
