@@ -215,6 +215,8 @@ public class ReferenceResolution {
                 System.err.println("after time adjustment:" + referencePoint);
                 //TODO: create a grounded time stamp and return it as a web resource
 
+
+
             }
 
             if (Noun.class.isAssignableFrom(Ontology.thingNameMap.get((String) reference.get("class")))) {
