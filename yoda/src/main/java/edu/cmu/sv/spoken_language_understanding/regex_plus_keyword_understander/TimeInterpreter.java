@@ -36,6 +36,7 @@ public class TimeInterpreter implements MiniLanguageInterpreter{
         singleMinuteMap.put("five", (long) 5);
         singleMinuteMap.put("5", (long) 5);
 
+        amPmMap.put("a.m.", "AM");
         amPmMap.put("p.m.", "PM");
         amPmMap.put("PM", "PM");
         amPmMap.put("P_ M_", "PM");

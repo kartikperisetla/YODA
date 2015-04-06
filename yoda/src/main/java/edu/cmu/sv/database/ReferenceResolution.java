@@ -160,28 +160,35 @@ public class ReferenceResolution {
             boolean incrementDay = false;
 
             if (AmPm == null) {
+                System.err.println("refres: adjustInto: AmPm==null");
                 alternateAmPm =
                         (hour != null && temporal.get(ChronoField.HOUR_OF_AMPM) > hour) ||
                                 (hour != null && temporal.get(ChronoField.HOUR_OF_AMPM) == hour && minuteOfHour != 0);
                 incrementDay = alternateAmPm && temporal.get(ChronoField.HOUR_OF_DAY) >= 12;
             } else {
+                System.err.println("refres: adjustInto: AmPm!=null");
                 if (temporal.get(ChronoField.AMPM_OF_DAY) != (AmPm.equals("AM") ? 0 : 1))
                     alternateAmPm = true;
-                if (temporal.get(ChronoField.AMPM_OF_DAY) > (AmPm.equals("AM") ? 0 : 1) ||
-                        (hour != null && temporal.get(ChronoField.HOUR_OF_AMPM) > hour) ||
-                        (hour != null && temporal.get(ChronoField.HOUR_OF_AMPM) == hour && minuteOfHour != 0)
-                )
+
+                if (temporal.get(ChronoField.AMPM_OF_DAY) > (AmPm.equals("AM") ? 0 : 1))
+                    incrementDay = true;
+                if (temporal.get(ChronoField.AMPM_OF_DAY) == (AmPm.equals("AM") ? 0 : 1) &&
+                        hour != null &&
+                        temporal.get(ChronoField.HOUR_OF_AMPM) >= hour)
                     incrementDay = true;
             }
+
+            System.err.println("refres: alternateAmPm"+alternateAmPm+", incrementDay:"+incrementDay);
 
             if (alternateAmPm)
                 ans = ans.with(ChronoField.AMPM_OF_DAY, temporal.get(ChronoField.AMPM_OF_DAY)==1 ? 0 : 1);
             if (incrementDay)
-                ans = ans.with(ChronoField.EPOCH_DAY, temporal.get(ChronoField.EPOCH_DAY) + 1);
+                ans = ans.with(ChronoField.EPOCH_DAY, temporal.getLong(ChronoField.EPOCH_DAY) + 1);
             if (hour != null)
                 ans = ans.with(ChronoField.HOUR_OF_AMPM, hour);
             ans = ans.with(ChronoField.MINUTE_OF_HOUR, minuteOfHour);
-
+            ans = ans.with(ChronoField.SECOND_OF_MINUTE, 0);
+            ans = ans.with(ChronoField.NANO_OF_SECOND, 0);
             return ans;
         }
     }
