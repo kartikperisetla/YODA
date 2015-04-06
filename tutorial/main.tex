@@ -267,18 +267,13 @@ Some important things to remember while writing a sensor:
 
 \section{Implement and Register Non-Dialog Tasks}
 
-TODO: UPDATE THIS SECTION (describe the simulator here)
-
-If a YODA dialog system is to do more than answer questions, the developer needs to implement some non-dialog tasks and register them with the system.
-Figure \ref{fig:turn_on_task} shows the important parts of the implementation we use for this demo.
-The TurnOnTask non-dialog task 'turns on' an appliance by directly modifying the database.
-Of course, in the real world, these tasks should have real-world effects, and sensors should update the database, but this works for demonstration purposes.
+The SmartHouse simulator is a simply a collection of classes relating or mimicking the real world. It essentially describes a space and the collection of objects in that space – for example, a room has ‘Things’ inside it.  The collection of ‘Things’ are objects whose presence can be sensed in a room or whose states can be updated (an electronic for example) by YODA.If a YODA dialog system is to do more than answer questions, the developer needs to implement some non-dialog tasks and register them with the system. Figure \ref{fig:turn_on_task} shows the important parts of the implementation we use for this demo. The TurnOnTask non-dialog task 'turns on' an appliance by directly modifying its state in the simulator. As with the real world, the sensors are implemented to continuously obtain the state of these appliances and the database is updated with all the information obtained from the sensors.
 
 
 \begin{figure}[htbp!]
 \centering
 \includegraphics[width=\textwidth]{TurnOnTask}
-\caption{A sample non-dialog task - TurnOnTask turns on an appliance by directly modifying the database.}
+\caption{A sample non-dialog task - TurnOnTask turns on an appliance by changing its state in the simulator.}
 \label{fig:turn_on_task}
 \end{figure}
 
@@ -542,17 +537,22 @@ In this case, the term "power up" will be understood by the system, but not gene
 
 \section{Extend a YODA Executable}
 
-TODO: UPDATE THIS SECTION: include a more exciting example from the current system
-
-The final step of creating a YODA dialog system is to extend one of the provided executable dialog systems to include the new domain.
-Figure \ref{fig:smart_house_command_line_system} shows the executable which includes the smart house domain.
-All that is required in the executable is to extend a YODA base executable and add the yoda skeleton domain and the smart house domain in a static context.
+The final step of creating a YODA dialog system is to extend one of the provided executable dialog systems to include the new domain. Figure \ref{fig:smart_house_command_line_system} shows the executable, which includes the smart house domain. All that is required in the executable is to extend a YODA base executable and add the yoda skeleton domain and the smart house domain in a static context.
 
 \begin{figure}[h!]
 \centering
 \includegraphics[width=\textwidth]{SmartHouseCommandLineExecutable}
 \caption{SmartHouseCommandLineSystem.java is a fully-functioning command line dialog system in the smart house domain.}
 \label{fig:smart_house_command_line_system}
+\end{figure}
+
+Note also that the thread for the simulator’s graphical user interface is started here and the simulator items are loaded in a static context as shown in Fig \ref{fig:smart_house_simulator} below.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{SmartHouseSimulator}
+\caption{Simulator.java shows items being populated in the smart house simulator.}
+\label{fig:smart_house_simulator}
 \end{figure}
 
 This creates a command-line dialog system, which takes words as input, and outputs words (and non-dialog tasks).
