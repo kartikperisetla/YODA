@@ -26,42 +26,6 @@ public class TimeInterpreter implements MiniLanguageInterpreter{
 
     YodaEnvironment yodaEnvironment;
 
-    private static final String[] numNames = {
-            "",
-            " one",
-            " two",
-            " three",
-            " four",
-            " five",
-            " six",
-            " seven",
-            " eight",
-            " nine",
-            " ten",
-            " eleven",
-            " twelve",
-            " thirteen",
-            " fourteen",
-            " fifteen",
-            " sixteen",
-            " seventeen",
-            " eighteen",
-            " nineteen"
-    };
-
-    private static final String[] tensNames = {
-            "",
-            " ten",
-            " twenty",
-            " thirty",
-            " forty",
-            " fifty",
-            " sixty",
-            " seventy",
-            " eighty",
-            " ninety"
-    };
-
     public TimeInterpreter(YodaEnvironment yodaEnvironment) {
         this.yodaEnvironment = yodaEnvironment;
         hourMap.put("two", (long) 2);
@@ -73,6 +37,7 @@ public class TimeInterpreter implements MiniLanguageInterpreter{
         singleMinuteMap.put("5", (long) 5);
 
         amPmMap.put("a.m.", "AM");
+        amPmMap.put("a.m.", "AM");
         amPmMap.put("p.m.", "PM");
         amPmMap.put("PM", "PM");
         amPmMap.put("P_ M_", "PM");
@@ -83,6 +48,7 @@ public class TimeInterpreter implements MiniLanguageInterpreter{
     @Override
     public Pair<JSONObject, Double> interpret(List<String> tokens, YodaEnvironment yodaEnvironment) {
         JSONObject ans = new JSONObject();
+        System.out.println("tokens: " + tokens);
         ans.put("class", Time.class.getSimpleName());
         List<String> remainingTokens = new LinkedList<>(tokens);
         for (String token : remainingTokens){
