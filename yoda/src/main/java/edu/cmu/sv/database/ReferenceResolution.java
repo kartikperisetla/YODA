@@ -92,37 +92,48 @@ public class ReferenceResolution {
     public static StringDistribution resolveReference(YodaEnvironment yodaEnvironment,
                                                       JSONObject reference,
                                                       boolean requireReferentInFocus){
-//        System.out.println("resolveReference: reference:" + reference);
-        String queryString = Database.prefixes + "SELECT DISTINCT ?x0 ?score0 WHERE {\n";
-        if (requireReferentInFocus)
-            queryString += "?x0 rdf:type dst:InFocus .\n";
-        queryString += referenceResolutionHelper(reference, 0).getKey();
-        queryString += "} \nORDER BY DESC(?score0) \nLIMIT 10";
-
-        yodaEnvironment.db.log(queryString);
-        Database.getLogger().info(MongoLogHandler.createSimpleRecord("reference resolution query", queryString).toJSONString());
-//        Database.getLogger().info("Reference resolution query:\n" + queryString);
         StringDistribution ans = new StringDistribution();
-        try {
-            TupleQuery query = yodaEnvironment.db.connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
-            TupleQueryResult result = query.evaluate();
+        if (reference.get("class").equals(Time.class.getSimpleName())){
+            LocalDateTime referencePoint = LocalDateTime.now();
+//            System.err.println("now:" + referencePoint.toString());
+            referencePoint = referencePoint.with(new NextTimeAdjuster(reference));
+//            System.err.println("after time adjustment:" + referencePoint);
+            String newUri = yodaEnvironment.db.insertValue(referencePoint);
+            ans.put(newUri, 1.0);
 
-            while (result.hasNext()){
-                BindingSet bindings = result.next();
-                if (bindings.getValue("score0")==null)
-                    continue;
-                String key = bindings.getValue("x0").stringValue();
-                Double score = Double.parseDouble(bindings.getValue("score0").stringValue());
-                ans.put(key, Doubles.max(score, ans.get(key)));
+        } else {
+
+//        System.out.println("resolveReference: reference:" + reference);
+            String queryString = Database.prefixes + "SELECT DISTINCT ?x0 ?score0 WHERE {\n";
+            if (requireReferentInFocus)
+                queryString += "?x0 rdf:type dst:InFocus .\n";
+            queryString += referenceResolutionHelper(reference, 0).getKey();
+            queryString += "} \nORDER BY DESC(?score0) \nLIMIT 10";
+
+            yodaEnvironment.db.log(queryString);
+            Database.getLogger().info(MongoLogHandler.createSimpleRecord("reference resolution query", queryString).toJSONString());
+//        Database.getLogger().info("Reference resolution query:\n" + queryString);
+            try {
+                TupleQuery query = yodaEnvironment.db.connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+                TupleQueryResult result = query.evaluate();
+
+                while (result.hasNext()) {
+                    BindingSet bindings = result.next();
+                    if (bindings.getValue("score0") == null)
+                        continue;
+                    String key = bindings.getValue("x0").stringValue();
+                    Double score = Double.parseDouble(bindings.getValue("score0").stringValue());
+                    ans.put(key, Doubles.max(score, ans.get(key)));
+                }
+                result.close();
+
+            } catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {
+                e.printStackTrace();
+                System.exit(0);
             }
-            result.close();
-//            System.err.println(ans);
 
-        } catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {
-            e.printStackTrace();
-            System.exit(0);
         }
-
+//        System.err.println(ans);
         ans.normalize();
         return ans;
     }
@@ -160,13 +171,13 @@ public class ReferenceResolution {
             boolean incrementDay = false;
 
             if (AmPm == null) {
-                System.err.println("refres: adjustInto: AmPm==null");
+//                System.err.println("refres: adjustInto: AmPm==null");
                 alternateAmPm =
                         (hour != null && temporal.get(ChronoField.HOUR_OF_AMPM) > hour) ||
                                 (hour != null && temporal.get(ChronoField.HOUR_OF_AMPM) == hour && minuteOfHour != 0);
                 incrementDay = alternateAmPm && temporal.get(ChronoField.HOUR_OF_DAY) >= 12;
             } else {
-                System.err.println("refres: adjustInto: AmPm!=null");
+//                System.err.println("refres: adjustInto: AmPm!=null");
                 if (temporal.get(ChronoField.AMPM_OF_DAY) != (AmPm.equals("AM") ? 0 : 1))
                     alternateAmPm = true;
 
@@ -178,7 +189,7 @@ public class ReferenceResolution {
                     incrementDay = true;
             }
 
-            System.err.println("refres: alternateAmPm"+alternateAmPm+", incrementDay:"+incrementDay);
+//            System.err.println("refres: alternateAmPm"+alternateAmPm+", incrementDay:"+incrementDay);
 
             if (alternateAmPm)
                 ans = ans.with(ChronoField.AMPM_OF_DAY, temporal.get(ChronoField.AMPM_OF_DAY)==1 ? 0 : 1);
@@ -204,20 +215,6 @@ public class ReferenceResolution {
             int referenceIndex = tmpVarIndex;
             tmpVarIndex ++;
             String ans = "";
-
-
-            // Time stamps are resolved with the Java 8 API, outside of SPARQL
-            if (Time.class.isAssignableFrom(Ontology.thingNameMap.get((String) reference.get("class")))){
-
-                LocalDateTime referencePoint = LocalDateTime.now();
-                System.err.println("now:" + referencePoint.toString());
-                referencePoint = referencePoint.with(new NextTimeAdjuster(reference));
-                System.err.println("after time adjustment:" + referencePoint);
-                //TODO: create a grounded time stamp and return it as a web resource
-
-
-
-            }
 
             if (Noun.class.isAssignableFrom(Ontology.thingNameMap.get((String) reference.get("class")))) {
                 ans += "?x" + referenceIndex + " rdf:type base:" + reference.get("class") + " .\n";

@@ -27,6 +27,8 @@ import org.openrdf.sail.memory.MemoryStore;
 
 import java.io.*;
 import java.lang.Object;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
@@ -239,7 +241,6 @@ public class Database {
             String newURI = "auto_generated_value_URI" + URICounter++;
             if (obj instanceof String) {
                 String updateString = prefixes + "INSERT DATA \n{ base:" + newURI + " rdf:value \"" + obj + "\"^^xsd:string}";
-//            System.out.println("Database.insertValue: updateString:"+updateString);
                 synchronized (connection) {
                     log(updateString);
                     Update update = connection.prepareUpdate(QueryLanguage.SPARQL, updateString, baseURI);
@@ -247,7 +248,14 @@ public class Database {
                 }
             } else if (obj instanceof Integer) {
                 String updateString = prefixes + "INSERT DATA \n{ base:" + newURI + " rdf:value \"" + obj + "\"^^xsd:int}";
-//            System.out.println("Database.insertValue: updateString:"+updateString);
+                synchronized (connection) {
+                    log(updateString);
+                    Update update = connection.prepareUpdate(QueryLanguage.SPARQL, updateString, baseURI);
+                    update.execute();
+                }
+            } else if (obj instanceof LocalDateTime){
+                String xsdString = "\""+((LocalDateTime)obj).format(DateTimeFormatter.ISO_DATE_TIME) + "\"^^xsd:dateTime";
+                String updateString = prefixes + "INSERT DATA \n{ base:" + newURI + " rdf:value " + xsdString + "}";
                 synchronized (connection) {
                     log(updateString);
                     Update update = connection.prepareUpdate(QueryLanguage.SPARQL, updateString, baseURI);
