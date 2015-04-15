@@ -43,7 +43,6 @@ public class ReferenceResolution {
     public static final double missingRoleNotInferredPenalty = .3;
     private static final String unfilledJunkString = "UNFILLED JUNK STRING@@234";
     public static final boolean PRINT_CACHING_DEBUG_OUTPUT = false;
-    public static final Boolean lock = true;
 
     private static Map<SemanticsModel, StringDistribution> refResCache = new HashMap<>();
     private static Map<SemanticsModel, StringDistribution> refResCacheInFocus = new HashMap<>();

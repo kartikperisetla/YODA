@@ -95,7 +95,7 @@ public class DialogStateTracker implements Runnable {
 
 
             // synchronize so that the RefRes cache is unique to this turn
-            synchronized (ReferenceResolution.lock) {
+            synchronized (yodaEnvironment.db.connection) {
                 ReferenceResolution.clearCache();
                 for (Class<? extends DialogStateUpdateInference> updateInferenceClass : updateInferences) {
                     if (ReferenceResolution.PRINT_CACHING_DEBUG_OUTPUT)
@@ -175,8 +175,10 @@ public class DialogStateTracker implements Runnable {
     @Override
     public void run() {
         while (true){
-            for (Sensor sensor : yodaEnvironment.db.sensors){
-                sensor.sense(yodaEnvironment);
+            synchronized (yodaEnvironment.db.connection) {
+                for (Sensor sensor : yodaEnvironment.db.sensors) {
+                    sensor.sense(yodaEnvironment);
+                }
             }
             try {
                 Pair<Turn, Long> DstInput = yodaEnvironment.DstInputQueue.poll(100, TimeUnit.MILLISECONDS);

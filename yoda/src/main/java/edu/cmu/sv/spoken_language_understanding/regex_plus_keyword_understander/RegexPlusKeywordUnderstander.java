@@ -120,7 +120,7 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
         int hypothesisId = 0;
 
         // synchronize so that the RefRes cache is unique to this utterance
-        synchronized (ReferenceResolution.lock) {
+        synchronized (yodaEnvironment.db.connection) {
             ReferenceResolution.clearCache();
             // incorporate mini-interpreters
             for (MiniLanguageInterpreter miniLanguageInterpreter : languageInterpreters) {
