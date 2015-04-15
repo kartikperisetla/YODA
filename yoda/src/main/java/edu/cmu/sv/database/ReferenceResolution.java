@@ -42,7 +42,43 @@ public class ReferenceResolution {
     public static final double minFocusSalience = .002;
     public static final double missingRoleNotInferredPenalty = .3;
     private static final String unfilledJunkString = "UNFILLED JUNK STRING@@234";
+    public static final boolean PRINT_CACHING_DEBUG_OUTPUT = false;
+    public static final Boolean lock = true;
 
+    private static Map<SemanticsModel, StringDistribution> refResCache = new HashMap<>();
+    private static Map<SemanticsModel, StringDistribution> refResCacheInFocus = new HashMap<>();
+
+    public static void clearCache(){
+        if (PRINT_CACHING_DEBUG_OUTPUT)
+            System.err.println("ReferenceResolution: resetting ref res cache");
+        refResCache = new HashMap<>();
+        refResCacheInFocus = new HashMap<>();
+    }
+
+    public static StringDistribution checkCache(JSONObject reference, boolean requireReferentInFocus){
+        if (PRINT_CACHING_DEBUG_OUTPUT)
+            System.err.println("RefRes.checkCache: reference:"+reference.toJSONString() + ", " + requireReferentInFocus);
+        if (requireReferentInFocus) {
+            for (SemanticsModel model : refResCacheInFocus.keySet()) {
+                if (SemanticsModel.contentEquivalenceComparisonAndReport(model, new SemanticsModel(reference)).getLeft()) {
+                    if (PRINT_CACHING_DEBUG_OUTPUT)
+                        System.err.println("ReferenceResolution: cache hit");
+                    return refResCacheInFocus.get(model).deepCopy();
+                }
+            }
+        } else {
+            for (SemanticsModel model : refResCache.keySet()){
+                if (SemanticsModel.contentEquivalenceComparisonAndReport(model, new SemanticsModel(reference)).getLeft()){
+                    if (PRINT_CACHING_DEBUG_OUTPUT)
+                        System.err.println("ReferenceResolution: cache hit");
+                    return refResCache.get(model).deepCopy();
+                }
+            }
+        }
+        if (PRINT_CACHING_DEBUG_OUTPUT)
+            System.err.println("ReferenceResolution: XXX cache miss XXX");
+        return null;
+    }
 
     public static StringDistribution inferRole(YodaEnvironment yodaEnvironment,
                                                Class<? extends Role> roleClass){
@@ -92,6 +128,10 @@ public class ReferenceResolution {
     public static StringDistribution resolveReference(YodaEnvironment yodaEnvironment,
                                                       JSONObject reference,
                                                       boolean requireReferentInFocus){
+        StringDistribution cachedAns = checkCache(reference, requireReferentInFocus);
+        if (cachedAns!=null)
+            return cachedAns;
+
         StringDistribution ans = new StringDistribution();
         if (reference.get("class").equals(Time.class.getSimpleName())){
             LocalDateTime referencePoint = LocalDateTime.now();
@@ -135,6 +175,11 @@ public class ReferenceResolution {
         }
 //        System.err.println(ans);
         ans.normalize();
+        if (requireReferentInFocus){
+            refResCacheInFocus.put(new SemanticsModel(reference.toJSONString()), ans.deepCopy());
+        } else {
+            refResCache.put(new SemanticsModel(reference.toJSONString()), ans.deepCopy());
+        }
         return ans;
     }
 

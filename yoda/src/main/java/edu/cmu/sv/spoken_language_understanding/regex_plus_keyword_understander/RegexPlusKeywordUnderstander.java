@@ -1,6 +1,7 @@
 package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander;
 
 import edu.cmu.sv.database.Ontology;
+import edu.cmu.sv.database.ReferenceResolution;
 import edu.cmu.sv.dialog_state_tracking.Turn;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.noun.PointOfInterest;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
@@ -118,28 +119,32 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
         StringDistribution hypothesisDistribution = new StringDistribution();
         int hypothesisId = 0;
 
-        // incorporate mini-interpreters
-        for (MiniLanguageInterpreter miniLanguageInterpreter : languageInterpreters) {
-            Pair<JSONObject, Double> interpretation = miniLanguageInterpreter.interpret(Tokenizer.tokenize(asrResult), yodaEnvironment);
-            if (interpretation == null)
-                continue;
-            hypotheses.put("hyp" + hypothesisId, new SemanticsModel(interpretation.getKey()));
-            hypothesisDistribution.put("hyp" + hypothesisId, interpretation.getRight());
-            hypothesisId++;
-        }
-
-        // incorporate mini multi-interpreters
-        for (MiniMultiLanguageInterpreter multiLanguageInterpreter : multiLanguageInterpreters) {
-            NBestDistribution<JSONObject> interpretation = multiLanguageInterpreter.interpret(Tokenizer.tokenize(asrResult), yodaEnvironment);
-            if (interpretation == null)
-                continue;
-            for (JSONObject key : interpretation.keySet()){
-                hypotheses.put("hyp" + hypothesisId, new SemanticsModel(key));
-                hypothesisDistribution.put("hyp" + hypothesisId, interpretation.get(key));
+        // synchronize so that the RefRes cache is unique to this utterance
+        synchronized (ReferenceResolution.lock) {
+            ReferenceResolution.clearCache();
+            // incorporate mini-interpreters
+            for (MiniLanguageInterpreter miniLanguageInterpreter : languageInterpreters) {
+                Pair<JSONObject, Double> interpretation = miniLanguageInterpreter.interpret(Tokenizer.tokenize(asrResult), yodaEnvironment);
+                if (interpretation == null)
+                    continue;
+                hypotheses.put("hyp" + hypothesisId, new SemanticsModel(interpretation.getKey()));
+                hypothesisDistribution.put("hyp" + hypothesisId, interpretation.getRight());
                 hypothesisId++;
             }
-        }
 
+            // incorporate mini multi-interpreters
+            for (MiniMultiLanguageInterpreter multiLanguageInterpreter : multiLanguageInterpreters) {
+                NBestDistribution<JSONObject> interpretation = multiLanguageInterpreter.interpret(Tokenizer.tokenize(asrResult), yodaEnvironment);
+                if (interpretation == null)
+                    continue;
+                for (JSONObject key : interpretation.keySet()) {
+                    hypotheses.put("hyp" + hypothesisId, new SemanticsModel(key));
+                    hypothesisDistribution.put("hyp" + hypothesisId, interpretation.get(key));
+                    hypothesisId++;
+                }
+            }
+            ReferenceResolution.clearCache();
+        }
 
 
         // create a turn and update the DST
