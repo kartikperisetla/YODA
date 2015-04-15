@@ -32,6 +32,7 @@ public interface SpokenLanguageUnderstander {
 
 
         for (Pair<String, SemanticsModel> sample : dataset.getDataSet()){
+//            System.err.println(sample.getLeft());
             process1BestAsr(sample.getKey());
             Pair<Turn, Long> dstInputTurn = yodaEnvironment.DstInputQueue.poll();
             if (dstInputTurn==null)

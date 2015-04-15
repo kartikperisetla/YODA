@@ -91,7 +91,7 @@ public class YelpPhoenixLexicon extends Lexicon {
                 entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "travel agencies");
                 entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "kiosks");
                 entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "travel guides");
-                add(HotelsAndTravel.class, entry, false);
+                add(HotelsAndTravel.class, entry, true);
             }
             {
                 LexicalEntry entry = new LexicalEntry();

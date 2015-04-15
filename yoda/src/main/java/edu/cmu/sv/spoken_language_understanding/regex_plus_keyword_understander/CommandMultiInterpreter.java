@@ -101,6 +101,10 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
                             else
                                 npInterpretation = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
                                     nounPhraseInterpreter.interpret(Tokenizer.tokenize(npString), yodaEnvironment);
+
+                            if (npInterpretation==null)
+                                continue;
+
                             String jsonString = "{\"dialogAct\":\"Command\",\"verb\":{\"class\":\"" + verbClass.getSimpleName() + "\"}}";
                             JSONObject hyp = SemanticsModel.parseJSON(jsonString);
                             ((JSONObject) hyp.get("verb")).put(roleClass.getSimpleName(), npInterpretation.getKey());
