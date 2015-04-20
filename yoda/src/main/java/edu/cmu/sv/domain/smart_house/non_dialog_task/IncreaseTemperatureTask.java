@@ -34,7 +34,7 @@ public class IncreaseTemperatureTask extends NonDialogTask {
                 itemFound = true;
                 if (!(thing instanceof GUIRoom))
                     continue;
-                ((GUIRoom) thing).setTemperature(86);
+                ((GUIRoom) thing).setTemperature(98);
                 break;
             }
         }
