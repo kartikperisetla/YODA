@@ -31,7 +31,7 @@ public class TimeInterpreter implements MiniLanguageInterpreter{
         put("nine", (long)9);
         put("ten", (long)10);
         put("eleven", (long)11);
-        put("twelve", (long)12);
+        put("twelve", (long)0);
         put("1", (long)1);
         put("2", (long)2);
         put("3", (long)3);
@@ -43,7 +43,7 @@ public class TimeInterpreter implements MiniLanguageInterpreter{
         put("9", (long)9);
         put("10", (long)10);
         put("11", (long)11);
-        put("12", (long)12);
+        put("12", (long)0);
     }};
     Map<String, Long> tenMinuteMap = new HashMap<String, Long>() {{
         // TODO teens are complicated
