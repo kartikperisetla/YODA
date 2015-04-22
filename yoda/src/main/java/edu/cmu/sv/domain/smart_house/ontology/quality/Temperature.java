@@ -17,7 +17,7 @@ public class Temperature extends TransientQuality {
     public Function<List<String>, String> getQualityCalculatorSPARQLQuery() {
         Function<List<String>, String> queryGen = (List<String> entityURIs) ->
                 entityURIs.get(0)+" base:temperature ?i_temperature . "+
-                        "BIND( 1.0 - ( ?i_temperature * 0.2 ) AS "+entityURIs.get(1)+") ";
+                        "BIND( ?i_temperature / 120 AS "+entityURIs.get(1)+") ";
         return queryGen;
 
     }

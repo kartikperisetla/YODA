@@ -1,12 +1,12 @@
 package edu.cmu.sv.domain.smart_house.ontology.adjective;
 
 /**
- * Created by dan on 4/15/15.
+ * Created by dan on 4/21/15.
  */
-public class Hot extends TemperatureAdjective {
+public class Cold extends TemperatureAdjective {
     @Override
     public double getCenter() {
-        return 1;
+        return 0;
     }
 
     @Override

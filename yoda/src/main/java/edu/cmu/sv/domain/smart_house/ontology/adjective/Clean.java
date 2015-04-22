@@ -15,4 +15,3 @@ public class Clean extends CleanlinessAdjective {
     }
 }
 
-

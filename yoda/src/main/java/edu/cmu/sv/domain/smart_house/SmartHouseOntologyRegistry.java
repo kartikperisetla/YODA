@@ -6,6 +6,7 @@ import edu.cmu.sv.domain.smart_house.ontology.adjective.Dirty;
 import edu.cmu.sv.domain.smart_house.ontology.adjective.Off;
 import edu.cmu.sv.domain.smart_house.ontology.adjective.On;
 import edu.cmu.sv.domain.smart_house.ontology.adjective.Hot;
+import edu.cmu.sv.domain.smart_house.ontology.adjective.Cold;
 import edu.cmu.sv.domain.smart_house.ontology.noun.*;
 import edu.cmu.sv.domain.smart_house.ontology.preposition.IsContainedBy;
 import edu.cmu.sv.domain.smart_house.ontology.quality.Cleanliness;
@@ -17,6 +18,7 @@ import edu.cmu.sv.domain.smart_house.ontology.verb.CleanRoom;
 import edu.cmu.sv.domain.smart_house.ontology.verb.TurnOffAppliance;
 import edu.cmu.sv.domain.smart_house.ontology.verb.TurnOnAppliance;
 import edu.cmu.sv.domain.smart_house.ontology.verb.IncreaseTemperature;
+import edu.cmu.sv.domain.smart_house.ontology.verb.DecreaseTemperature;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
@@ -92,6 +94,7 @@ public class SmartHouseOntologyRegistry extends OntologyRegistry{
         adjectiveClasses.add(Clean.class);
         adjectiveClasses.add(Dirty.class);
         adjectiveClasses.add(Hot.class);
+        adjectiveClasses.add(Cold.class);
 
         prepositionClasses.add(IsContainedBy.class);
 
@@ -99,6 +102,7 @@ public class SmartHouseOntologyRegistry extends OntologyRegistry{
         verbClasses.add(TurnOffAppliance.class);
         verbClasses.add(CleanRoom.class);
         verbClasses.add(IncreaseTemperature.class);
+        verbClasses.add(DecreaseTemperature.class);
 
         qualityClasses.add(PowerState.class);
         qualityClasses.add(Cleanliness.class);

@@ -39,7 +39,7 @@ public class IncreaseTemperatureTask extends NonDialogTask {
             }
         }
         if(!itemFound) {
-            System.out.println("ERROR: unknown URI:"+uri);
+            System.err.println("IncreaseTemperatureTask.execute(): ERROR: unknown URI:"+uri);
             System.exit(0);
         }
     }

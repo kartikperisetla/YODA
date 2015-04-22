@@ -41,7 +41,7 @@ public class TurnOffTask extends NonDialogTask {
             }
         }
         if(!itemFound) {
-            System.out.println("ERROR: unknown URI:"+uri);
+            System.err.println("TurnOffTask.execute(): ERROR: unknown URI:"+uri);
             System.exit(0);
         }
     }

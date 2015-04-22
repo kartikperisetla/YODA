@@ -3,6 +3,7 @@ package edu.cmu.sv.domain.smart_house;
 import edu.cmu.sv.domain.smart_house.ontology.adjective.Clean;
 import edu.cmu.sv.domain.smart_house.ontology.adjective.Dirty;
 import edu.cmu.sv.domain.smart_house.ontology.adjective.Hot;
+import edu.cmu.sv.domain.smart_house.ontology.adjective.Cold;
 import edu.cmu.sv.domain.smart_house.ontology.adjective.Off;
 import edu.cmu.sv.domain.smart_house.ontology.adjective.On;
 import edu.cmu.sv.domain.smart_house.ontology.noun.*;
@@ -121,6 +122,11 @@ public class SmartHouseLexicon extends Lexicon {
             }
             {
                 LexicalEntry entry = new LexicalEntry();
+                entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "cold");
+                add(Cold.class, entry, false);
+            }
+            {
+                LexicalEntry entry = new LexicalEntry();
                 entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "dirty");
                 entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "untidy");
                 add(Dirty.class, entry, false);
@@ -167,6 +173,12 @@ public class SmartHouseLexicon extends Lexicon {
                 add(Hot.class, entry, false);
             }
 
+            {
+                LexicalEntry entry = new LexicalEntry();
+                entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "cool down");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "cool down");
+                add(Cold.class, entry, false);
+            }
 
             {
                 LexicalEntry entry = new LexicalEntry();
