@@ -13,6 +13,8 @@ import edu.cmu.sv.domain.smart_house.ontology.role.HasRoom;
 import edu.cmu.sv.domain.smart_house.ontology.verb.CleanRoom;
 import edu.cmu.sv.domain.smart_house.ontology.verb.TurnOffAppliance;
 import edu.cmu.sv.domain.smart_house.ontology.verb.TurnOnAppliance;
+import edu.cmu.sv.domain.smart_house.ontology.verb.IncreaseTemperature;
+import edu.cmu.sv.domain.smart_house.ontology.verb.DecreaseTemperature;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 
 /**
@@ -170,14 +172,14 @@ public class SmartHouseLexicon extends Lexicon {
                 entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "heat up");
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "warm up");
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "heat up");
-                add(Hot.class, entry, false);
+                add(IncreaseTemperature.class, entry, false);
             }
 
             {
                 LexicalEntry entry = new LexicalEntry();
                 entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "cool down");
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "cool down");
-                add(Cold.class, entry, false);
+                add(DecreaseTemperature.class, entry, false);
             }
 
             {
