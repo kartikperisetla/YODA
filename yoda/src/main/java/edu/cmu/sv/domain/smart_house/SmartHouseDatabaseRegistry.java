@@ -94,7 +94,7 @@ public class SmartHouseDatabaseRegistry extends DatabaseRegistry {
                     }
 
                     // set new temperature
-                    int newTemperature = ((GUIRoom) thing).getDustLevel();
+                    double newTemperature = ((GUIRoom) thing).getTemperature();
                     String insertString = Database.prefixes + "INSERT DATA {";
                     insertString += "<" + thing.getCorrespondingURI() + "> base:temperature " + newTemperature + ".\n";
                     insertString += "}";
