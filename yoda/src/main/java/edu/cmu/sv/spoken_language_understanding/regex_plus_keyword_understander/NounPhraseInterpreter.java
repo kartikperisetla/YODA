@@ -2,6 +2,7 @@ package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander
 
 import com.google.common.primitives.Doubles;
 import edu.cmu.sv.database.Ontology;
+import edu.cmu.sv.database.ReferenceResolution;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.ThingWithRoles;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
@@ -14,6 +15,7 @@ import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
 import edu.cmu.sv.natural_language_generation.Grammar;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.semantics.SemanticsModel;
+import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -104,7 +106,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
 
     @Override
     public Pair<JSONObject, Double> interpret(List<String> tokens, YodaEnvironment yodaEnvironment) {
-        String utterance = String.join(" ", tokens);
+        String utterance = String.join(" ", tokens).trim();
         String entity1String = utterance;
         String entity2String = null;
         JSONObject entity1JSON = SemanticsModel.parseJSON("{}");
@@ -116,8 +118,8 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
             Pattern regexPattern = Pattern.compile("(.+)" + prepositionSeparatorRegexStringMap.get(cls) + "(.+)");
             Matcher matcher = regexPattern.matcher(utterance);
             if (matcher.matches()) {
-                entity1String = matcher.group(1);
-                entity2String = matcher.group(3);
+                entity1String = matcher.group(1).trim();
+                entity2String = matcher.group(3).trim();
                 prepositionClass = cls;
 
                 try {
@@ -147,6 +149,8 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
             entity2CoverageScore = entity2classAndAdjectives.getRight();
         }
 
+        double namedEntityScore = 1.0;
+
         // check for named entities
         if (entity1JSON.isEmpty() || entity1CoverageScore < .75)
             entity1JSON.put(HasName.class.getSimpleName(), entity1String);
@@ -159,6 +163,28 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         if (entity2JSON.containsKey(HasName.class.getSimpleName()) && !entity2JSON.containsKey("class"))
             entity2JSON.put("class", Noun.class.getSimpleName());
 
+        // If we think there's a named entity, score it based on how well its string matches known NEs
+        if (entity2JSON.containsKey(HasName.class.getSimpleName())){
+            StringDistribution referenceDistribution =
+                    ReferenceResolution.resolveReference(yodaEnvironment, entity2JSON, false, false);
+            namedEntityScore *= Doubles.min(1.0,
+                    referenceDistribution.get(referenceDistribution.getTopHypothesis()) /
+                            RegexPlusKeywordUnderstander.normalNamedEntityStringSimilarity /
+                            ReferenceResolution.minFocusSalience);
+        }
+        if (entity1JSON.containsKey(HasName.class.getSimpleName())){
+            StringDistribution referenceDistribution =
+                    ReferenceResolution.resolveReference(yodaEnvironment, entity1JSON, false, false);
+            namedEntityScore *= Doubles.min(1.0,
+                    referenceDistribution.get(referenceDistribution.getTopHypothesis()) /
+                            RegexPlusKeywordUnderstander.normalNamedEntityStringSimilarity /
+                            ReferenceResolution.minFocusSalience);
+        }
+
+        namedEntityScore = Math.pow(namedEntityScore, 3);
+//        System.err.println("NPInterpreter: input string:" + utterance);
+//        System.err.println("NPInterpreter: namedEntityScore:" + namedEntityScore);
+
         // default to UnknownThingWithRoles
         if (!entity1JSON.containsKey("class")){
             entity1JSON.put("class", UnknownThingWithRoles.class.getSimpleName());
@@ -166,7 +192,8 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         if (entity2String!=null && !entity2JSON.containsKey("class")){
             entity2JSON.put("class", UnknownThingWithRoles.class.getSimpleName());
         }
-        return new ImmutablePair<>(entity1JSON, RegexPlusKeywordUnderstander.nounPhraseInterpreterWeight);
+        return new ImmutablePair<>(entity1JSON,
+                RegexPlusKeywordUnderstander.nounPhraseInterpreterWeight * namedEntityScore);
     }
 
     private Pair<Map<String, Object>, Double> getClassAndAdjectives(String entityString){

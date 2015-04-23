@@ -62,6 +62,9 @@ public class StringDistribution{
 
     public void normalize(){
         Double total = internalDistribution.values().stream().reduce(0.0, (x, y) -> x + y);
+        if (total<=0) {
+            throw new Error("not a valid set of values to be normalized");
+        }
         if (total!=1.0) {
             for (String key : internalDistribution.keySet()) {
                 internalDistribution.put(key, internalDistribution.get(key) / total);

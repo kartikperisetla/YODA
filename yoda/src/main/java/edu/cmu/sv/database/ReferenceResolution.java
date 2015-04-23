@@ -126,7 +126,8 @@ public class ReferenceResolution {
     * */
     public static StringDistribution resolveReference(YodaEnvironment yodaEnvironment,
                                                       JSONObject reference,
-                                                      boolean requireReferentInFocus){
+                                                      boolean requireReferentInFocus,
+                                                      boolean normalizeResult){
         StringDistribution cachedAns = checkCache(reference, requireReferentInFocus);
         if (cachedAns!=null)
             return cachedAns;
@@ -173,7 +174,8 @@ public class ReferenceResolution {
 
         }
 //        System.err.println(ans);
-        ans.normalize();
+        if (normalizeResult)
+            ans.normalize();
         if (requireReferentInFocus){
             refResCacheInFocus.put(new SemanticsModel(reference.toJSONString()), ans.deepCopy());
         } else {
@@ -513,7 +515,7 @@ public class ReferenceResolution {
             resolutionMarginals.put(slotPathToResolve,
                     resolveReference(yodaEnvironment,
                             (JSONObject) targetDiscourseUnit.getSpokenByThem().newGetSlotPathFiller(slotPathToResolve),
-                            false));
+                            false, true));
         }
 
         // add inferred required roles to reference marginals

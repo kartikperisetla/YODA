@@ -89,7 +89,6 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
                         String rolePrefixRegexString = roleObj1PrefixPatterns.containsKey(roleClass) ? roleObj1PrefixPatterns.get(roleClass) : "()";
                         if (r1HasBlankPrefix.get(roleClass))
                             rolePrefixRegexString = new StringBuilder(rolePrefixRegexString).insert(rolePrefixRegexString.length()-1, "|").toString();
-                        System.err.println("CommandMultiInterpreter: here: "+rolePrefixRegexString);
                         Pattern obj1Pattern = Pattern.compile(rolePrefixRegexString + "(.+)");
                         Matcher matcher2 = obj1Pattern.matcher(obj1String);
                         if (matcher2.matches()) {
