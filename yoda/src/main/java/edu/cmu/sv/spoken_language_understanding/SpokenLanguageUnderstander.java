@@ -32,7 +32,7 @@ public interface SpokenLanguageUnderstander {
 
 
         for (Pair<String, SemanticsModel> sample : dataset.getDataSet()){
-//            System.err.println(sample.getLeft());
+            System.err.println("\n>>>>>>>>>>>>>>>>>>>>" + sample.getLeft());
             process1BestAsr(sample.getKey());
             Pair<Turn, Long> dstInputTurn = yodaEnvironment.DstInputQueue.poll();
             if (dstInputTurn==null)
@@ -94,7 +94,8 @@ public interface SpokenLanguageUnderstander {
         }
 
 
-
+        System.err.flush();
+        System.out.flush();
         System.out.println("Total number of test cases:" + numTestCases);
 
         System.out.println();

@@ -973,10 +973,15 @@ public class YelpPhoenixLexicon extends Lexicon {
             }
             {
                 LexicalEntry entry = new LexicalEntry();
-                entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "make reservation");
-                entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "book reservation");
-                entry.add(LexicalEntry.PART_OF_SPEECH.PRESENT_PROGRESSIVE_VERB, "making reservation");
-                entry.add(LexicalEntry.PART_OF_SPEECH.PRESENT_PROGRESSIVE_VERB, "booking a reservation");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "make reservation");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "book a table");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "book table");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "reserve a table");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "reserve table");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "reserve");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "book reservation");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "making reservation");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "booking a reservation");
                 add(MakeReservation.class, entry, true);
             }
             {
@@ -986,6 +991,13 @@ public class YelpPhoenixLexicon extends Lexicon {
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "direction");
                 entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "directions");
                 add(GiveDirections.class, entry, false);
+            }
+            {
+                LexicalEntry entry = new LexicalEntry();
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "direct");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "navigate");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "guide");
+                add(GiveDirections.class, entry, true);
             }
             {
                 LexicalEntry entry = new LexicalEntry();
