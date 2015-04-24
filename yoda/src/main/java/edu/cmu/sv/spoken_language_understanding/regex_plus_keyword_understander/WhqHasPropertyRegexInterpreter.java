@@ -77,7 +77,7 @@ public class WhqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
             }
         }
         if (!qualityNounRegexString.equals("()")) {
-            Pattern regexPattern = Pattern.compile("(what |how much |what's |what're )(is |are |)(the |)" +
+            Pattern regexPattern = Pattern.compile("(what |how much |what 's |what are )(is |are |)(the |)" +
                     qualityNounRegexString +
                     " (is |are |)"+MiniLanguageInterpreter.possessivePrepositionRegexString+"(.+)");
             Matcher matcher = regexPattern.matcher(utterance);

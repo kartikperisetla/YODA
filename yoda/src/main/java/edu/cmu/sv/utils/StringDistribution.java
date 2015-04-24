@@ -60,7 +60,18 @@ public class StringDistribution{
         return 0.0;
     }
 
+
+    public void filterZeroEntries(){
+        internalDistribution.keySet().stream().
+                filter(key -> internalDistribution.get(key) <= 0).
+                forEach(internalDistribution::remove);
+    }
+
     public void normalize(){
+        filterZeroEntries();
+        if (internalDistribution.size()==0)
+            return;
+
         Double total = internalDistribution.values().stream().reduce(0.0, (x, y) -> x + y);
         if (total<=0) {
             throw new Error("not a valid set of values to be normalized");

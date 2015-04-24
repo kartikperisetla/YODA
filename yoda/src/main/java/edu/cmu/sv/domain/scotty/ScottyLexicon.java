@@ -173,19 +173,19 @@ public class ScottyLexicon extends Lexicon {
         {
             {
                 LexicalEntry entry = new LexicalEntry();
-                entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "close to");
-                entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "near to");
-                entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "near");
-                entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "by");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PREPOSITION, "close to");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PREPOSITION, "near to");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PREPOSITION, "near");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PREPOSITION, "by");
                 add(IsCloseTo.class, entry, false);
             }
             {
                 LexicalEntry entry = new LexicalEntry();
-                entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "on");
-                entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "closest to");
-                entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "closest");
-                entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "nearest to");
-                entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "nearest");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PREPOSITION, "on");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PREPOSITION, "closest to");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PREPOSITION, "closest");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PREPOSITION, "nearest to");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PREPOSITION, "nearest");
                 add(IsCloseTo.class, entry, true);
             }
         }
@@ -214,7 +214,6 @@ public class ScottyLexicon extends Lexicon {
             {
                 LexicalEntry entry = new LexicalEntry();
                 entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "give directions");
-                entry.add(LexicalEntry.PART_OF_SPEECH.PRESENT_PROGRESSIVE_VERB, "giving directions");
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "direction");
                 entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "directions");
                 add(GiveDirections.class, entry, false);

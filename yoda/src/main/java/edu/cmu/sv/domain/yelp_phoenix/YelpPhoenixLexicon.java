@@ -923,19 +923,19 @@ public class YelpPhoenixLexicon extends Lexicon {
         {
             {
                 LexicalEntry entry = new LexicalEntry();
-                entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "close to");
-                entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "near to");
-                entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "near");
-                entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "by");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PREPOSITION, "close to");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PREPOSITION, "near to");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PREPOSITION, "near");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PREPOSITION, "by");
                 add(IsCloseTo.class, entry, false);
             }
             {
                 LexicalEntry entry = new LexicalEntry();
-                entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "on");
-                entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "closest to");
-                entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "closest");
-                entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "nearest to");
-                entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "nearest");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PREPOSITION, "on");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PREPOSITION, "closest to");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PREPOSITION, "closest");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PREPOSITION, "nearest to");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PREPOSITION, "nearest");
                 add(IsCloseTo.class, entry, true);
             }
         }
@@ -965,8 +965,6 @@ public class YelpPhoenixLexicon extends Lexicon {
                 LexicalEntry entry = new LexicalEntry();
                 entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "make a reservation");
                 entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "book a reservation");
-                entry.add(LexicalEntry.PART_OF_SPEECH.PRESENT_PROGRESSIVE_VERB, "making a reservation");
-                entry.add(LexicalEntry.PART_OF_SPEECH.PRESENT_PROGRESSIVE_VERB, "booking a reservation");
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "reservation");
                 entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "reservations");
                 add(MakeReservation.class, entry, false);
@@ -981,13 +979,13 @@ public class YelpPhoenixLexicon extends Lexicon {
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "reserve");
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "book reservation");
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "making reservation");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "making a reservation");
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "booking a reservation");
                 add(MakeReservation.class, entry, true);
             }
             {
                 LexicalEntry entry = new LexicalEntry();
                 entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "give directions");
-                entry.add(LexicalEntry.PART_OF_SPEECH.PRESENT_PROGRESSIVE_VERB, "giving directions");
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "direction");
                 entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "directions");
                 add(GiveDirections.class, entry, false);
@@ -997,6 +995,7 @@ public class YelpPhoenixLexicon extends Lexicon {
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "direct");
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "navigate");
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "guide");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "giving directions");
                 add(GiveDirections.class, entry, true);
             }
             {

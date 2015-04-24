@@ -41,9 +41,9 @@ public class TestRegexPlusKeywordUnderstander {
     * */
     @Test
     public void Test() throws FileNotFoundException, UnsupportedEncodingException {
-        testYodaSkeletonSLU();
+//        testYodaSkeletonSLU();
 //        testYelpPhoenixSLU();
-//        testSmartHouseSLU();
+        testSmartHouseSLU();
 //        runUnderstander();
     }
 

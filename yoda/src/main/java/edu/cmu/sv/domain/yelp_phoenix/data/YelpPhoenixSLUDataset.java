@@ -11,52 +11,52 @@ public class YelpPhoenixSLUDataset extends SLUDataset {
     public YelpPhoenixSLUDataset() {
         // for these examples, the annotation scheme completely captures the meaning of the utterance
         {
-//            add(new ImmutablePair<>("make a reservation at this restaurant",
-//                    new SemanticsModel("{\"verb\": {\"Destination\": {\"refType\": \"pronoun\", \"class\": \"Restaurants\"}, \"class\": \"MakeReservation\"}, \"dialogAct\": \"Command\"}")));
-//            add(new ImmutablePair<>("are there any cheap mexican restaurants near preston fields hotel",
-//                    new SemanticsModel("{\"verb\": {\"class\":\"Exist\", \"Agent\" : {\"refType\": \"pronoun\", \"HasDistance\": {\"InRelationTo\": {\"class\": \"Hotels\", \"HasName\": \"preston fields hotel\"}, \"class\": \"IsCloseTo\"}, \"class\": \"Mexican\", \"HasExpensiveness\": {\"class\": \"Cheap\"}}}, \"dialogAct\": \"YNQuestion\"}")));
-//            add(new ImmutablePair<>("is there a bar near the preston fields hotel",
-//                    new SemanticsModel("{\"verb\": {\"class\":\"Exist\", \"Agent\" : {\"HasDistance\": {\"InRelationTo\": {\"class\": \"Hotels\", \"HasName\": \"preston fields hotel\"}, \"class\": \"IsCloseTo\"}, \"class\": \"Bars\"}}, \"dialogAct\": \"YNQuestion\"}")));
-//            add(new ImmutablePair<>("can i get directions from preston feels hotel to this restaurant",
-//                    new SemanticsModel("{\"verb\": {\"Destination\": {\"refType\": \"pronoun\", \"class\": \"Restaurants\"}, \"Origin\" : {\"class\": \"Hotels\", \"HasName\": \"preston feels hotel\"}, \"class\": \"GiveDirections\"}, \"dialogAct\": \"Command\"}")));
-//            add(new ImmutablePair<>("make a reservation at burger meats buns",
-//                    new SemanticsModel("{\"verb\": {\"Destination\": {\"class\": \"UnknownThingWithRoles\", \"HasName\": \"burger meats buns\"}, \"class\": \"MakeReservation\"}, \"dialogAct\": \"Command\"}")));
-//            add(new ImmutablePair<>("the restaurant burger meats buns",
-//                    new SemanticsModel("{\"topic\": {\"class\": \"Restaurants\", \"HasName\": \"burger meats buns\"}, \"dialogAct\": \"Fragment\"}")));
-//            add(new ImmutablePair<>("the restaurant burger meats buns",
-//                    new SemanticsModel("{\"topic\": {\"class\": \"Restaurants\", \"HasName\": \"burger meats buns\"}, \"dialogAct\": \"Fragment\"}")));
-//            add(new ImmutablePair<>("directions to the restaurant burger meats buns",
-//                    new SemanticsModel("{\"verb\": {\"Destination\": {\"class\": \"Restaurants\", \"HasName\": \"burger meats buns\"}, \"class\": \"GiveDirections\"}, \"dialogAct\": \"Command\"}")));
-//            add(new ImmutablePair<>("what restaurants are near the preston fields hotel",
-//                    new SemanticsModel("{\"verb\": {\"class\":\"Exist\", \"Agent\" : {\"refType\": \"pronoun\", \"HasDistance\": {\"InRelationTo\": {\"class\": \"Hotels\", \"HasName\": \"the preston fields hotel\"}, \"class\": \"IsCloseTo\"}, \"class\": \"Restaurants\"}}, \"dialogAct\": \"YNQuestion\"}")));
-//            add(new ImmutablePair<>("what's the price range of rhubarb",
-//                    new SemanticsModel("{\"verb\": {\"Patient\": {\"HasValue\": {\"class\": \"Expensiveness\"}, \"class\": \"Requested\"}, \"class\": \"HasProperty\", \"Agent\": {\"class\": \"UnknownThingWithRoles\", \"HasName\": \" rhubarb\"}}, \"dialogAct\": \"WHQuestion\"}")));
-//            add(new ImmutablePair<>("the reservation at rhubarb",
-//                    new SemanticsModel("{\"verb\": {\"Destination\": {\"class\": \"UnknownThingWithRoles\", \"HasName\": \"rhubarb\"}, \"class\": \"MakeReservation\"}, \"dialogAct\": \"Command\"}")));
-//            add(new ImmutablePair<>("what restaurants are near the preston fields hotel",
-//                    new SemanticsModel("{\"verb\": {\"class\":\"Exist\", \"Agent\" : {\"refType\": \"pronoun\", \"HasDistance\": {\"InRelationTo\": {\"class\": \"Hotels\", \"HasName\": \"the preston fields hotel\"}, \"class\": \"IsCloseTo\"}, \"class\": \"Restaurants\"}}, \"dialogAct\": \"YNQuestion\"}")));
-//            add(new ImmutablePair<>("yes",
-//                    new SemanticsModel("{\"dialogAct\": \"Accept\"}")));
-//            add(new ImmutablePair<>("give me directions to the restaurant",
-//                    new SemanticsModel("{\"verb\": {\"Destination\": {\"class\": \"Restaurants\"}, \"class\": \"GiveDirections\"}, \"dialogAct\": \"Command\"}")));
-//            add(new ImmutablePair<>("yes",
-//                    new SemanticsModel("{\"dialogAct\": \"Accept\"}")));
-//            add(new ImmutablePair<>("find restaurants near preston field hotel",
-//                    new SemanticsModel("{\"verb\": {\"class\": \"Exist\", \"Agent\": {\"HasDistance\": {\"InRelationTo\": {\"class\": \"Hotels\", \"HasName\": \"preston field hotel\"}, \"class\": \"IsCloseTo\"}, \"class\": \"Restaurants\"}}, \"dialogAct\": \"YNQuestion\"}")));
-//            add(new ImmutablePair<>("yes",
-//                    new SemanticsModel("{\"dialogAct\": \"Accept\"}")));
-//            add(new ImmutablePair<>("send me directions",
-//                    new SemanticsModel("{\"verb\": {\"class\": \"GiveDirections\"}, \"dialogAct\": \"Command\"}")));
-//            add(new ImmutablePair<>("yes",
-//                    new SemanticsModel("{\"dialogAct\": \"Accept\"}")));
-//            add(new ImmutablePair<>("no",
-//                    new SemanticsModel("{\"dialogAct\": \"Reject\"}")));
-//            add(new ImmutablePair<>("scotty can you find a restaurant near the preston fields hotel for me",
-//                    new SemanticsModel("{\"verb\": {\"class\":\"Exist\", \"Agent\" : {\"refType\": \"pronoun\", \"HasDistance\": {\"InRelationTo\": {\"class\": \"Hotels\", \"HasName\": \"the preston fields hotel\"}, \"class\": \"IsCloseTo\"}, \"class\": \"Restaurants\"}}, \"dialogAct\": \"YNQuestion\"}")));
-//            add(new ImmutablePair<>("restaurants near preston fields hotel",
-//                    new SemanticsModel("{\"topic\": {\"HasDistance\": {\"InRelationTo\": {\"class\": \"Hotels\", \"HasName\": \"preston fields hotel\"}, \"class\": \"IsCloseTo\"}, \"class\": \"Restaurants\"}, \"dialogAct\": \"Fragment\"}")));
-//            add(new ImmutablePair<>("i'd like to make a reservation at that restaurant",
-//                    new SemanticsModel("{\"verb\": {\"class\": \"MakeReservation\", \"Destination\":{\"class\": \"Restaurants\", \"refType\":\"pronoun\"}}, \"dialogAct\": \"Command\"}")));
+            add(new ImmutablePair<>("make a reservation at this restaurant",
+                    new SemanticsModel("{\"verb\": {\"Destination\": {\"refType\": \"pronoun\", \"class\": \"Restaurants\"}, \"class\": \"MakeReservation\"}, \"dialogAct\": \"Command\"}")));
+            add(new ImmutablePair<>("are there any cheap mexican restaurants near preston fields hotel",
+                    new SemanticsModel("{\"verb\": {\"class\":\"Exist\", \"Agent\" : {\"refType\": \"pronoun\", \"HasDistance\": {\"InRelationTo\": {\"class\": \"Hotels\", \"HasName\": \"preston fields hotel\"}, \"class\": \"IsCloseTo\"}, \"class\": \"Mexican\", \"HasExpensiveness\": {\"class\": \"Cheap\"}}}, \"dialogAct\": \"YNQuestion\"}")));
+            add(new ImmutablePair<>("is there a bar near the preston fields hotel",
+                    new SemanticsModel("{\"verb\": {\"class\":\"Exist\", \"Agent\" : {\"HasDistance\": {\"InRelationTo\": {\"class\": \"Hotels\", \"HasName\": \"preston fields hotel\"}, \"class\": \"IsCloseTo\"}, \"class\": \"Bars\"}}, \"dialogAct\": \"YNQuestion\"}")));
+            add(new ImmutablePair<>("can i get directions from preston feels hotel to this restaurant",
+                    new SemanticsModel("{\"verb\": {\"Destination\": {\"refType\": \"pronoun\", \"class\": \"Restaurants\"}, \"Origin\" : {\"class\": \"Hotels\", \"HasName\": \"preston feels hotel\"}, \"class\": \"GiveDirections\"}, \"dialogAct\": \"Command\"}")));
+            add(new ImmutablePair<>("make a reservation at burger meats buns",
+                    new SemanticsModel("{\"verb\": {\"Destination\": {\"class\": \"UnknownThingWithRoles\", \"HasName\": \"burger meats buns\"}, \"class\": \"MakeReservation\"}, \"dialogAct\": \"Command\"}")));
+            add(new ImmutablePair<>("the restaurant burger meats buns",
+                    new SemanticsModel("{\"topic\": {\"class\": \"Restaurants\", \"HasName\": \"burger meats buns\"}, \"dialogAct\": \"Fragment\"}")));
+            add(new ImmutablePair<>("the restaurant burger meats buns",
+                    new SemanticsModel("{\"topic\": {\"class\": \"Restaurants\", \"HasName\": \"burger meats buns\"}, \"dialogAct\": \"Fragment\"}")));
+            add(new ImmutablePair<>("directions to the restaurant burger meats buns",
+                    new SemanticsModel("{\"verb\": {\"Destination\": {\"class\": \"Restaurants\", \"HasName\": \"burger meats buns\"}, \"class\": \"GiveDirections\"}, \"dialogAct\": \"Command\"}")));
+            add(new ImmutablePair<>("what restaurants are near the preston fields hotel",
+                    new SemanticsModel("{\"verb\": {\"class\":\"Exist\", \"Agent\" : {\"refType\": \"pronoun\", \"HasDistance\": {\"InRelationTo\": {\"class\": \"Hotels\", \"HasName\": \"the preston fields hotel\"}, \"class\": \"IsCloseTo\"}, \"class\": \"Restaurants\"}}, \"dialogAct\": \"YNQuestion\"}")));
+            add(new ImmutablePair<>("what's the price range of rhubarb",
+                    new SemanticsModel("{\"verb\": {\"Patient\": {\"HasValue\": {\"class\": \"Expensiveness\"}, \"class\": \"Requested\"}, \"class\": \"HasProperty\", \"Agent\": {\"class\": \"UnknownThingWithRoles\", \"HasName\": \" rhubarb\"}}, \"dialogAct\": \"WHQuestion\"}")));
+            add(new ImmutablePair<>("the reservation at rhubarb",
+                    new SemanticsModel("{\"verb\": {\"Destination\": {\"class\": \"UnknownThingWithRoles\", \"HasName\": \"rhubarb\"}, \"class\": \"MakeReservation\"}, \"dialogAct\": \"Command\"}")));
+            add(new ImmutablePair<>("what restaurants are near the preston fields hotel",
+                    new SemanticsModel("{\"verb\": {\"class\":\"Exist\", \"Agent\" : {\"refType\": \"pronoun\", \"HasDistance\": {\"InRelationTo\": {\"class\": \"Hotels\", \"HasName\": \"the preston fields hotel\"}, \"class\": \"IsCloseTo\"}, \"class\": \"Restaurants\"}}, \"dialogAct\": \"YNQuestion\"}")));
+            add(new ImmutablePair<>("yes",
+                    new SemanticsModel("{\"dialogAct\": \"Accept\"}")));
+            add(new ImmutablePair<>("give me directions to the restaurant",
+                    new SemanticsModel("{\"verb\": {\"Destination\": {\"class\": \"Restaurants\"}, \"class\": \"GiveDirections\"}, \"dialogAct\": \"Command\"}")));
+            add(new ImmutablePair<>("yes",
+                    new SemanticsModel("{\"dialogAct\": \"Accept\"}")));
+            add(new ImmutablePair<>("find restaurants near preston field hotel",
+                    new SemanticsModel("{\"verb\": {\"class\": \"Exist\", \"Agent\": {\"HasDistance\": {\"InRelationTo\": {\"class\": \"Hotels\", \"HasName\": \"preston field hotel\"}, \"class\": \"IsCloseTo\"}, \"class\": \"Restaurants\"}}, \"dialogAct\": \"YNQuestion\"}")));
+            add(new ImmutablePair<>("yes",
+                    new SemanticsModel("{\"dialogAct\": \"Accept\"}")));
+            add(new ImmutablePair<>("send me directions",
+                    new SemanticsModel("{\"verb\": {\"class\": \"GiveDirections\"}, \"dialogAct\": \"Command\"}")));
+            add(new ImmutablePair<>("yes",
+                    new SemanticsModel("{\"dialogAct\": \"Accept\"}")));
+            add(new ImmutablePair<>("no",
+                    new SemanticsModel("{\"dialogAct\": \"Reject\"}")));
+            add(new ImmutablePair<>("scotty can you find a restaurant near the preston fields hotel for me",
+                    new SemanticsModel("{\"verb\": {\"class\":\"Exist\", \"Agent\" : {\"refType\": \"pronoun\", \"HasDistance\": {\"InRelationTo\": {\"class\": \"Hotels\", \"HasName\": \"the preston fields hotel\"}, \"class\": \"IsCloseTo\"}, \"class\": \"Restaurants\"}}, \"dialogAct\": \"YNQuestion\"}")));
+            add(new ImmutablePair<>("restaurants near preston fields hotel",
+                    new SemanticsModel("{\"topic\": {\"HasDistance\": {\"InRelationTo\": {\"class\": \"Hotels\", \"HasName\": \"preston fields hotel\"}, \"class\": \"IsCloseTo\"}, \"class\": \"Restaurants\"}, \"dialogAct\": \"Fragment\"}")));
+            add(new ImmutablePair<>("i'd like to make a reservation at that restaurant",
+                    new SemanticsModel("{\"verb\": {\"class\": \"MakeReservation\", \"Destination\":{\"class\": \"Restaurants\", \"refType\":\"pronoun\"}}, \"dialogAct\": \"Command\"}")));
 
             add(new ImmutablePair<>("how do i get to that restaurant",
                     new SemanticsModel("{\"verb\": {\"class\": \"GiveDirections\", \"Destination\":{\"class\": \"Restaurants\", \"refType\":\"pronoun\"}}, \"dialogAct\": \"Command\"}")));

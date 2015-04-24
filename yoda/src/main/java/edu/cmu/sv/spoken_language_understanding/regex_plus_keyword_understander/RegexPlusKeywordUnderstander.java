@@ -101,7 +101,7 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
 
         languageInterpreters.add(
                 new SimpleStringMatchInterpreter("{\"dialogAct\":\"Reject\"}",
-                        new HashSet(Arrays.asList("no", "nope", "negative", "i don't think so", "wrong", "not really", "not"))));
+                        new HashSet(Arrays.asList("no", "nope", "negative", "i do not think so", "wrong", "not really", "not"))));
 
 
     }

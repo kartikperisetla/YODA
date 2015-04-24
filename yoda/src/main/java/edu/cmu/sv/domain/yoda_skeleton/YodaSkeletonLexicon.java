@@ -1,13 +1,12 @@
 package edu.cmu.sv.domain.yoda_skeleton;
 
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Agent;
+import edu.cmu.sv.domain.yelp_phoenix.ontology.noun.PointOfInterest;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Person;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Time;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasAtTime;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Patient;
 import edu.cmu.sv.natural_language_generation.Lexicon;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Person;
-import edu.cmu.sv.domain.yelp_phoenix.ontology.noun.PointOfInterest;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Time;
 
 /**
  * Created by David Cohen on 3/3/15.
@@ -30,7 +29,6 @@ public class YodaSkeletonLexicon extends Lexicon {
                 entry.add(LexicalEntry.PART_OF_SPEECH.WH_PRONOUN, "who");
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "person");
                 entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "people");
-                entry.add(LexicalEntry.PART_OF_SPEECH.S1_PRONOUN, "i");
                 entry.add(LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, "they");
                 add(Person.class, entry, false);
             }
@@ -54,12 +52,6 @@ public class YodaSkeletonLexicon extends Lexicon {
 
         //// Entries for Roles
         {
-            {
-                // directions from X, directions <...> from X
-                LexicalEntry entry = new LexicalEntry();
-                entry.add(LexicalEntry.PART_OF_SPEECH.AS_SUBJECT_PREFIX, "");
-                add(Agent.class, entry, false);
-            }
             {
                 // directions from X, directions <...> from X
                 LexicalEntry entry = new LexicalEntry();

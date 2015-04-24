@@ -39,7 +39,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         for (Class<? extends Preposition> prepositionClass : Ontology.prepositionClasses) {
             try {
                 Set<String> relationalPhraseStrings = this.yodaEnvironment.lex.getPOSForClass(prepositionClass,
-                        Lexicon.LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, false);
+                        Lexicon.LexicalEntry.PART_OF_SPEECH.PREPOSITION, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, false);
                 relationalPhraseStrings = relationalPhraseStrings.stream().
                         map(x -> x.equals("") ? x : " "+x+" ").collect(Collectors.toSet());
                 String regexString = "(" + String.join("|", relationalPhraseStrings) + ")";

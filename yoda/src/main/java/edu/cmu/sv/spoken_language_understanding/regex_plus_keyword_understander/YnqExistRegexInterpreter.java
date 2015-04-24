@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  * Created by David Cohen on 1/21/15.
  */
 public class YnqExistRegexInterpreter implements MiniLanguageInterpreter {
-    static String ynqExistsPrefixRegexString = "(are there |is there |i'm looking for |i want |find |get |search for |show me |look for |search |look |show )";
+    static String ynqExistsPrefixRegexString = "(are there |is there |i 'm looking for |i want |find |get |search for |show me |look for |search |look |show )";
 
     @Override
     public Pair<JSONObject, Double> interpret(List<String> tokens, YodaEnvironment yodaEnvironment) {

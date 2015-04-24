@@ -89,9 +89,9 @@ public class SmartHouseLexicon extends Lexicon {
         {
             {
                 LexicalEntry entry = new LexicalEntry();
-                entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "in");
-                entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "inside");
-                entry.add(LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE, "at");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PREPOSITION, "in");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PREPOSITION, "inside");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PREPOSITION, "at");
                 add(IsContainedBy.class, entry, false);
             }
         }

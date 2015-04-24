@@ -12,10 +12,11 @@ public class Tokenizer {
 
         // split up contractions
         inputString = inputString.replaceAll("n't", " not");
-        inputString = inputString.replaceAll("'s", " 's");
-        inputString = inputString.replaceAll("s' |s'$", "s 's");
         inputString = inputString.replaceAll("'re", " are");
         inputString = inputString.replaceAll("'ll", " will");
+        inputString = inputString.replaceAll("i'm", "i am");
+        inputString = inputString.replaceAll("'s", " 's");
+        inputString = inputString.replaceAll("s' |s'$", "s 's");
         inputString = inputString.replaceAll("'d", " 'd");
 
         // split at white space, between alpha and num, between num and alpha

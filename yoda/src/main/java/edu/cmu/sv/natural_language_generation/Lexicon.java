@@ -94,11 +94,11 @@ public class Lexicon {
      */
     public static class LexicalEntry {
         public enum PART_OF_SPEECH {
-            WH_PRONOUN, S1_PRONOUN, S3_PRONOUN,
+            WH_PRONOUN, S3_PRONOUN,
             SINGULAR_NOUN, PLURAL_NOUN,
-            S1_VERB, S3_VERB, PRESENT_PROGRESSIVE_VERB,
-            ADJECTIVE, RELATIONAL_PREPOSITIONAL_PHRASE,
-        AS_SUBJECT_PREFIX, AS_OBJECT_PREFIX, AS_OBJECT2_PREFIX}
+            S1_VERB,
+            ADJECTIVE, PREPOSITION,
+            AS_OBJECT_PREFIX, AS_OBJECT2_PREFIX}
         private Map<PART_OF_SPEECH, Set<String>> wordMap = new HashMap<>();
 
         public Set<String> get(PART_OF_SPEECH partOfSpeech){

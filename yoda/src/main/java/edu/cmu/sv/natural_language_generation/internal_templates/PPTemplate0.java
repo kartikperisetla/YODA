@@ -57,7 +57,7 @@ public class PPTemplate0 implements Template {
         Set<String> ppStrings;
         try{
             ppStrings = yodaEnvironment.lex.getPOSForClass(prepositionClass,
-                Lexicon.LexicalEntry.PART_OF_SPEECH.RELATIONAL_PREPOSITIONAL_PHRASE,
+                Lexicon.LexicalEntry.PART_OF_SPEECH.PREPOSITION,
                 yodaEnvironment.nlg.grammarPreferences, false);
         } catch (Lexicon.NoLexiconEntryException e) {
             ppStrings = new HashSet<>();
