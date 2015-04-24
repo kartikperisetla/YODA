@@ -1,6 +1,6 @@
 package edu.cmu.sv.domain.smart_house.non_dialog_task;
 
-import edu.cmu.sv.domain.smart_house.GUI.GUIElectronic;
+import edu.cmu.sv.domain.smart_house.GUI.GUIRoom;
 import edu.cmu.sv.domain.smart_house.GUI.GUIThing;
 import edu.cmu.sv.domain.smart_house.GUI.Simulator;
 import edu.cmu.sv.semantics.SemanticsModel;
@@ -15,9 +15,9 @@ import java.util.HashSet;
 import java.util.Map;
 
 /**
- * Created by David Cohen on 12/19/14.
+ * Created by dan on 4/21/15.
  */
-public class TurnOnTask extends NonDialogTask {
+public class DecreaseTemperatureTask extends NonDialogTask {
     private static Map<String, TaskStatus> executionStatus = new HashMap<>();
     private static NonDialogTaskPreferences preferences =
             new NonDialogTaskPreferences(false, 1, 20, 15,
@@ -27,21 +27,19 @@ public class TurnOnTask extends NonDialogTask {
     @Override
     public void execute(YodaEnvironment yodaEnvironment) {
         super.execute(yodaEnvironment);
-        String uri = (String) new SemanticsModel(taskSpec.toJSONString()).newGetSlotPathFiller("Component.HasURI");
+        String uri = (String) new SemanticsModel(taskSpec.toJSONString()).newGetSlotPathFiller("HasRoom.HasURI");
         boolean itemFound = false;
-        for(GUIThing thing : Simulator.getThings()) {
-            if(thing.getCorrespondingURI().equals(uri)) {
-                if (((GUIElectronic)thing).getState()){
-                    // do nothing if the electronic piece is already on
-                } else {
-                    ((GUIElectronic) thing).toggleSwitch();
-                }
+        for (GUIThing thing : Simulator.getThings()) {
+            if (thing.getCorrespondingURI().equals(uri)) {
                 itemFound = true;
+                if (!(thing instanceof GUIRoom))
+                    continue;
+                ((GUIRoom) thing).setTemperature(60);
                 break;
             }
         }
-        if(!itemFound) {
-            System.err.println("TurnOnTask.execute(): ERROR: unknown URI:"+uri);
+        if (!itemFound) {
+            System.err.println("DecreaseTemperatureTask.execute(): ERROR: unknown URI:" + uri);
             System.exit(0);
         }
     }

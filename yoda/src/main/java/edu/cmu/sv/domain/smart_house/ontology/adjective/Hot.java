@@ -1,9 +1,9 @@
 package edu.cmu.sv.domain.smart_house.ontology.adjective;
 
 /**
- * Created by cohend on 3/4/15.
+ * Created by dan on 4/15/15.
  */
-public class Clean extends CleanlinessAdjective {
+public class Hot extends TemperatureAdjective {
     @Override
     public double getCenter() {
         return 1;
@@ -11,7 +11,6 @@ public class Clean extends CleanlinessAdjective {
 
     @Override
     public double getSlope() {
-        return 2;
+        return 1;
     }
 }
-

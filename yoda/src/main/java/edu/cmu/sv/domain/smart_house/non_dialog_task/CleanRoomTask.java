@@ -39,7 +39,7 @@ public class CleanRoomTask extends NonDialogTask {
             }
         }
         if(!itemFound) {
-            System.out.println("ERROR: unknown URI:"+uri);
+            System.err.println("CleanRoomTask.execute(): ERROR: unknown URI:"+uri);
             System.exit(0);
         }
     }

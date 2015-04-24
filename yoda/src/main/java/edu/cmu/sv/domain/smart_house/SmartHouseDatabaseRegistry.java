@@ -24,6 +24,7 @@ public class SmartHouseDatabaseRegistry extends DatabaseRegistry {
         sensors.add(new RoomDustLevelSensor());
         sensors.add(new AppliancePowerStateSensor());
         sensors.add(new ThingLocationSensor());
+        sensors.add(new RoomTemperatureSensor());
     }
 
 
@@ -55,6 +56,49 @@ public class SmartHouseDatabaseRegistry extends DatabaseRegistry {
                     insertString += "<" + thing.getCorrespondingURI() + "> base:dust_level " + newDustLevel + ".\n";
                     insertString += "}";
                     Database.getLogger().info(MongoLogHandler.createSimpleRecord("sensing room's dust level", insertString).toJSONString());
+                    try {
+                        Update update = targetEnvironment.db.connection.prepareUpdate(
+                                QueryLanguage.SPARQL, insertString, Database.dstFocusURI);
+                        update.execute();
+                    } catch (RepositoryException | UpdateExecutionException | MalformedQueryException e) {
+                        e.printStackTrace();
+                        System.exit(0);
+                    }
+
+                }
+            }
+        }
+    }
+
+
+    public class RoomTemperatureSensor implements Sensor{
+        @Override
+        public void sense(YodaEnvironment targetEnvironment) {
+            synchronized (targetEnvironment.db.connection) {
+                for (GUIThing thing : Simulator.getThings()){
+                    if (!(thing instanceof GUIRoom))
+                        continue;
+
+                    // clear existing room temperature
+                    String deleteString = Database.prefixes;
+                    deleteString += "DELETE {<" + thing.getCorrespondingURI() + "> base:temperature ?y }";
+                    deleteString += "WHERE {<" + thing.getCorrespondingURI() + "> base:temperature ?y }";
+                    Database.getLogger().info(MongoLogHandler.createSimpleRecord("clear room's temperature", deleteString).toJSONString());
+                    try {
+                        Update update = targetEnvironment.db.connection.prepareUpdate(
+                                QueryLanguage.SPARQL, deleteString, Database.dstFocusURI);
+                        update.execute();
+                    } catch (RepositoryException | UpdateExecutionException | MalformedQueryException e) {
+                        e.printStackTrace();
+                        System.exit(0);
+                    }
+
+                    // set new temperature
+                    double newTemperature = ((GUIRoom) thing).getTemperature();
+                    String insertString = Database.prefixes + "INSERT DATA {";
+                    insertString += "<" + thing.getCorrespondingURI() + "> base:temperature " + newTemperature + ".\n";
+                    insertString += "}";
+                    Database.getLogger().info(MongoLogHandler.createSimpleRecord("sensing room's temperature", insertString).toJSONString());
                     try {
                         Update update = targetEnvironment.db.connection.prepareUpdate(
                                 QueryLanguage.SPARQL, insertString, Database.dstFocusURI);

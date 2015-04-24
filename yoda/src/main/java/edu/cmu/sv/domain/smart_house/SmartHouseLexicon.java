@@ -2,6 +2,8 @@ package edu.cmu.sv.domain.smart_house;
 
 import edu.cmu.sv.domain.smart_house.ontology.adjective.Clean;
 import edu.cmu.sv.domain.smart_house.ontology.adjective.Dirty;
+import edu.cmu.sv.domain.smart_house.ontology.adjective.Hot;
+import edu.cmu.sv.domain.smart_house.ontology.adjective.Cold;
 import edu.cmu.sv.domain.smart_house.ontology.adjective.Off;
 import edu.cmu.sv.domain.smart_house.ontology.adjective.On;
 import edu.cmu.sv.domain.smart_house.ontology.noun.*;
@@ -11,6 +13,8 @@ import edu.cmu.sv.domain.smart_house.ontology.role.HasRoom;
 import edu.cmu.sv.domain.smart_house.ontology.verb.CleanRoom;
 import edu.cmu.sv.domain.smart_house.ontology.verb.TurnOffAppliance;
 import edu.cmu.sv.domain.smart_house.ontology.verb.TurnOnAppliance;
+import edu.cmu.sv.domain.smart_house.ontology.verb.IncreaseTemperature;
+import edu.cmu.sv.domain.smart_house.ontology.verb.DecreaseTemperature;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 
 /**
@@ -115,6 +119,16 @@ public class SmartHouseLexicon extends Lexicon {
             }
             {
                 LexicalEntry entry = new LexicalEntry();
+                entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "hot");
+                add(Hot.class, entry, false);
+            }
+            {
+                LexicalEntry entry = new LexicalEntry();
+                entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "cold");
+                add(Cold.class, entry, false);
+            }
+            {
+                LexicalEntry entry = new LexicalEntry();
                 entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "dirty");
                 entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "untidy");
                 add(Dirty.class, entry, false);
@@ -152,6 +166,21 @@ public class SmartHouseLexicon extends Lexicon {
                 add(CleanRoom.class, entry, false);
             }
 
+            {
+                LexicalEntry entry = new LexicalEntry();
+                entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "warm up");
+                entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "heat up");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "warm up");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "heat up");
+                add(IncreaseTemperature.class, entry, false);
+            }
+
+            {
+                LexicalEntry entry = new LexicalEntry();
+                entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "cool down");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "cool down");
+                add(DecreaseTemperature.class, entry, false);
+            }
 
             {
                 LexicalEntry entry = new LexicalEntry();

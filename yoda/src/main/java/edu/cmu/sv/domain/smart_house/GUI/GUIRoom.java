@@ -32,10 +32,9 @@ public class GUIRoom extends GUIThing {
     @Override
 	public List<String> provideDetails() {
 		List<String> ans = new ArrayList<>();
-		ans.add(this.getName() + " entities: \n");
-		ans.add("Temp: " + String.valueOf(temperature) + (char)186 + "F\n");
+		ans.add(this.getName() + " (" + String.valueOf(temperature) + (char)186 + "F) entities:\n");
 		for(GUIThing o : Simulator.getThings()) {
-			if(!(o instanceof GUIRoom) && o.getRoom().equals(this.getRoom())) {
+			if(!(o instanceof GUIRoom) && o.getRoom().equals(this)) {
 				ans.add(o.getName() + "\n");
 			}
 		}
