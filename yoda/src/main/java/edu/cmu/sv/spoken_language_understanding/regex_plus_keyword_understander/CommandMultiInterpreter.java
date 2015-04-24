@@ -78,37 +78,46 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
         if (!verbRegexString.equals("()")) {
             {
                 // command with one role as the obj1
-                Pattern regexPattern = Pattern.compile(MiniLanguageInterpreter.startingPolitenessRegexString +
-                        "(could you |can you |will you please |)" +
-                        "(i'd like |i would like |i want |give me |give |can i get |could i get |make |set up |)(a |the |some |)" +
+//                Pattern regexPattern = Pattern.compile(MiniLanguageInterpreter.startingPolitenessRegexString +
+//                        "(could you |can you |will you please |)" +
+//                        "(i'd like |i would like |i want |give me |give |can i get |could i get |make |set up |)(a |the |some |)" +
+//                        verbRegexString + "(.+)" + MiniLanguageInterpreter.endingPolitenessRegexString);
+                Pattern regexPattern = Pattern.compile("(.* |)" +
                         verbRegexString + "(.+)" + MiniLanguageInterpreter.endingPolitenessRegexString);
                 Matcher matcher = regexPattern.matcher(utterance);
                 if (matcher.matches()) {
-                    String obj1String = matcher.group(6).trim();
-                    for (Class<? extends Role> roleClass : r1HasBlankPrefix.keySet()) {
-                        String rolePrefixRegexString = roleObj1PrefixPatterns.containsKey(roleClass) ? roleObj1PrefixPatterns.get(roleClass) : "()";
-                        if (r1HasBlankPrefix.get(roleClass))
-                            rolePrefixRegexString = new StringBuilder(rolePrefixRegexString).insert(rolePrefixRegexString.length()-1, "|").toString();
-                        System.err.println("CommandMultiInterpreter: here: "+rolePrefixRegexString);
-                        Pattern obj1Pattern = Pattern.compile(rolePrefixRegexString + "(.+)");
-                        Matcher matcher2 = obj1Pattern.matcher(obj1String);
-                        if (matcher2.matches()) {
-                            String npString = matcher2.group(2);
-                            Pair<JSONObject, Double> npInterpretation;
-                            if (roleClass.equals(HasAtTime.class))
-                                npInterpretation = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
-                                        timeInterpreter.interpret(Tokenizer.tokenize(npString), yodaEnvironment);
-                            else
-                                npInterpretation = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
-                                    nounPhraseInterpreter.interpret(Tokenizer.tokenize(npString), yodaEnvironment);
+                    System.err.println("CommandMultiInterpreter: 1-role initial match");
+                    String phraseIntroString = matcher.group(1);
+                    System.err.println("phrase intro string:" + phraseIntroString);
+                    Pattern negationPattern = Pattern.compile("(.* |)" + MiniLanguageInterpreter.negationRegexString + " .*|");
+                    Matcher negationMatcher = negationPattern.matcher(phraseIntroString);
+                    if (!negationMatcher.matches()) {
+                        String obj1String = matcher.group(3).trim();
+                        System.err.println("obj1string:" + obj1String);
+                        for (Class<? extends Role> roleClass : r1HasBlankPrefix.keySet()) {
+                            String rolePrefixRegexString = roleObj1PrefixPatterns.containsKey(roleClass) ? roleObj1PrefixPatterns.get(roleClass) : "()";
+                            if (r1HasBlankPrefix.get(roleClass))
+                                rolePrefixRegexString = new StringBuilder(rolePrefixRegexString).insert(rolePrefixRegexString.length() - 1, "|").toString();
+                            Pattern obj1Pattern = Pattern.compile(rolePrefixRegexString + "(.+)");
+                            Matcher matcher2 = obj1Pattern.matcher(obj1String);
+                            if (matcher2.matches()) {
+                                String npString = matcher2.group(2);
+                                Pair<JSONObject, Double> npInterpretation;
+                                if (roleClass.equals(HasAtTime.class))
+                                    npInterpretation = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
+                                            timeInterpreter.interpret(Tokenizer.tokenize(npString), yodaEnvironment);
+                                else
+                                    npInterpretation = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
+                                            nounPhraseInterpreter.interpret(Tokenizer.tokenize(npString), yodaEnvironment);
 
-                            if (npInterpretation==null)
-                                continue;
+                                if (npInterpretation == null)
+                                    continue;
 
-                            String jsonString = "{\"dialogAct\":\"Command\",\"verb\":{\"class\":\"" + verbClass.getSimpleName() + "\"}}";
-                            JSONObject hyp = SemanticsModel.parseJSON(jsonString);
-                            ((JSONObject) hyp.get("verb")).put(roleClass.getSimpleName(), npInterpretation.getKey());
-                            ans.put(hyp, RegexPlusKeywordUnderstander.regexInterpreterWeight);
+                                String jsonString = "{\"dialogAct\":\"Command\",\"verb\":{\"class\":\"" + verbClass.getSimpleName() + "\"}}";
+                                JSONObject hyp = SemanticsModel.parseJSON(jsonString);
+                                ((JSONObject) hyp.get("verb")).put(roleClass.getSimpleName(), npInterpretation.getKey());
+                                ans.put(hyp, RegexPlusKeywordUnderstander.regexInterpreterWeight);
+                            }
                         }
                     }
                 }
@@ -116,51 +125,63 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
 
             {
                 // command with two roles as obj1 and obj2
-                Pattern regexPattern = Pattern.compile(MiniLanguageInterpreter.startingPolitenessRegexString +
-                        "(could you |can you |will you please |)" +
-                        "(i'd like |i would like |i want |give me |give |can i get |could i get |make |set up |)(a |the |some |)" +
+//                Pattern regexPattern = Pattern.compile(MiniLanguageInterpreter.startingPolitenessRegexString +
+//                        "(could you |can you |will you please |)" +
+//                        "(i'd like |i would like |i want |give me |give |can i get |could i get |make |set up |)(a |the |some |)" +
+//                        verbRegexString + "(.+)" + MiniLanguageInterpreter.endingPolitenessRegexString);
+                Pattern regexPattern = Pattern.compile("(.* |)" +
                         verbRegexString + "(.+)" + MiniLanguageInterpreter.endingPolitenessRegexString);
                 Matcher matcher = regexPattern.matcher(utterance);
                 if (matcher.matches()) {
-                    String twoRoleString = matcher.group(6).trim();
-                    for (Class<? extends Role> roleClass1 : roleObj1PrefixPatterns.keySet()) {
-                        for (Class<? extends Role> roleClass2 : roleObj2PrefixPatterns.keySet()) {
-                            Pattern multiRolePattern = Pattern.compile(roleObj1PrefixPatterns.get(roleClass1) +
-                                    " (.+) " +
-                                    roleObj2PrefixPatterns.get(roleClass2) +
-                                    " (.+)");
-                            Matcher matcher2 = multiRolePattern.matcher(twoRoleString);
-                            if (matcher2.matches()) {
+                    System.err.println("CommandMultiInterpreter: 2-role initial match");
+                    String phraseIntroString = matcher.group(1);
+                    System.err.println("phrase intro string:" + phraseIntroString);
+                    Pattern negationPattern = Pattern.compile("(.* |)" + MiniLanguageInterpreter.negationRegexString + " .*|");
+                    Matcher negationMatcher = negationPattern.matcher(phraseIntroString);
+                    if (!negationMatcher.matches()) {
+
+                        String twoRoleString = matcher.group(3).trim();
+                        System.err.println("twoRoleString:" + twoRoleString);
+
+                        for (Class<? extends Role> roleClass1 : roleObj1PrefixPatterns.keySet()) {
+                            for (Class<? extends Role> roleClass2 : roleObj2PrefixPatterns.keySet()) {
+                                Pattern multiRolePattern = Pattern.compile(roleObj1PrefixPatterns.get(roleClass1) +
+                                        " (.+) " +
+                                        roleObj2PrefixPatterns.get(roleClass2) +
+                                        " (.+)");
+                                Matcher matcher2 = multiRolePattern.matcher(twoRoleString);
+                                if (matcher2.matches()) {
 //                                System.err.println("Match groups:");
 //                                for (int i = 0; i <= matcher2.groupCount(); i++) {
 //                                    System.err.println(i + " : " + matcher2.group(i));
 //                                }
-                                String objString1 = matcher2.group(2);
-                                String objString2 = matcher2.group(4);
-                                Pair<JSONObject, Double> npInterpretation1;
-                                if (roleClass1.equals(HasAtTime.class))
-                                    npInterpretation1 = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
-                                            timeInterpreter.interpret(Tokenizer.tokenize(objString1), yodaEnvironment);
-                                else
-                                    npInterpretation1 = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
-                                            nounPhraseInterpreter.interpret(Tokenizer.tokenize(objString1), yodaEnvironment);
+                                    String objString1 = matcher2.group(2);
+                                    String objString2 = matcher2.group(4);
+                                    Pair<JSONObject, Double> npInterpretation1;
+                                    if (roleClass1.equals(HasAtTime.class))
+                                        npInterpretation1 = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
+                                                timeInterpreter.interpret(Tokenizer.tokenize(objString1), yodaEnvironment);
+                                    else
+                                        npInterpretation1 = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
+                                                nounPhraseInterpreter.interpret(Tokenizer.tokenize(objString1), yodaEnvironment);
 
-                                Pair<JSONObject, Double> npInterpretation2;
-                                if (roleClass2.equals(HasAtTime.class))
-                                    npInterpretation2 = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
-                                            timeInterpreter.interpret(Tokenizer.tokenize(objString2), yodaEnvironment);
-                                else
-                                    npInterpretation2 = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
-                                            nounPhraseInterpreter.interpret(Tokenizer.tokenize(objString2), yodaEnvironment);
+                                    Pair<JSONObject, Double> npInterpretation2;
+                                    if (roleClass2.equals(HasAtTime.class))
+                                        npInterpretation2 = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
+                                                timeInterpreter.interpret(Tokenizer.tokenize(objString2), yodaEnvironment);
+                                    else
+                                        npInterpretation2 = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
+                                                nounPhraseInterpreter.interpret(Tokenizer.tokenize(objString2), yodaEnvironment);
 
-                                if (npInterpretation1==null || npInterpretation2==null)
-                                    continue;
+                                    if (npInterpretation1 == null || npInterpretation2 == null)
+                                        continue;
 
-                                String jsonString = "{\"dialogAct\":\"Command\",\"verb\":{\"class\":\"" + verbClass.getSimpleName() + "\"}}";
-                                JSONObject hyp = SemanticsModel.parseJSON(jsonString);
-                                ((JSONObject) hyp.get("verb")).put(roleClass1.getSimpleName(), npInterpretation1.getKey());
-                                ((JSONObject) hyp.get("verb")).put(roleClass2.getSimpleName(), npInterpretation2.getKey());
-                                ans.put(hyp, RegexPlusKeywordUnderstander.regexInterpreterWeight);
+                                    String jsonString = "{\"dialogAct\":\"Command\",\"verb\":{\"class\":\"" + verbClass.getSimpleName() + "\"}}";
+                                    JSONObject hyp = SemanticsModel.parseJSON(jsonString);
+                                    ((JSONObject) hyp.get("verb")).put(roleClass1.getSimpleName(), npInterpretation1.getKey());
+                                    ((JSONObject) hyp.get("verb")).put(roleClass2.getSimpleName(), npInterpretation2.getKey());
+                                    ans.put(hyp, RegexPlusKeywordUnderstander.regexInterpreterWeight);
+                                }
                             }
                         }
                     }

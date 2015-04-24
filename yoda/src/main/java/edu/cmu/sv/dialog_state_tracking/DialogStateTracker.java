@@ -93,20 +93,28 @@ public class DialogStateTracker implements Runnable {
 //            StringDistribution newHypothesisDistribution = new StringDistribution();
 //            Map<String, DialogState> newHypotheses = new HashMap<>();
 
-            for (DialogState currentDialogState : dialogStateNBestDistribution.keySet()){
+
+            // synchronize so that the RefRes cache is unique to this turn
+            synchronized (yodaEnvironment.db.connection) {
+                ReferenceResolution.clearCache();
                 for (Class<? extends DialogStateUpdateInference> updateInferenceClass : updateInferences) {
-                    NBestDistribution<DialogState> inferredUpdatedState = updateInferenceClass.newInstance().
-                            applyAll(yodaEnvironment, currentDialogState, turn, timeStamp);
-                    for (DialogState newDialogState : inferredUpdatedState.keySet()){
-                        newDialogStateDistribution.put(newDialogState, inferredUpdatedState.get(newDialogState) *
-                                dialogStateNBestDistribution.get(currentDialogState));
+                    if (ReferenceResolution.PRINT_CACHING_DEBUG_OUTPUT)
+                        System.err.println("DialogStateTracker: updateInferenceClass:" + updateInferenceClass);
+                    for (DialogState currentDialogState : dialogStateNBestDistribution.keySet()) {
+                        NBestDistribution<DialogState> inferredUpdatedState = updateInferenceClass.newInstance().
+                                applyAll(yodaEnvironment, currentDialogState, turn, timeStamp);
+                        for (DialogState newDialogState : inferredUpdatedState.keySet()) {
+                            newDialogStateDistribution.put(newDialogState, inferredUpdatedState.get(newDialogState) *
+                                    dialogStateNBestDistribution.get(currentDialogState));
+                        }
                     }
                 }
-            }
 
-            dialogStateNBestDistribution = HypothesisSetManagement.keepRatioDistribution(newDialogStateDistribution, .05, 5);
-            dialogStateNBestDistribution.normalize();
-            ReferenceResolution.updateSalience(yodaEnvironment, dialogStateNBestDistribution);
+                dialogStateNBestDistribution = HypothesisSetManagement.keepRatioDistribution(newDialogStateDistribution, .05, 5);
+                dialogStateNBestDistribution.normalize();
+                ReferenceResolution.updateSalience(yodaEnvironment, dialogStateNBestDistribution);
+                ReferenceResolution.clearCache();
+            }
 
 //            // generate log record
 //            JSONObject loopCompleteRecord = MongoLogHandler.createEventRecord("dst_loop_complete");
@@ -167,8 +175,10 @@ public class DialogStateTracker implements Runnable {
     @Override
     public void run() {
         while (true){
-            for (Sensor sensor : yodaEnvironment.db.sensors){
-                sensor.sense(yodaEnvironment);
+            synchronized (yodaEnvironment.db.connection) {
+                for (Sensor sensor : yodaEnvironment.db.sensors) {
+                    sensor.sense(yodaEnvironment);
+                }
             }
             try {
                 Pair<Turn, Long> DstInput = yodaEnvironment.DstInputQueue.poll(100, TimeUnit.MILLISECONDS);

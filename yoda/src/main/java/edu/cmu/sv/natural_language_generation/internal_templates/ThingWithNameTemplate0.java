@@ -38,7 +38,7 @@ public class ThingWithNameTemplate0 implements Template {
 //        System.out.println("ThingWithNameTemplate: here");
 
         // resolve reference, take top guess
-        String entityURI = ReferenceResolution.resolveReference(yodaEnvironment, constraints, false).getTopHypothesis();
+        String entityURI = ReferenceResolution.resolveReference(yodaEnvironment, constraints, false, true).getTopHypothesis();
 
         // generate for the top resolution hypothesis
         JSONObject wrappedEntity = SemanticsModel.parseJSON(Ontology.webResourceWrap(entityURI));

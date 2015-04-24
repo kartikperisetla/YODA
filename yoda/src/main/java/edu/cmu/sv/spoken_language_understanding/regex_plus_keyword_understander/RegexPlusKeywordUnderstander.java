@@ -1,8 +1,9 @@
 package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander;
 
+import com.google.common.primitives.Doubles;
 import edu.cmu.sv.database.Ontology;
+import edu.cmu.sv.database.ReferenceResolution;
 import edu.cmu.sv.dialog_state_tracking.Turn;
-import edu.cmu.sv.domain.yelp_phoenix.ontology.noun.PointOfInterest;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
@@ -30,7 +31,6 @@ import java.util.logging.SimpleFormatter;
  *
  */
 public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
-    public static boolean switchToMultiInterpretersWhenPossible = true;
 
     public NounPhraseInterpreter nounPhraseInterpreter;
     public TimeInterpreter timeInterpreter;
@@ -40,7 +40,7 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
 
     // define parameters for the SLU component
     public static final double keywordInterpreterWeight = 0.5;
-    public static final double regexInterpreterWeight = 0.5;
+    public static final double regexInterpreterWeight = .9;
     public static final double namedEntityFragmentWeight = 0.1;
     public static final double nounPhraseInterpreterWeight = 1.0;
     public static final double timeInterpreterWeight = 1.0;
@@ -48,6 +48,8 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
     public static final double secondaryRegexMatchWeight = 0.3;
     public static final double requiredRoleWeight = 0.9;
     public static final double optionalRoleWeight = 0.7;
+    public static final double normalNamedEntityStringSimilarity = 0.075;
+    public static final double sigma = .00001;
 
 
     private static Logger logger = Logger.getLogger("yoda.spoken_language_understanding.RegexPlusKeywordUnderstander");
@@ -85,14 +87,11 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
             languageInterpreters.add(new WhqHasPropertyRegexInterpreter(qualityClass, yodaEnvironment));
         }
         for (Class<? extends Verb> verbClass : Ontology.verbClasses){
-            if (switchToMultiInterpretersWhenPossible)
-                multiLanguageInterpreters.add(new CommandMultiInterpreter(verbClass, yodaEnvironment));
-            else
-                languageInterpreters.add(new CommandRegexInterpreter(verbClass, yodaEnvironment));
+            multiLanguageInterpreters.add(new CommandMultiInterpreter(verbClass, yodaEnvironment));
             languageInterpreters.add(new CommandKeywordInterpreter(verbClass, yodaEnvironment));
         }
-        languageInterpreters.add(new NamedEntityFragmentInterpreter(PointOfInterest.class));
-        languageInterpreters.add(new NounPhraseFragmentInterpreter(nounPhraseInterpreter));
+//        languageInterpreters.add(new NamedEntityFragmentInterpreter(PointOfInterest.class));
+        multiLanguageInterpreters.add(new NounPhraseFragmentMultiInterpreter(nounPhraseInterpreter));
         languageInterpreters.add(new TimeFragmentInterpreter(timeInterpreter));
 
         // add simple string match interpreters
@@ -118,28 +117,37 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
         StringDistribution hypothesisDistribution = new StringDistribution();
         int hypothesisId = 0;
 
-        // incorporate mini-interpreters
-        for (MiniLanguageInterpreter miniLanguageInterpreter : languageInterpreters) {
-            Pair<JSONObject, Double> interpretation = miniLanguageInterpreter.interpret(Tokenizer.tokenize(asrResult), yodaEnvironment);
-            if (interpretation == null)
-                continue;
-            hypotheses.put("hyp" + hypothesisId, new SemanticsModel(interpretation.getKey()));
-            hypothesisDistribution.put("hyp" + hypothesisId, interpretation.getRight());
-            hypothesisId++;
-        }
-
-        // incorporate mini multi-interpreters
-        for (MiniMultiLanguageInterpreter multiLanguageInterpreter : multiLanguageInterpreters) {
-            NBestDistribution<JSONObject> interpretation = multiLanguageInterpreter.interpret(Tokenizer.tokenize(asrResult), yodaEnvironment);
-            if (interpretation == null)
-                continue;
-            for (JSONObject key : interpretation.keySet()){
-                hypotheses.put("hyp" + hypothesisId, new SemanticsModel(key));
-                hypothesisDistribution.put("hyp" + hypothesisId, interpretation.get(key));
+        // synchronize so that the RefRes cache is unique to this utterance
+        synchronized (yodaEnvironment.db.connection) {
+            ReferenceResolution.clearCache();
+            // incorporate mini-interpreters
+            for (MiniLanguageInterpreter miniLanguageInterpreter : languageInterpreters) {
+//                System.err.println("interpreter:" + miniLanguageInterpreter);
+                Pair<JSONObject, Double> interpretation = miniLanguageInterpreter.interpret(Tokenizer.tokenize(asrResult), yodaEnvironment);
+//                System.err.println("interpretation:" + interpretation);
+                if (interpretation == null)
+                    continue;
+                hypotheses.put("hyp" + hypothesisId, new SemanticsModel(interpretation.getKey()));
+                hypothesisDistribution.put("hyp" + hypothesisId, Doubles.max(sigma, interpretation.getRight()));
                 hypothesisId++;
             }
-        }
 
+            // incorporate mini multi-interpreters
+            for (MiniMultiLanguageInterpreter multiLanguageInterpreter : multiLanguageInterpreters) {
+//                System.err.println("interpreter:" + multiLanguageInterpreter);
+                NBestDistribution<JSONObject> interpretation = multiLanguageInterpreter.interpret(Tokenizer.tokenize(asrResult), yodaEnvironment);
+//                System.err.println("interpretation:" + interpretation);
+                if (interpretation == null)
+                    continue;
+                for (JSONObject key : interpretation.keySet()) {
+
+                    hypotheses.put("hyp" + hypothesisId, new SemanticsModel(key));
+                    hypothesisDistribution.put("hyp" + hypothesisId, Doubles.max(sigma, interpretation.get(key)));
+                    hypothesisId++;
+                }
+            }
+            ReferenceResolution.clearCache();
+        }
 
 
         // create a turn and update the DST

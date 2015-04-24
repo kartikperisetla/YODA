@@ -30,7 +30,7 @@ public class YodaSkeletonLexicon extends Lexicon {
                 entry.add(LexicalEntry.PART_OF_SPEECH.WH_PRONOUN, "who");
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "person");
                 entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "people");
-                entry.add(LexicalEntry.PART_OF_SPEECH.S1_PRONOUN, "I");
+                entry.add(LexicalEntry.PART_OF_SPEECH.S1_PRONOUN, "i");
                 entry.add(LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, "they");
                 add(Person.class, entry, false);
             }

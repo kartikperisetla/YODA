@@ -238,7 +238,7 @@ public class DefiniteReferenceTemplate0 implements Template {
             filteredModel.filterOutLeafSlot("chunk-end");
 //            System.out.println("reference:"+reference+", model:"+filteredModel.getInternalRepresentation());
             StringDistribution referenceAmbiguity = ReferenceResolution.resolveReference(
-                    yodaEnvironment, filteredModel.getInternalRepresentation(), true);
+                    yodaEnvironment, filteredModel.getInternalRepresentation(), true, true);
 //            System.out.println("information:"+referenceAmbiguity.information() + ", distribution:"+referenceAmbiguity);
             if (!referenceAmbiguity.containsKey(entityURI)){
 //                System.out.println("the intended reference doesn't even appear as a top 10 referent in the discourse context");
