@@ -34,8 +34,8 @@ public class SmartHouseCommandLineSystem extends CommandLineYodaSystem {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 frame = new MainFrame("Smart Home");
-                frame.setSize(300, 400);
-                frame.setLocation(950, 150);
+                frame.setSize(400, 400);
+                frame.setLocation(900, 150);
 //                frame.setLocationRelativeTo(null);
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setVisible(true);
