@@ -248,7 +248,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
             ans.put("class", nounClass.getSimpleName());
 
 //        ans.put("<remaining>", remaining);
-        System.err.println("total coverage:" + (pronounCoverage + bestNounCoverage + totalAdjectiveCoverage));
+//        System.err.println("NPInterpreter: total coverage:" + (pronounCoverage + bestNounCoverage + totalAdjectiveCoverage));
         return new ImmutablePair<>(ans, pronounCoverage + bestNounCoverage + totalAdjectiveCoverage);
     }
 

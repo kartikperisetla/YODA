@@ -94,7 +94,7 @@ public class TimeInterpreter implements MiniLanguageInterpreter{
     @Override
     public Pair<JSONObject, Double> interpret(List<String> tokens, YodaEnvironment yodaEnvironment) {
         JSONObject ans = new JSONObject();
-        System.out.println("tokens: " + tokens);
+        System.err.println("TimeInterpreter.interpret(): tokens: " + tokens);
         ans.put("class", Time.class.getSimpleName());
         List<String> remainingTokens = new LinkedList<>(tokens);
         for (String token : remainingTokens){
