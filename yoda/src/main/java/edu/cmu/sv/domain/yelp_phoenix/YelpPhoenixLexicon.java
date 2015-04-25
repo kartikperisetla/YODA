@@ -994,6 +994,7 @@ public class YelpPhoenixLexicon extends Lexicon {
                 LexicalEntry entry = new LexicalEntry();
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "direct");
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "navigate");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "navigation");
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "guide");
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "giving directions");
                 add(GiveDirections.class, entry, true);
