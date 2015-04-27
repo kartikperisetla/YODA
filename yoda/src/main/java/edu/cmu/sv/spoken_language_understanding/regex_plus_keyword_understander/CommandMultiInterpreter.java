@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
     Class<? extends Verb> verbClass;
     String verbRegexString = "()";
+    String adjectiveRegexString = "()";
     Map<Class<? extends Role>, String> roleObj1PrefixPatterns = new HashMap<>();
     Map<Class<? extends Role>, String> roleObj2PrefixPatterns = new HashMap<>();
     Map<Class<? extends Role>, Boolean> r1HasBlankPrefix = new HashMap<>();
@@ -32,6 +33,8 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
     public CommandMultiInterpreter(Class<? extends Verb> verbClass, YodaEnvironment yodaEnvironment) {
         this.verbClass = verbClass;
         this.yodaEnvironment = yodaEnvironment;
+
+        // get noun forms
         Set<String> verbNounStrings = new HashSet<>();
         try {
             verbNounStrings.addAll(this.yodaEnvironment.lex.getPOSForClass(verbClass, Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true));
@@ -40,6 +43,15 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
             verbNounStrings.addAll(this.yodaEnvironment.lex.getPOSForClass(verbClass, Lexicon.LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true));
         } catch (Lexicon.NoLexiconEntryException e) {}
         verbRegexString = "("+String.join("|",verbNounStrings)+")";
+
+        // get adjective forms
+        Set<String> verbAdjectiveStrings = new HashSet<>();
+        try {
+            verbAdjectiveStrings.addAll(this.yodaEnvironment.lex.getPOSForClass(verbClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true));
+        } catch (Lexicon.NoLexiconEntryException e) {}
+        adjectiveRegexString = "("+String.join("|",verbAdjectiveStrings)+")";
+
+        // get role prefixes
         for (Class<? extends Role> roleClass : Ontology.roleClasses) {
             if (Ontology.inDomain(roleClass, verbClass)) {
                 Set<String> roleObj1PrefixStrings = new HashSet<>();
@@ -75,6 +87,50 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
         NBestDistribution<JSONObject> ans = new NBestDistribution<>();
         String utterance = String.join(" ", tokens);
 
+        if (!adjectiveRegexString.equals("()")) {
+            Pattern regexPattern = Pattern.compile("(.* |)" +
+                    MiniLanguageInterpreter.putInStateVerbRegexString + "(.+)" + adjectiveRegexString + MiniLanguageInterpreter.endingPolitenessRegexString);
+            Matcher matcher = regexPattern.matcher(utterance);
+            if (matcher.matches()) {
+                System.err.println("CommandMultiInterpreter: Adjective form initial match");
+                String phraseIntroString = matcher.group(1).trim();
+                System.err.println("phrase intro string:" + phraseIntroString);
+                Pattern negationPattern = Pattern.compile("(.* |)" + MiniLanguageInterpreter.negationRegexString + "( .*|)");
+                Matcher negationMatcher = negationPattern.matcher(phraseIntroString);
+                if (!negationMatcher.matches()) {
+                    String obj1String = matcher.group(3).trim();
+                    System.err.println("obj1string:" + obj1String);
+                    for (Class<? extends Role> roleClass : r1HasBlankPrefix.keySet()) {
+                        String rolePrefixRegexString = roleObj1PrefixPatterns.containsKey(roleClass) ? roleObj1PrefixPatterns.get(roleClass) : "()";
+                        if (r1HasBlankPrefix.get(roleClass))
+                            rolePrefixRegexString = new StringBuilder(rolePrefixRegexString).insert(rolePrefixRegexString.length() - 1, "|").toString();
+                        Pattern obj1Pattern = Pattern.compile(rolePrefixRegexString + "(.+)");
+                        Matcher matcher2 = obj1Pattern.matcher(obj1String);
+                        if (matcher2.matches()) {
+                            String npString = matcher2.group(2);
+                            Pair<JSONObject, Double> npInterpretation;
+                            if (roleClass.equals(HasAtTime.class))
+                                npInterpretation = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
+                                        timeInterpreter.interpret(Tokenizer.tokenize(npString), yodaEnvironment);
+                            else
+                                npInterpretation = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
+                                        nounPhraseInterpreter.interpret(Tokenizer.tokenize(npString), yodaEnvironment);
+
+                            if (npInterpretation == null)
+                                continue;
+
+                            String jsonString = "{\"dialogAct\":\"Command\",\"verb\":{\"class\":\"" + verbClass.getSimpleName() + "\"}}";
+                            JSONObject hyp = SemanticsModel.parseJSON(jsonString);
+                            ((JSONObject) hyp.get("verb")).put(roleClass.getSimpleName(), npInterpretation.getKey());
+                            ans.put(hyp, RegexPlusKeywordUnderstander.regexInterpreterWeight);
+                        }
+                    }
+                }
+            }
+        }
+
+
+
         if (!verbRegexString.equals("()")) {
             {
                 // command with one role as the obj1
@@ -87,9 +143,9 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
                 Matcher matcher = regexPattern.matcher(utterance);
                 if (matcher.matches()) {
                     System.err.println("CommandMultiInterpreter: 1-role initial match");
-                    String phraseIntroString = matcher.group(1);
+                    String phraseIntroString = matcher.group(1).trim();
                     System.err.println("phrase intro string:" + phraseIntroString);
-                    Pattern negationPattern = Pattern.compile("(.* |)" + MiniLanguageInterpreter.negationRegexString + " .*|");
+                    Pattern negationPattern = Pattern.compile("(.* |)" + MiniLanguageInterpreter.negationRegexString + "( .*|)");
                     Matcher negationMatcher = negationPattern.matcher(phraseIntroString);
                     if (!negationMatcher.matches()) {
                         String obj1String = matcher.group(3).trim();
@@ -134,9 +190,9 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
                 Matcher matcher = regexPattern.matcher(utterance);
                 if (matcher.matches()) {
                     System.err.println("CommandMultiInterpreter: 2-role initial match");
-                    String phraseIntroString = matcher.group(1);
+                    String phraseIntroString = matcher.group(1).trim();
                     System.err.println("phrase intro string:" + phraseIntroString);
-                    Pattern negationPattern = Pattern.compile("(.* |)" + MiniLanguageInterpreter.negationRegexString + " .*|");
+                    Pattern negationPattern = Pattern.compile("(.* |)" + MiniLanguageInterpreter.negationRegexString + "( .*|)");
                     Matcher negationMatcher = negationPattern.matcher(phraseIntroString);
                     if (!negationMatcher.matches()) {
 

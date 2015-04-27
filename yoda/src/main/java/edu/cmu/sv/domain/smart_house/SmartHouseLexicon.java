@@ -146,6 +146,7 @@ public class SmartHouseLexicon extends Lexicon {
                 entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "power on");
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "turn on");
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "power on");
+                entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "on");
                 add(TurnOnAppliance.class, entry, false);
             }
             {
@@ -188,6 +189,7 @@ public class SmartHouseLexicon extends Lexicon {
                 entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "power off");
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "turn off");
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "power off");
+                entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "off");
                 add(TurnOffAppliance.class, entry, false);
             }
             {
