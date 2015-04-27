@@ -15,6 +15,8 @@ public class SmartHouseSLUDataset extends SLUDataset {
                 new SemanticsModel("{\"dialogAct\":\"Command\",\"verb\":{\"Component\":{\"class\":\"AirConditioner\"},\"class\":\"TurnOnAppliance\"}}")));
         add(new ImmutablePair<>("turn it on",
                 new SemanticsModel("{\"dialogAct\":\"Command\",\"verb\":{\"Component\":{\"refType\":\"pronoun\",\"class\":\"Noun\"},\"class\":\"TurnOnAppliance\"}}")));
+        add(new ImmutablePair<>("turn it off",
+                new SemanticsModel("{\"dialogAct\":\"Command\",\"verb\":{\"Component\":{\"refType\":\"pronoun\",\"class\":\"Noun\"},\"class\":\"TurnOffAppliance\"}}")));
         add(new ImmutablePair<>("switch it on",
                 new SemanticsModel("{\"dialogAct\":\"Command\",\"verb\":{\"Component\":{\"refType\":\"pronoun\",\"class\":\"Noun\"},\"class\":\"TurnOnAppliance\"}}")));
         add(new ImmutablePair<>("is the security system on",
