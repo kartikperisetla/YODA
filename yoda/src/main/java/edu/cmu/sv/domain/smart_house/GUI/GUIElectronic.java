@@ -12,7 +12,8 @@ public abstract class GUIElectronic extends GUIThing {
 
 	public void toggleSwitch() {
 		state = state ? false : true;
-		((MainFrame) SmartHouseCommandLineSystem.frame).refreshGUI();
+		if (Simulator.runningGUI)
+			((MainFrame) SmartHouseCommandLineSystem.frame).refreshGUI();
 	}
 	
 	public boolean getState() {

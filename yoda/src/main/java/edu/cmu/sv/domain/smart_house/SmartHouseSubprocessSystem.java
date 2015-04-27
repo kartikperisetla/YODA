@@ -3,6 +3,7 @@ package edu.cmu.sv.domain.smart_house;
 import edu.cmu.sv.domain.DatabaseRegistry;
 import edu.cmu.sv.domain.DomainSpec;
 import edu.cmu.sv.domain.NonDialogTaskRegistry;
+import edu.cmu.sv.domain.smart_house.GUI.Simulator;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonLexicon;
 import edu.cmu.sv.yoda_environment.SubprocessYodaSystem;
@@ -12,6 +13,7 @@ import edu.cmu.sv.yoda_environment.SubprocessYodaSystem;
  */
 public class SmartHouseSubprocessSystem extends SubprocessYodaSystem {
     static {
+        Simulator.runningGUI = false;
         // skeleton domain
         domainSpecs.add(new DomainSpec(
                 "YODA skeleton domain",
