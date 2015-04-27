@@ -62,7 +62,8 @@ public class StringDistribution{
 
 
     public void filterZeroEntries(){
-        internalDistribution.keySet().stream().
+        List<String> keys = new LinkedList<>(internalDistribution.keySet());
+        keys.stream().
                 filter(key -> internalDistribution.get(key) <= 0).
                 forEach(internalDistribution::remove);
     }
