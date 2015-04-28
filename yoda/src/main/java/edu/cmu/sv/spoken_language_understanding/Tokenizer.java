@@ -10,6 +10,9 @@ public class Tokenizer {
     public static List<String> tokenize(String inputString){
         inputString = inputString.toLowerCase();
 
+        // get rid of <noise>
+        inputString = inputString.replaceAll("<NOISE>", "");
+
         // split up contractions
         inputString = inputString.replaceAll("n't", " not");
         inputString = inputString.replaceAll("'re", " are");
