@@ -107,9 +107,23 @@ public class SmartHouseLexicon extends Lexicon {
             }
             {
                 LexicalEntry entry = new LexicalEntry();
+                entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "armed");
+                entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "active");
+                entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "activated");
+                add(On.class, entry, true);
+            }
+            {
+                LexicalEntry entry = new LexicalEntry();
                 entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "off");
                 entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "turned off");
                 add(Off.class, entry, false);
+            }
+            {
+                LexicalEntry entry = new LexicalEntry();
+                entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "disarmed");
+                entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "inactive");
+                entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "deactivated");
+                add(On.class, entry, true);
             }
             {
                 LexicalEntry entry = new LexicalEntry();
@@ -151,10 +165,12 @@ public class SmartHouseLexicon extends Lexicon {
             }
             {
                 LexicalEntry entry = new LexicalEntry();
-                entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "power up");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "power up");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "arm");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "activate");
+                entry.add(LexicalEntry.PART_OF_SPEECH.ADJECTIVE, "active");
                 add(TurnOnAppliance.class, entry, true);
             }
-
 
             {
                 LexicalEntry entry = new LexicalEntry();
@@ -194,7 +210,9 @@ public class SmartHouseLexicon extends Lexicon {
             }
             {
                 LexicalEntry entry = new LexicalEntry();
-                entry.add(LexicalEntry.PART_OF_SPEECH.S1_VERB, "power down");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "power down");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "disarm");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "shut off");
                 add(TurnOffAppliance.class, entry, true);
             }
 

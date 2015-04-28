@@ -19,4 +19,6 @@ public abstract class GUIElectronic extends GUIThing {
 	public boolean getState() {
 		return state;
 	}
+	public void setState(boolean newState) {state = newState;}
+
 }
