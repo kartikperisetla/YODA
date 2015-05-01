@@ -4,9 +4,7 @@ import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.dialog_state_tracking.Utils;
-import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
@@ -16,21 +14,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by David Cohen on 9/8/14.
+ * Created by David Cohen on 10/18/14.
  */
-public class Statement extends DialogAct {
+public class SearchReturnedNothing extends DialogAct {
     static Map<String, Class<? extends Thing>> individualParameters = new HashMap<>();
     static Map<String, Class<? extends Thing>> classParameters = new HashMap<>();
     static Map<String, Class<? extends Thing>> descriptionParameters = new HashMap<>();
     static Map<String, Class<? extends Thing>> pathParameters = new HashMap<>();
+
+    static{
+        descriptionParameters.put("asserted_role_description", Thing.class);
+        classParameters.put("verb_class", Verb.class);
+    }
+
     @Override
     public Map<String, Class<? extends Thing>> getPathParameters() {
         return pathParameters;
-    }
-    static{
-        individualParameters.put("topic_individual", Noun.class);
-        classParameters.put("verb_class", Verb.class);
-        descriptionParameters.put("asserted_role_description", Thing.class);
     }
     @Override
     public Map<String, Class<? extends Thing>> getDescriptionParameters() {
@@ -50,8 +49,6 @@ public class Statement extends DialogAct {
         SemanticsModel ans = super.getNlgCommand();
         ans.getInternalRepresentation().put("verb",
                 SemanticsModel.parseJSON("{\"class\":\""+this.getBoundClasses().get("verb_class")+"\"}"));
-        String topicString = Ontology.webResourceWrap((String) this.getBoundIndividuals().get("topic_individual"));
-        ((JSONObject)ans.newGetSlotPathFiller("verb")).put("Agent", SemanticsModel.parseJSON(topicString));
         ((JSONObject)ans.newGetSlotPathFiller("verb")).put("Patient",
                 SemanticsModel.parseJSON(((JSONObject)this.getBoundDescriptions().get("asserted_role_description")).toJSONString()));
         return ans;
@@ -71,6 +68,8 @@ public class Statement extends DialogAct {
                 (answerObliged && answerNotProvided ? RewardAndCostCalculator.penaltyForIgnoringUserRequest : 0);
 //        System.out.println("Statement reward:" + ans);
         return ans;
-    }
 
+
+
+    }
 }

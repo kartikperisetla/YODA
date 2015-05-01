@@ -47,6 +47,7 @@ public class DialogRegistry {
 
         argumentationDialogActs.add(DontKnow.class);
         argumentationDialogActs.add(Statement.class);
+        argumentationDialogActs.add(SearchReturnedNothing.class);
 
         simpleDialogActs.add(RequestFixMisunderstanding.class);
         simpleDialogActs.add(InformDialogLost.class);
