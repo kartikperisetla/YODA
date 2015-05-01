@@ -8,6 +8,7 @@ import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.SystemAction;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.DontKnow;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.SearchReturnedNothing;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Statement;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ClarificationDialogAct;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
@@ -121,6 +122,17 @@ public class DialogManager implements Runnable {
                         Double currentReward = enumeratedStatement.reward(currentDialogState, contextDiscourseUnit) *
                                 dialogStateDistribution.get(currentDialogState);
                         accumulateReward(actionExpectedReward, enumeratedStatement, currentReward);
+                    } else if (!contextDiscourseUnit.actionAnalysis.responseStatement.isEmpty() &&
+                            contextDiscourseUnit.actionAnalysis.responseStatement.get("dialogAct").equals(SearchReturnedNothing.class.getSimpleName())){
+                        SearchReturnedNothing enumeratedSearchReturnedNothing = new SearchReturnedNothing();
+                        Map<String, Object> bindings = new HashMap<>();
+                        bindings.put("verb_class", HasProperty.class.getSimpleName());
+                        bindings.put("asserted_role_description",
+                                ((JSONObject) contextDiscourseUnit.actionAnalysis.responseStatement.get("verb.Patient")));
+                        enumeratedSearchReturnedNothing.bindVariables(bindings);
+                        Double currentReward = enumeratedSearchReturnedNothing.reward(currentDialogState, contextDiscourseUnit) *
+                                dialogStateDistribution.get(currentDialogState);
+                        accumulateReward(actionExpectedReward, enumeratedSearchReturnedNothing, currentReward);
                     } else if (!contextDiscourseUnit.actionAnalysis.responseStatement.isEmpty() &&
                             contextDiscourseUnit.actionAnalysis.responseStatement.get("dialogAct").equals(DontKnow.class.getSimpleName())) {
                         DontKnow enumeratedDontKnow = new DontKnow();
