@@ -31,27 +31,21 @@ public class AnswerInference extends DialogStateUpdateInference {
 
         } else { // if turn.speaker.equals("system")
             String dialogAct = turn.systemUtterance.getSlotPathFiller("dialogAct");
-            System.err.println("AnswerInference: here 1");
             if (Arrays.asList(
                     Accept.class.getSimpleName(),
                     Reject.class.getSimpleName(),
                     DontKnow.class.getSimpleName(),
                     Statement.class.getSimpleName(),
                     SearchReturnedNothing.class.getSimpleName()).contains(dialogAct)) {
-                System.err.println("AnswerInference: here 2");
                 for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
-                    System.err.println("AnswerInference: here 2.5");
                     DiscourseUnit predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId);
                     try {
                         Assert.verify(!predecessor.initiator.equals("system"));
-                        System.err.println("AnswerInference: here a");
                         String predecessorDialogAct = predecessor.spokenByThem.getSlotPathFiller("dialogAct");
-                        System.err.println("predecessor dialog act:" + predecessorDialogAct);
                         Assert.verify(Arrays.asList(WHQuestion.class.getSimpleName(), YNQuestion.class.getSimpleName()).contains(predecessorDialogAct));
                     } catch (Assert.AssertException e){
                         continue;
                     }
-                    System.err.println("AnswerInference: here 3");
                     DialogState newDialogState = currentState.deepCopy();
                     DiscourseUnit newDUHypothesis = new DiscourseUnit();
                     SemanticsModel newSpokenByMeHypothesis = turn.systemUtterance.deepCopy();
