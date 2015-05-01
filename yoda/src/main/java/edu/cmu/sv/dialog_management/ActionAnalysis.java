@@ -139,6 +139,7 @@ public class ActionAnalysis {
                     String bestRecommendation = recommendations.getTopHypothesis();
                     JSONObject responseDescription = SemanticsModel.parseJSON(searchDescription.toJSONString());
                     if (bestRecommendation==null){
+                        responseDescription.put("refType", "indefinite");
                         responseStatement.put("dialogAct", SearchReturnedNothing.class.getSimpleName());
                         responseStatement.put("verb.Patient", responseDescription);
                     } else {
