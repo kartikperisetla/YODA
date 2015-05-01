@@ -1,6 +1,11 @@
 package edu.cmu.sv.dialog_state_tracking;
 
-import java.util.*;
+import edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences.MisunderstoodTurnInference;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by David Cohen on 12/1/14.
@@ -52,6 +57,7 @@ public class DialogState {
         Set<String> activeDiscourseUnits = new HashSet<>();
         Long mostRecentContributionTime = (long) 0;
         for (String discourseUnitKey : discourseUnitHypothesisMap.keySet()){
+            String dialogAct = (String)discourseUnitHypothesisMap.get(discourseUnitKey).getFromInitiator("dialogAct");
             boolean anyLink = false;
             for (ArgumentationLink link : argumentationLinks){
                 if (link.getPredecessor().equals(discourseUnitKey) || link.getSuccessor().equals(discourseUnitKey)){
@@ -61,8 +67,10 @@ public class DialogState {
             }
             if (!anyLink) {
                 activeDiscourseUnits.add(discourseUnitKey);
-                mostRecentContributionTime = Long.max(mostRecentContributionTime,
-                        discourseUnitHypothesisMap.get(discourseUnitKey).getMostRecentContributionTime());
+                if (!dialogAct.equals(MisunderstoodTurnInference.duString)) {
+                    mostRecentContributionTime = Long.max(mostRecentContributionTime,
+                            discourseUnitHypothesisMap.get(discourseUnitKey).getMostRecentContributionTime());
+                }
             }
         }
 
