@@ -1,9 +1,6 @@
 package edu.cmu.sv.dialog_state_tracking;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by David Cohen on 12/1/14.
@@ -47,6 +44,40 @@ public class DialogState {
                     '}';
         }
     }
+
+    /*
+    * clean() eliminates un-linked user DUs if there are other more recent unlinked user DUs
+    * */
+    public void clean(){
+        Set<String> activeDiscourseUnits = new HashSet<>();
+        Long mostRecentContributionTime = (long) 0;
+        for (String discourseUnitKey : discourseUnitHypothesisMap.keySet()){
+            boolean anyLink = false;
+            for (ArgumentationLink link : argumentationLinks){
+                if (link.getPredecessor().equals(discourseUnitKey) || link.getSuccessor().equals(discourseUnitKey)){
+                    anyLink = true;
+                    break;
+                }
+            }
+            if (!anyLink) {
+                activeDiscourseUnits.add(discourseUnitKey);
+                mostRecentContributionTime = Long.max(mostRecentContributionTime,
+                        discourseUnitHypothesisMap.get(discourseUnitKey).getMostRecentContributionTime());
+            }
+        }
+
+        if (activeDiscourseUnits.size()<=1)
+            return;
+
+        for (String discourseUnitKey : activeDiscourseUnits){
+            if (discourseUnitHypothesisMap.get(discourseUnitKey).getMostRecentContributionTime() < mostRecentContributionTime) {
+                discourseUnitHypothesisMap.remove(discourseUnitKey);
+//                System.err.println("DialogState.clean(): removing an old active discourse unit");
+            }
+        }
+
+    }
+
 
     public DialogState deepCopy(){
         DialogState ans = new DialogState();

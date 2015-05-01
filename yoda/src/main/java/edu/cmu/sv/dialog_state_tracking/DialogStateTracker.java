@@ -104,6 +104,7 @@ public class DialogStateTracker implements Runnable {
                         NBestDistribution<DialogState> inferredUpdatedState = updateInferenceClass.newInstance().
                                 applyAll(yodaEnvironment, currentDialogState, turn, timeStamp);
                         for (DialogState newDialogState : inferredUpdatedState.keySet()) {
+                            newDialogState.clean();
                             newDialogStateDistribution.put(newDialogState, inferredUpdatedState.get(newDialogState) *
                                     dialogStateNBestDistribution.get(currentDialogState));
                         }
