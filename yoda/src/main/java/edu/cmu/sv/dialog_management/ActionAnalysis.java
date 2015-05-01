@@ -15,10 +15,7 @@ import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.HasProperty;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.ActionSchema;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.DontKnow;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Statement;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.WHQuestion;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.YNQuestion;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.*;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -140,10 +137,11 @@ public class ActionAnalysis {
                     StringDistribution recommendations = ReferenceResolution.resolveReference(yodaEnvironment, searchDescription, false, true);
 //                    System.err.println("recommendations:" + recommendations);
                     String bestRecommendation = recommendations.getTopHypothesis();
+                    JSONObject responseDescription = SemanticsModel.parseJSON(searchDescription.toJSONString());
                     if (bestRecommendation==null){
-                        responseStatement.put("dialogAct", DontKnow.class.getSimpleName());
+                        responseStatement.put("dialogAct", SearchReturnedNothing.class.getSimpleName());
+                        responseStatement.put("verb.Patient", responseDescription);
                     } else {
-                        JSONObject responseDescription = SemanticsModel.parseJSON(searchDescription.toJSONString());
                         responseDescription.put("refType", "indefinite");
                         responseStatement.put("dialogAct", Statement.class.getSimpleName());
                         responseStatement.put("verb.Agent", SemanticsModel.parseJSON(Ontology.webResourceWrap(bestRecommendation)));
