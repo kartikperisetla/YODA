@@ -60,8 +60,28 @@ public class CommandLineExecutor implements Executor {
         } else {
             throw new Error("Can not execute this type of action: "+systemAction);
         }
-
-
     }
 
+    @Override
+    public void executeUntracked(SystemAction systemAction) {
+        if (systemAction instanceof DialogAct){
+            SemanticsModel model = ((DialogAct) systemAction).getNlgCommand();
+            NaturalLanguageGenerator.getLogger().info("nlg request made:"+model);
+            Map.Entry<String, SemanticsModel> chosenUtterance =
+                    yodaEnvironment.nlg.generateBestForSemantics(model,
+                            Grammar.DEFAULT_GRAMMAR_PREFERENCES);
+            chosenUtterance.getValue().filterOutLeafSlot("chunk-start");
+            chosenUtterance.getValue().filterOutLeafSlot("chunk-end");
+            NaturalLanguageGenerator.getLogger().info("chosen utterance:" + chosenUtterance);
+            yodaEnvironment.out.sendOutput(chosenUtterance.getKey());
+
+        } else if (systemAction instanceof NonDialogTask){
+            JSONObject taskSemantics = SemanticsModel.parseJSON("{\"dialogAct\":\""+systemAction.getClass().getSimpleName()+"\"}");
+            taskSemantics.put("verb", SemanticsModel.parseJSON(((NonDialogTask) systemAction).getTaskSpec().toJSONString()));
+            ((NonDialogTask) systemAction).execute(yodaEnvironment);
+
+        } else {
+            throw new Error("Can not execute this type of action: "+systemAction);
+        }
+    }
 }

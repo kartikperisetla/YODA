@@ -66,8 +66,34 @@ public class JsonExecutor implements Executor {
         } else {
             throw new Error("Can not execute this type of action: "+systemAction);
         }
-
-
     }
 
+    @Override
+    public void executeUntracked(SystemAction systemAction) {
+
+        if (systemAction instanceof DialogAct){
+            SemanticsModel model = ((DialogAct) systemAction).getNlgCommand();
+            NaturalLanguageGenerator.getLogger().info("nlg request made:"+model);
+            Map.Entry<String, SemanticsModel> chosenUtterance =
+                    yodaEnvironment.nlg.generateBestForSemantics(model,
+                            Grammar.DEFAULT_GRAMMAR_PREFERENCES);
+            chosenUtterance.getValue().filterOutLeafSlot("chunk-start");
+            chosenUtterance.getValue().filterOutLeafSlot("chunk-end");
+            NaturalLanguageGenerator.getLogger().info("chosen utterance:" + chosenUtterance);
+            JSONObject outputContent = SemanticsModel.parseJSON("{\"messageType\":\"tts\", \"content\":\""+chosenUtterance.getKey()+"\"}");
+            yodaEnvironment.out.sendOutput(outputContent.toJSONString());
+
+        } else if (systemAction instanceof NonDialogTask){
+            JSONObject taskSemantics = SemanticsModel.parseJSON("{\"dialogAct\":\""+systemAction.getClass().getSimpleName()+"\"}");
+            taskSemantics.put("verb", SemanticsModel.parseJSON(((NonDialogTask) systemAction).getTaskSpec().toJSONString()));
+            ((NonDialogTask) systemAction).execute(yodaEnvironment);
+            JSONObject outputContent = SemanticsModel.parseJSON(
+                    "{\"messageType\":\""+systemAction.getClass().getSimpleName()+"\", " +
+                            "\"content\":"+((NonDialogTask) systemAction).getTaskSpec().toJSONString()+"}");
+            yodaEnvironment.out.sendOutput(outputContent.toJSONString());
+
+        } else {
+            throw new Error("Can not execute this type of action: "+systemAction);
+        }
+    }
 }
