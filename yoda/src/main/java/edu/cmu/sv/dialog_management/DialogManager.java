@@ -7,6 +7,7 @@ import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.HasProperty;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.SystemAction;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Acknowledge;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.DontKnow;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.SearchReturnedNothing;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Statement;
@@ -270,6 +271,9 @@ public class DialogManager implements Runnable {
                             logger.info("system cancelling action, dialog state has been updated");
                             continue;
                         } else {
+                            if (selectedAction instanceof NonDialogTask){
+                                yodaEnvironment.exe.executeUntracked(new Acknowledge());
+                            }
                             yodaEnvironment.exe.execute(selectedAction);
                             outstandingSystemAction = true;
                         }

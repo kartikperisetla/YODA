@@ -59,6 +59,7 @@ public class Grammar {
         grammar1_roots.add(SearchReturnedNothingTemplate0.class);
         grammar1_roots.add(AcceptTemplate.class);
         grammar1_roots.add(RejectTemplate.class);
+        grammar1_roots.add(AcknowledgeTemplate.class);
         grammar1_roots.add(DontKnowTemplate.class);
         grammar1_roots.add(RequestConfirmValueTemplate0.class);
         grammar1_roots.add(ConfirmGroundingSuggestionTemplate0.class);
