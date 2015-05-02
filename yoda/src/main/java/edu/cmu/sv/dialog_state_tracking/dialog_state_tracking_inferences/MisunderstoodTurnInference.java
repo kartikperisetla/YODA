@@ -15,7 +15,7 @@ import edu.cmu.sv.yoda_environment.YodaEnvironment;
  */
 public class MisunderstoodTurnInference extends DialogStateUpdateInference {
     public static final double probabilityUserTurnMisunderstood = .08;
-    public static final double probabilitySystemTurnMisunderstood = .0001;
+//    public static final double probabilitySystemTurnMisunderstood = .0001;
     public static final String duString = "Misunderstood";
 
     @Override
@@ -39,24 +39,24 @@ public class MisunderstoodTurnInference extends DialogStateUpdateInference {
 //            newDUHypothesis.actionAnalysis.update(yodaEnvironment, newDUHypothesis);
             newDialogState.misunderstandingCounter ++;
             resultHypotheses.put(newDialogState, probabilityUserTurnMisunderstood);
-        } else { // turn.speaker == system
-
-            DiscourseUnit newDUHypothesis = new DiscourseUnit();
-            SemanticsModel newSpokenByMeHypothesis = turn.getSystemUtterance();
-            newSpokenByMeHypothesis.getInternalRepresentation().put("dialogAct", duString);
-            //new SemanticsModel("{\"dialogAct\":\""+duString+"\"}");
-            newDUHypothesis.timeOfLastActByMe = timeStamp;
-            newDUHypothesis.spokenByMe = newSpokenByMeHypothesis;
-            newDUHypothesis.groundInterpretation = newSpokenByMeHypothesis;
-            newDUHypothesis.initiator = turn.speaker;
-            DialogState newDialogState = currentState.deepCopy();
-            newDialogState.discourseUnitCounter += 1;
-            newDialogState.getDiscourseUnitHypothesisMap().
-                    put("du_" + newDialogState.discourseUnitCounter, newDUHypothesis);
-
-//            newDUHypothesis.actionAnalysis.update(yodaEnvironment, newDUHypothesis);
-            newDialogState.misunderstandingCounter ++;
-            resultHypotheses.put(newDialogState, probabilitySystemTurnMisunderstood);
+//        } else { // turn.speaker == system
+//
+//            DiscourseUnit newDUHypothesis = new DiscourseUnit();
+//            SemanticsModel newSpokenByMeHypothesis = turn.getSystemUtterance();
+//            newSpokenByMeHypothesis.getInternalRepresentation().put("dialogAct", duString);
+//            //new SemanticsModel("{\"dialogAct\":\""+duString+"\"}");
+//            newDUHypothesis.timeOfLastActByMe = timeStamp;
+//            newDUHypothesis.spokenByMe = newSpokenByMeHypothesis;
+//            newDUHypothesis.groundInterpretation = newSpokenByMeHypothesis;
+//            newDUHypothesis.initiator = turn.speaker;
+//            DialogState newDialogState = currentState.deepCopy();
+//            newDialogState.discourseUnitCounter += 1;
+//            newDialogState.getDiscourseUnitHypothesisMap().
+//                    put("du_" + newDialogState.discourseUnitCounter, newDUHypothesis);
+//
+////            newDUHypothesis.actionAnalysis.update(yodaEnvironment, newDUHypothesis);
+//            newDialogState.misunderstandingCounter ++;
+//            resultHypotheses.put(newDialogState, probabilitySystemTurnMisunderstood);
 
 
         }

@@ -254,8 +254,13 @@ public class DialogManager implements Runnable {
 
                     SystemAction selectedAction = rankedActions.get(0).getKey();
                     if (selectedAction != null) {
-                        yodaEnvironment.exe.execute(selectedAction);
-                        outstandingSystemAction = true;
+                        if (!yodaEnvironment.DmInputQueue.isEmpty()){
+                            logger.info("system cancelling action, dialog state has been updated");
+                            continue;
+                        } else {
+                            yodaEnvironment.exe.execute(selectedAction);
+                            outstandingSystemAction = true;
+                        }
                     }
                 }
                 Thread.sleep(100);
