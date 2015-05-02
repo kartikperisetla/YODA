@@ -8,5 +8,5 @@ package edu.cmu.sv.system_action;
  *
  */
 public interface Executor {
-    public void execute(SystemAction systemAction);
+    void execute(SystemAction systemAction);
 }
