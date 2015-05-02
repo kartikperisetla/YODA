@@ -9,4 +9,5 @@ package edu.cmu.sv.system_action;
  */
 public interface Executor {
     void execute(SystemAction systemAction);
+    void executeUntracked(SystemAction systemAction);
 }
