@@ -31,10 +31,12 @@ public class TurnOnTask extends NonDialogTask {
         boolean itemFound = false;
         for(GUIThing thing : Simulator.getThings()) {
             if(thing.getCorrespondingURI().equals(uri)) {
-                if (((GUIElectronic)thing).getState()){
-                    // do nothing if the electronic piece is already on
-                } else {
-                    ((GUIElectronic) thing).toggleSwitch();
+                if (thing instanceof GUIElectronic) {
+                    if (((GUIElectronic) thing).getState()) {
+                        // do nothing if the electronic piece is already on
+                    } else {
+                        ((GUIElectronic) thing).toggleSwitch();
+                    }
                 }
                 itemFound = true;
                 break;

@@ -30,7 +30,6 @@ public class RejectGroundingSuggestionInference extends DialogStateUpdateInferen
                 String dialogAct = hypModel.getSlotPathFiller("dialogAct");
                 if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(Reject.class)) {
                     for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
-                        String newDialogStateHypothesisID = "dialog_state_hyp_" + newHypothesisCounter++;
                         DialogState newDialogState = currentState.deepCopy();
                         DiscourseUnit predecessor = newDialogState.discourseUnitHypothesisMap.get(predecessorId);
 

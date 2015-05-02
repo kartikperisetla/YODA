@@ -26,7 +26,6 @@ public class AnswerInference extends DialogStateUpdateInference {
 
         NBestDistribution<DialogState> ans = new NBestDistribution<>();
 
-        int newHypothesisCounter = 0;
         if (turn.speaker.equals("user")){
 
         } else { // if turn.speaker.equals("system")
@@ -46,6 +45,7 @@ public class AnswerInference extends DialogStateUpdateInference {
                     } catch (Assert.AssertException e){
                         continue;
                     }
+
                     DialogState newDialogState = currentState.deepCopy();
                     DiscourseUnit newDUHypothesis = new DiscourseUnit();
                     SemanticsModel newSpokenByMeHypothesis = turn.systemUtterance.deepCopy();
