@@ -111,6 +111,12 @@ public class DialogStateTracker implements Runnable {
                     }
                 }
 
+                // if
+                if (newDialogStateDistribution.internalDistribution.size()==0) {
+                    System.err.println("DialogStateTracker: DST has no dialog state hypotheses. Starting over from empty dialog state.");
+                    newDialogStateDistribution.internalDistribution.put(new DialogState(), 1.0);
+                }
+
                 dialogStateNBestDistribution = HypothesisSetManagement.keepRatioDistribution(newDialogStateDistribution, .05, 5);
                 dialogStateNBestDistribution.normalize();
                 ReferenceResolution.updateSalience(yodaEnvironment, dialogStateNBestDistribution);
