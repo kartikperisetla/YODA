@@ -3,25 +3,19 @@ package edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.dialog_state_tracking.Turn;
-import edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences.DialogStateUpdateInference;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.NBestDistribution;
-import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by David Cohen on 9/19/14.
  *
- * Infers the dialog state after misunderstanding a user turn
+ * Infers the dialog state after misunderstanding a user turn, or after the system speaks an awkward turn
  *
  */
 public class MisunderstoodTurnInference extends DialogStateUpdateInference {
     public static final double probabilityUserTurnMisunderstood = .08;
+    public static final double probabilitySystemTurnMisunderstood = .0001;
     public static final String duString = "Misunderstood";
 
     @Override
@@ -45,6 +39,26 @@ public class MisunderstoodTurnInference extends DialogStateUpdateInference {
 //            newDUHypothesis.actionAnalysis.update(yodaEnvironment, newDUHypothesis);
             newDialogState.misunderstandingCounter ++;
             resultHypotheses.put(newDialogState, probabilityUserTurnMisunderstood);
+        } else { // turn.speaker == system
+
+            DiscourseUnit newDUHypothesis = new DiscourseUnit();
+            SemanticsModel newSpokenByMeHypothesis = turn.getSystemUtterance();
+            newSpokenByMeHypothesis.getInternalRepresentation().put("dialogAct", duString);
+            //new SemanticsModel("{\"dialogAct\":\""+duString+"\"}");
+            newDUHypothesis.timeOfLastActByMe = timeStamp;
+            newDUHypothesis.spokenByMe = newSpokenByMeHypothesis;
+            newDUHypothesis.groundInterpretation = newSpokenByMeHypothesis;
+            newDUHypothesis.initiator = turn.speaker;
+            DialogState newDialogState = currentState.deepCopy();
+            newDialogState.discourseUnitCounter += 1;
+            newDialogState.getDiscourseUnitHypothesisMap().
+                    put("du_" + newDialogState.discourseUnitCounter, newDUHypothesis);
+
+//            newDUHypothesis.actionAnalysis.update(yodaEnvironment, newDUHypothesis);
+            newDialogState.misunderstandingCounter ++;
+            resultHypotheses.put(newDialogState, probabilitySystemTurnMisunderstood);
+
+
         }
         return resultHypotheses;
     }
