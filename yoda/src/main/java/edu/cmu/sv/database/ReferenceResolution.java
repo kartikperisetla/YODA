@@ -143,7 +143,7 @@ public class ReferenceResolution {
 
         } else {
 
-        System.out.println("resolveReference: reference:" + reference);
+//        System.err.println("resolveReference: reference:" + reference);
             String queryString = Database.prefixes + "SELECT DISTINCT ?x0 ?score0 WHERE {\n";
             if (requireReferentInFocus)
                 queryString += "?x0 rdf:type dst:InFocus .\n";
@@ -173,7 +173,7 @@ public class ReferenceResolution {
             }
 
         }
-        System.err.println(ans);
+//        System.err.println(ans);
         if (normalizeResult)
             ans.normalize();
         if (requireReferentInFocus){
