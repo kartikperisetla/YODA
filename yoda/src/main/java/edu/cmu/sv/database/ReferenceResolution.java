@@ -143,7 +143,7 @@ public class ReferenceResolution {
 
         } else {
 
-//        System.out.println("resolveReference: reference:" + reference);
+        System.out.println("resolveReference: reference:" + reference);
             String queryString = Database.prefixes + "SELECT DISTINCT ?x0 ?score0 WHERE {\n";
             if (requireReferentInFocus)
                 queryString += "?x0 rdf:type dst:InFocus .\n";
@@ -173,7 +173,7 @@ public class ReferenceResolution {
             }
 
         }
-//        System.err.println(ans);
+        System.err.println(ans);
         if (normalizeResult)
             ans.normalize();
         if (requireReferentInFocus){
@@ -267,12 +267,15 @@ public class ReferenceResolution {
             }
             List<String> scoresToAccumulate = new LinkedList<>();
 
-            scoresToAccumulate.add("?score"+tmpVarIndex);
-            ans += "{{OPTIONAL { ?x"+referenceIndex+" dst:salience ?score"+tmpVarIndex+" }}\n" +
-                    "UNION\n" +
-                    "{OPTIONAL { FILTER NOT EXISTS { ?x"+referenceIndex+" dst:salience ?score"+tmpVarIndex+" } " +
-                    "BIND("+minFocusSalience+" AS ?score"+tmpVarIndex+" ) }}}\n";
-            tmpVarIndex++;
+            // if not a named entity, weight by salience
+            if (! reference.keySet().contains(HasName.class.getSimpleName())) {
+                scoresToAccumulate.add("?score"+tmpVarIndex);
+                ans += "{{OPTIONAL { ?x" + referenceIndex + " dst:salience ?score" + tmpVarIndex + " }}\n" +
+                        "UNION\n" +
+                        "{OPTIONAL { FILTER NOT EXISTS { ?x" + referenceIndex + " dst:salience ?score" + tmpVarIndex + " } " +
+                        "BIND(" + minFocusSalience + " AS ?score" + tmpVarIndex + " ) }}}\n";
+                tmpVarIndex++;
+            }
 
             for (Object key : reference.keySet()) {
                 if (key.equals("class")) {
@@ -321,6 +324,8 @@ public class ReferenceResolution {
                     ans += "?x" + referenceIndex + " rdfs:label ?tmp" + tmpVarIndex + " . \n" +
                             "BIND(base:" + StringSimilarity.class.getSimpleName() +
                             "(?tmp" + tmpVarIndex + ", \""+ similarityString + "\") AS ?score" + tmpVarIndex + ")\n";
+                    ans += "FILTER(?score"+tmpVarIndex+" > "+StringSimilarity.possibleMatchThreshold+")\n";
+
                     scoresToAccumulate.add("?score"+tmpVarIndex);
                 } else {
                     throw new Error("this role isn't handled:" + key);
@@ -393,6 +398,7 @@ public class ReferenceResolution {
     /*
     * return the truth with which the description describes the grounded individual
     * Any nested noun phrases in the description must be grounded in advance (WebResources)
+    * Salience is not part of this computation
     * */
     public static Double descriptionMatch(YodaEnvironment yodaEnvironment, JSONObject individual, JSONObject description){
         try {
