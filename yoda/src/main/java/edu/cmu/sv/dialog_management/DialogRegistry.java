@@ -34,14 +34,13 @@ public class DialogRegistry {
     public static Set<Class <? extends DialogAct>> simpleDialogActs = new HashSet<>();
     public static Set<Class <? extends DialogAct>> slotFillingDialogActs = new HashSet<>();
     public static Set<Class <? extends DialogAct>> discourseUnitDialogActs = new HashSet<>();
+    public static Set<Class <? extends DialogAct>> oocDialogActs= new HashSet<>();
+    public static Set<Class <? extends DialogAct>> oocResponseDialogActs= new HashSet<>();
     public static Set<Class< ? extends NonDialogTask>> nonDialogTasks = new HashSet<>();
 
     public static Set<ActionSchema> actionSchemata = new HashSet<>();
 
     static{
-
-        //todo: re-do enumeration grouping: add Statement
-
         clarificationDialogActs.add(ConfirmValueSuggestion.class);
         clarificationDialogActs.add(RequestConfirmValue.class);
 
@@ -62,8 +61,15 @@ public class DialogRegistry {
         userOnlyDialogActs.add(Accept.class);
         userOnlyDialogActs.add(Reject.class);
 
+        oocDialogActs.add(RequestListOptions.class);
+        oocDialogActs.add(RequestSearchAlternative.class);
+
+        oocResponseDialogActs.add(OOCRespondToRequestListOptions.class);
+        oocResponseDialogActs.add(OOCRespondToRequestSearchAlternative.class);
+
         for (Class<? extends DialogAct> cls : Iterables.concat(discourseUnitDialogActs, argumentationDialogActs,
-                userOnlyDialogActs, clarificationDialogActs, simpleDialogActs, Arrays.asList(Fragment.class))) {
+                userOnlyDialogActs, clarificationDialogActs, simpleDialogActs, oocDialogActs, oocResponseDialogActs,
+                Arrays.asList(Fragment.class))) {
             dialogActNameMap.put(cls.getSimpleName(), cls);
         }
 

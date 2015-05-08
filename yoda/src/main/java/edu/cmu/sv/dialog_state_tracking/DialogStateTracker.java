@@ -56,9 +56,8 @@ public class DialogStateTracker implements Runnable {
         updateInferences.add(ElaborateInference.class);
         updateInferences.add(TakeRequestedActionInference.class);
         updateInferences.add(MisunderstoodTurnInference.class);
-        updateInferences.add(RequestFixMisunderstandingInference.class);
         updateInferences.add(DialogLostInference.class);
-        updateInferences.add(ResetLostDialogInference.class);
+        updateInferences.add(OOCInference.class);
     }
 
     YodaEnvironment yodaEnvironment;
