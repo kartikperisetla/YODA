@@ -34,6 +34,7 @@ public class OOCInference extends DialogStateUpdateInference {
                     newDUHypothesis.timeOfLastActByThem = timeStamp;
                     newDUHypothesis.spokenByThem = newSpokenByThemHypothesis;
                     newDUHypothesis.initiator = turn.speaker;
+                    newDUHypothesis.setGroundInterpretation(newSpokenByThemHypothesis.deepCopy());
 
                     DialogState newDialogState = currentState.deepCopy();
                     newDialogState.discourseUnitCounter += 1;

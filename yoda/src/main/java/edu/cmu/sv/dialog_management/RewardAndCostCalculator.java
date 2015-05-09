@@ -168,6 +168,8 @@ public class RewardAndCostCalculator {
                     continue;
                 Double discourseUnitConfidence = Utils.discourseUnitContextProbability(dialogState, contextDiscourseUnit);
                 boolean anyMatches = false;
+//                System.err.println("contextDU:");
+//                System.err.println(contextDiscourseUnit);
                 for (String path : contextDiscourseUnit.getGroundInterpretation().findAllPathsToClass(WebResource.class.getSimpleName())){
                     if (contextDiscourseUnit.getGroundInterpretation().newGetSlotPathFiller(path+"."+ HasURI.class.getSimpleName()).equals(valueURI)){
                         anyMatches = true;
