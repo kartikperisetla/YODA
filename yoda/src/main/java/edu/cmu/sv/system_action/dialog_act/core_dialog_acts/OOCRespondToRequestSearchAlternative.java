@@ -1,5 +1,6 @@
 package edu.cmu.sv.system_action.dialog_act.core_dialog_acts;
 
+import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
@@ -36,7 +37,7 @@ public class OOCRespondToRequestSearchAlternative extends DialogAct {
 
     @Override
     public Double reward(DialogState dialogState, DiscourseUnit discourseUnit){
-        return -1.0;
+        return RewardAndCostCalculator.rewardForOOCRespondToRequestSearchAlternative(dialogState, discourseUnit);
     }
 
 }

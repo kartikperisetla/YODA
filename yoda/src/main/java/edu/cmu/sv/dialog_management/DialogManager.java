@@ -1,5 +1,6 @@
 package edu.cmu.sv.dialog_management;
 
+import com.google.common.collect.Iterables;
 import edu.cmu.sv.database.ActionEnumeration;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
@@ -102,7 +103,9 @@ public class DialogManager implements Runnable {
 
 
                     // simple dialog acts
-                    for (Class<? extends DialogAct> dialogActClass : DialogRegistry.simpleDialogActs) {
+                    for (Class<? extends DialogAct> dialogActClass : Iterables.concat(
+                            DialogRegistry.simpleDialogActs,
+                            DialogRegistry.oocResponseDialogActs)) {
                         DialogAct dialogActInstance = dialogActClass.newInstance();
                         Double currentReward = dialogActInstance.reward(currentDialogState, contextDiscourseUnit) *
                                 dialogStateDistribution.get(currentDialogState);

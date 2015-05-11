@@ -43,6 +43,16 @@ public class RewardAndCostCalculator {
                 ((discourseUnit.getFromInitiator("dialogAct")).equals(MisunderstoodTurnInference.duString) ? 1 : -1);
     }
 
+    public static Double rewardForOOCRespondToRequestListOptions(DialogState dialogState, DiscourseUnit discourseUnit){
+        return 1.0 * Utils.discourseUnitContextProbability(dialogState, discourseUnit) *
+                ((discourseUnit.getFromInitiator("dialogAct")).equals(RequestListOptions.class.getSimpleName()) ? 1 : -1);
+    }
+
+    public static Double rewardForOOCRespondToRequestSearchAlternative(DialogState dialogState, DiscourseUnit discourseUnit){
+        return 1.0 * Utils.discourseUnitContextProbability(dialogState, discourseUnit) *
+                ((discourseUnit.getFromInitiator("dialogAct")).equals(OOCRespondToRequestSearchAlternative.class.getSimpleName()) ? 1 : -1);
+    }
+
     public static Double rewardForDialogLost(DialogState dialogState, DiscourseUnit discourseUnit){
         return 1.0 * Utils.discourseUnitContextProbability(dialogState, discourseUnit) *
                 ((discourseUnit.getFromInitiator("dialogAct")).equals(DialogLostInference.duString) ? 1 : -1);
