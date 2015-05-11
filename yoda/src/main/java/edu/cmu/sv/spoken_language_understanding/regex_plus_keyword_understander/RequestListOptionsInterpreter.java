@@ -22,6 +22,7 @@ public class RequestListOptionsInterpreter implements MiniLanguageInterpreter {
         keywords.add("all");
         keywords.add("options");
         keywords.add("alternatives");
+        keywords.add("others");
     }
 
     @Override
