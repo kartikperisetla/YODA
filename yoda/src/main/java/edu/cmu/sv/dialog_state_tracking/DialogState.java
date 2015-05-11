@@ -83,7 +83,20 @@ public class DialogState {
 //                System.err.println("DialogState.clean(): removing an old active discourse unit");
             }
         }
+    }
 
+    public DiscourseUnit activeDiscourseUnit(){
+        DiscourseUnit ans = null;
+        Long mostRecentContributionTime = (long) 0;
+        for (String discourseUnitKey : discourseUnitHypothesisMap.keySet()) {
+            long thisDuTime = discourseUnitHypothesisMap.get(discourseUnitKey).getMostRecentContributionTime();
+            if (mostRecentContributionTime < thisDuTime){
+                ans = discourseUnitHypothesisMap.get(discourseUnitKey);
+                mostRecentContributionTime = thisDuTime;
+            }
+        }
+
+        return ans;
     }
 
 

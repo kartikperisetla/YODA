@@ -40,22 +40,22 @@ public class RewardAndCostCalculator {
 
     public static Double rewardForRequestFixMisunderstanding(DialogState dialogState, DiscourseUnit discourseUnit){
         return 1.0 * Utils.discourseUnitContextProbability(dialogState, discourseUnit) *
-                ((discourseUnit.getFromInitiator("dialogAct")).equals(MisunderstoodTurnInference.duString) ? 1 : -1);
+                ((discourseUnit.getFromInitiator("dialogAct")).equals(MisunderstoodTurnInference.duString) ? 2 : -1);
     }
 
     public static Double rewardForOOCRespondToRequestListOptions(DialogState dialogState, DiscourseUnit discourseUnit){
         return 1.0 * Utils.discourseUnitContextProbability(dialogState, discourseUnit) *
-                ((discourseUnit.getFromInitiator("dialogAct")).equals(RequestListOptions.class.getSimpleName()) ? 1 : -1);
+                ((discourseUnit.getFromInitiator("dialogAct")).equals(RequestListOptions.class.getSimpleName()) ? 2 : -1);
     }
 
     public static Double rewardForOOCRespondToRequestSearchAlternative(DialogState dialogState, DiscourseUnit discourseUnit){
         return 1.0 * Utils.discourseUnitContextProbability(dialogState, discourseUnit) *
-                ((discourseUnit.getFromInitiator("dialogAct")).equals(OOCRespondToRequestSearchAlternative.class.getSimpleName()) ? 1 : -1);
+                ((discourseUnit.getFromInitiator("dialogAct")).equals(RequestSearchAlternative.class.getSimpleName()) ? 2 : -1);
     }
 
     public static Double rewardForDialogLost(DialogState dialogState, DiscourseUnit discourseUnit){
         return 1.0 * Utils.discourseUnitContextProbability(dialogState, discourseUnit) *
-                ((discourseUnit.getFromInitiator("dialogAct")).equals(DialogLostInference.duString) ? 1 : -1);
+                ((discourseUnit.getFromInitiator("dialogAct")).equals(DialogLostInference.duString) ? 2 : -1);
     }
 
     public static Double nonDialogTaskReward(NonDialogTask task,

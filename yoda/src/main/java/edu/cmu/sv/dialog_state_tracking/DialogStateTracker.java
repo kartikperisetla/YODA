@@ -9,6 +9,7 @@ import edu.cmu.sv.utils.NBestDistribution;
 import edu.cmu.sv.yoda_environment.MongoLogHandler;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.Pair;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.io.IOException;
@@ -123,10 +124,29 @@ public class DialogStateTracker implements Runnable {
             }
 
 //            // generate log record
-//            JSONObject loopCompleteRecord = MongoLogHandler.createEventRecord("dst_loop_complete");
-//            loopCompleteRecord.put("n_hypotheses", hypothesisMap.size());
+            JSONObject loopCompleteRecord = MongoLogHandler.createEventRecord("dst_loop_complete");
+            loopCompleteRecord.put("speaker", turn.speaker);
+            loopCompleteRecord.put("n_hypotheses", dialogStateNBestDistribution.internalDistribution.size());
+            JSONArray dialogStateDistributionDescription = new JSONArray();
+            for (DialogState dialogState : dialogStateNBestDistribution.keySet()){
+                JSONObject thisDialogStateDescription = new JSONObject();
+                DiscourseUnit activeDu = dialogState.activeDiscourseUnit();
+                String activeDuInitiator = null;
+                String activeDuDialogAct = null;
+                if (activeDu!=null){
+                    activeDuInitiator = activeDu.initiator;
+                    activeDuDialogAct = (String) activeDu.getFromInitiator("dialogAct");
+                }
+                thisDialogStateDescription.put("initiator", activeDuInitiator);
+                thisDialogStateDescription.put("dA", activeDuDialogAct);
+                thisDialogStateDescription.put("p", dialogStateNBestDistribution.get(dialogState));
+                dialogStateDistributionDescription.add(thisDialogStateDescription);
+            }
+            loopCompleteRecord.put("NBestDialogStates", dialogStateDistributionDescription);
+
 //            loopCompleteRecord.put("hypothesis_distribution", new JSONObject(hypothesisDistribution.getInternalDistribution()));
-//
+            logger.info(loopCompleteRecord.toJSONString());
+
 //            JSONObject dialogStateHypothesesJSON = new JSONObject();
 //            for (String key : hypothesisMap.keySet()){
 //                DialogState hypothesisState = hypothesisMap.get(key);
