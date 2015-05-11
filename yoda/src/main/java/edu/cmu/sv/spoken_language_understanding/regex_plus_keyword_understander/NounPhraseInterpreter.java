@@ -1,6 +1,5 @@
 package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander;
 
-import com.google.common.primitives.Doubles;
 import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.ThingWithRoles;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
@@ -14,6 +13,7 @@ import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
 import edu.cmu.sv.natural_language_generation.Grammar;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.semantics.SemanticsModel;
+import edu.cmu.sv.spoken_language_understanding.Utils;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -88,18 +88,6 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
             } catch (Lexicon.NoLexiconEntryException e) {}
         }
 
-    }
-
-    private double stringSetCoverage(String phrase, Set<String> matchingStrings){
-        double ans = 0.0;
-        int adjustedLength = phrase.replace("any ","").replace("the ","").replace("some ","").trim().length();
-        for (String matchingString : matchingStrings) {
-            Pattern regexPattern = Pattern.compile("(.+ | |)" + matchingString + "( .+| |)");
-            Matcher matcher = regexPattern.matcher(phrase);
-            if (matcher.matches())
-                ans = Doubles.max(ans, matchingString.length() * 1.0 / adjustedLength);
-            }
-        return Doubles.min(ans, 1.0);
     }
 
     @Override
@@ -206,7 +194,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
 
         // get class from pronoun
         for (Class<? extends Noun> cls : pronounStringSetMap.keySet()){
-            Double coverage = stringSetCoverage(entityString, pronounStringSetMap.get(cls));
+            Double coverage = Utils.stringSetBestCoverage(entityString, pronounStringSetMap.get(cls));
             if (coverage > pronounCoverage){
                 pronounCoverage = coverage;
                 nounClass = cls;
@@ -216,7 +204,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
 
         // get class from noun
         for (Class<? extends Noun> cls : nounStringSetMap.keySet()) {
-            Double coverage = stringSetCoverage(entityString, nounStringSetMap.get(cls));
+            Double coverage = Utils.stringSetBestCoverage(entityString, nounStringSetMap.get(cls));
             if (coverage > bestNounCoverage){
                 bestNounCoverage = coverage;
                 nounClass = cls;
@@ -225,7 +213,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
 
         // get adjective
         for (Class<? extends Adjective> cls : adjectiveStringSetMap.keySet()) {
-            Double coverage = stringSetCoverage(entityString, adjectiveStringSetMap.get(cls));
+            Double coverage = Utils.stringSetBestCoverage(entityString, adjectiveStringSetMap.get(cls));
             if (coverage > 0) {
                 totalAdjectiveCoverage += coverage;
                 adjectiveClasses.add(cls);
