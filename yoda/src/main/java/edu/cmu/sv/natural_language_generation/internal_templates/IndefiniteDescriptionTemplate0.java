@@ -31,7 +31,7 @@ public class IndefiniteDescriptionTemplate0 implements Template {
             Assert.verify(constraints.get("refType").equals("indefinite"));
             if (constraints.containsKey("class")) {
                 nounClass = Ontology.thingNameMap.get((String) constraints.get("class"));
-                Assert.verify(Noun.class.isAssignableFrom(nounClass));
+                Assert.verify(Noun.class.isAssignableFrom(nounClass) || UnknownThingWithRoles.class.isAssignableFrom(nounClass));
             }
             for (Object key : constraints.keySet()){
                 if (key.equals("refType") || key.equals("class"))
@@ -48,6 +48,8 @@ public class IndefiniteDescriptionTemplate0 implements Template {
         }
         List<Map<String, JSONObject>> chunks = new LinkedList<>();
         // if no noun class, leave out the determiner, make the class Unk
+        if (nounClass!=null && nounClass.equals(UnknownThingWithRoles.class))
+            nounClass=null;
         if (nounClass!=null){
             Map<String, JSONObject> detChunk = new HashMap<>();
             detChunk.put("a", SemanticsModel.parseJSON("{}"));
