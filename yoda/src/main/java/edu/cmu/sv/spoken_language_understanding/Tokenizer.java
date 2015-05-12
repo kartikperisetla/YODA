@@ -10,8 +10,8 @@ public class Tokenizer {
     public static List<String> tokenize(String inputString){
         inputString = inputString.toLowerCase();
 
-        // get rid of <noise>
-        inputString = inputString.replaceAll("<NOISE>", "");
+        // get rid of <noise>, <unk>, etc.
+        inputString = inputString.replaceAll("<.*?>", "");
 
         // split up contractions
         inputString = inputString.replaceAll("n't", " not");
@@ -22,6 +22,7 @@ public class Tokenizer {
         inputString = inputString.replaceAll("s' |s'$", "s 's");
         inputString = inputString.replaceAll("'d", " 'd");
 
+        inputString = inputString.trim();
         // split at white space, between alpha and num, between num and alpha
         return Arrays.asList(inputString.split("\\s+|(?<=\\p{Alpha})(?=\\p{Digit})|(?<=\\p{Digit})(?=\\p{Alpha})"));
     }
