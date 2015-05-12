@@ -30,19 +30,39 @@ public class StringSimilarity implements Function{
                     "exactly 2 arguments, got " + values.length);
         }
 
-        double maxSimilarity = 0.0;
         String s1 = (values[0]).stringValue();
         String s2 = (values[1]).stringValue();
-//        System.out.println("s1:"+s1+", s2:"+s2);
-        if (s1.length()==0 || s2.length()==0){
-            return valueFactory.createLiteral(0.0);
+        return valueFactory.createLiteral(similarityHelper(s1, s2));
+    }
+
+    public static double similarityHelper(String s1, String s2){
+        double maxSimilarity = 0.0;
+        s1 = s1.toLowerCase().trim();
+        s2 = s2.toLowerCase().trim();
+
+        if (s1.length()==0 || s2.length()==0) {
+            return 0.0;
         }
 
-//        double levenshteinSimilarity = 1.0 - (1.0*StringUtils.getLevenshteinDistance(s1.toLowerCase(), s2.toLowerCase()) / (Integer.max(s1.length(),s2.length())));
-        maxSimilarity = Doubles.max(maxSimilarity, StringUtils.getJaroWinklerDistance(s1.toLowerCase(), s2.toLowerCase()));
+            // initial raw similarity
+        maxSimilarity = Doubles.max(maxSimilarity, StringUtils.getJaroWinklerDistance(s1, s2));
+
+        // remove 'the'
         s1 = s1.replaceAll("\\Athe ","");
         s2 = s2.replaceAll("\\Athe ","");
-        maxSimilarity = Doubles.max(maxSimilarity, StringUtils.getJaroWinklerDistance(s1.toLowerCase(), s2.toLowerCase()));
-        return valueFactory.createLiteral(Math.pow(maxSimilarity,10));
+        maxSimilarity = Doubles.max(maxSimilarity, StringUtils.getJaroWinklerDistance(s1, s2));
+
+        // detect and compare as acronyms, require 2 letters
+        String acronymRegex ="(\\p{Alpha} )+\\p{Alpha}";
+        String s1a, s2a;
+        if (s1.matches(acronymRegex) || s2.matches(acronymRegex)){
+            s1a = s1.contains(" ") ? s1.replaceAll("(?<=\\p{Alpha})\\p{Alpha}+(?=( |\\z))", "").replaceAll(" ","") : s1;
+            s2a = s2.contains(" ") ? s2.replaceAll("(?<=\\p{Alpha})\\p{Alpha}+(?=( |\\z))", "").replaceAll(" ","") : s2;
+//            System.out.println(s1a);
+//            System.out.println(s2a);
+            maxSimilarity = Doubles.max(maxSimilarity, .95 * StringUtils.getJaroWinklerDistance(s1a, s2a));
+        }
+
+        return Math.pow(maxSimilarity,10);
     }
 }

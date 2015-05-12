@@ -1,5 +1,6 @@
 package edu.cmu.sv;
 
+import edu.cmu.sv.database.StringSimilarity;
 import edu.cmu.sv.spoken_language_understanding.Tokenizer;
 import edu.cmu.sv.utils.StringDistribution;
 import org.junit.Test;
@@ -20,6 +21,14 @@ public class TestUtils {
     * */
     @Test
     public void Test() throws FileNotFoundException, UnsupportedEncodingException {
+        System.out.println(StringSimilarity.similarityHelper("C M U", "CMU"));
+        System.out.println(StringSimilarity.similarityHelper("C M U", "Carnegie Mellon Univ"));
+        System.out.println(StringSimilarity.similarityHelper("C M U", "Carnegie"));
+        System.out.println(StringSimilarity.similarityHelper("C M U", "Carnegie mellon silicon valley"));
+
+
+
+
         String inputString = "<s><NOISE> hi there <unk> uhh</s>";
         System.out.println(Tokenizer.tokenize(inputString));
 
