@@ -89,7 +89,7 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
 
         if (!adjectiveRegexString.equals("()")) {
             Pattern regexPattern = Pattern.compile("(.* |)" +
-                    MiniLanguageInterpreter.putInStateVerbRegexString + "(.+)" + adjectiveRegexString + MiniLanguageInterpreter.endingPolitenessRegexString);
+                    MiniLanguageInterpreter.putInStateVerbRegexString + "(.+?)" + adjectiveRegexString + MiniLanguageInterpreter.endingPolitenessRegexString);
             Matcher matcher = regexPattern.matcher(utterance);
             if (matcher.matches()) {
                 System.err.println("CommandMultiInterpreter: Adjective form initial match");
@@ -139,7 +139,7 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
 //                        "(i'd like |i would like |i want |give me |give |can i get |could i get |make |set up |)(a |the |some |)" +
 //                        verbRegexString + "(.+)" + MiniLanguageInterpreter.endingPolitenessRegexString);
                 Pattern regexPattern = Pattern.compile("(.* |)" +
-                        verbRegexString + "(.+)" + MiniLanguageInterpreter.endingPolitenessRegexString);
+                        verbRegexString + "(.+?)" + MiniLanguageInterpreter.endingPolitenessRegexString);
                 Matcher matcher = regexPattern.matcher(utterance);
                 if (matcher.matches()) {
                     System.err.println("CommandMultiInterpreter: 1-role initial match");
@@ -186,7 +186,7 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
 //                        "(i'd like |i would like |i want |give me |give |can i get |could i get |make |set up |)(a |the |some |)" +
 //                        verbRegexString + "(.+)" + MiniLanguageInterpreter.endingPolitenessRegexString);
                 Pattern regexPattern = Pattern.compile("(.* |)" +
-                        verbRegexString + "(.+)" + MiniLanguageInterpreter.endingPolitenessRegexString);
+                        verbRegexString + "(.+?)" + MiniLanguageInterpreter.endingPolitenessRegexString);
                 Matcher matcher = regexPattern.matcher(utterance);
                 if (matcher.matches()) {
                     System.err.println("CommandMultiInterpreter: 2-role initial match");
