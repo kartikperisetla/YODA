@@ -1,5 +1,7 @@
 package edu.cmu.sv.natural_language_generation.top_level_templates;
 
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Agent;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.HasProperty;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.natural_language_generation.Template;
@@ -38,26 +40,18 @@ public class RequestRoleTemplate implements Template {
         Class<? extends Role> roleClass;
 
         try{
-            System.err.println("here1");
             Assert.verify(constraints.get("dialogAct").equals(RequestRole.class.getSimpleName()));
-            System.err.println("here2");
             Assert.verify(constraints.containsKey("verb"));
-            System.err.println("here3");
             JSONObject verbObject = (JSONObject)constraints.get("verb");
-            System.err.println("here4");
             verbClassString = (String)verbObject.get("class");
-            System.err.println("here5");
             Assert.verify(constraintsModel.findAllPathsToClass(Requested.class.getSimpleName()).size() == 1);
-            System.err.println("here6");
             requestedSlotPath = new LinkedList<>(constraintsModel.findAllPathsToClass(Requested.class.getSimpleName())).get(0);
             String[] fillerPath = requestedSlotPath.split("\\.");
             Assert.verify(Ontology.roleNameMap.containsKey(fillerPath[fillerPath.length - 1]));
-            System.err.println("here7");
             roleClass = Ontology.roleNameMap.get(fillerPath[fillerPath.length - 1]);
         } catch (Assert.AssertException e){
             return new HashMap<>();
         }
-        System.err.println("here10");
 
         Set<String> rolePrefixStrings = new HashSet<>();
         Set<String> whStrings = new HashSet<>();
@@ -81,6 +75,9 @@ public class RequestRoleTemplate implements Template {
         } catch (InstantiationException | IllegalAccessException | Lexicon.NoLexiconEntryException e) {
 //            e.printStackTrace();
         }
+        if (Ontology.thingNameMap.get(verbClassString).isAssignableFrom(HasProperty.class)){
+            verbStrings.add("is");
+        }
 
         Map<String, JSONObject> whChunks = whStrings.stream().
                 collect(Collectors.toMap(x->x, x->SemanticsModel.parseJSON("{}")));
@@ -90,13 +87,26 @@ public class RequestRoleTemplate implements Template {
                 collect(Collectors.toMap(x->x, (x -> SemanticsModel.parseJSON(constraints.toJSONString()))));
 
         Map<String, Pair<Integer, Integer>> childNodeChunks = new HashMap<>();
-        childNodeChunks.put(requestedSlotPath, new ImmutablePair<>(2,2));
-        return GenerationUtils.simpleOrderedCombinations(Arrays.asList(verbChunks, rolePrefixChunks, whChunks),
-                RequestRoleTemplate::compositionFunction, childNodeChunks, yodaEnvironment);
+        if (roleClass.isAssignableFrom(Agent.class)){
+            childNodeChunks.put(requestedSlotPath, new ImmutablePair<>(1, 1));
+            return GenerationUtils.simpleOrderedCombinations(Arrays.asList(whChunks, verbChunks),
+                    RequestRoleTemplate::compositionFunction2, childNodeChunks, yodaEnvironment);
+
+        } else {
+            childNodeChunks.put(requestedSlotPath, new ImmutablePair<>(2, 2));
+            return GenerationUtils.simpleOrderedCombinations(Arrays.asList(verbChunks, rolePrefixChunks, whChunks),
+                    RequestRoleTemplate::compositionFunction, childNodeChunks, yodaEnvironment);
+        }
     }
 
     private static JSONObject compositionFunction(List<JSONObject> children) {
         JSONObject verbPhrase = children.get(0);
         return SemanticsModel.parseJSON(verbPhrase.toJSONString());
     }
+
+    private static JSONObject compositionFunction2(List<JSONObject> children) {
+        JSONObject verbPhrase = children.get(1);
+        return SemanticsModel.parseJSON(verbPhrase.toJSONString());
+    }
+
 }

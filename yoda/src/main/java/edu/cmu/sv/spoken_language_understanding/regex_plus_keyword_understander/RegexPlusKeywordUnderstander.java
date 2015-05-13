@@ -41,7 +41,7 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
     // define parameters for the SLU component
     public static final double keywordInterpreterWeight = 0.5;
     public static final double regexInterpreterWeight = .9;
-    public static final double namedEntityFragmentWeight = 0.1;
+    public static final double namedEntityFragmentWeight = 0.5;
     public static final double nounPhraseInterpreterWeight = 1.0;
     public static final double timeInterpreterWeight = 1.0;
     public static final double simpleStringMatchInterpreterWeight = 1.0;

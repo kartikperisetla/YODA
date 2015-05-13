@@ -1,5 +1,6 @@
 package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander;
 
+import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasName;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.NBestDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -21,11 +22,13 @@ public class NounPhraseFragmentMultiInterpreter implements MiniMultiLanguageInte
     @Override
     public NBestDistribution<JSONObject> interpret(List<String> tokens, YodaEnvironment yodaEnvironment) {
         Pair<JSONObject, Double> npInterpretation = npInterpreter.interpret(tokens, yodaEnvironment);
+        double score = npInterpretation.getLeft().containsKey(HasName.class.getSimpleName()) ?
+                RegexPlusKeywordUnderstander.namedEntityFragmentWeight : 1.0;
         NBestDistribution<JSONObject> ans = new NBestDistribution<>();
         String jsonString = "{\"dialogAct\":\"Fragment\"}";
         JSONObject tmp = SemanticsModel.parseJSON(jsonString);
         tmp.put("topic", npInterpretation.getLeft());
-        ans.put(tmp, npInterpretation.getRight() * RegexPlusKeywordUnderstander.namedEntityFragmentWeight);
+        ans.put(tmp, npInterpretation.getRight() * score);
         return ans;
     }
 }

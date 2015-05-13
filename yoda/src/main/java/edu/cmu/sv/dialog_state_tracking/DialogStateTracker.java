@@ -133,12 +133,15 @@ public class DialogStateTracker implements Runnable {
                 DiscourseUnit activeDu = dialogState.activeDiscourseUnit();
                 String activeDuInitiator = null;
                 String activeDuDialogAct = null;
+                String activeVerb = null;
                 if (activeDu!=null){
                     activeDuInitiator = activeDu.initiator;
                     activeDuDialogAct = (String) activeDu.getFromInitiator("dialogAct");
+                    activeVerb = (String) activeDu.getFromInitiator("verb.class");
                 }
                 thisDialogStateDescription.put("initiator", activeDuInitiator);
                 thisDialogStateDescription.put("dA", activeDuDialogAct);
+                thisDialogStateDescription.put("verb", activeVerb);
                 thisDialogStateDescription.put("p", dialogStateNBestDistribution.get(dialogState));
                 dialogStateDistributionDescription.add(thisDialogStateDescription);
             }

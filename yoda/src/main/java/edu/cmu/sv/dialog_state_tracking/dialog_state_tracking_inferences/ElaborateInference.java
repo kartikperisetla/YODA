@@ -34,6 +34,7 @@ public class ElaborateInference extends DialogStateUpdateInference {
                 if (DialogRegistry.discourseUnitDialogActs.contains(DialogRegistry.dialogActNameMap.get(dialogAct))) {
                     // todo: implement non-fragment case
                 } else if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(Fragment.class)) {
+
                     for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
                         DiscourseUnit predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId).deepCopy();
 

@@ -1,21 +1,17 @@
 package edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences;
 
 import edu.cmu.sv.dialog_state_tracking.*;
-import edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences.DialogStateUpdateInference;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.Requested;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestRole;
 import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestRoleGivenRole;
 import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.utils.NBestDistribution;
-import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.math3.distribution.NormalDistribution;
 import org.json.simple.JSONObject;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.Set;
 
 /**
  * Created by David Cohen on 10/17/14.
@@ -27,10 +23,7 @@ public class RequestSlotInference extends DialogStateUpdateInference {
                                                                                  Turn turn, long timeStamp) {
         NBestDistribution<DialogState> resultHypotheses = new NBestDistribution<>();
 
-        if (turn.speaker.equals("user")){
-            // todo: implement to understand slot requests from the user
-        } else { // if turn.speaker.equals("system")
-
+        if (turn.speaker.equals("system")){
             SemanticsModel hypModel = turn.systemUtterance;
             String dialogAct = hypModel.getSlotPathFiller("dialogAct");
             if (RequestRoleGivenRole.class.getSimpleName().equals(dialogAct) ||
@@ -47,6 +40,7 @@ public class RequestSlotInference extends DialogStateUpdateInference {
                         JSONObject verbObject = (JSONObject) hypModel.newGetSlotPathFiller("verb");
                         Set<String> requestPaths = hypModel.findAllPathsToClass(Requested.class.getSimpleName());
                         Assert.verify(requestPaths.size() == 1);
+
                         requestPath = new LinkedList<>(requestPaths).get(0);
                         Assert.verify(predecessor.getFromInitiator(requestPath) == null);
                         Assert.verify(

@@ -1,11 +1,9 @@
 package edu.cmu.sv.natural_language_generation.top_level_templates;
 
-import edu.cmu.sv.natural_language_generation.GenerationUtils;
-import edu.cmu.sv.natural_language_generation.Lexicon;
-import edu.cmu.sv.natural_language_generation.Template;
-import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.Requested;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.HasProperty;
+import edu.cmu.sv.natural_language_generation.GenerationUtils;
+import edu.cmu.sv.natural_language_generation.Template;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestRoleGivenRole;
 import edu.cmu.sv.utils.Assert;
@@ -35,7 +33,7 @@ public class RequestAgentTemplate implements Template {
             JSONObject verbObject = (JSONObject)constraints.get("verb");
             verbClassString = (String)verbObject.get("class");
             Assert.verify(verbClassString.equals(HasProperty.class.getSimpleName()));
-            Assert.verify(constraintsModel.findAllPathsToClass(Requested.class.getSimpleName()).size()==1);
+            Assert.verify(constraintsModel.findAllPathsToClass(Requested.class.getSimpleName()).size() == 1);
             Assert.verify(constraintsModel.newGetSlotPathFiller("verb.Agent.class").equals(Requested.class.getSimpleName()));
             Assert.verify(constraintsModel.newGetSlotPathFiller("verb.Patient")!=null);
             patientDescription = (JSONObject)verbObject.get("Patient");
@@ -47,13 +45,8 @@ public class RequestAgentTemplate implements Template {
         whChunks.put("what", SemanticsModel.parseJSON("{}"));
 
         Map<String, JSONObject> verbChunks = new HashMap<>();
-        Set<String> verbStrings;
-        try{
-            verbStrings = yodaEnvironment.lex.getPOSForClass(Ontology.thingNameMap.get(verbClassString),
-                    Lexicon.LexicalEntry.PART_OF_SPEECH.S1_VERB, yodaEnvironment.nlg.grammarPreferences, false);
-        } catch (Lexicon.NoLexiconEntryException e) {
-            verbStrings = new HashSet<>();
-        }
+        Set<String> verbStrings = new HashSet<>();
+        verbStrings.add("is");
         for (String verbString : verbStrings) {
             verbChunks.put(verbString, SemanticsModel.parseJSON(constraints.toJSONString()));
         }
