@@ -38,18 +38,26 @@ public class RequestRoleTemplate implements Template {
         Class<? extends Role> roleClass;
 
         try{
+            System.err.println("here1");
             Assert.verify(constraints.get("dialogAct").equals(RequestRole.class.getSimpleName()));
+            System.err.println("here2");
             Assert.verify(constraints.containsKey("verb"));
+            System.err.println("here3");
             JSONObject verbObject = (JSONObject)constraints.get("verb");
+            System.err.println("here4");
             verbClassString = (String)verbObject.get("class");
-            Assert.verify(constraintsModel.findAllPathsToClass(Requested.class.getSimpleName()).size()==1);
+            System.err.println("here5");
+            Assert.verify(constraintsModel.findAllPathsToClass(Requested.class.getSimpleName()).size() == 1);
+            System.err.println("here6");
             requestedSlotPath = new LinkedList<>(constraintsModel.findAllPathsToClass(Requested.class.getSimpleName())).get(0);
             String[] fillerPath = requestedSlotPath.split("\\.");
             Assert.verify(Ontology.roleNameMap.containsKey(fillerPath[fillerPath.length - 1]));
+            System.err.println("here7");
             roleClass = Ontology.roleNameMap.get(fillerPath[fillerPath.length - 1]);
         } catch (Assert.AssertException e){
             return new HashMap<>();
         }
+        System.err.println("here10");
 
         Set<String> rolePrefixStrings = new HashSet<>();
         Set<String> whStrings = new HashSet<>();

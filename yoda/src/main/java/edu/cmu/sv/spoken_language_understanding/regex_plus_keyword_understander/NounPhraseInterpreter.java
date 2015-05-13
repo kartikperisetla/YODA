@@ -167,7 +167,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
 //                            ReferenceResolution.minFocusSalience);
 //        }
 
-        namedEntityScore = Math.pow(namedEntityScore, 3);
+//        namedEntityScore = Math.pow(namedEntityScore, 3);
 //        System.err.println("NPInterpreter: input string:" + utterance);
 //        System.err.println("NPInterpreter: namedEntityScore:" + namedEntityScore);
 

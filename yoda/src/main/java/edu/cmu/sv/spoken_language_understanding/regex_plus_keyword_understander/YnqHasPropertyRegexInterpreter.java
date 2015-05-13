@@ -47,23 +47,55 @@ public class YnqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
     @Override
     public Pair<JSONObject, Double> interpret(List<String> tokens, YodaEnvironment yodaEnvironment) {
         String utterance = String.join(" ", tokens);
+//        if (!adjectiveRegexString.equals("()")) {
+//            Pattern regexPattern = Pattern.compile("(is |are )(the |)?(.+)" + adjectiveRegexString);
+//            Matcher matcher = regexPattern.matcher(utterance);
+//            if (matcher.matches()) {
+//                String npString = matcher.group(3);
+//                Pair<JSONObject, Double> npInterpretation =
+//                        ((RegexPlusKeywordUnderstander)yodaEnvironment.slu).nounPhraseInterpreter.interpret(Tokenizer.tokenize(npString), yodaEnvironment);
+//
+//                String jsonString = "{\"dialogAct\":\"YNQuestion\",\"verb\":{\"Agent\":"+
+//                        npInterpretation.getKey().toJSONString()+
+//                        ",\"Patient\":{\"class\":\"UnknownThingWithRoles\",\"" +
+//                        hasQualityRole.getSimpleName()+
+//                        "\":{\"class\":\"" + adjectiveClass.getSimpleName() + "\"}},\"class\":\"HasProperty\"}}";
+//                return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString),
+//                        RegexPlusKeywordUnderstander.regexInterpreterWeight);
+//            }
+//        }
+
         if (!adjectiveRegexString.equals("()")) {
-            Pattern regexPattern = Pattern.compile("(is |are )(the |)?(.+)" + adjectiveRegexString);
+            Pattern regexPattern = Pattern.compile("(is |are )(.*)" + adjectiveRegexString);
             Matcher matcher = regexPattern.matcher(utterance);
             if (matcher.matches()) {
-                String npString = matcher.group(3);
-                Pair<JSONObject, Double> npInterpretation =
-                        ((RegexPlusKeywordUnderstander)yodaEnvironment.slu).nounPhraseInterpreter.interpret(Tokenizer.tokenize(npString), yodaEnvironment);
+                String npString = matcher.group(2).trim();
+                Pair<JSONObject, Double> npInterpretation = null;
+                if (npString.length() > 0)
+                    npInterpretation = ((RegexPlusKeywordUnderstander)yodaEnvironment.slu).nounPhraseInterpreter.interpret(Tokenizer.tokenize(npString), yodaEnvironment);
 
-                String jsonString = "{\"dialogAct\":\"YNQuestion\",\"verb\":{\"Agent\":"+
-                        npInterpretation.getKey().toJSONString()+
-                        ",\"Patient\":{\"class\":\"UnknownThingWithRoles\",\"" +
-                        hasQualityRole.getSimpleName()+
-                        "\":{\"class\":\"" + adjectiveClass.getSimpleName() + "\"}},\"class\":\"HasProperty\"}}";
+                String jsonString;
+                if (npInterpretation==null){
+                    jsonString = "{\"dialogAct\":\"YNQuestion\",\"verb\":{" +
+                            "\"Patient\":{\"class\":\"UnknownThingWithRoles\",\"" +
+                            hasQualityRole.getSimpleName() +
+                            "\":{\"class\":\"" + adjectiveClass.getSimpleName() + "\"}},\"class\":\"HasProperty\"}}";
+                }
+                else {
+                    jsonString = "{\"dialogAct\":\"YNQuestion\",\"verb\":{\"Agent\":" +
+                            npInterpretation.getKey().toJSONString() +
+                            ",\"Patient\":{\"class\":\"UnknownThingWithRoles\",\"" +
+                            hasQualityRole.getSimpleName() +
+                            "\":{\"class\":\"" + adjectiveClass.getSimpleName() + "\"}},\"class\":\"HasProperty\"}}";
+                }
+
                 return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString),
                         RegexPlusKeywordUnderstander.regexInterpreterWeight);
             }
         }
+
+
+
         return null;
     }
 }
