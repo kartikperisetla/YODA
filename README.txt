@@ -19,7 +19,10 @@
 # along with YODA.  If not, see <http://www.gnu.org/licenses/>.
 # -------------------------------------------------------------
 
-README last updated on Mar 9, 2015
+README last updated on June 12, 2015
+
+The YODA tutorial and detailed instructions can be found at:
+http://davidogbodfog.bitbucket.org/yoda.html
 
 YODA requires the Java 8 language level and SDK.
 YODA uses Maven to manage its dependencies.
@@ -31,19 +34,20 @@ To compile and build executables (this will be slow the first time, and Maven re
 > mvn clean
 > mvn compile
 > mvn package
-> mvn dependency:copy-dependencies
 
 To run in the command line, from yoda/yoda/:
 
-> java -cp target/yoda-1.0-SNAPSHOT.jar:target/dependency/* edu.cmu.sv.domain.smart_house.SmartHouseCommandLineSystem
+> java -cp target/yoda-0.5.0.jar:target/lib/* edu.cmu.sv.domain.smart_house.SmartHouseCommandLineSystem
 or
-> java -cp target/yoda-1.0-SNAPSHOT.jar:target/dependency/* edu.cmu.sv.domain.yelp_phoenix.YelpPhoenixCommandLineSystem
+> java -cp target/yoda-0.5.0.jar:target/lib/* edu.cmu.sv.domain.yelp_phoenix.YelpPhoenixCommandLineSystem
 
 To run the subProcess systems (for integration into a complete SDS), run from yoda/yoda/:
 
-> java -cp target/yoda-1.0-SNAPSHOT.jar:target/dependency/* edu.cmu.sv.domain.smart_house.SmartHouseSubprocessSystem
+> java -cp target/yoda-0.5.0.jar:target/lib/* edu.cmu.sv.domain.smart_house.SmartHouseSubprocessSystem
 or
-> java -cp target/yoda-1.0-SNAPSHOT.jar:target/dependency/* edu.cmu.sv.domain.yelp_phoenix.YelpPhoenixSubprocessSystem
+> java -cp target/yoda-0.5.0.jar:target/lib/* edu.cmu.sv.domain.yelp_phoenix.YelpPhoenixSubprocessSystem
+
+
 
 
 You may see messages such as:

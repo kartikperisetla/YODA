@@ -1,14 +1,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>edu.cmu.sv</groupId>
   <artifactId>yoda</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>0.5.0</version>
   <packaging>jar</packaging>
 
-  <name>yoda</name>
-  <url>http://maven.apache.org</url>
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>A library that allows rapid prototyping of dialog systems (language understanding, discourse modelling, dialog management, language generation).</description>
+  <url>http://davidogbodfog.bitbucket.org/yoda.html</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -16,81 +17,130 @@
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 
-
-    <build>
+  
+  <build>
     <plugins>
-    <plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
-            <execution>
-                <id>copy-dependencies</id>
-                <phase>prepare-package</phase>
-                <goals>
-                    <goal>copy-dependencies</goal>
-                </goals>
-                <configuration>
-                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                    <overWriteReleases>false</overWriteReleases>
-                    <overWriteSnapshots>false</overWriteSnapshots>
-                    <overWriteIfNewer>true</overWriteIfNewer>
-                </configuration>
-            </execution>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/lib</outputDirectory>
+              <overWriteReleases>false</overWriteReleases>
+              <overWriteSnapshots>false</overWriteSnapshots>
+              <overWriteIfNewer>true</overWriteIfNewer>
+            </configuration>
+          </execution>
         </executions>
-    </plugin>
+      </plugin>
+      <plugin>
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-source-plugin</artifactId>
+	<version>2.2.1</version>
+	<executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+	</executions>
+      </plugin>
+      <plugin>
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-javadoc-plugin</artifactId>
+	<version>2.9.1</version>
+	<executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+	</executions>
+      </plugin>
     </plugins>
-    </build>
+  </build>
+  
+  
+  <licenses>
+    <license>
+      <name>The GNU General Public License v3.0 (GPL3)</name>
+      <url>http://www.gnu.org/licenses/gpl-3.0.en.html</url>
+    </license>
+  </licenses>
+  
+  <developers>
+    <developer>
+      <name>David Cohen</name>
+      <email>david.cohen@sv.cmu.edu</email>
+      <organization>Carnegie Mellon University</organization>
+      <organizationUrl>http://www.cmu.edu</organizationUrl>
+    </developer>
+  </developers>
 
+  <scm>
+    <connection>scm:git:git@bitbucket.org:davidogbodfog/yoda.git</connection>
+    <developerConnection>scm:git:git@bitbucket.org:davidogbodfog/yoda.git</developerConnection>
+    <url>http://bitbucket.org/davidogbodfog/yoda</url>
+  </scm>
+  
   <dependencies>
-      <dependency>
-          <groupId>org.mongodb</groupId>
-          <artifactId>mongo-java-driver</artifactId>
-          <version>2.12.4</version>
-      </dependency>
-      <dependency>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-          <version>4.10</version>
-      </dependency>
-      <dependency>
-          <groupId>org.kohsuke.metainf-services</groupId>
-          <artifactId>metainf-services</artifactId>
-          <version>1.5</version>
-      </dependency>
-      <dependency>
-          <groupId>org.openrdf.sesame</groupId>
-          <artifactId>sesame-model</artifactId>
-          <version>2.7.13</version>
-      </dependency>
-      <dependency>
-          <groupId>org.openrdf.sesame</groupId>
-          <artifactId>sesame-sail-memory</artifactId>
-          <version>2.7.13</version>
-      </dependency>
-      <dependency>
-          <groupId>org.openrdf.sesame</groupId>
-          <artifactId>sesame-repository-sail</artifactId>
-          <version>2.7.13</version>
-      </dependency>
-      <dependency>
-          <groupId>org.apache.commons</groupId>
-          <artifactId>commons-lang3</artifactId>
-          <version>3.3.2</version>
-      </dependency>
-      <dependency>
-          <groupId>org.apache.commons</groupId>
-          <artifactId>commons-math3</artifactId>
-          <version>3.0</version>
-      </dependency>
-      <dependency>
-          <groupId>com.google.guava</groupId>
-          <artifactId>guava</artifactId>
-          <version>18.0</version>
-      </dependency>
-      <dependency>
-          <groupId>com.googlecode.json-simple</groupId>
-          <artifactId>json-simple</artifactId>
-          <version>1.1.1</version>
-      </dependency>
-    </dependencies>
+    <dependency>
+      <groupId>org.mongodb</groupId>
+      <artifactId>mongo-java-driver</artifactId>
+      <version>2.12.4</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.10</version>
+    </dependency>
+    <dependency>
+      <groupId>org.kohsuke.metainf-services</groupId>
+      <artifactId>metainf-services</artifactId>
+      <version>1.5</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-model</artifactId>
+      <version>2.7.13</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-sail-memory</artifactId>
+      <version>2.7.13</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openrdf.sesame</groupId>
+      <artifactId>sesame-repository-sail</artifactId>
+      <version>2.7.13</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.3.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-math3</artifactId>
+      <version>3.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>18.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.googlecode.json-simple</groupId>
+      <artifactId>json-simple</artifactId>
+      <version>1.1.1</version>
+    </dependency>
+  </dependencies>
 </project>

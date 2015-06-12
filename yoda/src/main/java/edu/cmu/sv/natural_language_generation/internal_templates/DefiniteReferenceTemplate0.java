@@ -28,7 +28,7 @@ import java.util.*;
  * Created by David Cohen on 11/3/14.
  *
  * Try all adjectives that this individual is in the range for.
- * Generate the + adj + cls if > .5 truth to the description.
+ * Generate the + adj + cls if greater than .5 truth to the description.
  * Generates {cls:UnknownThingWithRoles, X:HasAQD: {cls: Y:aqd}}
  *
  */

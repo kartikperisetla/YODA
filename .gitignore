@@ -6,6 +6,7 @@
 *.pyc
 *.class
 *.jar
+*.asc
 *.iml
 *.idea
 .classpath
