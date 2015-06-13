@@ -4,7 +4,7 @@ import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Agent;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.HasProperty;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
 import edu.cmu.sv.natural_language_generation.Lexicon;
-import edu.cmu.sv.natural_language_generation.Template;
+import edu.cmu.sv.natural_language_generation.TopLevelNLGTemplate;
 import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.Requested;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  * is what?
  *
  */
-public class RequestRoleTemplate implements Template {
+public class RequestRoleTopLevelNLGTemplate implements TopLevelNLGTemplate {
 
     @Override
     public Map<String, JSONObject> generateAll(JSONObject constraints, YodaEnvironment yodaEnvironment, int remainingDepth) {
@@ -90,12 +90,12 @@ public class RequestRoleTemplate implements Template {
         if (roleClass.isAssignableFrom(Agent.class)){
             childNodeChunks.put(requestedSlotPath, new ImmutablePair<>(1, 1));
             return GenerationUtils.simpleOrderedCombinations(Arrays.asList(whChunks, verbChunks),
-                    RequestRoleTemplate::compositionFunction2, childNodeChunks, yodaEnvironment);
+                    RequestRoleTopLevelNLGTemplate::compositionFunction2, childNodeChunks, yodaEnvironment);
 
         } else {
             childNodeChunks.put(requestedSlotPath, new ImmutablePair<>(2, 2));
             return GenerationUtils.simpleOrderedCombinations(Arrays.asList(verbChunks, rolePrefixChunks, whChunks),
-                    RequestRoleTemplate::compositionFunction, childNodeChunks, yodaEnvironment);
+                    RequestRoleTopLevelNLGTemplate::compositionFunction, childNodeChunks, yodaEnvironment);
         }
     }
 

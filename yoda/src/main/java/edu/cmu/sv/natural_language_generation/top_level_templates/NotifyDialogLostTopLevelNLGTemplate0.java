@@ -1,6 +1,6 @@
 package edu.cmu.sv.natural_language_generation.top_level_templates;
 
-import edu.cmu.sv.natural_language_generation.Template;
+import edu.cmu.sv.natural_language_generation.TopLevelNLGTemplate;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.InformDialogLost;
 import edu.cmu.sv.utils.Assert;
@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Created by David Cohen on 10/29/14.
  */
-public class NotifyDialogLostTemplate0 implements Template {
+public class NotifyDialogLostTopLevelNLGTemplate0 implements TopLevelNLGTemplate {
     @Override
     public Map<String, JSONObject> generateAll(JSONObject constraints, YodaEnvironment yodaEnvironment, int remainingDepth) {
         // ensure that the constraints match this template

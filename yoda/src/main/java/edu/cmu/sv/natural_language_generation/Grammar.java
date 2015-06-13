@@ -2,6 +2,10 @@ package edu.cmu.sv.natural_language_generation;
 
 
 import edu.cmu.sv.natural_language_generation.internal_templates.*;
+import edu.cmu.sv.natural_language_generation.nlg2_top_level_templates.AcceptTopLevelNLGTemplate;
+import edu.cmu.sv.natural_language_generation.nlg2_top_level_templates.AcknowledgeTopLevelNLGTemplate;
+import edu.cmu.sv.natural_language_generation.nlg2_top_level_templates.ConfirmGroundingSuggestionTopLevelNLGTemplate;
+import edu.cmu.sv.natural_language_generation.nlg2_top_level_templates.DontKnowTopLevelNLGTemplate;
 import edu.cmu.sv.natural_language_generation.top_level_templates.*;
 
 import java.util.HashMap;
@@ -27,9 +31,9 @@ public class Grammar {
         public int maxPhrasesPerPreposition;
         public int maxCombinations;
         public int maxWordForms;
-        Map<Class<? extends Template>, Double> templateProbability;
+        Map<Class<? extends TopLevelNLGTemplate>, Double> templateProbability;
 
-        public GrammarPreferences(double referenceAmbiguityThreshold, double pExpandPrepositionalPhrase, double pIncludeAdjective, int maxUtteranceDepth, int maxNounPhraseDepth, int maxPhrasesPerPreposition, int maxCombinations, int maxWordForms, Map<Class<? extends Template>, Double> templateProbability) {
+        public GrammarPreferences(double referenceAmbiguityThreshold, double pExpandPrepositionalPhrase, double pIncludeAdjective, int maxUtteranceDepth, int maxNounPhraseDepth, int maxPhrasesPerPreposition, int maxCombinations, int maxWordForms, Map<Class<? extends TopLevelNLGTemplate>, Double> templateProbability) {
             this.referenceAmbiguityThreshold = referenceAmbiguityThreshold;
             this.pExpandPrepositionalPhrase = pExpandPrepositionalPhrase;
             this.pIncludeAdjective = pIncludeAdjective;
@@ -42,33 +46,33 @@ public class Grammar {
         }
     }
 
-    public static Set<Class<? extends Template>> grammar1_roots = new HashSet<>();
-    public static Set<Class<? extends Template>> grammar1 = new HashSet<>();
+    public static Set<Class<? extends TopLevelNLGTemplate>> grammar1_roots = new HashSet<>();
+    public static Set<Class<? extends TopLevelNLGTemplate>> grammar1 = new HashSet<>();
 
     static {
         grammar1.add(SimpleNamedEntity0.class);
-        grammar1.add(DefiniteReferenceTemplate0.class);
-        grammar1.add(PPTemplate0.class);
-        grammar1.add(AdjTemplate0.class);
-        grammar1.add(NounClassTemplate.class);
-        grammar1.add(ThingWithNameTemplate0.class);
-        grammar1.add(IndefiniteDescriptionTemplate0.class);
-        grammar1_roots.add(HasPropertyYNQTemplate0.class);
-        grammar1_roots.add(HasPropertyWHQTemplate0.class);
-        grammar1_roots.add(HasPropertyStatementTemplate0.class);
-        grammar1_roots.add(SearchReturnedNothingTemplate0.class);
-        grammar1_roots.add(AcceptTemplate.class);
-        grammar1_roots.add(RejectTemplate.class);
-        grammar1_roots.add(AcknowledgeTemplate.class);
-        grammar1_roots.add(OOCRespondToRequestSearchAlternativeTemplate.class);
-        grammar1_roots.add(OOCRespondToRequestListOptionsTemplate.class);
-        grammar1_roots.add(DontKnowTemplate.class);
-        grammar1_roots.add(RequestConfirmValueTemplate0.class);
-        grammar1_roots.add(ConfirmGroundingSuggestionTemplate0.class);
-        grammar1_roots.add(RequestAgentTemplate.class);
-        grammar1_roots.add(RequestRoleTemplate.class);
+        grammar1.add(DefiniteReferenceTopLevelNLGTemplate0.class);
+        grammar1.add(PPTopLevelNLGTemplate0.class);
+        grammar1.add(AdjTopLevelNLGTemplate0.class);
+        grammar1.add(NounClassTopLevelNLGTemplate.class);
+        grammar1.add(ThingWithNameTopLevelNLGTemplate0.class);
+        grammar1.add(IndefiniteDescriptionTopLevelNLGTemplate0.class);
+        grammar1_roots.add(HasPropertyYNQTopLevelNLGTemplate0.class);
+        grammar1_roots.add(HasPropertyWHQTopLevelNLGTemplate0.class);
+        grammar1_roots.add(StatementTopLevelNLGTemplate.class);
+        grammar1_roots.add(SearchReturnedNothingTopLevelNLGTemplate0.class);
+        grammar1_roots.add(AcceptTopLevelNLGTemplate.class);
+        grammar1_roots.add(RejectTopLevelNLGTemplate.class);
+        grammar1_roots.add(AcknowledgeTopLevelNLGTemplate.class);
+        grammar1_roots.add(OOCRespondToRequestSearchAlternativeTopLevelNLGTemplate.class);
+        grammar1_roots.add(OOCRespondToRequestListOptionsTopLevelNLGTemplate.class);
+        grammar1_roots.add(DontKnowTopLevelNLGTemplate.class);
+        grammar1_roots.add(RequestConfirmValueTopLevelNLGTemplate0.class);
+        grammar1_roots.add(ConfirmGroundingSuggestionTopLevelNLGTemplate.class);
+        grammar1_roots.add(RequestAgentTopLevelNLGTemplate.class);
+        grammar1_roots.add(RequestRoleTopLevelNLGTemplate.class);
 //        grammar1_roots.add(RequestRoleGivenRoleTemplate.class);
-        grammar1_roots.add(RequestFixMisunderstandingTemplate0.class);
-        grammar1_roots.add(NotifyDialogLostTemplate0.class);
+        grammar1_roots.add(RequestFixMisunderstandingTopLevelNLGTemplate0.class);
+        grammar1_roots.add(NotifyDialogLostTopLevelNLGTemplate0.class);
     }
 }

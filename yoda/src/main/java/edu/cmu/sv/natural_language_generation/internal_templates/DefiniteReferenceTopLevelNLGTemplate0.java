@@ -13,7 +13,7 @@ import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
-import edu.cmu.sv.natural_language_generation.Template;
+import edu.cmu.sv.natural_language_generation.TopLevelNLGTemplate;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.utils.StringDistribution;
@@ -32,7 +32,7 @@ import java.util.*;
  * Generates {cls:UnknownThingWithRoles, X:HasAQD: {cls: Y:aqd}}
  *
  */
-public class DefiniteReferenceTemplate0 implements Template {
+public class DefiniteReferenceTopLevelNLGTemplate0 implements TopLevelNLGTemplate {
     @Override
     public Map<String, JSONObject> generateAll(JSONObject constraints, YodaEnvironment yodaEnvironment, int remainingDepth) {
         // required information to generate
@@ -212,7 +212,7 @@ public class DefiniteReferenceTemplate0 implements Template {
                                 Map<String, Pair<Integer, Integer>> childChunkingIndexMap = new HashMap<>();
                                 childChunkingIndexMap.put(descriptor.getLeft().getSimpleName() + "." + InRelationTo.class.getSimpleName(), new ImmutablePair<>(4, 4));
                                 for (Map.Entry<String, JSONObject> entry : GenerationUtils.simpleOrderedCombinations(chunks,
-                                        DefiniteReferenceTemplate0::compositionFunctionWithPrepositionPhrase, childChunkingIndexMap, yodaEnvironment).entrySet()) {
+                                        DefiniteReferenceTopLevelNLGTemplate0::compositionFunctionWithPrepositionPhrase, childChunkingIndexMap, yodaEnvironment).entrySet()) {
                                     ans.put(entry.getKey(), entry.getValue());
                                 }
                             }
@@ -225,7 +225,7 @@ public class DefiniteReferenceTemplate0 implements Template {
         // compose without PP
         List<Map<String, JSONObject>> chunks = Arrays.asList(detChunks, adjChunks, clsChunks);
         for (Map.Entry<String, JSONObject> entry : GenerationUtils.simpleOrderedCombinations(chunks,
-                DefiniteReferenceTemplate0::compositionFunction, new HashMap<>(), yodaEnvironment).entrySet()){
+                DefiniteReferenceTopLevelNLGTemplate0::compositionFunction, new HashMap<>(), yodaEnvironment).entrySet()){
             ans.put(entry.getKey(), entry.getValue());
         }
 

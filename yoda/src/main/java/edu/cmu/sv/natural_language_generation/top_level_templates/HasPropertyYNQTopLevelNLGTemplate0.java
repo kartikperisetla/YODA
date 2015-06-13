@@ -3,7 +3,7 @@ package edu.cmu.sv.natural_language_generation.top_level_templates;
 import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
-import edu.cmu.sv.natural_language_generation.Template;
+import edu.cmu.sv.natural_language_generation.TopLevelNLGTemplate;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.WebResource;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Agent;
@@ -21,7 +21,7 @@ import java.util.*;
 /**
  * Created by David Cohen on 11/13/14.
  */
-public class HasPropertyYNQTemplate0 implements Template {
+public class HasPropertyYNQTopLevelNLGTemplate0 implements TopLevelNLGTemplate {
 
     @Override
     public Map<String, JSONObject> generateAll(JSONObject constraints, YodaEnvironment yodaEnvironment, int remainingDepth) {
@@ -60,7 +60,7 @@ public class HasPropertyYNQTemplate0 implements Template {
         childNodeChunks.put("verb."+Agent.class.getSimpleName(), new ImmutablePair<>(1,1));
         childNodeChunks.put("verb."+Patient.class.getSimpleName(), new ImmutablePair<>(2,2));
         return GenerationUtils.simpleOrderedCombinations(Arrays.asList(toBeChunks, agentChunks, patientChunks),
-                HasPropertyYNQTemplate0::compositionFunction, childNodeChunks, yodaEnvironment);
+                HasPropertyYNQTopLevelNLGTemplate0::compositionFunction, childNodeChunks, yodaEnvironment);
     }
 
     private static JSONObject compositionFunction(List<JSONObject> children){

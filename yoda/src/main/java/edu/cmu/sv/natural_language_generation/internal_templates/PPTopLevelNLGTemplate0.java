@@ -2,7 +2,7 @@ package edu.cmu.sv.natural_language_generation.internal_templates;
 
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
 import edu.cmu.sv.natural_language_generation.Lexicon;
-import edu.cmu.sv.natural_language_generation.Template;
+import edu.cmu.sv.natural_language_generation.TopLevelNLGTemplate;
 import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 /**
  * Created by David Cohen on 11/13/14.
  */
-public class PPTemplate0 implements Template {
+public class PPTopLevelNLGTemplate0 implements TopLevelNLGTemplate {
     @Override
     public Map<String, JSONObject> generateAll(JSONObject constraints, YodaEnvironment yodaEnvironment, int remainingDepth) {
         // required information to generate
@@ -75,7 +75,7 @@ public class PPTemplate0 implements Template {
         Map<String, Pair<Integer, Integer>> childNodeChunks = new HashMap<>();
         childNodeChunks.put(hasQualityRole+"."+InRelationTo.class.getSimpleName(), new ImmutablePair<>(1,1));
         return GenerationUtils.simpleOrderedCombinations(Arrays.asList(prepositionChunks, childChunks),
-                PPTemplate0::compositionFunction, childNodeChunks, yodaEnvironment);
+                PPTopLevelNLGTemplate0::compositionFunction, childNodeChunks, yodaEnvironment);
     }
 
     private static JSONObject compositionFunction(List<JSONObject> children){

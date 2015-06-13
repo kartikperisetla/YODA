@@ -1,6 +1,6 @@
 package edu.cmu.sv.natural_language_generation.top_level_templates;
 
-import edu.cmu.sv.natural_language_generation.Template;
+import edu.cmu.sv.natural_language_generation.TopLevelNLGTemplate;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -24,7 +24,7 @@ import java.util.Map;
  * is what?
  *
  */
-public class RequestRoleGivenRoleTemplate implements Template {
+public class RequestRoleGivenRoleTopLevelNLGTemplate implements TopLevelNLGTemplate {
 
     // TODO: this is not completely implemented
     @Override
@@ -122,7 +122,7 @@ public class RequestRoleGivenRoleTemplate implements Template {
 //                Map<String, JSONObject> givenPrefixChunks = givenPrefixStrings.stream().
 //                        collect(Collectors.toMap(x -> x, x -> SemanticsModel.parseJSON("{}")));
 //
-//                Map<String, JSONObject> givenChunks = yodaEnvironment.nlg.generateAll(givenDescription, yodaEnvironment, remainingDepth - 1);
+//                Map<String, JSONObject> givenChunks = yodaEnvironment.nlg.generate(givenDescription, yodaEnvironment, remainingDepth - 1);
 //                // recursively wrap the given chunks in the given path
 //                String[] slots = givenSlotPath.split("\\.");
 //                for (int i = 0; i < slots.length ; i++) {

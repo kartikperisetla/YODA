@@ -4,7 +4,7 @@ import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Patient;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.HasProperty;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
-import edu.cmu.sv.natural_language_generation.Template;
+import edu.cmu.sv.natural_language_generation.TopLevelNLGTemplate;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.SearchReturnedNothing;
 import edu.cmu.sv.utils.Assert;
@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * Created by David Cohen on 11/13/14.
  */
-public class SearchReturnedNothingTemplate0 implements Template {
+public class SearchReturnedNothingTopLevelNLGTemplate0 implements TopLevelNLGTemplate {
 
     @Override
     public Map<String, JSONObject> generateAll(JSONObject constraints, YodaEnvironment yodaEnvironment, int remainingDepth) {
@@ -57,7 +57,7 @@ public class SearchReturnedNothingTemplate0 implements Template {
         Map<String, Pair<Integer, Integer>> childNodeChunks = new HashMap<>();
         childNodeChunks.put("verb."+Patient.class.getSimpleName(), new ImmutablePair<>(1,1));
         return GenerationUtils.simpleOrderedCombinations(Arrays.asList(toBeChunks, patientChunks),
-                SearchReturnedNothingTemplate0::compositionFunction, childNodeChunks, yodaEnvironment);
+                SearchReturnedNothingTopLevelNLGTemplate0::compositionFunction, childNodeChunks, yodaEnvironment);
     }
 
     private static JSONObject compositionFunction(List<JSONObject> children){

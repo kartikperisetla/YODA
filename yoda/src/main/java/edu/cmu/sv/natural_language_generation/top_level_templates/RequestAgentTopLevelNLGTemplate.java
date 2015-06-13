@@ -3,7 +3,7 @@ package edu.cmu.sv.natural_language_generation.top_level_templates;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.Requested;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.HasProperty;
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
-import edu.cmu.sv.natural_language_generation.Template;
+import edu.cmu.sv.natural_language_generation.TopLevelNLGTemplate;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestRoleGivenRole;
 import edu.cmu.sv.utils.Assert;
@@ -20,7 +20,7 @@ import java.util.*;
  * A special NLG template for requesting roles when it is the agent role that's requested
  *
  */
-public class RequestAgentTemplate implements Template {
+public class RequestAgentTopLevelNLGTemplate implements TopLevelNLGTemplate {
 
     @Override
     public Map<String, JSONObject> generateAll(JSONObject constraints, YodaEnvironment yodaEnvironment, int remainingDepth) {
@@ -61,7 +61,7 @@ public class RequestAgentTemplate implements Template {
         childNodeChunks.put("verb.Agent", new ImmutablePair<>(1,1));
         childNodeChunks.put("verb.Patient", new ImmutablePair<>(2,2));
         return GenerationUtils.simpleOrderedCombinations(Arrays.asList(verbChunks, whChunks, descriptionChunks),
-                RequestAgentTemplate::compositionFunction, childNodeChunks, yodaEnvironment);
+                RequestAgentTopLevelNLGTemplate::compositionFunction, childNodeChunks, yodaEnvironment);
     }
 
     private static JSONObject compositionFunction(List<JSONObject> children) {

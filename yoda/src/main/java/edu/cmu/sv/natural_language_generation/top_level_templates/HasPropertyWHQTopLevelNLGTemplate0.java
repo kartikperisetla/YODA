@@ -2,7 +2,7 @@ package edu.cmu.sv.natural_language_generation.top_level_templates;
 
 import edu.cmu.sv.natural_language_generation.GenerationUtils;
 import edu.cmu.sv.natural_language_generation.Lexicon;
-import edu.cmu.sv.natural_language_generation.Template;
+import edu.cmu.sv.natural_language_generation.TopLevelNLGTemplate;
 import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.ThingWithRoles;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.Requested;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 /**
  * Created by David Cohen on 11/13/14.
  */
-public class HasPropertyWHQTemplate0 implements Template {
+public class HasPropertyWHQTopLevelNLGTemplate0 implements TopLevelNLGTemplate {
     @Override
     public Map<String, JSONObject> generateAll(JSONObject constraints, YodaEnvironment yodaEnvironment, int remainingDepth) {
 
@@ -126,7 +126,7 @@ public class HasPropertyWHQTemplate0 implements Template {
             childNodeChunks.put(givenSlotPath, new ImmutablePair<>(2, 2));
             childNodeChunks.put(requestedSlotPath, new ImmutablePair<>(0, 0));
             ans.putAll(GenerationUtils.simpleOrderedCombinations(orderedChunks,
-                    HasPropertyWHQTemplate0::compositionFunction, childNodeChunks, yodaEnvironment));
+                    HasPropertyWHQTopLevelNLGTemplate0::compositionFunction, childNodeChunks, yodaEnvironment));
         }
 
         { // template: what X is Y?
@@ -139,7 +139,7 @@ public class HasPropertyWHQTemplate0 implements Template {
             childNodeChunks.put(givenSlotPath, new ImmutablePair<>(3, 3));
             childNodeChunks.put(requestedSlotPath, new ImmutablePair<>(0, 1));
             ans.putAll(GenerationUtils.simpleOrderedCombinations(orderedChunks,
-                    HasPropertyWHQTemplate0::compositionFunction, childNodeChunks, yodaEnvironment));
+                    HasPropertyWHQTopLevelNLGTemplate0::compositionFunction, childNodeChunks, yodaEnvironment));
         }
 
 

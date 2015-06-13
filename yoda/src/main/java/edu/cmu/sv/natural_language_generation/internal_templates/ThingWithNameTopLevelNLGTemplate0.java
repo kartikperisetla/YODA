@@ -1,7 +1,7 @@
 package edu.cmu.sv.natural_language_generation.internal_templates;
 
 import edu.cmu.sv.database.ReferenceResolution;
-import edu.cmu.sv.natural_language_generation.Template;
+import edu.cmu.sv.natural_language_generation.TopLevelNLGTemplate;
 import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * Created by David Cohen on 10/29/14.
  */
-public class ThingWithNameTemplate0 implements Template {
+public class ThingWithNameTopLevelNLGTemplate0 implements TopLevelNLGTemplate {
     @Override
     public Map<String, JSONObject> generateAll(JSONObject constraints, YodaEnvironment yodaEnvironment, int remainingDepth) {
         // required information to generate

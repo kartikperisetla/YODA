@@ -51,9 +51,9 @@ public class NaturalLanguageGenerator {
                                                    Grammar.GrammarPreferences grammarPreferences){
         this.grammarPreferences = grammarPreferences;
         Map<String, SemanticsModel> ans = new HashMap<>();
-        for (Class<? extends Template> templateCls : Grammar.grammar1_roots){
+        for (Class<? extends TopLevelNLGTemplate> templateCls : Grammar.grammar1_roots){
             try {
-                templateCls.newInstance().generateAll(model.getInternalRepresentation(), yodaEnvironment,
+                templateCls.newInstance().generate(model.getInternalRepresentation(), yodaEnvironment,
                         this.grammarPreferences.maxUtteranceDepth).
                         entrySet().forEach(x -> ans.put(x.getKey(), new SemanticsModel(x.getValue())));
             } catch (InstantiationException | IllegalAccessException e) {
@@ -73,9 +73,9 @@ public class NaturalLanguageGenerator {
         Map<String, JSONObject> ans = new HashMap<>();
         if (remainingDepth==0)
             return ans;
-        for (Class<? extends Template> templateCls : Grammar.grammar1){
+        for (Class<? extends TopLevelNLGTemplate> templateCls : Grammar.grammar1){
             try {
-                templateCls.newInstance().generateAll(constraints, yodaEnvironment, remainingDepth).
+                templateCls.newInstance().generate(constraints, yodaEnvironment, remainingDepth).
                         entrySet().forEach(x -> ans.put(x.getKey(), x.getValue()));
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
