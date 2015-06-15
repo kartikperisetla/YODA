@@ -13,7 +13,7 @@ import java.util.Set;
 public class Lexicon {
     // Map from ontology concepts to sets of corresponding lexical entries
     private Map<Class<? extends Thing>, Set<LexicalEntry>> standardLexiconMap = new HashMap<>();
-    private Map<Class<? extends Thing>, Set<LexicalEntry>> casualLexiconMap = new HashMap<>();
+    private Map<Class<? extends Thing>, Set<LexicalEntry>> understandingOnlyLexiconMap = new HashMap<>();
 
 
     /*
@@ -25,28 +25,28 @@ public class Lexicon {
                 add(key, entry, false);
             }
         }
-        for (Class<? extends Thing> key : otherLexicon.casualLexiconMap.keySet()){
-            for (LexicalEntry entry : otherLexicon.casualLexiconMap.get(key)){
+        for (Class<? extends Thing> key : otherLexicon.understandingOnlyLexiconMap.keySet()){
+            for (LexicalEntry entry : otherLexicon.understandingOnlyLexiconMap.get(key)){
                 add(key, entry, true);
             }
         }
     }
 
 
-    public Set<LexicalEntry> get(Class<? extends Thing> cls, boolean allowCasual){
+    public Set<LexicalEntry> get(Class<? extends Thing> cls, boolean allowUnderstandingOnly){
         Set<LexicalEntry> ans = new HashSet<>();
         if (standardLexiconMap.containsKey(cls))
             ans.addAll(standardLexiconMap.get(cls));
-        if (allowCasual && casualLexiconMap.containsKey(cls))
-            ans.addAll(casualLexiconMap.get(cls));
+        if (allowUnderstandingOnly && understandingOnlyLexiconMap.containsKey(cls))
+            ans.addAll(understandingOnlyLexiconMap.get(cls));
         return ans;
     }
 
-    public void add(Class<? extends Thing> cls, LexicalEntry lexicalEntry, boolean isCasual){
-        if (isCasual){
-            if (!casualLexiconMap.containsKey(cls))
-                casualLexiconMap.put(cls, new HashSet<>());
-            casualLexiconMap.get(cls).add(lexicalEntry);
+    public void add(Class<? extends Thing> cls, LexicalEntry lexicalEntry, boolean understandingOnly){
+        if (understandingOnly){
+            if (!understandingOnlyLexiconMap.containsKey(cls))
+                understandingOnlyLexiconMap.put(cls, new HashSet<>());
+            understandingOnlyLexiconMap.get(cls).add(lexicalEntry);
 
         } else {
             if (!standardLexiconMap.containsKey(cls))
@@ -58,9 +58,9 @@ public class Lexicon {
 
     public Set<String> getPOSForClass(Class<? extends Thing> cls,
                                              LexicalEntry.PART_OF_SPEECH partOfSpeech,
-                                             boolean allowCasual) throws NoLexiconEntryException {
+                                             boolean allowUnderstandingOnly) throws NoLexiconEntryException {
         Set<String> ans = new HashSet<>();
-        for (LexicalEntry lexicalEntry : get(cls, allowCasual)) {
+        for (LexicalEntry lexicalEntry : get(cls, allowUnderstandingOnly)) {
             ans.addAll(lexicalEntry.get(partOfSpeech));
         }
         if (ans.size()==0)
@@ -70,17 +70,17 @@ public class Lexicon {
 
     public  Set<String> getPOSForClassHierarchy(Class cls,
                                                       LexicalEntry.PART_OF_SPEECH partOfSpeech,
-                                                      boolean allowCasual) throws NoLexiconEntryException {
+                                                      boolean allowUnderstandingOnly) throws NoLexiconEntryException {
         if (! (Thing.class.isAssignableFrom(cls)))
             throw new NoLexiconEntryException();
         try {
-            Set<String> ans = getPOSForClass((Class<? extends Thing>)cls, partOfSpeech, allowCasual);
+            Set<String> ans = getPOSForClass((Class<? extends Thing>)cls, partOfSpeech, allowUnderstandingOnly);
             if (ans.size()==0){
                 throw new NoLexiconEntryException();
             }
             return ans;
         } catch (NoLexiconEntryException e){
-            return getPOSForClassHierarchy(cls.getSuperclass(), partOfSpeech, allowCasual);
+            return getPOSForClassHierarchy(cls.getSuperclass(), partOfSpeech, allowUnderstandingOnly);
         }
     }
 
