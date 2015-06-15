@@ -1,7 +1,9 @@
-package edu.cmu.sv.domain.yoda_skeleton.ontology.quality;
+package edu.cmu.sv.domain.yoda_skeleton.ontology.ontology2;
 
 
 import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
+
+import java.util.Set;
 
 /**
  * Created by David Cohen on 10/31/14.
@@ -9,6 +11,7 @@ import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
 public interface Quality2{
     Class<? extends Noun> getFirstArgumentClassConstraint();
     Class<? extends Noun> getSecondArgumentClassConstraint();
+    Set<Class<? extends QualityDegree>> getQualityDegrees();
     String getSparqlQueryFragment(String firstArgument, String secondArgument, String resultVariable);
     //TODO: getMetric(), getUnitOfMeasurement()
 

@@ -1,4 +1,4 @@
-package edu.cmu.sv.domain.yoda_skeleton.ontology.role;
+package edu.cmu.sv.domain.yoda_skeleton.ontology.ontology2;
 
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.ThingWithRoles;
