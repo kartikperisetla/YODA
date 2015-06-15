@@ -1,4 +1,4 @@
-package edu.cmu.sv.natural_language_generation.top_level_templates;
+package edu.cmu.sv.natural_language_generation.nlg2_top_level_templates;
 
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Agent;

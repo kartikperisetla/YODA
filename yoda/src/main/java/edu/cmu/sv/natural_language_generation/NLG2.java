@@ -4,19 +4,19 @@ import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.WebResource;
+import edu.cmu.sv.domain.yoda_skeleton.ontology.preposition.Preposition;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasURI;
-import edu.cmu.sv.natural_language_generation.nlg2_phrase_generators.AdjectiveGenerator;
-import edu.cmu.sv.natural_language_generation.nlg2_phrase_generators.DefiniteReferenceGenerator;
 import edu.cmu.sv.natural_language_generation.nlg2_top_level_templates.AcceptTopLevelNLGTemplate;
 import edu.cmu.sv.natural_language_generation.nlg2_top_level_templates.AcknowledgeTopLevelNLGTemplate;
 import edu.cmu.sv.natural_language_generation.nlg2_top_level_templates.ConfirmGroundingSuggestionTopLevelNLGTemplate;
 import edu.cmu.sv.natural_language_generation.nlg2_top_level_templates.DontKnowTopLevelNLGTemplate;
-import edu.cmu.sv.natural_language_generation.top_level_templates.StatementTopLevelNLGTemplate;
+import edu.cmu.sv.natural_language_generation.phrase_generators.*;
+import edu.cmu.sv.natural_language_generation.nlg2_top_level_templates.StatementTopLevelNLGTemplate;
+import edu.cmu.sv.natural_language_generation.nlg2_top_level_templates.SearchReturnedNothingNLGTemplate;
+import edu.cmu.sv.natural_language_generation.nlg2_top_level_templates.InformDialogLostNLGTemplate;
+import edu.cmu.sv.natural_language_generation.nlg2_top_level_templates.RejectNLGTemplate;
 import edu.cmu.sv.semantics.SemanticsModel;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Accept;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Acknowledge;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.DontKnow;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Statement;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.*;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ConfirmValueSuggestion;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -55,6 +55,9 @@ public class NLG2 {
         topLevelNLGTemplateMap.put(ConfirmValueSuggestion.class.getSimpleName(), new ConfirmGroundingSuggestionTopLevelNLGTemplate());
         topLevelNLGTemplateMap.put(DontKnow.class.getSimpleName(), new DontKnowTopLevelNLGTemplate());
         topLevelNLGTemplateMap.put(Statement.class.getSimpleName(), new StatementTopLevelNLGTemplate());
+        topLevelNLGTemplateMap.put(SearchReturnedNothing.class.getSimpleName(), new SearchReturnedNothingNLGTemplate());
+        topLevelNLGTemplateMap.put(InformDialogLost.class.getSimpleName(), new InformDialogLostNLGTemplate());
+        topLevelNLGTemplateMap.put(Reject.class.getSimpleName(), new RejectNLGTemplate());
     }
 
     public NLG2(YodaEnvironment yodaEnvironment) {
@@ -86,6 +89,22 @@ public class NLG2 {
                                 constraints.keySet().stream().filter(x -> !x.equals("class")).findAny().get())).
                         get("class")))){
             return new AdjectiveGenerator();
+        } else if (constraints.get("class").equals(UnknownThingWithRoles.class.getSimpleName()) &&
+                constraints.keySet().size()==2 &&
+                Preposition.class.isAssignableFrom(Ontology.thingNameMap.get(
+                        ((JSONObject) constraints.get(
+                                constraints.keySet().stream().filter(x -> !x.equals("class")).findAny().get())).
+                                get("class")))) {
+            return new PrepositionGenerator();
+        } else if (constraints.containsKey("class") &&
+                constraints.keySet().size()==1) {
+            return new NounClassGenerator();
+//        } else if (constraints.containsKey("class") &&
+//                constraints.containsKey(HasName.class.getSimpleName())){
+//            return new NamedThingGenerator();
+        } else if (constraints.containsKey("refType") &&
+                constraints.get("refType").equals("indefinite")){
+            return new IndefiniteDescriptionGenerator();
         }
 
         return null;

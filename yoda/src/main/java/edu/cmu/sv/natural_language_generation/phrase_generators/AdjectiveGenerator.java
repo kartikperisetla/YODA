@@ -1,4 +1,4 @@
-package edu.cmu.sv.natural_language_generation.nlg2_phrase_generators;
+package edu.cmu.sv.natural_language_generation.phrase_generators;
 
 import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
@@ -31,7 +31,7 @@ public class AdjectiveGenerator implements PhraseGenerationRoutine {
         try {
             Class<? extends Thing> adjectiveClass = Ontology.thingNameMap.get(adjectiveClassString);
             String adjectiveString = null;
-            adjectiveString = yodaEnvironment.lex.getPOSForClass(adjectiveClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, yodaEnvironment.nlg.grammarPreferences, false).stream().findAny().get();
+            adjectiveString = yodaEnvironment.lex.getPOSForClass(adjectiveClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, false).stream().findAny().get();
 
             JSONObject tmp = SemanticsModel.parseJSON("{\"class\":\"" + adjectiveClass.getSimpleName() + "\"}");
             SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(), hasQualityRole);

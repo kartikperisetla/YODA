@@ -59,7 +59,6 @@ public class Lexicon {
 
     public Set<String> getPOSForClass(Class<? extends Thing> cls,
                                              LexicalEntry.PART_OF_SPEECH partOfSpeech,
-                                             Grammar.GrammarPreferences grammarPreferences,
                                              boolean allowCasual) throws NoLexiconEntryException {
         Set<String> ans = new HashSet<>();
         for (LexicalEntry lexicalEntry : get(cls, allowCasual)) {
@@ -68,23 +67,22 @@ public class Lexicon {
         if (ans.size()==0)
             throw new NoLexiconEntryException();
 
-        return Combination.randomSubset(ans, grammarPreferences.maxWordForms);
+        return Combination.randomSubset(ans, 1);
     }
 
     public  Set<String> getPOSForClassHierarchy(Class cls,
                                                       LexicalEntry.PART_OF_SPEECH partOfSpeech,
-                                                      Grammar.GrammarPreferences grammarPreferences,
                                                       boolean allowCasual) throws NoLexiconEntryException {
         if (! (Thing.class.isAssignableFrom(cls)))
             throw new NoLexiconEntryException();
         try {
-            Set<String> ans = getPOSForClass((Class<? extends Thing>)cls, partOfSpeech, grammarPreferences, allowCasual);
+            Set<String> ans = getPOSForClass((Class<? extends Thing>)cls, partOfSpeech, allowCasual);
             if (ans.size()==0){
                 throw new NoLexiconEntryException();
             }
             return ans;
         } catch (NoLexiconEntryException e){
-            return getPOSForClassHierarchy(cls.getSuperclass(), partOfSpeech, grammarPreferences, allowCasual);
+            return getPOSForClassHierarchy(cls.getSuperclass(), partOfSpeech, allowCasual);
         }
     }
 

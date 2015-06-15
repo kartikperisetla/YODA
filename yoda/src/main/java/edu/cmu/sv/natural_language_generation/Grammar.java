@@ -2,10 +2,10 @@ package edu.cmu.sv.natural_language_generation;
 
 
 import edu.cmu.sv.natural_language_generation.internal_templates.*;
-import edu.cmu.sv.natural_language_generation.nlg2_top_level_templates.AcceptTopLevelNLGTemplate;
-import edu.cmu.sv.natural_language_generation.nlg2_top_level_templates.AcknowledgeTopLevelNLGTemplate;
-import edu.cmu.sv.natural_language_generation.nlg2_top_level_templates.ConfirmGroundingSuggestionTopLevelNLGTemplate;
-import edu.cmu.sv.natural_language_generation.nlg2_top_level_templates.DontKnowTopLevelNLGTemplate;
+import edu.cmu.sv.natural_language_generation.nlg2_top_level_templates.*;
+import edu.cmu.sv.natural_language_generation.phrase_generators.IndefiniteDescriptionGenerator;
+import edu.cmu.sv.natural_language_generation.phrase_generators.NounClassGenerator;
+import edu.cmu.sv.natural_language_generation.phrase_generators.PrepositionGenerator;
 import edu.cmu.sv.natural_language_generation.top_level_templates.*;
 
 import java.util.HashMap;
@@ -52,17 +52,17 @@ public class Grammar {
     static {
         grammar1.add(SimpleNamedEntity0.class);
         grammar1.add(DefiniteReferenceTopLevelNLGTemplate0.class);
-        grammar1.add(PPTopLevelNLGTemplate0.class);
+        grammar1.add(PrepositionGenerator.class);
         grammar1.add(AdjTopLevelNLGTemplate0.class);
-        grammar1.add(NounClassTopLevelNLGTemplate.class);
-        grammar1.add(ThingWithNameTopLevelNLGTemplate0.class);
-        grammar1.add(IndefiniteDescriptionTopLevelNLGTemplate0.class);
+        grammar1.add(NounClassGenerator.class);
+        grammar1.add(NamedThingGenerator.class);
+        grammar1.add(IndefiniteDescriptionGenerator.class);
         grammar1_roots.add(HasPropertyYNQTopLevelNLGTemplate0.class);
         grammar1_roots.add(HasPropertyWHQTopLevelNLGTemplate0.class);
         grammar1_roots.add(StatementTopLevelNLGTemplate.class);
-        grammar1_roots.add(SearchReturnedNothingTopLevelNLGTemplate0.class);
+        grammar1_roots.add(SearchReturnedNothingNLGTemplate.class);
         grammar1_roots.add(AcceptTopLevelNLGTemplate.class);
-        grammar1_roots.add(RejectTopLevelNLGTemplate.class);
+        grammar1_roots.add(RejectNLGTemplate.class);
         grammar1_roots.add(AcknowledgeTopLevelNLGTemplate.class);
         grammar1_roots.add(OOCRespondToRequestSearchAlternativeTopLevelNLGTemplate.class);
         grammar1_roots.add(OOCRespondToRequestListOptionsTopLevelNLGTemplate.class);
@@ -73,6 +73,6 @@ public class Grammar {
         grammar1_roots.add(RequestRoleTopLevelNLGTemplate.class);
 //        grammar1_roots.add(RequestRoleGivenRoleTemplate.class);
         grammar1_roots.add(RequestFixMisunderstandingTopLevelNLGTemplate0.class);
-        grammar1_roots.add(NotifyDialogLostTopLevelNLGTemplate0.class);
+        grammar1_roots.add(InformDialogLostNLGTemplate.class);
     }
 }

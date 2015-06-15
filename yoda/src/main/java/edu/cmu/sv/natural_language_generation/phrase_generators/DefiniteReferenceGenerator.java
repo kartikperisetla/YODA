@@ -1,4 +1,4 @@
-package edu.cmu.sv.natural_language_generation.nlg2_phrase_generators;
+package edu.cmu.sv.natural_language_generation.phrase_generators;
 
 import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
@@ -57,7 +57,7 @@ public class DefiniteReferenceGenerator implements PhraseGenerationRoutine {
         String mostSpecificClass = yodaEnvironment.db.mostSpecificClass(entityURI);
         try {
             classNounString = yodaEnvironment.lex.getPOSForClass(Ontology.thingNameMap.get(mostSpecificClass),
-                    Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, yodaEnvironment.nlg.grammarPreferences, false).
+                    Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, false).
                     stream().findAny().get();
             classNounJSON = SemanticsModel.parseJSON("{\"class\":\"" + mostSpecificClass + "\"}");
         } catch (Lexicon.NoLexiconEntryException e) {}
@@ -86,7 +86,7 @@ public class DefiniteReferenceGenerator implements PhraseGenerationRoutine {
                         if (degreeOfMatch!=null && degreeOfMatch > 0.5) {
                             try {
                                 adjString = yodaEnvironment.lex.getPOSForClass(adjectiveClass,
-                                        Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, yodaEnvironment.nlg.grammarPreferences, false).
+                                        Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, false).
                                         stream().findAny().get();
                                 adjJSON = SemanticsModel.parseJSON("{\"class\":\"" + adjectiveClass.getSimpleName() + "\"}");
                                 SemanticsModel.wrap(adjJSON, UnknownThingWithRoles.class.getSimpleName(),
