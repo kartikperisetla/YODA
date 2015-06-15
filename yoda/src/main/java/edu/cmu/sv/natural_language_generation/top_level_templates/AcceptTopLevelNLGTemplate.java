@@ -1,4 +1,4 @@
-package edu.cmu.sv.natural_language_generation.nlg2_top_level_templates;
+package edu.cmu.sv.natural_language_generation.top_level_templates;
 
 import edu.cmu.sv.natural_language_generation.TopLevelNLGTemplate;
 import edu.cmu.sv.semantics.SemanticsModel;
@@ -8,9 +8,9 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 /**
  * Created by David Cohen on 10/29/14.
  */
-public class AcknowledgeTopLevelNLGTemplate implements TopLevelNLGTemplate {
+public class AcceptTopLevelNLGTemplate implements TopLevelNLGTemplate {
     @Override
     public ImmutablePair<String, SemanticsModel> generate(SemanticsModel constraints, YodaEnvironment yodaEnvironment) {
-        return new ImmutablePair<>("Ok", constraints.deepCopy());
+        return new ImmutablePair<>("Yes", constraints.deepCopy());
     }
 }

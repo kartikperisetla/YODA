@@ -5,7 +5,7 @@ import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.InRelationTo;
 import edu.cmu.sv.natural_language_generation.Lexicon;
-import edu.cmu.sv.natural_language_generation.NLG2;
+import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
 import edu.cmu.sv.natural_language_generation.PhraseGenerationRoutine;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -41,7 +41,7 @@ public class PrepositionGenerator implements PhraseGenerationRoutine{
         JSONObject ansJSON = SemanticsModel.parseJSON("{\"class\":\"" + prepositionClass.getSimpleName() + "\"}");
         SemanticsModel.wrap(ansJSON, UnknownThingWithRoles.class.getSimpleName(), hasQualityRole);
 
-        ImmutablePair<String, JSONObject> nestedPhrase = NLG2.getAppropriatePhraseGenerationRoutine(child).
+        ImmutablePair<String, JSONObject> nestedPhrase = NaturalLanguageGenerator.getAppropriatePhraseGenerationRoutine(child).
                 generate(child, yodaEnvironment);
 
         SemanticsModel.putAtPath(ansJSON, hasQualityRole+"."+InRelationTo.class.getSimpleName(), nestedPhrase.getRight());

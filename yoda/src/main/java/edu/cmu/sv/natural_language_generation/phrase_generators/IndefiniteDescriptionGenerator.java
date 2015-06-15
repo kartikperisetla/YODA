@@ -6,7 +6,7 @@ import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.preposition.Preposition;
 import edu.cmu.sv.natural_language_generation.Lexicon;
-import edu.cmu.sv.natural_language_generation.NLG2;
+import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
 import edu.cmu.sv.natural_language_generation.PhraseGenerationRoutine;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -53,7 +53,7 @@ public class IndefiniteDescriptionGenerator implements PhraseGenerationRoutine {
         for (Object key : adjectiveDescriptors.keySet()) {
             JSONObject adjectiveContent = SemanticsModel.parseJSON(adjectiveDescriptors.get(key).toJSONString());
             SemanticsModel.wrap(adjectiveContent, UnknownThingWithRoles.class.getSimpleName(), (String) key);
-            ImmutablePair<String, JSONObject> adjPhrase = NLG2.getAppropriatePhraseGenerationRoutine(adjectiveContent).
+            ImmutablePair<String, JSONObject> adjPhrase = NaturalLanguageGenerator.getAppropriatePhraseGenerationRoutine(adjectiveContent).
                     generate(adjectiveContent, yodaEnvironment);
 
             adjectivesAddedCounter += 1;
@@ -75,13 +75,15 @@ public class IndefiniteDescriptionGenerator implements PhraseGenerationRoutine {
             } catch (Lexicon.NoLexiconEntryException e) {}
             ans += singularNounForm;
             ansObject.extendAndOverwrite(new SemanticsModel("{\"class\":\"" + nounClass.getSimpleName() + "\"}"));
+            if (prepositionDescriptors.size()>0)
+                ans+=" ";
         }
 
         // add PPs
         for (Object key : prepositionDescriptors.keySet()){
             JSONObject prepositionContent = SemanticsModel.parseJSON(prepositionDescriptors.get(key).toJSONString());
             SemanticsModel.wrap(prepositionContent, UnknownThingWithRoles.class.getSimpleName(), (String) key);
-            ImmutablePair<String, JSONObject> prepPhrase = NLG2.getAppropriatePhraseGenerationRoutine(prepositionContent).
+            ImmutablePair<String, JSONObject> prepPhrase = NaturalLanguageGenerator.getAppropriatePhraseGenerationRoutine(prepositionContent).
                     generate(prepositionContent, yodaEnvironment);
 
             if (nounClass == null &&

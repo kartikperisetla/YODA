@@ -4,7 +4,6 @@ import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
-import edu.cmu.sv.natural_language_generation.Grammar;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.spoken_language_understanding.Tokenizer;
@@ -34,7 +33,7 @@ public class YnqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
         try {
             this.qualityClass = adjectiveClass.newInstance().getQuality();
             this.hasQualityRole = Ontology.qualityDescriptors(qualityClass).getKey();
-            Set<String> adjectiveStrings = this.yodaEnvironment.lex.getPOSForClass(adjectiveClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true);
+            Set<String> adjectiveStrings = this.yodaEnvironment.lex.getPOSForClass(adjectiveClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, true);
             this.adjectiveRegexString = "("+String.join("|",adjectiveStrings)+")";
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();

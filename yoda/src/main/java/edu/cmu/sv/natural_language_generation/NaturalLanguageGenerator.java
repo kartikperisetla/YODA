@@ -6,18 +6,15 @@ import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.WebResource;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.preposition.Preposition;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasURI;
-import edu.cmu.sv.natural_language_generation.nlg2_top_level_templates.AcceptTopLevelNLGTemplate;
-import edu.cmu.sv.natural_language_generation.nlg2_top_level_templates.AcknowledgeTopLevelNLGTemplate;
-import edu.cmu.sv.natural_language_generation.nlg2_top_level_templates.ConfirmGroundingSuggestionTopLevelNLGTemplate;
-import edu.cmu.sv.natural_language_generation.nlg2_top_level_templates.DontKnowTopLevelNLGTemplate;
 import edu.cmu.sv.natural_language_generation.phrase_generators.*;
-import edu.cmu.sv.natural_language_generation.nlg2_top_level_templates.StatementTopLevelNLGTemplate;
-import edu.cmu.sv.natural_language_generation.nlg2_top_level_templates.SearchReturnedNothingNLGTemplate;
-import edu.cmu.sv.natural_language_generation.nlg2_top_level_templates.InformDialogLostNLGTemplate;
-import edu.cmu.sv.natural_language_generation.nlg2_top_level_templates.RejectNLGTemplate;
+import edu.cmu.sv.natural_language_generation.top_level_templates.*;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.*;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ConfirmValueSuggestion;
+import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestConfirmValue;
+import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestFixMisunderstanding;
+import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestRole;
+import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestRoleGivenRole;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.json.simple.JSONObject;
@@ -33,7 +30,7 @@ import java.util.logging.SimpleFormatter;
 /**
  * YODA's built-in NLG module
  */
-public class NLG2 {
+public class NaturalLanguageGenerator {
     private static Logger logger = Logger.getLogger("yoda.natural_language_generation.NaturalLanguageGenerator");
     private static FileHandler fh;
     static {
@@ -58,9 +55,15 @@ public class NLG2 {
         topLevelNLGTemplateMap.put(SearchReturnedNothing.class.getSimpleName(), new SearchReturnedNothingNLGTemplate());
         topLevelNLGTemplateMap.put(InformDialogLost.class.getSimpleName(), new InformDialogLostNLGTemplate());
         topLevelNLGTemplateMap.put(Reject.class.getSimpleName(), new RejectNLGTemplate());
+        topLevelNLGTemplateMap.put(RequestFixMisunderstanding.class.getSimpleName(), new RequestFixMisunderstandingNLGTemplate());
+        topLevelNLGTemplateMap.put(RequestConfirmValue.class.getSimpleName(), new RequestConfirmValueNLGTemplate());
+        topLevelNLGTemplateMap.put(RequestRoleGivenRole.class.getSimpleName(), new RequestAgentNLGTemplate());
+        topLevelNLGTemplateMap.put(RequestRole.class.getSimpleName(), new RequestRoleNLGTemplate());
+        topLevelNLGTemplateMap.put(OOCRespondToRequestListOptions.class.getSimpleName(), new OOCRespondToRequestListOptionsNLGTemplate());
+        topLevelNLGTemplateMap.put(OOCRespondToRequestSearchAlternative.class.getSimpleName(), new OOCRespondToRequestSearchAlternativeNLGTemplate());
     }
 
-    public NLG2(YodaEnvironment yodaEnvironment) {
+    public NaturalLanguageGenerator(YodaEnvironment yodaEnvironment) {
         this.yodaEnvironment = yodaEnvironment;
     }
 

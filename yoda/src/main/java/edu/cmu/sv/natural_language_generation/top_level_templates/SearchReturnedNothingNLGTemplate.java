@@ -1,9 +1,9 @@
-package edu.cmu.sv.natural_language_generation.nlg2_top_level_templates;
+package edu.cmu.sv.natural_language_generation.top_level_templates;
 
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Patient;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.HasProperty;
-import edu.cmu.sv.natural_language_generation.NLG2;
+import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
 import edu.cmu.sv.natural_language_generation.TopLevelNLGTemplate;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.SearchReturnedNothing;
@@ -24,7 +24,7 @@ public class SearchReturnedNothingNLGTemplate implements TopLevelNLGTemplate {
 
         String ansString = "i don't know of ";
 
-        ImmutablePair<String, JSONObject> patientPhrase = NLG2.getAppropriatePhraseGenerationRoutine(patientConstraint).
+        ImmutablePair<String, JSONObject> patientPhrase = NaturalLanguageGenerator.getAppropriatePhraseGenerationRoutine(patientConstraint).
                 generate(patientConstraint, yodaEnvironment);
 
         JSONObject patient = patientPhrase.getRight();

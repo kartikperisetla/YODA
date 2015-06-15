@@ -1,6 +1,5 @@
 package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander;
 
-import edu.cmu.sv.natural_language_generation.Grammar;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.ThingWithRoles;
@@ -44,14 +43,14 @@ public class WhqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
         Set<String> adjectiveStrings = new HashSet<>();
         for (Class<? extends Adjective> adjectiveClass : adjectiveClasses) {
             try {
-                adjectiveStrings.addAll(this.yodaEnvironment.lex.getPOSForClass(adjectiveClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true));
+                adjectiveStrings.addAll(this.yodaEnvironment.lex.getPOSForClass(adjectiveClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, true));
             } catch (Lexicon.NoLexiconEntryException e) {}
         }
         this.adjectiveRegexString = "(" + String.join("|", adjectiveStrings) + ")";
 
         Set<String> nounStrings = new HashSet<>();
         try {
-            nounStrings.addAll(this.yodaEnvironment.lex.getPOSForClass(qualityClass, Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true));
+            nounStrings.addAll(this.yodaEnvironment.lex.getPOSForClass(qualityClass, Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, true));
         } catch (Lexicon.NoLexiconEntryException e) {}
         this.qualityNounRegexString = "(" + String.join("|", nounStrings) + ")";
 

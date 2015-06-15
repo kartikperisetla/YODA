@@ -1,10 +1,10 @@
-package edu.cmu.sv.natural_language_generation.nlg2_top_level_templates;
+package edu.cmu.sv.natural_language_generation.top_level_templates;
 
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Agent;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Patient;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.HasProperty;
-import edu.cmu.sv.natural_language_generation.NLG2;
+import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
 import edu.cmu.sv.natural_language_generation.PhraseGenerationRoutine;
 import edu.cmu.sv.natural_language_generation.TopLevelNLGTemplate;
 import edu.cmu.sv.semantics.SemanticsModel;
@@ -30,9 +30,9 @@ public class StatementTopLevelNLGTemplate implements TopLevelNLGTemplate {
         if (!verbConstraint.get("class").equals(HasProperty.class.getSimpleName()))
             throw new Error("can only generate statements for "+HasProperty.class.getSimpleName()+":\n"+constraints);
 
-        PhraseGenerationRoutine agentRoutine = NLG2.getAppropriatePhraseGenerationRoutine(agentConstraint);
+        PhraseGenerationRoutine agentRoutine = NaturalLanguageGenerator.getAppropriatePhraseGenerationRoutine(agentConstraint);
         ImmutablePair<String, JSONObject> agentPhraseContent = agentRoutine.generate(agentConstraint, yodaEnvironment);
-        PhraseGenerationRoutine patientRoutine = NLG2.getAppropriatePhraseGenerationRoutine(patientConstraint);
+        PhraseGenerationRoutine patientRoutine = NaturalLanguageGenerator.getAppropriatePhraseGenerationRoutine(patientConstraint);
         ImmutablePair<String, JSONObject> patientPhraseContent = patientRoutine.generate(patientConstraint, yodaEnvironment);
 
         String ansString = agentPhraseContent.getLeft() + " is " + patientPhraseContent.getLeft();

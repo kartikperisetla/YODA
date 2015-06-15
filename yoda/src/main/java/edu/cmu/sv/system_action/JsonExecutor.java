@@ -1,7 +1,6 @@
 package edu.cmu.sv.system_action;
 
 import edu.cmu.sv.dialog_state_tracking.Turn;
-import edu.cmu.sv.natural_language_generation.Grammar;
 import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
@@ -33,8 +32,7 @@ public class JsonExecutor implements Executor {
 
             NaturalLanguageGenerator.getLogger().info("nlg request made:"+model);
             Map.Entry<String, SemanticsModel> chosenUtterance =
-                    yodaEnvironment.nlg.generateBestForSemantics(model,
-                            Grammar.DEFAULT_GRAMMAR_PREFERENCES);
+                    yodaEnvironment.nlg.generateBestForSemantics(model);
             chosenUtterance.getValue().filterOutLeafSlot("chunk-start");
             chosenUtterance.getValue().filterOutLeafSlot("chunk-end");
             NaturalLanguageGenerator.getLogger().info("chosen utterance:" + chosenUtterance);
@@ -75,8 +73,7 @@ public class JsonExecutor implements Executor {
             SemanticsModel model = ((DialogAct) systemAction).getNlgCommand();
             NaturalLanguageGenerator.getLogger().info("nlg request made:"+model);
             Map.Entry<String, SemanticsModel> chosenUtterance =
-                    yodaEnvironment.nlg.generateBestForSemantics(model,
-                            Grammar.DEFAULT_GRAMMAR_PREFERENCES);
+                    yodaEnvironment.nlg.generateBestForSemantics(model);
             chosenUtterance.getValue().filterOutLeafSlot("chunk-start");
             chosenUtterance.getValue().filterOutLeafSlot("chunk-end");
             NaturalLanguageGenerator.getLogger().info("chosen utterance:" + chosenUtterance);

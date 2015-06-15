@@ -4,7 +4,6 @@ import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasAtTime;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
-import edu.cmu.sv.natural_language_generation.Grammar;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.spoken_language_understanding.Tokenizer;
@@ -37,17 +36,17 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
         // get noun forms
         Set<String> verbNounStrings = new HashSet<>();
         try {
-            verbNounStrings.addAll(this.yodaEnvironment.lex.getPOSForClass(verbClass, Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true));
+            verbNounStrings.addAll(this.yodaEnvironment.lex.getPOSForClass(verbClass, Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, true));
         } catch (Lexicon.NoLexiconEntryException e) {}
         try{
-            verbNounStrings.addAll(this.yodaEnvironment.lex.getPOSForClass(verbClass, Lexicon.LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true));
+            verbNounStrings.addAll(this.yodaEnvironment.lex.getPOSForClass(verbClass, Lexicon.LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, true));
         } catch (Lexicon.NoLexiconEntryException e) {}
         verbRegexString = "("+String.join("|",verbNounStrings)+")";
 
         // get adjective forms
         Set<String> verbAdjectiveStrings = new HashSet<>();
         try {
-            verbAdjectiveStrings.addAll(this.yodaEnvironment.lex.getPOSForClass(verbClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true));
+            verbAdjectiveStrings.addAll(this.yodaEnvironment.lex.getPOSForClass(verbClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, true));
         } catch (Lexicon.NoLexiconEntryException e) {}
         adjectiveRegexString = "("+String.join("|",verbAdjectiveStrings)+")";
 
@@ -57,11 +56,11 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
                 Set<String> roleObj1PrefixStrings = new HashSet<>();
                 Set<String> roleObj2PrefixStrings = new HashSet<>();
                 try {
-                    roleObj1PrefixStrings = this.yodaEnvironment.lex.getPOSForClass(roleClass, Lexicon.LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true);
+                    roleObj1PrefixStrings = this.yodaEnvironment.lex.getPOSForClass(roleClass, Lexicon.LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, true);
                 } catch (Lexicon.NoLexiconEntryException e) {
                 }
                 try {
-                    roleObj2PrefixStrings = this.yodaEnvironment.lex.getPOSForClass(roleClass, Lexicon.LexicalEntry.PART_OF_SPEECH.AS_OBJECT2_PREFIX, Grammar.EXHAUSTIVE_GENERATION_PREFERENCES, true);
+                    roleObj2PrefixStrings = this.yodaEnvironment.lex.getPOSForClass(roleClass, Lexicon.LexicalEntry.PART_OF_SPEECH.AS_OBJECT2_PREFIX, true);
                 } catch (Lexicon.NoLexiconEntryException e) {
                 }
                 r1HasBlankPrefix.put(roleClass, roleObj1PrefixStrings.contains(""));

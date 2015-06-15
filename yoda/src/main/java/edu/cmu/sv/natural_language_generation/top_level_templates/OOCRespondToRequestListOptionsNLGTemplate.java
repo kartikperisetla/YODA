@@ -1,4 +1,4 @@
-package edu.cmu.sv.natural_language_generation.nlg2_top_level_templates;
+package edu.cmu.sv.natural_language_generation.top_level_templates;
 
 import edu.cmu.sv.natural_language_generation.TopLevelNLGTemplate;
 import edu.cmu.sv.semantics.SemanticsModel;
@@ -8,9 +8,9 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 /**
  * Created by David Cohen on 10/29/14.
  */
-public class InformDialogLostNLGTemplate implements TopLevelNLGTemplate {
+public class OOCRespondToRequestListOptionsNLGTemplate implements TopLevelNLGTemplate {
     @Override
     public ImmutablePair<String, SemanticsModel> generate(SemanticsModel constraints, YodaEnvironment yodaEnvironment) {
-        return new ImmutablePair<>("I'm confused let's start over", constraints.deepCopy());
+        return new ImmutablePair<>("I'm sorry, talking about multiple items simultaneously hasn't been implemented yet. Try describing a new item for me to search for.",constraints.deepCopy());
     }
 }

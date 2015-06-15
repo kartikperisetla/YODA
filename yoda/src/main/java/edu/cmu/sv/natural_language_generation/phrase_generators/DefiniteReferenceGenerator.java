@@ -9,7 +9,7 @@ import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasName;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasURI;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
 import edu.cmu.sv.natural_language_generation.Lexicon;
-import edu.cmu.sv.natural_language_generation.NLG2;
+import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
 import edu.cmu.sv.natural_language_generation.PhraseGenerationRoutine;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -29,8 +29,8 @@ public class DefiniteReferenceGenerator implements PhraseGenerationRoutine {
     public ImmutablePair<String, JSONObject> generate(JSONObject constraints, YodaEnvironment yodaEnvironment) {
         String entityURI = (String) new SemanticsModel(constraints).newGetSlotPathFiller(HasURI.class.getSimpleName());
 //        boolean expandPP = NLG2.random.nextDouble() < .1;
-        boolean expandAdj = NLG2.random.nextDouble() < .2;
-        boolean preferNameReference = NLG2.random.nextDouble() < .9;
+        boolean expandAdj = NaturalLanguageGenerator.random.nextDouble() < .2;
+        boolean preferNameReference = NaturalLanguageGenerator.random.nextDouble() < .9;
         String entityNameString = null;
         String classNounString = null;
         String adjString = null;

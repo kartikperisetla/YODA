@@ -1,6 +1,5 @@
 package edu.cmu.sv.utils;
 
-import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
 import org.apache.commons.math3.random.RandomData;
 import org.apache.commons.math3.random.RandomDataImpl;
 
@@ -16,7 +15,7 @@ public class Combination {
 
     public static <T> Set<T> randomSubset(Collection<T> items, int k){
         if (items.size() > k){
-            return Arrays.asList(NaturalLanguageGenerator.randomData.nextSample(
+            return Arrays.asList(randomData.nextSample(
                     items, k)).stream().
                     map(x -> (T)x).
                     collect(Collectors.toSet());
