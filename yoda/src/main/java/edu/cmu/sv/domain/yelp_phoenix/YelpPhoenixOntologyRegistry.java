@@ -11,6 +11,8 @@ import edu.cmu.sv.domain.yelp_phoenix.ontology.quality.binary_quality.Distance;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.quality.unary_quality.Expensiveness;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.quality.unary_quality.Goodness;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.quality.unary_quality.Popularity;
+import edu.cmu.sv.domain.yelp_phoenix.ontology.role.Destination;
+import edu.cmu.sv.domain.yelp_phoenix.ontology.role.Origin;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.role.has_quality_subroles.HasDistance;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.role.has_quality_subroles.HasExpensiveness;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.role.has_quality_subroles.HasGoodness;
@@ -31,7 +33,7 @@ import java.util.Set;
 /**
  * Created by David Cohen on 3/3/15.
  */
-public class YelpPhoenixOntologyRegistry extends OntologyRegistry{
+public class YelpPhoenixOntologyRegistry implements OntologyRegistry{
 
     public Set<Class <? extends Verb>> verbClasses = new HashSet<>();
     public Set<Class <? extends Noun>> nounClasses = new HashSet<>();
@@ -175,6 +177,9 @@ public class YelpPhoenixOntologyRegistry extends OntologyRegistry{
         roleClasses.add(HasExpensiveness.class);
         roleClasses.add(HasGoodness.class);
         roleClasses.add(HasPopularity.class);
+
+        roleClasses.add(Origin.class);
+        roleClasses.add(Destination.class);
 
         adjectiveClasses.add(Cheap.class);
         adjectiveClasses.add(Expensive.class);

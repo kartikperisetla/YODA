@@ -2,8 +2,6 @@ package edu.cmu.sv.domain.yoda_skeleton;
 
 import edu.cmu.sv.domain.OntologyRegistry;
 import edu.cmu.sv.domain.yelp_phoenix.ontology.noun.PointOfInterest;
-import edu.cmu.sv.domain.yelp_phoenix.ontology.role.Destination;
-import edu.cmu.sv.domain.yelp_phoenix.ontology.role.Origin;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.*;
@@ -16,21 +14,27 @@ import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Exist;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.HasProperty;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Created by David Cohen on 3/3/15.
  */
-public class YodaSkeletonOntologyRegistry extends OntologyRegistry{
+public class YodaSkeletonOntologyRegistry implements OntologyRegistry{
 
     public Set<Class <? extends Verb>> verbClasses = new HashSet<>();
     public Set<Class <? extends Noun>> nounClasses = new HashSet<>();
     public Set<Class <? extends Adjective>> adjectiveClasses = new HashSet<>();
     public Set<Class <? extends Preposition>> prepositionClasses = new HashSet<>();
-    public Set<Class <? extends Role>> roleClasses = new HashSet<>();
     public Set<Class <? extends TransientQuality>> qualityClasses = new HashSet<>();
     public Set<Class <? extends Thing>> miscClasses = new HashSet<>();
+    public Set<Role2> roles = new HashSet<>();
+
+    @Override
+    public Set<Role2> getRoles() {
+        return roles;
+    }
 
     public Set<Class<? extends Verb>> getVerbClasses() {
         return verbClasses;
@@ -46,10 +50,6 @@ public class YodaSkeletonOntologyRegistry extends OntologyRegistry{
 
     public Set<Class<? extends Preposition>> getPrepositionClasses() {
         return prepositionClasses;
-    }
-
-    public Set<Class<? extends Role>> getRoleClasses() {
-        return roleClasses;
     }
 
     public Set<Class<? extends TransientQuality>> getQualityClasses() {
@@ -74,31 +74,36 @@ public class YodaSkeletonOntologyRegistry extends OntologyRegistry{
         nounClasses.add(Time.class);
         nounClasses.add(PointOfInterest.class);
 
-        roleClasses.add(Role.class);
-        roleClasses.add(Agent.class);
-        roleClasses.add(Patient.class);
-        roleClasses.add(Origin.class);
-        roleClasses.add(Destination.class);
+//        roleClasses.add(Role.class);
+        roles.add(new Role2("Agent", new HashSet<>(Arrays.asList(HasProperty.class, Exist.class)),
+                new HashSet<>(Arrays.asList(Noun.class)), ));
+        roles.add(new Role2("Patient", new HashSet<>(Arrays.asList(HasProperty.class, HasProperty.class)),
+                new HashSet<>(Arrays.asList(Person.class)), ));
+        roles.add(new Role2("HasAtTime", new HashSet<>(Arrays.asList(Verb.class)),
+                new HashSet<>(Arrays.asList(Time.class)), ));
+        roles.add(new Role2("HasHour", new HashSet<>(Arrays.asList(Time.class)),
+                new HashSet<>(Arrays.asList(WebResource.class)), ));
+        roles.add(new Role2("HasTenMinute", new HashSet<>(Arrays.asList(Time.class)),
+                new HashSet<>(Arrays.asList(WebResource.class)), ));
+        roles.add(new Role2("HasSingleMinute", new HashSet<>(Arrays.asList(Time.class)),
+                new HashSet<>(Arrays.asList(WebResource.class)), ));
+        roles.add(new Role2("HasAmPm", new HashSet<>(Arrays.asList(Time.class)),
+                new HashSet<>(Arrays.asList(WebResource.class)), ));
+        roles.add(new Role2("HasName", new HashSet<>(Arrays.asList(Noun.class)),
+                new HashSet<>(Arrays.asList(Time.class)), ));
+        roles.add(new Role2("HasValue", new HashSet<>(Arrays.asList(Suggested.class, Requested.class)),
+                new HashSet<>(Arrays.asList(Thing.class)), ));
+        roles.add(new Role2("HasURI", new HashSet<>(Arrays.asList(WebResource.class)),
+                new HashSet<>(), ));
+        roles.add(new Role2("InRelationTo", new HashSet<>(Arrays.asList(Preposition.class)),
+                new HashSet<>(Arrays.asList(Thing.class)), ));
 
-        roleClasses.add(HasAtTime.class);
-        roleClasses.add(HasHour.class);
-        roleClasses.add(HasTenMinute.class);
-        roleClasses.add(HasSingleMinute.class);
-        roleClasses.add(HasAmPm.class);
-
-        roleClasses.add(HasName.class);
-        roleClasses.add(HasValues.class);
-        roleClasses.add(HasValue.class);
-        roleClasses.add(HasURI.class);
-        roleClasses.add(InRelationTo.class);
 
         miscClasses.add(NonHearing.class);
         miscClasses.add(NonUnderstanding.class);
         miscClasses.add(Requested.class);
         miscClasses.add(Suggested.class);
         miscClasses.add(UnknownThingWithRoles.class);
-        miscClasses.add(Or.class);
-        miscClasses.add(And.class);
         miscClasses.add(WebResource.class);
 
     }
