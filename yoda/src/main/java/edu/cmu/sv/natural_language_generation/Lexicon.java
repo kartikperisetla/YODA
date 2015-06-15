@@ -1,7 +1,6 @@
 package edu.cmu.sv.natural_language_generation;
 
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
-import edu.cmu.sv.utils.Combination;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -66,8 +65,7 @@ public class Lexicon {
         }
         if (ans.size()==0)
             throw new NoLexiconEntryException();
-
-        return Combination.randomSubset(ans, 1);
+        return ans;
     }
 
     public  Set<String> getPOSForClassHierarchy(Class cls,

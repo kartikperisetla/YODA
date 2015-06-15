@@ -35,6 +35,7 @@ public class YnqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
             this.hasQualityRole = Ontology.qualityDescriptors(qualityClass).getKey();
             Set<String> adjectiveStrings = this.yodaEnvironment.lex.getPOSForClass(adjectiveClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, true);
             this.adjectiveRegexString = "("+String.join("|",adjectiveStrings)+")";
+//            System.err.println(this.adjectiveRegexString);
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
             System.exit(-1);

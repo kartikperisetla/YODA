@@ -79,8 +79,9 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         for (Class<? extends Adjective> adjectiveClass : Ontology.adjectiveClasses) {
             try {
                 Set<String> adjectiveStrings = this.yodaEnvironment.lex.getPOSForClass(adjectiveClass,
-                        Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, false);
+                        Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, true);
                 adjectiveStringSetMap.put(adjectiveClass, adjectiveStrings);
+//                System.out.println(adjectiveStringSetMap.get(adjectiveClass));
 //                String regexString = "(" + String.join("|", adjectiveStrings) + ")";
 //                if (!regexString.equals("()"))
 //                    adjectiveStringSetMap.put(adjectiveClass, regexString);
