@@ -2,35 +2,14 @@ package edu.cmu.sv.domain.smart_house;
 
 import edu.cmu.sv.domain.OntologyRegistry;
 import edu.cmu.sv.domain.ontology2.*;
-import edu.cmu.sv.domain.smart_house.ontology.adjective.Clean;
-import edu.cmu.sv.domain.smart_house.ontology.adjective.Dirty;
-import edu.cmu.sv.domain.smart_house.ontology.adjective.Off;
-import edu.cmu.sv.domain.smart_house.ontology.adjective.On;
-import edu.cmu.sv.domain.smart_house.ontology.adjective.Hot;
-import edu.cmu.sv.domain.smart_house.ontology.adjective.Cold;
-import edu.cmu.sv.domain.smart_house.ontology.noun.*;
-import edu.cmu.sv.domain.smart_house.ontology.preposition.IsContainedBy;
-import edu.cmu.sv.domain.smart_house.ontology.quality.Cleanliness;
-import edu.cmu.sv.domain.smart_house.ontology.quality.ContainedBy;
-import edu.cmu.sv.domain.smart_house.ontology.quality.PowerState;
-import edu.cmu.sv.domain.smart_house.ontology.quality.Temperature;
-import edu.cmu.sv.domain.smart_house.ontology.role.*;
-import edu.cmu.sv.domain.smart_house.ontology.verb.CleanRoom;
-import edu.cmu.sv.domain.smart_house.ontology.verb.TurnOffAppliance;
-import edu.cmu.sv.domain.smart_house.ontology.verb.TurnOnAppliance;
-import edu.cmu.sv.domain.smart_house.ontology.verb.IncreaseTemperature;
-import edu.cmu.sv.domain.smart_house.ontology.verb.DecreaseTemperature;
+import edu.cmu.sv.domain.ontology2.query_fragments.BinaryRelationQueryFragment;
+import edu.cmu.sv.domain.ontology2.query_fragments.OrderedStringsQueryFragment;
+import edu.cmu.sv.domain.ontology2.query_fragments.ScaledShiftedSingleValueQueryFragment;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.preposition.Preposition;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 
 /**
@@ -82,6 +61,25 @@ public class SmartHouseOntologyRegistry implements OntologyRegistry{
     public static Noun2 kitchen = new Noun2("Kitchen", room);
     public static Noun2 livingRoom = new Noun2("LivingRoom", room);
 
+    public static Quality2 cleanliness = new Quality2("Cleanliness", room, null,
+            new ScaledShiftedSingleValueQueryFragment("dust_level", 0.0, 5.0, true));
+    public static QualityDegree clean = new QualityDegree("Clean", 1.0, 2.0, cleanliness);
+    public static QualityDegree dirty = new QualityDegree("Dirty", 0.0, 1.0, cleanliness);
+
+    public static Quality2 powerState = new Quality2("PowerState", appliance, null,
+            new OrderedStringsQueryFragment("power_state", Arrays.asList("off", "on")));
+    public static QualityDegree on = new QualityDegree("On", 1.0, 100.0, cleanliness);
+    public static QualityDegree off = new QualityDegree("Off", 0.0, 100.0, cleanliness);
+
+    public static Quality2 containedBy = new Quality2("ContainedBy", appliance, room,
+            new BinaryRelationQueryFragment("in_room"));
+    public static QualityDegree isContainedBy = new QualityDegree("IsContainedBy", 1.0, 100.0, containedBy);
+
+
+    public static Verb2 turnOnAppliance = new Verb2("TurnOnAppliance", Arrays.asList(component), new LinkedList<>());
+    public static Verb2 turnOffAppliance = new Verb2("TurnOffAppliance", Arrays.asList(component), new LinkedList<>());
+    public static Verb2 cleanRoom = new Verb2("CleanRoom", Arrays.asList(hasRoom), new LinkedList<>());
+
     static {
         component.getDomain().addAll(Arrays.asList(turnOnAppliance, turnOffAppliance));
         component.getRange().addAll(Arrays.asList(appliance));
@@ -90,6 +88,10 @@ public class SmartHouseOntologyRegistry implements OntologyRegistry{
     }
 
     public SmartHouseOntologyRegistry() {
+        verbs.add(turnOnAppliance);
+        verbs.add(turnOffAppliance);
+        verbs.add(cleanRoom);
+
         nouns.add(appliance);
         nouns.add(airConditioner);
         nouns.add(securitySystem);
@@ -103,29 +105,15 @@ public class SmartHouseOntologyRegistry implements OntologyRegistry{
         roles.add(component);
         roles.add(hasRoom);
 
+        qualities.add(cleanliness);
+        qualities.add(powerState);
+        qualities.add(containedBy);
 
-        roleClasses.add(Component.class);
-        roleClasses.add(HasRoom.class);
-
-        adjectiveClasses.add(On.class);
-        adjectiveClasses.add(Off.class);
-        adjectiveClasses.add(Clean.class);
-        adjectiveClasses.add(Dirty.class);
-        adjectiveClasses.add(Hot.class);
-        adjectiveClasses.add(Cold.class);
-
-        prepositionClasses.add(IsContainedBy.class);
-
-        verbClasses.add(TurnOnAppliance.class);
-        verbClasses.add(TurnOffAppliance.class);
-        verbClasses.add(CleanRoom.class);
-        verbClasses.add(IncreaseTemperature.class);
-        verbClasses.add(DecreaseTemperature.class);
-
-        qualityClasses.add(PowerState.class);
-        qualityClasses.add(Cleanliness.class);
-        qualityClasses.add(ContainedBy.class);
-        qualityClasses.add(Temperature.class);
+        qualityDegrees.add(clean);
+        qualityDegrees.add(dirty);
+        qualityDegrees.add(on);
+        qualityDegrees.add(off);
+        qualityDegrees.add(isContainedBy);
     }
 
 }
