@@ -1,22 +1,10 @@
-package edu.cmu.sv.domain.yoda_skeleton.ontology.ontology2;
-
-
-import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
-
-import java.util.Set;
+package edu.cmu.sv.domain.ontology2;
 
 /**
- * Created by David Cohen on 10/31/14.
+ * Created by David Cohen on 6/16/15.
  */
-public interface Quality2{
-    Class<? extends Noun> getFirstArgumentClassConstraint();
-    Class<? extends Noun> getSecondArgumentClassConstraint();
-    Set<Class<? extends QualityDegree>> getQualityDegrees();
-    String getSparqlQueryFragment(String firstArgument, String secondArgument, String resultVariable);
-    //TODO: getMetric(), getUnitOfMeasurement()
-
-
-//   /*
+public interface QueryFragment {
+    //   /*
 //    * Return a query fragment that binds the transient quality to ?transient_quality
 //    * (based on some non-transient information)
 //    *
@@ -29,4 +17,5 @@ public interface Quality2{
 //    * The input list should be able to contain either variables: ?XXX or URIs: <http://sdfs.sdfsdf.sdfsdf#lkjssdf>
 //    * */
 //    java.util.function.Function<List<String>, String> getQualityCalculatorSPARQLQuery();
+    String getSparqlQueryFragment(String firstArgument, String secondArgument, String resultVariable);
 }

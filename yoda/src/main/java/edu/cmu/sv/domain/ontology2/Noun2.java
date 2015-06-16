@@ -1,4 +1,4 @@
-package edu.cmu.sv.domain.yoda_skeleton.ontology.ontology2;
+package edu.cmu.sv.domain.ontology2;
 
 /**
  * Created by David Cohen on 9/20/14.

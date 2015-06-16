@@ -1,23 +1,11 @@
 package edu.cmu.sv.domain.yoda_skeleton;
 
 import edu.cmu.sv.domain.OntologyRegistry;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.*;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.ontology2.Noun2;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Person;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Time;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.preposition.Preposition;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.ontology2.Quality2;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.ontology2.Role2;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Create;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Exist;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.HasProperty;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
+import edu.cmu.sv.domain.ontology2.*;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -25,18 +13,15 @@ import java.util.Set;
  */
 public class YodaSkeletonOntologyRegistry implements OntologyRegistry{
 
-    public Set<Class <? extends Verb>> verbClasses = new HashSet<>();
-    public Set<Class <? extends Noun>> nounClasses = new HashSet<>();
-    public Set<Class <? extends Adjective>> adjectiveClasses = new HashSet<>();
-    public Set<Class <? extends Preposition>> prepositionClasses = new HashSet<>();
-    public Set<Class <? extends Quality2>> qualityClasses = new HashSet<>();
-    public Set<Class <? extends Thing>> miscClasses = new HashSet<>();
+    public Set<Verb2> verbs = new HashSet<>();
     public Set<Role2> roles = new HashSet<>();
     public Set<Noun2> nouns = new HashSet<>();
+    public Set<Quality2> qualities = new HashSet<>();
+    public Set<QualityDegree> qualityDegrees = new HashSet<>();
 
     @Override
-    public Set<Noun2> getNouns() {
-        return nouns;
+    public Set<Verb2> getVerbs() {
+        return verbs;
     }
 
     @Override
@@ -44,56 +29,43 @@ public class YodaSkeletonOntologyRegistry implements OntologyRegistry{
         return roles;
     }
 
-    public Set<Class<? extends Verb>> getVerbClasses() {
-        return verbClasses;
+    @Override
+    public Set<Noun2> getNouns() {
+        return nouns;
     }
 
-    public Set<Class<? extends Noun>> getNounClasses() {
-        return nounClasses;
+    @Override
+    public Set<Quality2> getQualities() {
+        return qualities;
     }
 
-    public Set<Class<? extends Adjective>> getAdjectiveClasses() {
-        return adjectiveClasses;
+    @Override
+    public Set<QualityDegree> getQualityDegrees() {
+        return qualityDegrees;
     }
 
-    public Set<Class<? extends Preposition>> getPrepositionClasses() {
-        return prepositionClasses;
-    }
-
-    public Set<Class< ? extends Quality2>> getQualityClasses() {
-        return qualityClasses;
-    }
-
-    public Set<Class<? extends Thing>> getMiscClasses() {
-        return miscClasses;
-    }
+    // define misc 'nouns'
+    public static Noun2 nonHearing = new Noun2("NonHearing", null);
+    public static Noun2 nonUnderstanding = new Noun2("NonUnderstanding", null);
+    public static Noun2 requested = new Noun2("Requested", null);
+    public static Noun2 suggested = new Noun2("Suggested", null);
+    public static Noun2 unknownThingWithRoles = new Noun2("UnknownThingWithRoles", null);
+    public static Noun2 webResource = new Noun2("WebResource", null);
 
     // the skeleton ontology roles are public & static so that they can be referred to in code easily
     // this is needed to define their lexical information
-    public static Role2 agent = new Role2("Agent", new HashSet<>(Arrays.asList(HasProperty.class, Exist.class)),
-            new HashSet<>(Arrays.asList(Noun.class)), false);
-    public static Role2 patient = new Role2("Patient", new HashSet<>(Arrays.asList(HasProperty.class, HasProperty.class)),
-            new HashSet<>(Arrays.asList(Person.class)), false);
-    public static Role2 hasAtTime = new Role2("HasAtTime", new HashSet<>(Arrays.asList(Verb.class)),
-            new HashSet<>(Arrays.asList(Time.class)), false);
-    public static Role2 hasHour = new Role2("HasHour", new HashSet<>(Arrays.asList(Time.class)),
-            new HashSet<>(Arrays.asList(WebResource.class)), false);
-    public static Role2 hasTenMinute = new Role2("HasTenMinute", new HashSet<>(Arrays.asList(Time.class)),
-            new HashSet<>(Arrays.asList(WebResource.class)), false);
-    public static Role2 hasSingleMinute = new Role2("HasSingleMinute", new HashSet<>(Arrays.asList(Time.class)),
-            new HashSet<>(Arrays.asList(WebResource.class)), false);
-    public static Role2 hasAmPm = new Role2("HasAmPm", new HashSet<>(Arrays.asList(Time.class)),
-            new HashSet<>(Arrays.asList(WebResource.class)), false);
-    public static Role2 hasName = new Role2("HasName", new HashSet<>(Arrays.asList(Noun.class)),
-            new HashSet<>(Arrays.asList(Time.class)), false);
-    public static Role2 hasValue = new Role2("HasValue", new HashSet<>(Arrays.asList(Suggested.class, Requested.class)),
-            new HashSet<>(Arrays.asList(Thing.class)), false);
-    public static Role2 hasUri = new Role2("HasURI", new HashSet<>(Arrays.asList(WebResource.class)),
-            new HashSet<>(), false);
-    public static Role2 inRelationTo = new Role2("InRelationTo", new HashSet<>(Arrays.asList(Preposition.class)),
-            new HashSet<>(Arrays.asList(Thing.class)), false);
-
-
+    public static Role2 agent = new Role2("Agent", false);
+    public static Role2 patient = new Role2("Patient", false);
+    public static Role2 hasAtTime = new Role2("HasAtTime", false);
+    public static Role2 hasHour = new Role2("HasHour", false);
+    public static Role2 hasTenMinute = new Role2("HasTenMinute", false);
+    public static Role2 hasSingleMinute = new Role2("HasSingleMinute", false);
+    public static Role2 hasAmPm = new Role2("HasAmPm", false);
+    public static Role2 hasName = new Role2("HasName", false);
+    public static Role2 hasValue = new Role2("HasValue", false);
+    public static Role2 hasUri = new Role2("HasURI", false);
+    // todo: every preposition should be automatically added to inRelationTo's domain
+    public static Role2 inRelationTo = new Role2("InRelationTo", false);
 
 
     // define root noun hierarchy
@@ -105,12 +77,41 @@ public class YodaSkeletonOntologyRegistry implements OntologyRegistry{
     public static Noun2 place = new Noun2("Place", physicalNoun);
 
 
+    // define verbs
+    public static Verb2 hasProperty = new Verb2("HasProperty", Arrays.asList(agent), Arrays.asList(patient));
+    public static Verb2 exist = new Verb2("Exist", Arrays.asList(agent), new LinkedHashSet<>());
+
+
+    static{
+        // finalize the domain and range of roles
+        agent.getDomain().addAll(Arrays.asList(hasProperty, exist));
+        agent.getRange().addAll(Arrays.asList(rootNoun));
+        patient.getDomain().addAll(Arrays.asList(hasProperty));
+        patient.getRange().addAll(Arrays.asList(person));
+        // todo: hasAtTime should allow any verb, but I currently have no verb hierarchy
+        hasAtTime.getDomain().addAll(Arrays.asList(hasProperty, exist));
+        hasAtTime.getRange().addAll(Arrays.asList(timeNounClass));
+        hasHour.getDomain().addAll(Arrays.asList(timeNounClass));
+        hasHour.getRange().addAll(Arrays.asList(webResource));
+        hasTenMinute.getDomain().addAll(Arrays.asList(timeNounClass));
+        hasTenMinute.getRange().addAll(Arrays.asList(webResource));
+        hasSingleMinute.getDomain().addAll(Arrays.asList(timeNounClass));
+        hasSingleMinute.getRange().addAll(Arrays.asList(webResource));
+        hasAmPm.getDomain().addAll(Arrays.asList(timeNounClass));
+        hasAmPm.getRange().addAll(Arrays.asList(webResource));
+        hasName.getDomain().addAll(Arrays.asList(rootNoun));
+        hasName.getRange().addAll(Arrays.asList(webResource));
+        hasValue.getDomain().addAll(Arrays.asList(suggested, requested));
+        hasValue.getRange().addAll(Arrays.asList(rootNoun));
+        hasUri.getDomain().addAll(Arrays.asList(webResource));
+        hasUri.getRange().addAll(Arrays.asList());
+        inRelationTo.getDomain().addAll(Arrays.asList());
+        inRelationTo.getRange().addAll(Arrays.asList(rootNoun));
+    }
+
     public YodaSkeletonOntologyRegistry() {
-        // register classes
-        verbClasses.add(Verb.class);
-        verbClasses.add(Create.class);
-        verbClasses.add(HasProperty.class);
-        verbClasses.add(Exist.class);
+        verbs.add(hasProperty);
+        verbs.add(exist);
 
         nouns.add(rootNoun);
         nouns.add(physicalNoun);
@@ -131,13 +132,5 @@ public class YodaSkeletonOntologyRegistry implements OntologyRegistry{
         roles.add(hasUri);
         roles.add(inRelationTo);
 
-        miscClasses.add(NonHearing.class);
-        miscClasses.add(NonUnderstanding.class);
-        miscClasses.add(Requested.class);
-        miscClasses.add(Suggested.class);
-        miscClasses.add(UnknownThingWithRoles.class);
-        miscClasses.add(WebResource.class);
-
     }
-
 }
