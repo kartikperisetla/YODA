@@ -1,6 +1,7 @@
 package edu.cmu.sv.domain.smart_house;
 
 import edu.cmu.sv.domain.OntologyRegistry;
+import edu.cmu.sv.domain.ontology2.*;
 import edu.cmu.sv.domain.smart_house.ontology.adjective.Clean;
 import edu.cmu.sv.domain.smart_house.ontology.adjective.Dirty;
 import edu.cmu.sv.domain.smart_house.ontology.adjective.Off;
@@ -19,6 +20,7 @@ import edu.cmu.sv.domain.smart_house.ontology.verb.TurnOffAppliance;
 import edu.cmu.sv.domain.smart_house.ontology.verb.TurnOnAppliance;
 import edu.cmu.sv.domain.smart_house.ontology.verb.IncreaseTemperature;
 import edu.cmu.sv.domain.smart_house.ontology.verb.DecreaseTemperature;
+import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
@@ -27,65 +29,81 @@ import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Created by David Cohen on 3/3/15.
  */
-public class SmartHouseOntologyRegistry extends OntologyRegistry{
+public class SmartHouseOntologyRegistry implements OntologyRegistry{
 
-    public Set<Class <? extends Verb>> verbClasses = new HashSet<>();
-    public Set<Class <? extends Noun>> nounClasses = new HashSet<>();
-    public Set<Class <? extends Adjective>> adjectiveClasses = new HashSet<>();
-    public Set<Class <? extends Preposition>> prepositionClasses = new HashSet<>();
-    public Set<Class <? extends Role>> roleClasses = new HashSet<>();
-    public Set<Class <? extends TransientQuality>> qualityClasses = new HashSet<>();
-    public Set<Class <? extends Thing>> miscClasses = new HashSet<>();
+    public Set<Verb2> verbs = new HashSet<>();
+    public Set<Role2> roles = new HashSet<>();
+    public Set<Noun2> nouns = new HashSet<>();
+    public Set<Quality2> qualities = new HashSet<>();
+    public Set<QualityDegree> qualityDegrees = new HashSet<>();
 
-    public Set<Class<? extends Verb>> getVerbClasses() {
-        return verbClasses;
+    @Override
+    public Set<Verb2> getVerbs() {
+        return verbs;
     }
 
-    public Set<Class<? extends Noun>> getNounClasses() {
-        return nounClasses;
+    @Override
+    public Set<Role2> getRoles() {
+        return roles;
     }
 
-    public Set<Class<? extends Adjective>> getAdjectiveClasses() {
-        return adjectiveClasses;
+    @Override
+    public Set<Noun2> getNouns() {
+        return nouns;
     }
 
-    public Set<Class<? extends Preposition>> getPrepositionClasses() {
-        return prepositionClasses;
+    @Override
+    public Set<Quality2> getQualities() {
+        return qualities;
     }
 
-    public Set<Class<? extends Role>> getRoleClasses() {
-        return roleClasses;
+    @Override
+    public Set<QualityDegree> getQualityDegrees() {
+        return qualityDegrees;
     }
 
-    public Set<Class<? extends TransientQuality>> getQualityClasses() {
-        return qualityClasses;
-    }
+    public static Role2 component = new Role2("Component", false);
+    public static Role2 hasRoom = new Role2("HasRoom", false);
 
-    public Set<Class<? extends Thing>> getMiscClasses() {
-        return miscClasses;
+    public static Noun2 appliance = new Noun2("Appliance", YodaSkeletonOntologyRegistry.physicalNoun);
+    public static Noun2 airConditioner = new Noun2("AirConditioner", appliance);
+    public static Noun2 securitySystem = new Noun2("SecuritySystem", appliance);
+    public static Noun2 thermostat = new Noun2("Thermostat", appliance);
+    public static Noun2 microwave = new Noun2("Microwave", appliance);
+    public static Noun2 roomba = new Noun2("Roomba", appliance);
+    public static Noun2 room = new Noun2("Room", YodaSkeletonOntologyRegistry.place);
+    public static Noun2 kitchen = new Noun2("Kitchen", room);
+    public static Noun2 livingRoom = new Noun2("LivingRoom", room);
+
+    static {
+        component.getDomain().addAll(Arrays.asList(turnOnAppliance, turnOffAppliance));
+        component.getRange().addAll(Arrays.asList(appliance));
+        hasRoom.getDomain().addAll(Arrays.asList(cleanRoom));
+        hasRoom.getRange().addAll(Arrays.asList(room));
     }
 
     public SmartHouseOntologyRegistry() {
-        nounClasses.add(Appliance.class);
-        nounClasses.add(AirConditioner.class);
-        nounClasses.add(SecuritySystem.class);
-        nounClasses.add(Thermostat.class);
-        nounClasses.add(Microwave.class);
-        nounClasses.add(Roomba.class);
-        nounClasses.add(Room.class);
-        nounClasses.add(Kitchen.class);
-        nounClasses.add(LivingRoom.class);
+        nouns.add(appliance);
+        nouns.add(airConditioner);
+        nouns.add(securitySystem);
+        nouns.add(thermostat);
+        nouns.add(microwave);
+        nouns.add(roomba);
+        nouns.add(room);
+        nouns.add(kitchen);
+        nouns.add(livingRoom);
 
-        roleClasses.add(HasPowerState.class);
-        roleClasses.add(HasCleanliness.class);
-        roleClasses.add(HasTemperature.class);
-        roleClasses.add(HasContainedByState.class);
+        roles.add(component);
+        roles.add(hasRoom);
+
+
         roleClasses.add(Component.class);
         roleClasses.add(HasRoom.class);
 
