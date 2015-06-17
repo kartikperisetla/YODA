@@ -113,7 +113,7 @@ public class RewardAndCostCalculator {
                     || dialogAct instanceof DontKnow) {
                 probabilityAppropriateInContext = 0.0;
             } else if (dialogActString.equals(SearchReturnedNothing.class.getSimpleName())
-                    && dialogAct.getBoundClasses().get("verb_class").equals(HasProperty.class.getSimpleName())
+                    && dialogAct.getBoundClasses().get("verb_class").equals(YodaSkeletonOntologyRegistry.hasProperty.name)
                     && SemanticsModel.contentEqual(
                     new SemanticsModel((JSONObject) dialogAct.getBoundDescriptions().get("asserted_role_description")),
                     new SemanticsModel((JSONObject) discourseUnit.actionAnalysis.responseStatement.get("verb.Patient")))) {
@@ -121,7 +121,7 @@ public class RewardAndCostCalculator {
             } else if (dialogActString.equals(Statement.class.getSimpleName())
                     && dialogAct.getBoundIndividuals().get("topic_individual").equals(
                     ((JSONObject) discourseUnit.actionAnalysis.responseStatement.get("verb.Agent")).get("HasURI"))
-                    && dialogAct.getBoundClasses().get("verb_class").equals(HasProperty.class.getSimpleName())
+                    && dialogAct.getBoundClasses().get("verb_class").equals(YodaSkeletonOntologyRegistry.hasProperty.name)
                     && SemanticsModel.contentEqual(
                     new SemanticsModel((JSONObject) dialogAct.getBoundDescriptions().get("asserted_role_description")),
                     new SemanticsModel((JSONObject) discourseUnit.actionAnalysis.responseStatement.get("verb.Patient")))) {

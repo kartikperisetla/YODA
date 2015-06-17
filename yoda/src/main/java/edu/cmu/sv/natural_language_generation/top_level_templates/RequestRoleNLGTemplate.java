@@ -34,7 +34,7 @@ public class RequestRoleNLGTemplate implements TopLevelNLGTemplate {
 
         JSONObject verbObject = (JSONObject)constraints.newGetSlotPathFiller("verb");
         verbClassString = (String)verbObject.get("class");
-        requestedSlotPath = new LinkedList<>(constraints.findAllPathsToClass(Requested.class.getSimpleName())).get(0);
+        requestedSlotPath = new LinkedList<>(constraints.findAllPathsToClass(YodaSkeletonOntologyRegistry.requested.name)).get(0);
         String[] fillerPath = requestedSlotPath.split("\\.");
         roleClass = Ontology.roleNameMap.get(fillerPath[fillerPath.length - 1]);
 

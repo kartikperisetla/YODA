@@ -27,8 +27,8 @@ public class StatementTopLevelNLGTemplate implements TopLevelNLGTemplate {
         agentConstraint = (JSONObject) verbConstraint.get(Agent.class.getSimpleName());
         patientConstraint = (JSONObject) verbConstraint.get(Patient.class.getSimpleName());
 
-        if (!verbConstraint.get("class").equals(HasProperty.class.getSimpleName()))
-            throw new Error("can only generate statements for "+HasProperty.class.getSimpleName()+":\n"+constraints);
+        if (!verbConstraint.get("class").equals(YodaSkeletonOntologyRegistry.hasProperty.name))
+            throw new Error("can only generate statements for "+YodaSkeletonOntologyRegistry.hasProperty.name+":\n"+constraints);
 
         PhraseGenerationRoutine agentRoutine = NaturalLanguageGenerator.getAppropriatePhraseGenerationRoutine(agentConstraint);
         ImmutablePair<String, JSONObject> agentPhraseContent = agentRoutine.generate(agentConstraint, yodaEnvironment);
@@ -40,7 +40,7 @@ public class StatementTopLevelNLGTemplate implements TopLevelNLGTemplate {
         String empty = "{\"class\":\""+UnknownThingWithRoles.class.getSimpleName()+"\"}";
         SemanticsModel ansModel = new SemanticsModel("{\"dialogAct\":\""+Statement.class.getSimpleName()+
                 "\", \"verb\": {\"class\":\""+
-                HasProperty.class.getSimpleName()+"\", \""+
+                YodaSkeletonOntologyRegistry.hasProperty.name+"\", \""+
                 Agent.class.getSimpleName()+"\":"+empty+", \""+
                 Patient.class.getSimpleName()+"\":"+empty+"}}");
 

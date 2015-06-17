@@ -2,11 +2,11 @@ package edu.cmu.sv.system_action.dialog_act;
 
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.SystemAction;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by David Cohen on 9/2/14.
@@ -24,10 +24,10 @@ public abstract class DialogAct extends SystemAction {
     private Map<String, Object> boundDescriptions = new HashMap<>();
     private Map<String, Object> boundPaths = new HashMap<>();
 
-    public abstract Map<String, Class<? extends Thing>> getClassParameters();
-    public abstract Map<String, Class<? extends Thing>> getIndividualParameters();
-    public abstract Map<String, Class<? extends Thing>> getDescriptionParameters();
-    public abstract Map<String, Class<? extends Thing>> getPathParameters();
+    public abstract Map<String, Object> getClassParameters();
+    public abstract Map<String, Object> getIndividualParameters();
+    public abstract Map<String, Object> getDescriptionParameters();
+    public abstract Map<String, Object> getPathParameters();
 
     public Map<String, Object> getBoundClasses(){return boundClasses;}
     public Map<String, Object> getBoundIndividuals(){return boundIndividuals;}

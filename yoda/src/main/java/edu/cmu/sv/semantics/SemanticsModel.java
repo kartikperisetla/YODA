@@ -3,9 +3,6 @@ package edu.cmu.sv.semantics;
 
 import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.dialog_management.DialogRegistry;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.WebResource;
 import edu.cmu.sv.spoken_language_understanding.Tokenizer;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -41,137 +38,6 @@ public class SemanticsModel {
 
     public JSONObject getInternalRepresentation() {
         return internalRepresentation;
-    }
-
-
-    /*
-    * Detect whether there will be any new content added while extending source with insertionContent
-    * */
-    public static boolean anyNewSenseInformation(JSONObject source, JSONObject insertionContent){
-        if (source.keySet().isEmpty())
-            return true;
-        if (insertionContent.keySet().isEmpty())
-            return false;
-        // check for class compatibility
-        if (source.get("class")==null || insertionContent.get("class")==null)
-            throw new Error("one of these does not have a class!"+source + insertionContent);
-        Class sourceClass = Ontology.thingNameMap.get(source.get("class"));
-        Class insertionClass = Ontology.thingNameMap.get(insertionContent.get("class"));
-        if (sourceClass==null || insertionClass==null){
-            System.out.println("one of these classes is missing from thingNameMap: "+source.get("class")+", "+insertionContent.get("class"));
-        }
-
-        // two web resources always add new content, but not sense content
-        if (sourceClass.equals(WebResource.class) && insertionClass.equals(WebResource.class))
-            return false;
-
-        // the insertionContent may not be more specific that the source content
-        if (!(insertionClass.isAssignableFrom(sourceClass) ||
-                insertionClass.equals(UnknownThingWithRoles.class)))
-            return true;
-
-        // check recursively for other role compatibility
-        for (Object key : insertionContent.keySet()){
-            if (key.equals("class")){
-                continue;
-            } else {
-                if (source.containsKey(key)){
-                    if (source.get(key) instanceof String &&
-                            !(source.get(key).equals(insertionContent.get(key)))) {
-                        return true;
-                    } else if (insertionContent.get(key) instanceof String &&
-                            !(insertionContent.get(key).equals(source.get(key)))) {
-                        return true;
-                    } else if (anyNewSenseInformation((JSONObject) source.get(key), (JSONObject) insertionContent.get(key))){
-                        return true;
-                    }
-                } else {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /*
-    * Detect whether there will be any conflicts while extending source with insertionContent
-    * Does NOT check that the resulting object will be valid
-    * */
-    public static boolean anySenseConflicts(JSONObject source, JSONObject insertionContent){
-        if (source.keySet().isEmpty())
-            return true;
-        if (insertionContent.keySet().isEmpty())
-            return false;
-        // check for class compatibility
-        if (source.get("class")==null || insertionContent.get("class")==null)
-            throw new Error("one of these does not have a class!" + source + insertionContent);
-        Class sourceClass = Ontology.thingNameMap.get(source.get("class"));
-        Class insertionClass = Ontology.thingNameMap.get(insertionContent.get("class"));
-        if (sourceClass==null || insertionClass==null){
-            System.out.println("one of these classes is missing from thingNameMap: "+source.get("class")+", "+insertionContent.get("class"));
-        }
-
-        // two web resources can not cause sense conflicts, only denotation conflicts
-        if (sourceClass.equals(WebResource.class) && insertionClass.equals(WebResource.class))
-            return false;
-
-        if (!(sourceClass.isAssignableFrom(insertionClass) ||
-                insertionClass.isAssignableFrom(sourceClass) ||
-                sourceClass.equals(UnknownThingWithRoles.class) ||
-                insertionClass.equals(UnknownThingWithRoles.class)))
-            return true;
-
-        // check recursively for other role compatibility
-        for (Object key : insertionContent.keySet()){
-            if (key.equals("class")){
-                continue;
-            } else {
-                if (source.containsKey(key)){
-                    if (source.get(key) instanceof String &&
-                            !(source.get(key).equals(insertionContent.get(key)))) {
-                        return true;
-                    } else if (insertionContent.get(key) instanceof String &&
-                            !(insertionContent.get(key).equals(source.get(key)))) {
-                        return true;
-                    } else if (anySenseConflicts((JSONObject) source.get(key), (JSONObject) insertionContent.get(key))){
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    public static boolean anySLUTopLevelConflicts(SemanticsModel filter, SemanticsModel testCase){
-        try {
-            filter.validateSLUHypothesis();
-            testCase.validateSLUHypothesis();
-        } catch (Error e){
-            System.out.println(filter);
-            System.out.println(testCase);
-            System.out.println("SM.anySLUTopLevelConflicts: invalid filter or test case");
-            return true;
-        }
-        if (!testCase.newGetSlotPathFiller("dialogAct").equals(filter.newGetSlotPathFiller("dialogAct")))
-            return true;
-
-        if (filter.newGetSlotPathFiller("topic")!=null){
-            if (testCase.newGetSlotPathFiller("topic")==null)
-                return true;
-            if (anySenseConflicts((JSONObject) testCase.newGetSlotPathFiller("topic"),
-                    (JSONObject) filter.newGetSlotPathFiller("topic")))
-                return true;
-        }
-
-        if (filter.newGetSlotPathFiller("verb")!=null){
-            if (testCase.newGetSlotPathFiller("verb")==null)
-                return true;
-            if (anySenseConflicts((JSONObject) testCase.newGetSlotPathFiller("verb"),
-                    (JSONObject) filter.newGetSlotPathFiller("verb")))
-                return true;
-        }
-
-        return false;
     }
 
     public SemanticsModel deepCopy(){
@@ -426,17 +292,6 @@ public class SemanticsModel {
                 collect(Collectors.toSet());
     }
 
-
-    /*
-    * return the set of paths pointing to nodes that don't conflict with the filler
-    * */
-    public Set<String> findAllPathsToNonConflict(JSONObject filter){
-        return getAllInternalNodePaths().stream().
-                filter(x -> !anySenseConflicts((JSONObject) newGetSlotPathFiller(x), filter)).
-                collect(Collectors.toSet());
-    }
-
-
     /*
     * Return all the slot paths that point to JSONObjects
     * */
@@ -488,7 +343,7 @@ public class SemanticsModel {
         String clsString = (String) getSlotPathFillerHelper(description, "class");
         if (clsString==null)
             throw new Error("thing description missing class slot: "+description);
-        Class<? extends Thing> cls = Ontology.thingNameMap.get(clsString);
+        Object cls = Ontology.thingNameMap.get(clsString);
         // check that all slots correspond to roles which this node's class is in the domain of
         for (Object slot : description.keySet()){
             if (slot.equals("class") || slot.equals("refType"))
@@ -496,11 +351,11 @@ public class SemanticsModel {
             boolean inDomain = false;
             if (!Ontology.roleNameMap.containsKey(slot))
                 throw new Error("thing description's class not in registry: "+slot+","+description);
-            for (Class<? extends Thing> domainMember : Ontology.roleNameMap.get(slot).newInstance().getDomain()){
-                if (domainMember.isAssignableFrom(cls)) {
-                    inDomain = true;
-                    break;
-                }
+            for (Object domainMember : Ontology.roleNameMap.get(slot).getDomain()){
+//                if (domainMember.isAssignableFrom(cls)) {
+//                    inDomain = true;
+//                    break;
+//                }
             }
 //            if (!inDomain)
 //                throw new Error("Class is not in slot's domain: "+description+", "+slot);

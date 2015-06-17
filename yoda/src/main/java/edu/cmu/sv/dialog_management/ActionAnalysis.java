@@ -1,23 +1,14 @@
 package edu.cmu.sv.dialog_management;
 
 import com.google.common.collect.Iterables;
+import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.database.ReferenceResolution;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
-import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.domain.ontology2.Quality2;
 import edu.cmu.sv.domain.ontology2.QualityDegree;
 import edu.cmu.sv.domain.ontology2.Role2;
 import edu.cmu.sv.domain.ontology2.Verb2;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.ThingWithRoles;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.has_quality_subroles.HasQualityRole;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Exist;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.HasProperty;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.ActionSchema;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.*;
@@ -27,7 +18,10 @@ import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
 * Created by David Cohen on 12/17/14.
@@ -112,19 +106,19 @@ public class ActionAnalysis {
                     }
 
                     if (!dontKnow) {
-                        Class<? extends Thing> adjectiveClass = Ontology.thingNameMap.get(adjectiveScores.getTopHypothesis());
+                        QualityDegree adjectiveClass = Ontology.qualityDegreeNameMap.get(adjectiveScores.getTopHypothesis());
                         if (adjectiveClass == null) {
                             responseStatement.put("dialogAct", DontKnow.class.getSimpleName());
                         } else {
-                            JSONObject description = SemanticsModel.parseJSON("{\"class\":\"" + adjectiveClass.getSimpleName() + "\"}");
-                            SemanticsModel.wrap(description, UnknownThingWithRoles.class.getSimpleName(),
-                                    descriptor.getLeft().getSimpleName());
+                            JSONObject description = SemanticsModel.parseJSON("{\"class\":\"" + adjectiveClass.name + "\"}");
+                            SemanticsModel.wrap(description, YodaSkeletonOntologyRegistry.unknownThingWithRoles.name,
+                                    descriptor.getLeft().name);
                             responseStatement.put("dialogAct", Statement.class.getSimpleName());
                             responseStatement.put("verb.Agent", SemanticsModel.parseJSON(Ontology.webResourceWrap(entityURI)));
                             responseStatement.put("verb.Patient", description);
                         }
                     }
-                } else if (verbClass.equals(Exist.class)){
+                } else if (verbClass.equals(YodaSkeletonOntologyRegistry.exist)){
                     JSONObject searchDescription = (JSONObject) groundedMeaning.newGetSlotPathFiller("verb.Agent");
 //                    System.err.println("grounded meaning:" + groundedMeaning);
                     StringDistribution recommendations = ReferenceResolution.resolveReference(yodaEnvironment, searchDescription, false, true);

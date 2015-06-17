@@ -1,7 +1,7 @@
 package edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences;
 
 import edu.cmu.sv.dialog_state_tracking.*;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.Requested;
+import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestRole;
 import edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts.RequestRoleGivenRole;
@@ -38,7 +38,7 @@ public class RequestSlotInference extends DialogStateUpdateInference {
                         DiscourseAnalysis analysis = new DiscourseAnalysis(predecessor, yodaEnvironment);
                         analysis.analyseValidity();
                         JSONObject verbObject = (JSONObject) hypModel.newGetSlotPathFiller("verb");
-                        Set<String> requestPaths = hypModel.findAllPathsToClass(Requested.class.getSimpleName());
+                        Set<String> requestPaths = hypModel.findAllPathsToClass(YodaSkeletonOntologyRegistry.requested.name);
                         Assert.verify(requestPaths.size() == 1);
 
                         requestPath = new LinkedList<>(requestPaths).get(0);
@@ -73,7 +73,7 @@ public class RequestSlotInference extends DialogStateUpdateInference {
                     SemanticsModel newSpokenByMeHypothesis = updatedPredecessor.getSpokenByThem().deepCopy();
                     SemanticsModel.putAtPath(newSpokenByMeHypothesis.getInternalRepresentation(),
                             requestPath,
-                            SemanticsModel.parseJSON("{\"class\":\""+Requested.class.getSimpleName()+"\"}"));
+                            SemanticsModel.parseJSON("{\"class\":\""+ YodaSkeletonOntologyRegistry.requested.name+"\"}"));
 
                     Utils.unground(updatedPredecessor, newSpokenByMeHypothesis, turn.groundedSystemMeaning, timeStamp);
                     Double score = givenMatch *

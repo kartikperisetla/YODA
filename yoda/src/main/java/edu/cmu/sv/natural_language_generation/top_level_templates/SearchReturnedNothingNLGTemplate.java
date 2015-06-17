@@ -33,7 +33,7 @@ public class SearchReturnedNothingNLGTemplate implements TopLevelNLGTemplate {
         String empty = "{\"class\":\""+UnknownThingWithRoles.class.getSimpleName()+"\"}";
         SemanticsModel ansObject = new SemanticsModel("{\"dialogAct\":\""+SearchReturnedNothing.class.getSimpleName()+
                 "\", \"verb\": {\"class\":\""+
-                HasProperty.class.getSimpleName()+"\", \""+
+                YodaSkeletonOntologyRegistry.hasProperty.name+"\", \""+
                 Patient.class.getSimpleName()+"\":"+empty+"}}");
 
         ansObject.extendAndOverwriteAtPoint("verb." + Patient.class.getSimpleName(), new SemanticsModel(patient.toJSONString()));

@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables;
 import edu.cmu.sv.database.ActionEnumeration;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
+import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.HasProperty;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.SystemAction;
@@ -117,7 +118,7 @@ public class DialogManager implements Runnable {
                             contextDiscourseUnit.actionAnalysis.responseStatement.get("dialogAct").equals(Statement.class.getSimpleName())) {
                         Statement enumeratedStatement = new Statement();
                         Map<String, Object> bindings = new HashMap<>();
-                        bindings.put("verb_class", HasProperty.class.getSimpleName());
+                        bindings.put("verb_class", YodaSkeletonOntologyRegistry.hasProperty.name);
                         bindings.put("topic_individual",
                                 ((JSONObject) contextDiscourseUnit.actionAnalysis.responseStatement.get("verb.Agent")).get("HasURI"));
                         bindings.put("asserted_role_description",
@@ -130,7 +131,7 @@ public class DialogManager implements Runnable {
                             contextDiscourseUnit.actionAnalysis.responseStatement.get("dialogAct").equals(SearchReturnedNothing.class.getSimpleName())){
                         SearchReturnedNothing enumeratedSearchReturnedNothing = new SearchReturnedNothing();
                         Map<String, Object> bindings = new HashMap<>();
-                        bindings.put("verb_class", HasProperty.class.getSimpleName());
+                        bindings.put("verb_class", YodaSkeletonOntologyRegistry.hasProperty.name);
                         bindings.put("asserted_role_description",
                                 ((JSONObject) contextDiscourseUnit.actionAnalysis.responseStatement.get("verb.Patient")));
                         enumeratedSearchReturnedNothing.bindVariables(bindings);
@@ -178,7 +179,7 @@ public class DialogManager implements Runnable {
             // enumerate and evaluate clarification actions
             for (Class<? extends ClarificationDialogAct> dialogActClass : DialogRegistry.clarificationDialogActs) {
                 ClarificationDialogAct dialogActInstance = dialogActClass.newInstance();
-                Set<Map<String, Object>> possibleBindings = ActionEnumeration.
+                Set<HashMap<String, Object>> possibleBindings = ActionEnumeration.
                         getPossibleIndividualBindings(dialogActInstance, yodaEnvironment);
 //                System.out.println("enumerating for dialogAct:" + dialogActClass);
 //                System.out.println("possible enumerated bindings for individual:" + possibleBindings);

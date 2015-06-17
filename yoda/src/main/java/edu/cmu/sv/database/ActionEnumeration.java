@@ -30,10 +30,10 @@ public class ActionEnumeration {
     public static FOCUS_CONSTRAINT focusConstraint;
     public static ENUMERATION_TYPE enumerationType;
 
-    public static Set<Map<String, Object>> getPossibleIndividualBindings(DialogAct dialogAct,
-                                                                         YodaEnvironment yodaEnvironment) {
+    public static Set<HashMap<String, Object>> getPossibleIndividualBindings(DialogAct dialogAct,
+                                                                             YodaEnvironment yodaEnvironment) {
         if (dialogAct.getIndividualParameters().size() == 0) {
-            Set<Map<String, Object>> ans = new HashSet<>();
+            Set<HashMap<String, Object>> ans = new HashSet<>();
             ans.add(new HashMap<>());
             return ans;
         }
@@ -54,7 +54,7 @@ public class ActionEnumeration {
         if (enumerationType.equals(ENUMERATION_TYPE.SAMPLED))
             queryString += " LIMIT " + maxIndividualBindings;
 
-        Set<Map<String, Object>> ans = new HashSet<>();
+        Set<HashMap<String, Object>> ans = new HashSet<>();
 
         synchronized (yodaEnvironment.db.connection) {
             yodaEnvironment.db.log(queryString);
@@ -65,7 +65,7 @@ public class ActionEnumeration {
                 TupleQueryResult result = query.evaluate();
 
                 while (result.hasNext()) {
-                    Map<String, Object> binding = new HashMap<>();
+                    HashMap<String, Object> binding = new HashMap<>();
                     BindingSet bindings = result.next();
                     for (String variable : bindings.getBindingNames()) {
                         binding.put(variable, bindings.getValue(variable).stringValue());
