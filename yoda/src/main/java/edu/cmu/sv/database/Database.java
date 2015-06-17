@@ -2,19 +2,13 @@ package edu.cmu.sv.database;
 
 
 import edu.cmu.sv.domain.DatabaseRegistry;
+import edu.cmu.sv.domain.ontology2.Noun2;
+import edu.cmu.sv.domain.ontology2.Quality2;
+import edu.cmu.sv.domain.ontology2.QualityDegree;
 import edu.cmu.sv.yoda_environment.MongoLogHandler;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.ThingWithRoles;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.preposition.Preposition;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.openrdf.model.Value;
 import org.openrdf.query.*;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
@@ -26,10 +20,10 @@ import org.openrdf.sail.inferencer.fc.ForwardChainingRDFSInferencer;
 import org.openrdf.sail.memory.MemoryStore;
 
 import java.io.*;
-import java.lang.Object;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -81,15 +75,7 @@ public class Database {
     public void updateOntology(){
         try{
             // generate the class hierarchy
-            Set<Class> databaseClasses = new HashSet<>(Ontology.nouns);
-            databaseClasses.addAll(Ontology.verbs);
-            databaseClasses.addAll(Ontology.qualities);
-            Set<Class> databaseProperties = new HashSet<>(Ontology.roleClasses);
-            databaseProperties.addAll(Ontology.roleClasses);
-            generateClassHierarchy(databaseClasses, databaseProperties);
-
-            // generate the special individuals
-            addIndividuals(Ontology.individualNameMap);
+            generateClassHierarchy(Ontology.nouns);
 
         } catch (RepositoryException | MalformedQueryException | UpdateExecutionException e) {
             e.printStackTrace();
@@ -138,19 +124,6 @@ public class Database {
 
     }
 
-    private void addIndividuals(Map<String, Thing> individuals)
-            throws UpdateExecutionException, MalformedQueryException, RepositoryException {
-        String insertString = prefixes+"INSERT DATA\n{\n";
-        for (String key : individuals.keySet()){
-            Class<? extends Thing> cls = individuals.get(key).getClass();
-            insertString += "base:"+key+" rdf:type base:"+cls.getSimpleName()+" .\n";
-        }
-        insertString+="}";
-        log(insertString);
-        Update update = connection.prepareUpdate(QueryLanguage.SPARQL, insertString);
-        update.execute();
-    }
-
     private void addNonOntologyProperties(Set<String> properties)
             throws MalformedQueryException, RepositoryException, UpdateExecutionException {
 
@@ -162,7 +135,6 @@ public class Database {
         log(insertString);
         Update update = connection.prepareUpdate(QueryLanguage.SPARQL, insertString);
         update.execute();
-
     }
 
 
@@ -171,66 +143,26 @@ public class Database {
     * Insert all direct parent-child relationships (assume that the database does its own class hierarchy inference)
     * Insert rdfs:class and rdfs:property as required
     * */
-    private void generateClassHierarchy(Set<Class> classes, Set<Class> properties)
+    private void generateClassHierarchy(Set<Noun2> nouns)
             throws MalformedQueryException, RepositoryException, UpdateExecutionException {
 
         String insertString = prefixes+"INSERT DATA {\n";
-        for (Class cls : classes){
-            insertString += generateTriple(cls, "rdf:type", "rdfs:Class")+".\n";
-            if (cls != Noun.class && cls != Verb.class) {
-                insertString += generateTriple(cls, "rdfs:subClassOf", cls.getSuperclass()) + ".\n";
-            }
+        for (Noun2 nounClass : nouns) {
+            insertString += "base:" + nounClass.name + " rdf:type rdfs:Class .\n";
+            if (nounClass.directParent != null)
+                insertString += "base:" + nounClass.name + " rdfs:subClassOf base:" + nounClass.directParent.name + " .\n";
         }
-        for (Class prop : properties){
-            insertString += generateTriple(prop, "rdf:type", "rdf:Property")+".\n";
-            if (prop != Role.class) {
-                insertString += generateTriple(prop, "rdfs:subPropertyOf", prop.getSuperclass()) + ".\n";
-            }
-        }
+//        for (Class prop : properties){
+//            insertString += generateTriple(prop, "rdf:type", "rdf:Property")+".\n";
+//            if (prop != Role.class) {
+//                insertString += generateTriple(prop, "rdfs:subPropertyOf", prop.getSuperclass()) + ".\n";
+//            }
+//        }
         insertString += "}";
 //        System.out.println("Creating ontology, insert string:\n" + insertString);
         log(insertString);
         Update update = connection.prepareUpdate(QueryLanguage.SPARQL, insertString);
         update.execute();
-    }
-
-
-
-
-    /*
-    * Create a SPARQL triple for a given java triple of referents
-    *
-    * Each referent can be either:
-    *  - a string, which means it is already grounded to a URI in the database,
-    *  - a Class <? extends ontology.Thing>, which means it needs to have a string created for it
-    * and needs a prefix.
-    *
-    * */
-    private String generateTriple(Object subject, Object predicate, Object obj) {
-        assert (subject instanceof String || subject instanceof Class);
-        assert (predicate instanceof String || predicate instanceof Class);
-        assert (obj instanceof String || obj instanceof Class);
-
-        String ans = "";
-        if (subject instanceof String) {
-            ans += subject + " ";
-        } else {
-            ans += "base:" + ((Class) subject).getSimpleName() + " ";
-        }
-
-        if (predicate instanceof String) {
-            ans += predicate + " ";
-        } else {
-            ans += "base:" + ((Class) predicate).getSimpleName() + " ";
-        }
-
-        if (obj instanceof String) {
-            ans += obj + " ";
-        } else {
-            ans += "base:"+((Class)obj).getSimpleName()+" ";
-        }
-
-        return ans;
     }
 
     /*
@@ -326,82 +258,67 @@ public class Database {
 
     public String mostSpecificClass(String entityName){
         String queryString = prefixes + "SELECT ?x WHERE { <"+entityName+"> rdf:type ?x . }";
-        Set<Class> classes = runQuerySelectX(queryString).stream().
+        Set<Noun2> nounClasses = runQuerySelectX(queryString).stream().
                 map(Database::getLocalName).
-                filter(x -> Ontology.thingNameMap.containsKey(x)).
-                map(Ontology.thingNameMap::get).
+                filter(x -> Ontology.nounNameMap.containsKey(x)).
+                map(Ontology.nounNameMap::get).
                 collect(Collectors.toSet());
-        for (Class cls : classes){
+        for (Noun2 nounClass : nounClasses){
             boolean anyChildren = false;
-            for (Class cls2 : classes){
-                if (cls==cls2)
+            for (Noun2 nounClass2 : nounClasses){
+                if (nounClass==nounClass2)
                     continue;
-                if (cls.isAssignableFrom(cls2)){
+                if (Ontology.nounInherits(nounClass, nounClass2)){
                     anyChildren = true;
                     break;
                 }
             }
             if (!anyChildren)
-                return cls.getSimpleName();
+                return nounClass.name;
         }
         return null;
     }
 
-    public Set<List<String>> possibleBindings(List<Class<? extends Thing>> classConstraints){
-        Set<List<String>> ans = new HashSet<>();
-        List<String> variables = new LinkedList<>();
-        try {
-            String graph = "";
-            for (int i = 0; i < classConstraints.size(); i++) {
-                variables.add("binding" + i);
-                graph += "?binding" + i + " rdf:type base:" + classConstraints.get(i).getSimpleName() + " . ";
-            }
-            String queryString = prefixes + "SELECT " +String.join(" ", variables.stream().map(x -> "?"+x).collect(Collectors.toList()))
-                    + " WHERE { " + graph + "}";
-//            System.out.println("Database.possibleBindings. qQuerystring:\n"+queryString);
-            synchronized (connection) {
-                log(queryString);
-                TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
-                TupleQueryResult result = query.evaluate();
+//    public Set<List<String>> possibleBindings(List<Class<? extends Thing>> classConstraints){
+//        Set<List<String>> ans = new HashSet<>();
+//        List<String> variables = new LinkedList<>();
+//        try {
+//            String graph = "";
+//            for (int i = 0; i < classConstraints.size(); i++) {
+//                variables.add("binding" + i);
+//                graph += "?binding" + i + " rdf:type base:" + classConstraints.get(i).getSimpleName() + " . ";
+//            }
+//            String queryString = prefixes + "SELECT " +String.join(" ", variables.stream().map(x -> "?"+x).collect(Collectors.toList()))
+//                    + " WHERE { " + graph + "}";
+////            System.out.println("Database.possibleBindings. qQuerystring:\n"+queryString);
+//            synchronized (connection) {
+//                log(queryString);
+//                TupleQuery query = connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+//                TupleQueryResult result = query.evaluate();
+//
+//                while (result.hasNext()) {
+//                    BindingSet bindings = result.next();
+//                    ans.add(variables.stream().map(bindings::getValue).map(Value::stringValue).collect(Collectors.toList()));
+//                }
+//                result.close();
+//            }
+//        } catch (MalformedQueryException | RepositoryException | QueryEvaluationException e) {
+//            e.printStackTrace();
+//            throw new Error(e);
+//        }
+//        return ans;
+//    }
 
-                while (result.hasNext()) {
-                    BindingSet bindings = result.next();
-                    ans.add(variables.stream().map(bindings::getValue).map(Value::stringValue).collect(Collectors.toList()));
-                }
-                result.close();
-            }
-        } catch (MalformedQueryException | RepositoryException | QueryEvaluationException e) {
-            e.printStackTrace();
-            throw new Error(e);
-        }
-        return ans;
-
-    }
-
-    public Double evaluateQualityDegree(List<String> entityURIs, Class<? extends ThingWithRoles> degreeClass){
+    public Double evaluateQualityDegree(String firstArgument, String secondArgument, QualityDegree degreeClass){
         try {
             double center;
             double slope;
-            Class<? extends TransientQuality> qualityClass;
-            if (Preposition.class.isAssignableFrom(degreeClass)) {
-                Preposition preposition = (Preposition) degreeClass.newInstance();
-                center = preposition.getCenter();
-                slope = preposition.getSlope();
-                qualityClass = preposition.getQuality();
-            } else if (Adjective.class.isAssignableFrom(degreeClass)) {
-                Adjective adjective = (Adjective) degreeClass.newInstance();
-                center = adjective.getCenter();
-                slope = adjective.getSlope();
-                qualityClass = adjective.getQuality();
-            } else {
-                throw new Error("degreeClass is neither an adjective nor a Preposition class:" + degreeClass.getSimpleName());
-            }
-
-            List<String> params = entityURIs.stream().map(x -> "<"+x+">").collect(Collectors.toList());
-            params.add("?transient_quality");
+            Quality2 qualityClass = degreeClass.getQuality();
+            center = degreeClass.getCenter();
+            slope = degreeClass.getSlope();
 
             String queryString = prefixes + "SELECT ?fuzzy_mapped_quality WHERE {" +
-                    qualityClass.newInstance().getQualityCalculatorSPARQLQuery().apply(params) +
+                    qualityClass.queryFragment.getSparqlQueryFragment("<"+firstArgument+">", "<"+secondArgument+">","?transient_quality") +
                     "BIND(base:LinearFuzzyMap("+center+", "+slope+", ?transient_quality) AS ?fuzzy_mapped_quality)}";
             Double ans = null;
             synchronized (connection) {
@@ -416,7 +333,7 @@ public class Database {
             }
             return ans;
 
-        } catch (InstantiationException | IllegalAccessException | MalformedQueryException | RepositoryException | QueryEvaluationException e) {
+        } catch (MalformedQueryException | RepositoryException | QueryEvaluationException e) {
             e.printStackTrace();
             throw new Error(e);
         }

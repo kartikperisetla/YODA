@@ -11,7 +11,7 @@ public class Quality2{
     public String name;
     public Noun2 firstArgumentClassConstraint;
     public Noun2 secondArgumentClassConstraint;
-    QueryFragment queryFragment;
+    public QueryFragment queryFragment;
     Set<QualityDegree> qualityDegrees = new HashSet<>();
 
     public Quality2(String name, Noun2 firstArgumentClassConstraint, Noun2 secondArgumentClassConstraint, QueryFragment queryFragment) {

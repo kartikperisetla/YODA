@@ -5,7 +5,9 @@ import edu.cmu.sv.database.ReferenceResolution;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.domain.ontology2.Quality2;
+import edu.cmu.sv.domain.ontology2.QualityDegree;
 import edu.cmu.sv.domain.ontology2.Role2;
+import edu.cmu.sv.domain.ontology2.Verb2;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.ThingWithRoles;
@@ -57,18 +59,12 @@ public class ActionAnalysis {
 
         SemanticsModel groundedMeaning = discourseUnit.getGroundInterpretation();
         String verb = (String) groundedMeaning.newGetSlotPathFiller("verb.class");
-        Class<? extends Verb> verbClass = Ontology.verbNameMap.get(verb);
+        Verb2 verbClass = Ontology.verbNameMap.get(verb);
 
-        try {
-            Verb verbInstance = verbClass.newInstance();
-            for (Class<? extends Role> requiredRole : Iterables.concat(verbInstance.getRequiredDescriptions(), verbInstance.getRequiredGroundedRoles())) {
-                if (groundedMeaning.newGetSlotPathFiller("verb." + requiredRole.getSimpleName()) == null) {
-                    missingRequiredVerbSlots.add("verb." + requiredRole.getSimpleName());
-                }
+        for (Role2 requiredRole : Iterables.concat(verbClass.getRequiredDescriptions(), verbClass.getRequiredGroundedRoles())) {
+            if (groundedMeaning.newGetSlotPathFiller("verb." + requiredRole.name) == null) {
+                missingRequiredVerbSlots.add("verb." + requiredRole.name);
             }
-        } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
-            System.exit(0);
         }
 
         responseStatement = new HashMap<>();
@@ -102,21 +98,16 @@ public class ActionAnalysis {
                     if (secondQualityArgument != null)
                         throw new Error("the requested quality isn't an adjective");
 
-                    // iterate through every possible binding for the quality arguments
-                    List<String> fullArgumentList = Arrays.asList(entityURI);
-
                     boolean dontKnow = false;
                     StringDistribution adjectiveScores = new StringDistribution();
-                    Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> descriptor =
-                            Ontology.qualityDescriptors(requestedQualityClass);
-                    for (Class<? extends ThingWithRoles> adjectiveClass : descriptor.getRight()) {
-                        Double degreeOfMatch = yodaEnvironment.db.
-                                evaluateQualityDegree(fullArgumentList, adjectiveClass);
+                    Pair<Role2, Set<QualityDegree>> descriptor = Ontology.qualityDescriptors(requestedQualityClass);
+                    for (QualityDegree adjectiveClass : descriptor.getRight()) {
+                        Double degreeOfMatch = yodaEnvironment.db.evaluateQualityDegree(entityURI, null, adjectiveClass);
                         if (degreeOfMatch == null) {
                             dontKnow = true;
                             responseStatement.put("dialogAct", DontKnow.class.getSimpleName());
                         } else {
-                            adjectiveScores.put(adjectiveClass.getSimpleName(), degreeOfMatch);
+                            adjectiveScores.put(adjectiveClass.name, degreeOfMatch);
                         }
                     }
 

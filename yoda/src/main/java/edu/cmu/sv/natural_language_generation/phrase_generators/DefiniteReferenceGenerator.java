@@ -1,15 +1,10 @@
 package edu.cmu.sv.natural_language_generation.phrase_generators;
 
 import edu.cmu.sv.database.Ontology;
-import edu.cmu.sv.domain.ontology2.Noun2;
 import edu.cmu.sv.domain.ontology2.Quality2;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.ThingWithRoles;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasName;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasURI;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
+import edu.cmu.sv.domain.ontology2.QualityDegree;
+import edu.cmu.sv.domain.ontology2.Role2;
+import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
 import edu.cmu.sv.natural_language_generation.PhraseGenerationRoutine;
@@ -19,8 +14,6 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 
 /*
@@ -29,7 +22,7 @@ import java.util.Set;
 public class DefiniteReferenceGenerator implements PhraseGenerationRoutine {
     @Override
     public ImmutablePair<String, JSONObject> generate(JSONObject constraints, YodaEnvironment yodaEnvironment) {
-        String entityURI = (String) new SemanticsModel(constraints).newGetSlotPathFiller(HasURI.class.getSimpleName());
+        String entityURI = (String) new SemanticsModel(constraints).newGetSlotPathFiller(YodaSkeletonOntologyRegistry.hasUri.name);
 //        boolean expandPP = NLG2.random.nextDouble() < .1;
         boolean expandAdj = NaturalLanguageGenerator.random.nextDouble() < .2;
         boolean preferNameReference = NaturalLanguageGenerator.random.nextDouble() < .9;
@@ -51,8 +44,7 @@ public class DefiniteReferenceGenerator implements PhraseGenerationRoutine {
 
             String uri = yodaEnvironment.db.insertValue(entityNameString);
             JSONObject content = SemanticsModel.parseJSON("{\"HasURI\":\""+uri+"\",\"class\":\"WebResource\"}");
-            SemanticsModel.wrap(content, yodaEnvironment.db.mostSpecificClass(entityURI),
-                    HasName.class.getSimpleName());
+            SemanticsModel.wrap(content, yodaEnvironment.db.mostSpecificClass(entityURI), YodaSkeletonOntologyRegistry.hasName.name);
             return new ImmutablePair<>(entityNameString, content);
         }
 
@@ -76,25 +68,23 @@ public class DefiniteReferenceGenerator implements PhraseGenerationRoutine {
                 if (secondQualityArgument == null) {
                     if (!expandAdj)
                         continue;
-                    List<String> fullArgumentList = Arrays.asList(entityURI);
 
-                    Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> descriptor =
-                            Ontology.qualityDescriptors(qualityClass);
-                    for (Class<? extends ThingWithRoles> adjectiveClass : descriptor.getRight()) {
+                    Pair<Role2, Set<QualityDegree>> descriptor = Ontology.qualityDescriptors(qualityClass);
+                    for (QualityDegree adjectiveClass : descriptor.getRight()) {
                         if (adjString!=null)
                             break;
                         if (adjectiveClass==null)
                             continue;
                         Double degreeOfMatch = yodaEnvironment.db.
-                                evaluateQualityDegree(fullArgumentList, adjectiveClass);
+                                evaluateQualityDegree(entityURI, null, adjectiveClass);
                         if (degreeOfMatch!=null && degreeOfMatch > 0.5) {
                             try {
                                 adjString = yodaEnvironment.lex.getPOSForClass(adjectiveClass,
                                         Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, false).
                                         stream().findAny().get();
-                                adjJSON = SemanticsModel.parseJSON("{\"class\":\"" + adjectiveClass.getSimpleName() + "\"}");
-                                SemanticsModel.wrap(adjJSON, UnknownThingWithRoles.class.getSimpleName(),
-                                        descriptor.getLeft().getSimpleName());
+                                adjJSON = SemanticsModel.parseJSON("{\"class\":\"" + adjectiveClass.name + "\"}");
+                                SemanticsModel.wrap(adjJSON, YodaSkeletonOntologyRegistry.unknownThingWithRoles.name,
+                                        descriptor.getLeft().name);
                             } catch (Lexicon.NoLexiconEntryException e) {}
                         }
                     }

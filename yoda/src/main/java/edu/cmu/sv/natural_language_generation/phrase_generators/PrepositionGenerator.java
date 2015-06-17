@@ -1,9 +1,8 @@
 package edu.cmu.sv.natural_language_generation.phrase_generators;
 
 import edu.cmu.sv.database.Ontology;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.InRelationTo;
+import edu.cmu.sv.domain.ontology2.QualityDegree;
+import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
 import edu.cmu.sv.natural_language_generation.PhraseGenerationRoutine;
@@ -29,22 +28,22 @@ public class PrepositionGenerator implements PhraseGenerationRoutine{
         hasQualityRole = keys.get(0);
         JSONObject prepositionContent = (JSONObject) constraints.get(hasQualityRole);
         prepositionClassString = (String) prepositionContent.get("class");
-        child = SemanticsModel.parseJSON(((JSONObject) prepositionContent.get(InRelationTo.class.getSimpleName())).toJSONString());
+        child = SemanticsModel.parseJSON(((JSONObject) prepositionContent.get(YodaSkeletonOntologyRegistry.inRelationTo.name)).toJSONString());
 
-        Class<? extends Thing> prepositionClass = Ontology.thingNameMap.get(prepositionClassString);
+        QualityDegree prepositionClass = Ontology.qualityDegreeNameMap.get(prepositionClassString);
         String ppString = null;
         try {
             ppString = yodaEnvironment.lex.getPOSForClass(prepositionClass,
                     Lexicon.LexicalEntry.PART_OF_SPEECH.PREPOSITION, false).stream().findAny().get();
         } catch (Lexicon.NoLexiconEntryException e) {}
 
-        JSONObject ansJSON = SemanticsModel.parseJSON("{\"class\":\"" + prepositionClass.getSimpleName() + "\"}");
-        SemanticsModel.wrap(ansJSON, UnknownThingWithRoles.class.getSimpleName(), hasQualityRole);
+        JSONObject ansJSON = SemanticsModel.parseJSON("{\"class\":\"" + prepositionClass.name + "\"}");
+        SemanticsModel.wrap(ansJSON, YodaSkeletonOntologyRegistry.unknownThingWithRoles.name, hasQualityRole);
 
         ImmutablePair<String, JSONObject> nestedPhrase = NaturalLanguageGenerator.getAppropriatePhraseGenerationRoutine(child).
                 generate(child, yodaEnvironment);
 
-        SemanticsModel.putAtPath(ansJSON, hasQualityRole+"."+InRelationTo.class.getSimpleName(), nestedPhrase.getRight());
+        SemanticsModel.putAtPath(ansJSON, hasQualityRole+"."+YodaSkeletonOntologyRegistry.inRelationTo.name, nestedPhrase.getRight());
         String ansString = ppString + " " + nestedPhrase.getLeft();
 
         return new ImmutablePair<>(ansString, ansJSON);
