@@ -1,6 +1,7 @@
 package edu.cmu.sv.natural_language_generation;
 
 import edu.cmu.sv.database.Ontology;
+import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.WebResource;
@@ -81,18 +82,18 @@ public class NaturalLanguageGenerator {
     * */
     public static PhraseGenerationRoutine getAppropriatePhraseGenerationRoutine(JSONObject constraints){
         JSONObject tmpConstraints = SemanticsModel.parseJSON(constraints.toJSONString());
-        if (constraints.get("class").equals(WebResource.class.getSimpleName()) &&
+        if (constraints.get("class").equals(YodaSkeletonOntologyRegistry.webResource.name) &&
                 constraints.keySet().size()==2 &&
-                constraints.containsKey(HasURI.class.getSimpleName())){
+                constraints.containsKey(YodaSkeletonOntologyRegistry.hasUri.name)){
             return new DefiniteReferenceGenerator();
-        } else if (constraints.get("class").equals(UnknownThingWithRoles.class.getSimpleName()) &&
+        } else if (constraints.get("class").equals(YodaSkeletonOntologyRegistry.unknownThingWithRoles.name) &&
                 constraints.keySet().size()==2 &&
                 Adjective.class.isAssignableFrom(Ontology.thingNameMap.get(
                         ((JSONObject) constraints.get(
                                 constraints.keySet().stream().filter(x -> !x.equals("class")).findAny().get())).
                         get("class")))){
             return new AdjectiveGenerator();
-        } else if (constraints.get("class").equals(UnknownThingWithRoles.class.getSimpleName()) &&
+        } else if (constraints.get("class").equals(YodaSkeletonOntologyRegistry.unknownThingWithRoles.name) &&
                 constraints.keySet().size()==2 &&
                 Preposition.class.isAssignableFrom(Ontology.thingNameMap.get(
                         ((JSONObject) constraints.get(
@@ -103,7 +104,7 @@ public class NaturalLanguageGenerator {
                 constraints.keySet().size()==1) {
             return new NounClassGenerator();
 //        } else if (constraints.containsKey("class") &&
-//                constraints.containsKey(HasName.class.getSimpleName())){
+//                constraints.containsKey(YodaSkeletonOntologyRegistry.hasName.name)){
 //            return new NamedThingGenerator();
         } else if (constraints.containsKey("refType") &&
                 constraints.get("refType").equals("indefinite")){

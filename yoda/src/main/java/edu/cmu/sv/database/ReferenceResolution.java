@@ -4,6 +4,7 @@ import com.google.common.primitives.Doubles;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.dialog_state_tracking.Utils;
+import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
@@ -268,7 +269,7 @@ public class ReferenceResolution {
             List<String> scoresToAccumulate = new LinkedList<>();
 
             // if not a named entity, weight by salience
-            if (! reference.keySet().contains(HasName.class.getSimpleName())) {
+            if (! reference.keySet().contains(YodaSkeletonOntologyRegistry.hasName.name)) {
                 scoresToAccumulate.add("?score"+tmpVarIndex);
                 ans += "{{OPTIONAL { ?x" + referenceIndex + " dst:salience ?score" + tmpVarIndex + " }}\n" +
                         "UNION\n" +
@@ -280,10 +281,10 @@ public class ReferenceResolution {
             for (Object key : reference.keySet()) {
                 if (key.equals("class")) {
                     continue;
-                } else if (key.equals(HasURI.class.getSimpleName())){
-//                    ans += "FILTER (?x"+referenceIndex+" = <"+reference.get(HasURI.class.getSimpleName())+"> ) .\n";
-//                    ans += "FILTER ( sameTerm (?x"+referenceIndex+", <"+reference.get(HasURI.class.getSimpleName())+">) ) .\n";
-//                    ans += "BIND (<"+reference.get(HasURI.class.getSimpleName())+"> AS ?x"+referenceIndex+")\n";
+                } else if (key.equals(YodaSkeletonOntologyRegistry.hasUri.name)){
+//                    ans += "FILTER (?x"+referenceIndex+" = <"+reference.get(YodaSkeletonOntologyRegistry.hasUri.name)+"> ) .\n";
+//                    ans += "FILTER ( sameTerm (?x"+referenceIndex+", <"+reference.get(YodaSkeletonOntologyRegistry.hasUri.name)+">) ) .\n";
+//                    ans += "BIND (<"+reference.get(YodaSkeletonOntologyRegistry.hasUri.name)+"> AS ?x"+referenceIndex+")\n";
                 } else if (key.equals("refType")){
                     if (reference.get(key).equals("pronoun")){
                         ans += "?x rdf:type dst:InFocus . \n";
@@ -313,12 +314,12 @@ public class ReferenceResolution {
                     ans += "FILTER(?score"+tmpVarIndex+" > "+.5+")\n";
                 } else if (HasName.class.equals(Ontology.roleNameMap.get((String) key))) {
                     String similarityString = null;
-                    if (!(reference.get(HasName.class.getSimpleName()) instanceof String)){
-                        ans += "base:" + ((JSONObject)reference.get(HasName.class.getSimpleName())).
-                                get(HasURI.class.getSimpleName()) + " rdf:value ?tmpV" + tmpVarIndex + " . \n";
+                    if (!(reference.get(YodaSkeletonOntologyRegistry.hasName.name) instanceof String)){
+                        ans += "base:" + ((JSONObject)reference.get(YodaSkeletonOntologyRegistry.hasName.name)).
+                                get(YodaSkeletonOntologyRegistry.hasUri.name) + " rdf:value ?tmpV" + tmpVarIndex + " . \n";
                         similarityString = "?tmpV"+tmpVarIndex;
                     } else {
-                        similarityString = (String)reference.get(HasName.class.getSimpleName());
+                        similarityString = (String)reference.get(YodaSkeletonOntologyRegistry.hasName.name);
                     }
 
                     ans += "?x" + referenceIndex + " rdfs:label ?tmp" + tmpVarIndex + " . \n" +
@@ -334,9 +335,9 @@ public class ReferenceResolution {
             }
 
             for (Object key : reference.keySet()) {
-                if (key.equals("class") || key.equals("refType") || key.equals(HasURI.class.getSimpleName()))
+                if (key.equals("class") || key.equals("refType") || key.equals(YodaSkeletonOntologyRegistry.hasUri.name))
                     continue;
-                if (HasQualityRole.class.isAssignableFrom(Ontology.roleNameMap.get((String) key))) {
+                if (Ontology.roleNameMap.get((String) key).isQualityRole) {
                     double center;
                     double slope;
                     Class<? extends TransientQuality> qualityClass;
@@ -351,8 +352,8 @@ public class ReferenceResolution {
                         qualityClass = preposition.getQuality();
                         //recursively resolveDiscourseUnit the child to this PP, add the child's variable to entityURIs
                         JSONObject nestedNP = (JSONObject) ((JSONObject) reference.get(key)).get(InRelationTo.class.getSimpleName());
-                        if (nestedNP.containsKey(HasURI.class.getSimpleName())){
-                            String nestedUri = (String) nestedNP.get(HasURI.class.getSimpleName());
+                        if (nestedNP.containsKey(YodaSkeletonOntologyRegistry.hasUri.name)){
+                            String nestedUri = (String) nestedNP.get(YodaSkeletonOntologyRegistry.hasUri.name);
                             tmpVarIndex++;
 //                            entityURIs.add("?x" + tmpVarIndex);
                             entityURIs.add("<"+nestedUri+">");
@@ -403,7 +404,7 @@ public class ReferenceResolution {
     public static Double descriptionMatch(YodaEnvironment yodaEnvironment, JSONObject individual, JSONObject description){
         try {
             String queryString = yodaEnvironment.db.prefixes + "SELECT ?score WHERE {\n";
-            String individualURI = (String) individual.get(HasURI.class.getSimpleName());
+            String individualURI = (String) individual.get(YodaSkeletonOntologyRegistry.hasUri.name);
             int tmpVarIndex = 0;
             List<String> scoresToAccumulate = new LinkedList<>();
             for (Object key : description.keySet()) {
@@ -429,7 +430,7 @@ public class ReferenceResolution {
                         slope = preposition.getSlope();
                         qualityClass = preposition.getQuality();
                         String nestedURI = ((String) ((JSONObject) ((JSONObject) description.get(key)).
-                                get(InRelationTo.class.getSimpleName())).get(HasURI.class.getSimpleName()));
+                                get(InRelationTo.class.getSimpleName())).get(YodaSkeletonOntologyRegistry.hasUri.name));
                         entityURIs.add("<"+nestedURI+">");
                     } else if (Adjective.class.isAssignableFrom(qualityDegreeClass)) {
                         Adjective adjective = (Adjective) qualityDegreeClass.newInstance();
@@ -445,12 +446,12 @@ public class ReferenceResolution {
                     scoresToAccumulate.add("?score"+tmpVarIndex);
                 } else if (HasName.class.equals(Ontology.roleNameMap.get((String) key))) {
                     String similarityString = null;
-                    if (!(description.get(HasName.class.getSimpleName()) instanceof String)){
-                        queryString += "base:" + ((JSONObject)description.get(HasName.class.getSimpleName())).
-                                get(HasURI.class.getSimpleName()) + " rdf:value ?tmpV" + tmpVarIndex + " . \n";
+                    if (!(description.get(YodaSkeletonOntologyRegistry.hasName.name) instanceof String)){
+                        queryString += "base:" + ((JSONObject)description.get(YodaSkeletonOntologyRegistry.hasName.name)).
+                                get(YodaSkeletonOntologyRegistry.hasUri.name) + " rdf:value ?tmpV" + tmpVarIndex + " . \n";
                         similarityString = "?tmpV"+tmpVarIndex;
                     } else {
-                        similarityString = (String)description.get(HasName.class.getSimpleName());
+                        similarityString = (String)description.get(YodaSkeletonOntologyRegistry.hasName.name);
                     }
 
                     queryString += "<"+individualURI+"> rdfs:label ?tmp" + tmpVarIndex + " . \n" +
@@ -460,6 +461,8 @@ public class ReferenceResolution {
                 }
                 tmpVarIndex++;
             }
+
+
 
             queryString += "BIND(base:" + Product.class.getSimpleName() + "(";
             queryString += String.join(", ", scoresToAccumulate);
@@ -581,12 +584,12 @@ public class ReferenceResolution {
                         pathsToGroundedIndividuals.forEach(x ->
                                 individualsInGroundedDiscourseUnit.add((String) currentDiscourseUnit.
                                         getGroundInterpretation().
-                                        newGetSlotPathFiller(x + "." + HasURI.class.getSimpleName())));
+                                        newGetSlotPathFiller(x + "." + YodaSkeletonOntologyRegistry.hasUri.name)));
 
                         pathsToGroundedIndividuals.stream().filter(x -> x.contains("Patient")).
                                 forEach(x -> patientsInGroundedDiscourseUnit.add((String) currentDiscourseUnit.
                                         getGroundInterpretation().
-                                        newGetSlotPathFiller(x + "." + HasURI.class.getSimpleName())));
+                                        newGetSlotPathFiller(x + "." + YodaSkeletonOntologyRegistry.hasUri.name)));
 
                     }
                     if (currentDiscourseUnit.getGroundTruth() != null) {
@@ -595,12 +598,12 @@ public class ReferenceResolution {
                         pathsToGroundedIndividuals.forEach(x ->
                                 individualsInGroundedDiscourseUnit.add((String) currentDiscourseUnit.
                                         getGroundTruth().
-                                        newGetSlotPathFiller(x + "." + HasURI.class.getSimpleName())));
+                                        newGetSlotPathFiller(x + "." + YodaSkeletonOntologyRegistry.hasUri.name)));
 
                         pathsToGroundedIndividuals.stream().filter(x -> x.contains("Patient")).
                                 forEach(x -> patientsInGroundedDiscourseUnit.add((String) currentDiscourseUnit.
                                         getGroundTruth().
-                                        newGetSlotPathFiller(x + "." + HasURI.class.getSimpleName())));
+                                        newGetSlotPathFiller(x + "." + YodaSkeletonOntologyRegistry.hasUri.name)));
 
                     }
                     for (String key : individualsInGroundedDiscourseUnit) {

@@ -139,18 +139,18 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
 
         // check for named entities
         if (entity1JSON.isEmpty() || entity1CoverageScore < .75)
-            entity1JSON.put(HasName.class.getSimpleName(), entity1String);
+            entity1JSON.put(YodaSkeletonOntologyRegistry.hasName.name, entity1String);
         if (entity2String!=null && (entity2JSON.isEmpty() || entity2CoverageScore < .75))
-            entity2JSON.put(HasName.class.getSimpleName(), entity2String);
+            entity2JSON.put(YodaSkeletonOntologyRegistry.hasName.name, entity2String);
 
         // if a named entity has no class, give it the Noun class
-        if (entity1JSON.containsKey(HasName.class.getSimpleName()) && !entity1JSON.containsKey("class"))
+        if (entity1JSON.containsKey(YodaSkeletonOntologyRegistry.hasName.name) && !entity1JSON.containsKey("class"))
             entity1JSON.put("class", Noun.class.getSimpleName());
-        if (entity2JSON.containsKey(HasName.class.getSimpleName()) && !entity2JSON.containsKey("class"))
+        if (entity2JSON.containsKey(YodaSkeletonOntologyRegistry.hasName.name) && !entity2JSON.containsKey("class"))
             entity2JSON.put("class", Noun.class.getSimpleName());
 
 //        // If we think there's a named entity, score it based on how well its string matches known NEs
-//        if (entity2JSON.containsKey(HasName.class.getSimpleName())){
+//        if (entity2JSON.containsKey(YodaSkeletonOntologyRegistry.hasName.name)){
 //            StringDistribution referenceDistribution =
 //                    ReferenceResolution.resolveReference(yodaEnvironment, entity2JSON, false, false);
 //            namedEntityScore *= Doubles.min(1.0,
@@ -158,7 +158,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
 //                            RegexPlusKeywordUnderstander.normalNamedEntityStringSimilarity /
 //                            ReferenceResolution.minFocusSalience);
 //        }
-//        if (entity1JSON.containsKey(HasName.class.getSimpleName())){
+//        if (entity1JSON.containsKey(YodaSkeletonOntologyRegistry.hasName.name)){
 //            StringDistribution referenceDistribution =
 //                    ReferenceResolution.resolveReference(yodaEnvironment, entity1JSON, false, false);
 //            namedEntityScore *= Doubles.min(1.0,

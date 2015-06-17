@@ -22,7 +22,7 @@ public class NounPhraseFragmentMultiInterpreter implements MiniMultiLanguageInte
     @Override
     public NBestDistribution<JSONObject> interpret(List<String> tokens, YodaEnvironment yodaEnvironment) {
         Pair<JSONObject, Double> npInterpretation = npInterpreter.interpret(tokens, yodaEnvironment);
-        double score = npInterpretation.getLeft().containsKey(HasName.class.getSimpleName()) ?
+        double score = npInterpretation.getLeft().containsKey(YodaSkeletonOntologyRegistry.hasName.name) ?
                 RegexPlusKeywordUnderstander.namedEntityFragmentWeight : 1.0;
         NBestDistribution<JSONObject> ans = new NBestDistribution<>();
         String jsonString = "{\"dialogAct\":\"Fragment\"}";
