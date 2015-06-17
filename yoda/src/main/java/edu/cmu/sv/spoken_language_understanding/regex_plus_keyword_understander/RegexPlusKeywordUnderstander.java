@@ -79,13 +79,13 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
 
         // add regex interpreters
         languageInterpreters.add(new YnqExistRegexInterpreter());
-        for (Class<? extends Adjective> adjectiveClass : Ontology.adjectiveClasses){
+        for (Class<? extends Adjective> adjectiveClass : Ontology.qualityDegrees){
             languageInterpreters.add(new YnqHasPropertyRegexInterpreter(adjectiveClass, yodaEnvironment));
         }
-        for (Class<? extends TransientQuality> qualityClass : Ontology.qualityClasses){
+        for (Class<? extends TransientQuality> qualityClass : Ontology.qualities){
             languageInterpreters.add(new WhqHasPropertyRegexInterpreter(qualityClass, yodaEnvironment));
         }
-        for (Class<? extends Verb> verbClass : Ontology.verbClasses){
+        for (Class<? extends Verb> verbClass : Ontology.verbs){
             multiLanguageInterpreters.add(new CommandMultiInterpreter(verbClass, yodaEnvironment));
             languageInterpreters.add(new CommandKeywordInterpreter(verbClass, yodaEnvironment));
         }

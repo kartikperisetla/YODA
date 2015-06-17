@@ -4,6 +4,9 @@ import com.google.common.collect.Iterables;
 import edu.cmu.sv.database.ReferenceResolution;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.database.Ontology;
+import edu.cmu.sv.domain.ontology2.Quality2;
+import edu.cmu.sv.domain.ontology2.Role2;
+import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.ThingWithRoles;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
@@ -72,19 +75,17 @@ public class ActionAnalysis {
 
         if (missingRequiredVerbSlots.size()==0) {
             if (dialogActString.equals(YNQuestion.class.getSimpleName()) || dialogActString.equals(WHQuestion.class.getSimpleName())){
-                if (verbClass.equals(HasProperty.class)) {
+                if (verbClass.equals(YodaSkeletonOntologyRegistry.hasProperty)) {
                     String entityURI = (String) groundedMeaning.newGetSlotPathFiller("verb.Agent.HasURI");
-                    Class<? extends TransientQuality> requestedQualityClass;
+                    Quality2 requestedQualityClass;
                     if (dialogActString.equals(WHQuestion.class.getSimpleName())) {
-                        requestedQualityClass = (Class<? extends TransientQuality>)
-                                Ontology.thingNameMap.get(
+                        requestedQualityClass = Ontology.qualityNameMap.get(
                                         (String) groundedMeaning.newGetSlotPathFiller("verb.Patient.HasValue.class"));
                     } else {
                         Set<Object> patientRoles = ((JSONObject) groundedMeaning.newGetSlotPathFiller("verb.Patient")).keySet();
-                        Class<? extends Role> suggestedRole = null;
+                        Role2 suggestedRole = null;
                         for (Object role : patientRoles) {
-                            if (Ontology.roleNameMap.containsKey(role) &&
-                                    HasQualityRole.class.isAssignableFrom(Ontology.roleNameMap.get(role))) {
+                            if (Ontology.roleNameMap.containsKey(role) && Ontology.roleNameMap.get(role).isQualityRole) {
                                 suggestedRole = Ontology.roleNameMap.get(role);
                                 break;
                             }
@@ -92,12 +93,13 @@ public class ActionAnalysis {
                         if (suggestedRole == null) {
                             throw new Error("no role has been suggested");
                         }
-                        requestedQualityClass = Ontology.qualityInRolesRange(suggestedRole);
+                        requestedQualityClass = Ontology.qualityNameMap.get(suggestedRole.name.substring(3));
                     }
 
-
-                    List<Class<? extends Thing>> qualityArguments = Ontology.qualityArguments(requestedQualityClass);
-                    if (qualityArguments.size() != 0)
+                    // todo: replace with new quality argument accessor interface
+                    Object firstQualityArgument = requestedQualityClass.firstArgumentClassConstraint;
+                    Object secondQualityArgument = requestedQualityClass.secondArgumentClassConstraint;
+                    if (secondQualityArgument != null)
                         throw new Error("the requested quality isn't an adjective");
 
                     // iterate through every possible binding for the quality arguments

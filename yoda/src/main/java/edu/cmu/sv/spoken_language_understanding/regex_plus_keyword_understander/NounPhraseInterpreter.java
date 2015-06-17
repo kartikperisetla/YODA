@@ -47,7 +47,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
             } catch (Lexicon.NoLexiconEntryException e) {}
         }
 
-        for (Class<? extends Noun> nounClass : Ontology.nounClasses) {
+        for (Class<? extends Noun> nounClass : Ontology.nouns) {
             try {
                 Set<String> pronounStrings = this.yodaEnvironment.lex.getPOSForClass(nounClass,
                         Lexicon.LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, false);
@@ -58,7 +58,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
             } catch (Lexicon.NoLexiconEntryException e) {}
         }
 
-        for (Class<? extends Noun> nounClass : Ontology.nounClasses) {
+        for (Class<? extends Noun> nounClass : Ontology.nouns) {
             Set<String> nounStrings = new HashSet<>();
             try {
                 nounStrings.addAll(this.yodaEnvironment.lex.getPOSForClass(nounClass,
@@ -76,7 +76,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
 //                nounStringSetMap.put(nounClass, regexString);
         }
 
-        for (Class<? extends Adjective> adjectiveClass : Ontology.adjectiveClasses) {
+        for (Class<? extends Adjective> adjectiveClass : Ontology.qualityDegrees) {
             try {
                 Set<String> adjectiveStrings = this.yodaEnvironment.lex.getPOSForClass(adjectiveClass,
                         Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, true);

@@ -1,6 +1,8 @@
 package edu.cmu.sv.natural_language_generation.phrase_generators;
 
 import edu.cmu.sv.database.Ontology;
+import edu.cmu.sv.domain.ontology2.Noun2;
+import edu.cmu.sv.domain.ontology2.Quality2;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.ThingWithRoles;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
@@ -63,13 +65,15 @@ public class DefiniteReferenceGenerator implements PhraseGenerationRoutine {
         } catch (Lexicon.NoLexiconEntryException e) {}
 
         if (expandAdj){
-            for (Class<? extends TransientQuality> qualityClass : Ontology.qualitiesForClass.get(
+            for (Quality2 qualityClass : Ontology.qualitiesForClass.get(
                     Ontology.thingNameMap.get(mostSpecificClass))) {
                 if (adjString!=null)
                     break;
-                List<Class<? extends Thing>> qualityArguments = Ontology.qualityArguments(qualityClass);
+                //todo: ensure that the entityURI meets the firstQualityArgument constraint
+                Object firstQualityArgument = qualityClass.firstArgumentClassConstraint;
+                Object secondQualityArgument = qualityClass.secondArgumentClassConstraint;
                 // iterate through every possible binding for the quality arguments adjectives
-                if (qualityArguments.size() == 0) {
+                if (secondQualityArgument == null) {
                     if (!expandAdj)
                         continue;
                     List<String> fullArgumentList = Arrays.asList(entityURI);

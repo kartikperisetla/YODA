@@ -81,9 +81,9 @@ public class Database {
     public void updateOntology(){
         try{
             // generate the class hierarchy
-            Set<Class> databaseClasses = new HashSet<>(Ontology.nounClasses);
-            databaseClasses.addAll(Ontology.verbClasses);
-            databaseClasses.addAll(Ontology.qualityClasses);
+            Set<Class> databaseClasses = new HashSet<>(Ontology.nouns);
+            databaseClasses.addAll(Ontology.verbs);
+            databaseClasses.addAll(Ontology.qualities);
             Set<Class> databaseProperties = new HashSet<>(Ontology.roleClasses);
             databaseProperties.addAll(Ontology.roleClasses);
             generateClassHierarchy(databaseClasses, databaseProperties);

@@ -1,10 +1,8 @@
 package edu.cmu.sv.natural_language_generation.phrase_generators;
 
 import edu.cmu.sv.database.Ontology;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.preposition.Preposition;
+import edu.cmu.sv.domain.ontology2.Noun2;
+import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
 import edu.cmu.sv.natural_language_generation.PhraseGenerationRoutine;
@@ -22,20 +20,21 @@ import java.util.Map;
 public class IndefiniteDescriptionGenerator implements PhraseGenerationRoutine {
     @Override
     public ImmutablePair<String, JSONObject> generate(JSONObject constraints, YodaEnvironment yodaEnvironment) {
-        Class<? extends Thing> nounClass = null;
+        Noun2 nounClass = null;
         Map<Object, JSONObject> prepositionDescriptors = new HashMap<>();
         Map<Object, JSONObject> adjectiveDescriptors = new HashMap<>();
         if (constraints.containsKey("class")) {
-            nounClass = Ontology.thingNameMap.get((String) constraints.get("class"));
+            nounClass = Ontology.nounNameMap.get((String) constraints.get("class"));
         }
         for (Object key : constraints.keySet()) {
             if (key.equals("refType") || key.equals("class"))
                 continue;
             if (!Ontology.roleNameMap.containsKey(key))
                 continue;
-            if (Ontology.adjectiveOrPrepositionInRange(Ontology.roleNameMap.get(key)).equals(Adjective.class))
+            String keyString = (String)key;
+            if (Ontology.qualityNameMap.containsKey(keyString.substring(3)) && Ontology.qualityNameMap.get(keyString.substring(3)).secondArgumentClassConstraint==null)
                 adjectiveDescriptors.put(key, (JSONObject) constraints.get(key));
-            else if (Ontology.adjectiveOrPrepositionInRange(Ontology.roleNameMap.get(key)).equals(Preposition.class))
+            else if (Ontology.qualityNameMap.containsKey(keyString.substring(3)) && Ontology.qualityNameMap.get(keyString.substring(3)).secondArgumentClassConstraint!=null)
                 prepositionDescriptors.put(key, (JSONObject) constraints.get(key));
         }
 
@@ -43,7 +42,7 @@ public class IndefiniteDescriptionGenerator implements PhraseGenerationRoutine {
         SemanticsModel ansObject = new SemanticsModel("{}");
 
         // if no noun class, leave out the determiner, make the class Unk
-        if (nounClass!=null && nounClass.equals(UnknownThingWithRoles.class))
+        if (nounClass!=null && nounClass.equals(YodaSkeletonOntologyRegistry.unknownThingWithRoles))
             nounClass=null;
         if (nounClass!=null)
             ans = "a ";
@@ -52,7 +51,7 @@ public class IndefiniteDescriptionGenerator implements PhraseGenerationRoutine {
         int adjectivesAddedCounter = 0;
         for (Object key : adjectiveDescriptors.keySet()) {
             JSONObject adjectiveContent = SemanticsModel.parseJSON(adjectiveDescriptors.get(key).toJSONString());
-            SemanticsModel.wrap(adjectiveContent, UnknownThingWithRoles.class.getSimpleName(), (String) key);
+            SemanticsModel.wrap(adjectiveContent, YodaSkeletonOntologyRegistry.unknownThingWithRoles.name, (String) key);
             ImmutablePair<String, JSONObject> adjPhrase = NaturalLanguageGenerator.getAppropriatePhraseGenerationRoutine(adjectiveContent).
                     generate(adjectiveContent, yodaEnvironment);
 
@@ -74,7 +73,7 @@ public class IndefiniteDescriptionGenerator implements PhraseGenerationRoutine {
                         Lexicon.LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, false).stream().findAny().get();
             } catch (Lexicon.NoLexiconEntryException e) {}
             ans += singularNounForm;
-            ansObject.extendAndOverwrite(new SemanticsModel("{\"class\":\"" + nounClass.getSimpleName() + "\"}"));
+            ansObject.extendAndOverwrite(new SemanticsModel("{\"class\":\"" + nounClass.name + "\"}"));
             if (prepositionDescriptors.size()>0)
                 ans+=" ";
         }
@@ -82,7 +81,7 @@ public class IndefiniteDescriptionGenerator implements PhraseGenerationRoutine {
         // add PPs
         for (Object key : prepositionDescriptors.keySet()){
             JSONObject prepositionContent = SemanticsModel.parseJSON(prepositionDescriptors.get(key).toJSONString());
-            SemanticsModel.wrap(prepositionContent, UnknownThingWithRoles.class.getSimpleName(), (String) key);
+            SemanticsModel.wrap(prepositionContent, YodaSkeletonOntologyRegistry.unknownThingWithRoles.name, (String) key);
             ImmutablePair<String, JSONObject> prepPhrase = NaturalLanguageGenerator.getAppropriatePhraseGenerationRoutine(prepositionContent).
                     generate(prepositionContent, yodaEnvironment);
 

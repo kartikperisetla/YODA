@@ -1,8 +1,6 @@
 package edu.cmu.sv.database;
 
-import edu.cmu.sv.database.Database;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
-import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
 import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
@@ -135,12 +133,12 @@ public class ActionEnumeration {
 
 //        Set<Class<? extends verb>> verbClassSet;
 //        if (enumerationType.equals(ENUMERATION_TYPE.SAMPLED)){
-//            verbClassSet = Combination.randomSubset(Ontology.verbClasses, maxOntologyBindings);
+//            verbClassSet = Combination.randomSubset(Ontology.verbs, maxOntologyBindings);
 //        } else {
-//            verbClassSet = Ontology.verbClasses;
+//            verbClassSet = Ontology.verbs;
 //        }
 
-        for (Class<? extends Verb> verbClass : Ontology.verbClasses) {
+        for (Class<? extends Verb> verbClass : Ontology.verbs) {
             if (verbConstraint != null && !Ontology.thingNameMap.get(verbConstraint).equals(verbClass))
                 continue;
             if (verbClass==Verb.class)
