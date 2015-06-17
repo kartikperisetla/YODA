@@ -1,11 +1,5 @@
 package edu.cmu.sv.domain.yoda_skeleton;
 
-import edu.cmu.sv.domain.yelp_phoenix.ontology.noun.PointOfInterest;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Person;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Time;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasAtTime;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Patient;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 
 /**
@@ -22,7 +16,7 @@ public class YodaSkeletonLexicon extends Lexicon {
                 entry.add(LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, "it");
                 entry.add(LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, "that");
                 entry.add(LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, "this");
-                add(Noun.class, entry, false);
+                add(YodaSkeletonOntologyRegistry.rootNoun, entry, false);
             }
             {
                 LexicalEntry entry = new LexicalEntry();
@@ -30,14 +24,14 @@ public class YodaSkeletonLexicon extends Lexicon {
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "person");
                 entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "people");
                 entry.add(LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, "they");
-                add(Person.class, entry, false);
+                add(YodaSkeletonOntologyRegistry.person, entry, false);
             }
             {
                 LexicalEntry entry = new LexicalEntry();
                 entry.add(LexicalEntry.PART_OF_SPEECH.WH_PRONOUN, "where");
                 entry.add(LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, "there");
                 entry.add(LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, "here");
-                add(PointOfInterest.class, entry, false);
+                add(YodaSkeletonOntologyRegistry.place, entry, false);
             }
             {
                 LexicalEntry entry = new LexicalEntry();
@@ -46,7 +40,7 @@ public class YodaSkeletonLexicon extends Lexicon {
                 entry.add(LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, "then");
                 entry.add(LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, "that time");
                 entry.add(LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, "this time");
-                add(Time.class, entry, false);
+                add(YodaSkeletonOntologyRegistry.timeNounClass, entry, false);
             }
         }
 
@@ -56,21 +50,21 @@ public class YodaSkeletonLexicon extends Lexicon {
                 // directions from X, directions <...> from X
                 LexicalEntry entry = new LexicalEntry();
                 entry.add(LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, "");
-                add(Patient.class, entry, false);
+                add(YodaSkeletonOntologyRegistry.patient, entry, false);
             }
             {
                 // directions from X, directions <...> from X
                 LexicalEntry entry = new LexicalEntry();
                 entry.add(LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, "at");
                 entry.add(LexicalEntry.PART_OF_SPEECH.AS_OBJECT2_PREFIX, "at");
-                add(HasAtTime.class, entry, false);
+                add(YodaSkeletonOntologyRegistry.hasAtTime, entry, false);
             }
             {
                 // directions from X, directions <...> from X
                 LexicalEntry entry = new LexicalEntry();
                 entry.add(LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, "for");
                 entry.add(LexicalEntry.PART_OF_SPEECH.AS_OBJECT2_PREFIX, "for");
-                add(HasAtTime.class, entry, true);
+                add(YodaSkeletonOntologyRegistry.hasAtTime, entry, true);
             }
         }
     }

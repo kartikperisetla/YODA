@@ -1,7 +1,5 @@
 package edu.cmu.sv.natural_language_generation;
 
-import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -12,20 +10,20 @@ import java.util.Set;
  */
 public class Lexicon {
     // Map from ontology concepts to sets of corresponding lexical entries
-    private Map<Class<? extends Thing>, Set<LexicalEntry>> standardLexiconMap = new HashMap<>();
-    private Map<Class<? extends Thing>, Set<LexicalEntry>> understandingOnlyLexiconMap = new HashMap<>();
+    private Map<Object, Set<LexicalEntry>> standardLexiconMap = new HashMap<>();
+    private Map<Object, Set<LexicalEntry>> understandingOnlyLexiconMap = new HashMap<>();
 
 
     /*
     * Extend this lexicon by adding all entries from otherLexicon
     * */
     public void loadLexicon(Lexicon otherLexicon){
-        for (Class<? extends Thing> key : otherLexicon.standardLexiconMap.keySet()){
+        for (Object key : otherLexicon.standardLexiconMap.keySet()){
             for (LexicalEntry entry : otherLexicon.standardLexiconMap.get(key)){
                 add(key, entry, false);
             }
         }
-        for (Class<? extends Thing> key : otherLexicon.understandingOnlyLexiconMap.keySet()){
+        for (Object key : otherLexicon.understandingOnlyLexiconMap.keySet()){
             for (LexicalEntry entry : otherLexicon.understandingOnlyLexiconMap.get(key)){
                 add(key, entry, true);
             }
@@ -33,7 +31,7 @@ public class Lexicon {
     }
 
 
-    public Set<LexicalEntry> get(Class<? extends Thing> cls, boolean allowUnderstandingOnly){
+    public Set<LexicalEntry> get(Object cls, boolean allowUnderstandingOnly){
         Set<LexicalEntry> ans = new HashSet<>();
         if (standardLexiconMap.containsKey(cls))
             ans.addAll(standardLexiconMap.get(cls));
@@ -42,7 +40,7 @@ public class Lexicon {
         return ans;
     }
 
-    public void add(Class<? extends Thing> cls, LexicalEntry lexicalEntry, boolean understandingOnly){
+    public void add(Object cls, LexicalEntry lexicalEntry, boolean understandingOnly){
         if (understandingOnly){
             if (!understandingOnlyLexiconMap.containsKey(cls))
                 understandingOnlyLexiconMap.put(cls, new HashSet<>());
@@ -56,7 +54,7 @@ public class Lexicon {
 
     }
 
-    public Set<String> getPOSForClass(Class<? extends Thing> cls,
+    public Set<String> getPOSForClass(Object cls,
                                              LexicalEntry.PART_OF_SPEECH partOfSpeech,
                                              boolean allowUnderstandingOnly) throws NoLexiconEntryException {
         Set<String> ans = new HashSet<>();
@@ -71,10 +69,8 @@ public class Lexicon {
     public  Set<String> getPOSForClassHierarchy(Class cls,
                                                       LexicalEntry.PART_OF_SPEECH partOfSpeech,
                                                       boolean allowUnderstandingOnly) throws NoLexiconEntryException {
-        if (! (Thing.class.isAssignableFrom(cls)))
-            throw new NoLexiconEntryException();
         try {
-            Set<String> ans = getPOSForClass((Class<? extends Thing>)cls, partOfSpeech, allowUnderstandingOnly);
+            Set<String> ans = getPOSForClass((Object)cls, partOfSpeech, allowUnderstandingOnly);
             if (ans.size()==0){
                 throw new NoLexiconEntryException();
             }
