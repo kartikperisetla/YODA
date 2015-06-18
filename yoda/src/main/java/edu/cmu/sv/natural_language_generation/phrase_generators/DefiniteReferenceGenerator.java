@@ -14,6 +14,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 /*
@@ -39,13 +40,14 @@ public class DefiniteReferenceGenerator implements PhraseGenerationRoutine {
         if (preferNameReference){
             String queryString = yodaEnvironment.db.prefixes +
                     "SELECT ?x WHERE { <"+entityURI+"> rdfs:label ?x .}";
+            try {
+                entityNameString = yodaEnvironment.db.runQuerySelectX(queryString).stream().findAny().get();
 
-            entityNameString = yodaEnvironment.db.runQuerySelectX(queryString).stream().findAny().get();
-
-            String uri = yodaEnvironment.db.insertValue(entityNameString);
-            JSONObject content = SemanticsModel.parseJSON("{\"HasURI\":\""+uri+"\",\"class\":\"WebResource\"}");
-            SemanticsModel.wrap(content, yodaEnvironment.db.mostSpecificClass(entityURI), YodaSkeletonOntologyRegistry.hasName.name);
-            return new ImmutablePair<>(entityNameString, content);
+                String uri = yodaEnvironment.db.insertValue(entityNameString);
+                JSONObject content = SemanticsModel.parseJSON("{\"HasURI\":\"" + uri + "\",\"class\":\"WebResource\"}");
+                SemanticsModel.wrap(content, yodaEnvironment.db.mostSpecificClass(entityURI), YodaSkeletonOntologyRegistry.hasName.name);
+                return new ImmutablePair<>(entityNameString, content);
+            } catch (NoSuchElementException e ){}
         }
 
         String mostSpecificClass = yodaEnvironment.db.mostSpecificClass(entityURI);
@@ -96,7 +98,8 @@ public class DefiniteReferenceGenerator implements PhraseGenerationRoutine {
             return null;
         String ansString = "the " + (adjString==null ? "" : adjString +" ") + classNounString;
         SemanticsModel ans = new SemanticsModel(classNounJSON.toJSONString());
-        ans.extendAndOverwrite(new SemanticsModel(adjJSON.toJSONString()));
+        if (adjJSON!=null)
+            ans.extendAndOverwrite(new SemanticsModel(adjJSON.toJSONString()));
         JSONObject ansJSON = ans.getInternalRepresentation();
         return new ImmutablePair<>(ansString, ansJSON);
     }

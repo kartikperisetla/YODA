@@ -151,7 +151,7 @@ public class ReferenceResolution {
 
                 while (result.hasNext()) {
                     BindingSet bindings = result.next();
-                    if (bindings.getValue("score0") == null)
+                    if (bindings.getValue("score0") == null || bindings.getValue("x0")==null)
                         continue;
                     String key = bindings.getValue("x0").stringValue();
                     Double score = Double.parseDouble(bindings.getValue("score0").stringValue());
