@@ -1,15 +1,11 @@
 package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander;
 
 import edu.cmu.sv.database.Ontology;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.ThingWithRoles;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.preposition.Preposition;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasName;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.InRelationTo;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
+import edu.cmu.sv.domain.ontology2.Noun2;
+import edu.cmu.sv.domain.ontology2.Quality2;
+import edu.cmu.sv.domain.ontology2.QualityDegree;
+import edu.cmu.sv.domain.ontology2.Role2;
+import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.spoken_language_understanding.Utils;
@@ -27,15 +23,17 @@ import java.util.stream.Collectors;
  * Created by David Cohen on 1/27/15.
  */
 public class NounPhraseInterpreter implements MiniLanguageInterpreter{
-    Map<Class<? extends Preposition>, String> prepositionSeparatorRegexStringMap = new HashMap<>();
-    Map<Class<? extends Noun>, Set<String>> pronounStringSetMap = new HashMap<>();
-    Map<Class<? extends Noun>, Set<String>> nounStringSetMap = new HashMap<>();
-    Map<Class<? extends Adjective>, Set<String>> adjectiveStringSetMap = new HashMap<>();
+    Map<QualityDegree, String> prepositionSeparatorRegexStringMap = new HashMap<>();
+    Map<Noun2, Set<String>> pronounStringSetMap = new HashMap<>();
+    Map<Noun2, Set<String>> nounStringSetMap = new HashMap<>();
+    Map<QualityDegree, Set<String>> adjectiveStringSetMap = new HashMap<>();
     YodaEnvironment yodaEnvironment;
 
     public NounPhraseInterpreter(YodaEnvironment yodaEnvironment) {
         this.yodaEnvironment = yodaEnvironment;
-        for (Class<? extends Preposition> prepositionClass : Ontology.prepositionClasses) {
+        for (QualityDegree prepositionClass : Ontology.qualityDegrees) {
+            if (prepositionClass.getQuality().secondArgumentClassConstraint==null)
+                continue;
             try {
                 Set<String> relationalPhraseStrings = this.yodaEnvironment.lex.getPOSForClass(prepositionClass,
                         Lexicon.LexicalEntry.PART_OF_SPEECH.PREPOSITION, false);
@@ -47,7 +45,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
             } catch (Lexicon.NoLexiconEntryException e) {}
         }
 
-        for (Class<? extends Noun> nounClass : Ontology.nouns) {
+        for (Noun2 nounClass : Ontology.nouns) {
             try {
                 Set<String> pronounStrings = this.yodaEnvironment.lex.getPOSForClass(nounClass,
                         Lexicon.LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, false);
@@ -58,7 +56,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
             } catch (Lexicon.NoLexiconEntryException e) {}
         }
 
-        for (Class<? extends Noun> nounClass : Ontology.nouns) {
+        for (Noun2 nounClass : Ontology.nouns) {
             Set<String> nounStrings = new HashSet<>();
             try {
                 nounStrings.addAll(this.yodaEnvironment.lex.getPOSForClass(nounClass,
@@ -76,7 +74,9 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
 //                nounStringSetMap.put(nounClass, regexString);
         }
 
-        for (Class<? extends Adjective> adjectiveClass : Ontology.qualityDegrees) {
+        for (QualityDegree adjectiveClass : Ontology.qualityDegrees) {
+            if (adjectiveClass.getQuality().secondArgumentClassConstraint!=null)
+                continue;
             try {
                 Set<String> adjectiveStrings = this.yodaEnvironment.lex.getPOSForClass(adjectiveClass,
                         Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, true);
@@ -97,10 +97,10 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         String entity2String = null;
         JSONObject entity1JSON = SemanticsModel.parseJSON("{}");
         JSONObject entity2JSON = SemanticsModel.parseJSON("{}");
-        Class<? extends Preposition> prepositionClass = null;
+        QualityDegree prepositionClass = null;
 
         // check for PP separator (indicates a nested noun phrase) (only support 1 level of nesting)
-        for (Class<? extends Preposition> cls : prepositionSeparatorRegexStringMap.keySet()){
+        for (QualityDegree cls : prepositionSeparatorRegexStringMap.keySet()) {
             Pattern regexPattern = Pattern.compile("(.+)" + prepositionSeparatorRegexStringMap.get(cls) + "(.+)");
             Matcher matcher = regexPattern.matcher(utterance);
             if (matcher.matches()) {
@@ -108,17 +108,12 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
                 entity2String = matcher.group(3).trim();
                 prepositionClass = cls;
 
-                try {
-                    Class<? extends TransientQuality> qualityClass = prepositionClass.newInstance().getQuality();
-                    Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> descriptor = Ontology.qualityDescriptors(qualityClass);
-                    JSONObject intermediateObject = SemanticsModel.parseJSON("{\"class\":\""+cls.getSimpleName()+"\"}");
-                    intermediateObject.put(YodaSkeletonOntologyRegistry.inRelationTo.name, entity2JSON);
-                    entity1JSON.put(descriptor.getKey().getSimpleName(), intermediateObject);
+                Quality2 qualityClass = prepositionClass.getQuality();
+                Pair<Role2, Set<QualityDegree>> descriptor = Ontology.qualityDescriptors(qualityClass);
+                JSONObject intermediateObject = SemanticsModel.parseJSON("{\"class\":\"" + cls.name + "\"}");
+                intermediateObject.put(YodaSkeletonOntologyRegistry.inRelationTo.name, entity2JSON);
+                entity1JSON.put(descriptor.getKey().name, intermediateObject);
 
-                } catch (InstantiationException | IllegalAccessException e) {
-                    e.printStackTrace();
-                    System.exit(1);
-                }
                 break;
             }
         }
@@ -145,9 +140,9 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
 
         // if a named entity has no class, give it the Noun class
         if (entity1JSON.containsKey(YodaSkeletonOntologyRegistry.hasName.name) && !entity1JSON.containsKey("class"))
-            entity1JSON.put("class", Noun.class.getSimpleName());
+            entity1JSON.put("class", YodaSkeletonOntologyRegistry.rootNoun.name);
         if (entity2JSON.containsKey(YodaSkeletonOntologyRegistry.hasName.name) && !entity2JSON.containsKey("class"))
-            entity2JSON.put("class", Noun.class.getSimpleName());
+            entity2JSON.put("class", YodaSkeletonOntologyRegistry.rootNoun.name);
 
 //        // If we think there's a named entity, score it based on how well its string matches known NEs
 //        if (entity2JSON.containsKey(YodaSkeletonOntologyRegistry.hasName.name)){
@@ -189,11 +184,11 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         Double bestNounCoverage = 0.0;
         Double totalAdjectiveCoverage = 0.0;
 
-        Class<? extends Noun> nounClass = null;
-        Set<Class<? extends Adjective>> adjectiveClasses = new HashSet<>();
+        Noun2 nounClass = null;
+        Set<QualityDegree> adjectiveClasses = new HashSet<>();
 
         // get class from pronoun
-        for (Class<? extends Noun> cls : pronounStringSetMap.keySet()){
+        for (Noun2 cls : pronounStringSetMap.keySet()){
             Double coverage = Utils.stringSetBestCoverage(entityString, pronounStringSetMap.get(cls));
             if (coverage > pronounCoverage){
                 pronounCoverage = coverage;
@@ -203,7 +198,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         }
 
         // get class from noun
-        for (Class<? extends Noun> cls : nounStringSetMap.keySet()) {
+        for (Noun2 cls : nounStringSetMap.keySet()) {
             Double coverage = Utils.stringSetBestCoverage(entityString, nounStringSetMap.get(cls));
             if (coverage > bestNounCoverage){
                 bestNounCoverage = coverage;
@@ -212,7 +207,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         }
 
         // get adjective
-        for (Class<? extends Adjective> cls : adjectiveStringSetMap.keySet()) {
+        for (QualityDegree cls : adjectiveStringSetMap.keySet()) {
             Double coverage = Utils.stringSetBestCoverage(entityString, adjectiveStringSetMap.get(cls));
             if (coverage > 0) {
                 totalAdjectiveCoverage += coverage;
@@ -221,19 +216,14 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         }
 
         // create sub-JSON object for adjectives
-        for (Class<? extends Adjective> cls : adjectiveClasses){
-            try {
-                Class<? extends TransientQuality> qualityClass = cls.newInstance().getQuality();
-                Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> descriptor = Ontology.qualityDescriptors(qualityClass);
-                ans.put(descriptor.getKey().getSimpleName(), SemanticsModel.parseJSON("{\"class\":\"" + cls.getSimpleName() + "\"}"));
-            } catch (InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
-                System.exit(1);
-            }
+        for (QualityDegree cls : adjectiveClasses) {
+            Quality2 qualityClass = cls.getQuality();
+            Pair<Role2, Set<QualityDegree>> descriptor = Ontology.qualityDescriptors(qualityClass);
+            ans.put(descriptor.getKey().name, SemanticsModel.parseJSON("{\"class\":\"" + cls.name + "\"}"));
         }
 
         if (nounClass!=null)
-            ans.put("class", nounClass.getSimpleName());
+            ans.put("class", nounClass.name);
 
 //        ans.put("<remaining>", remaining);
 //        System.err.println("NPInterpreter: total coverage:" + (pronounCoverage + bestNounCoverage + totalAdjectiveCoverage));

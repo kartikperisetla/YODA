@@ -1,10 +1,9 @@
 package edu.cmu.sv.natural_language_generation.top_level_templates;
 
 import edu.cmu.sv.database.Ontology;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.Requested;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.HasProperty;
+import edu.cmu.sv.domain.ontology2.Noun2;
+import edu.cmu.sv.domain.ontology2.Role2;
+import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.natural_language_generation.TopLevelNLGTemplate;
 import edu.cmu.sv.semantics.SemanticsModel;
@@ -30,7 +29,7 @@ public class RequestRoleNLGTemplate implements TopLevelNLGTemplate {
     public ImmutablePair<String, SemanticsModel> generate(SemanticsModel constraints, YodaEnvironment yodaEnvironment) {
         String verbClassString;
         String requestedSlotPath;
-        Class<? extends Role> roleClass;
+        Role2 roleClass;
 
         JSONObject verbObject = (JSONObject)constraints.newGetSlotPathFiller("verb");
         verbClassString = (String)verbObject.get("class");
@@ -43,10 +42,12 @@ public class RequestRoleNLGTemplate implements TopLevelNLGTemplate {
         String verbString = null;
         try {
             // assume that classesInRange only contains the most general classes possible
-            Set<Class <? extends Thing>> classesInRange = roleClass.newInstance().getRange();
-            for (Class <? extends Thing> cls : classesInRange){
+            Set<Object> classesInRange = roleClass.getRange();
+            for (Object cls : classesInRange){
                 try {
-                    whString = yodaEnvironment.lex.getPOSForClassHierarchy(cls, Lexicon.LexicalEntry.PART_OF_SPEECH.WH_PRONOUN, false).
+                    if (!(cls instanceof Noun2))
+                        continue;
+                    whString = yodaEnvironment.lex.getPOSForClassHierarchy((Noun2)cls, Lexicon.LexicalEntry.PART_OF_SPEECH.WH_PRONOUN, false).
                             stream().findAny().get();
                     break;
                 } catch(Lexicon.NoLexiconEntryException e){}
@@ -59,10 +60,8 @@ public class RequestRoleNLGTemplate implements TopLevelNLGTemplate {
             verbString = yodaEnvironment.lex.getPOSForClass(Ontology.thingNameMap.get(verbClassString),
                     Lexicon.LexicalEntry.PART_OF_SPEECH.S1_VERB, false).stream().findAny().get();
 
-        } catch (InstantiationException | IllegalAccessException | Lexicon.NoLexiconEntryException e) {
-//            e.printStackTrace();
-        }
-        if (Ontology.thingNameMap.get(verbClassString).isAssignableFrom(HasProperty.class)){
+        } catch (Lexicon.NoLexiconEntryException e) {}
+        if (Ontology.verbNameMap.get(verbClassString).equals(YodaSkeletonOntologyRegistry.hasProperty)){
             verbString = "is";
         }
 

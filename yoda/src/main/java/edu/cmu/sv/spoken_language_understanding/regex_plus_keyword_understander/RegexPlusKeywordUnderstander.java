@@ -4,9 +4,9 @@ import com.google.common.primitives.Doubles;
 import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.database.ReferenceResolution;
 import edu.cmu.sv.dialog_state_tracking.Turn;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
+import edu.cmu.sv.domain.ontology2.Quality2;
+import edu.cmu.sv.domain.ontology2.QualityDegree;
+import edu.cmu.sv.domain.ontology2.Verb2;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.spoken_language_understanding.SpokenLanguageUnderstander;
 import edu.cmu.sv.spoken_language_understanding.Tokenizer;
@@ -79,13 +79,15 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
 
         // add regex interpreters
         languageInterpreters.add(new YnqExistRegexInterpreter());
-        for (Class<? extends Adjective> adjectiveClass : Ontology.qualityDegrees){
+        for (QualityDegree adjectiveClass : Ontology.qualityDegrees){
+            if (adjectiveClass.getQuality().secondArgumentClassConstraint!=null)
+                continue;
             languageInterpreters.add(new YnqHasPropertyRegexInterpreter(adjectiveClass, yodaEnvironment));
         }
-        for (Class<? extends TransientQuality> qualityClass : Ontology.qualities){
+        for (Quality2 qualityClass : Ontology.qualities){
             languageInterpreters.add(new WhqHasPropertyRegexInterpreter(qualityClass, yodaEnvironment));
         }
-        for (Class<? extends Verb> verbClass : Ontology.verbs){
+        for (Verb2 verbClass : Ontology.verbs){
             multiLanguageInterpreters.add(new CommandMultiInterpreter(verbClass, yodaEnvironment));
             languageInterpreters.add(new CommandKeywordInterpreter(verbClass, yodaEnvironment));
         }

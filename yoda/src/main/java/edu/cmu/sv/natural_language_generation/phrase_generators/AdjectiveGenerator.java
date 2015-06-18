@@ -1,8 +1,8 @@
 package edu.cmu.sv.natural_language_generation.phrase_generators;
 
 import edu.cmu.sv.database.Ontology;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
+import edu.cmu.sv.domain.ontology2.QualityDegree;
+import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.natural_language_generation.PhraseGenerationRoutine;
 import edu.cmu.sv.semantics.SemanticsModel;
@@ -29,11 +29,10 @@ public class AdjectiveGenerator implements PhraseGenerationRoutine {
         adjectiveClassString = (String) adjectiveContent.get("class");
 
         try {
-            Class<? extends Thing> adjectiveClass = Ontology.thingNameMap.get(adjectiveClassString);
-            String adjectiveString = null;
-            adjectiveString = yodaEnvironment.lex.getPOSForClass(adjectiveClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, false).stream().findAny().get();
+            QualityDegree adjectiveClass = Ontology.qualityDegreeNameMap.get(adjectiveClassString);
+            String adjectiveString = yodaEnvironment.lex.getPOSForClass(adjectiveClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, false).stream().findAny().get();
 
-            JSONObject tmp = SemanticsModel.parseJSON("{\"class\":\"" + adjectiveClass.getSimpleName() + "\"}");
+            JSONObject tmp = SemanticsModel.parseJSON("{\"class\":\"" + adjectiveClass.name + "\"}");
             SemanticsModel.wrap(tmp, YodaSkeletonOntologyRegistry.unknownThingWithRoles.name, hasQualityRole);
             return new ImmutablePair<>(adjectiveString, tmp);
 

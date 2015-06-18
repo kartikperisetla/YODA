@@ -1,9 +1,9 @@
 package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander;
 
 import edu.cmu.sv.database.Ontology;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
+import edu.cmu.sv.domain.ontology2.Quality2;
+import edu.cmu.sv.domain.ontology2.QualityDegree;
+import edu.cmu.sv.domain.ontology2.Role2;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.spoken_language_understanding.Tokenizer;
@@ -21,24 +21,21 @@ import java.util.regex.Pattern;
  * Created by David Cohen on 1/21/15.
  */
 public class YnqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
-    Class<? extends Adjective> adjectiveClass;
-    Class<? extends TransientQuality> qualityClass;
-    Class<? extends Role> hasQualityRole;
+    QualityDegree adjectiveClass;
+    Quality2 qualityClass;
+    Role2 hasQualityRole;
     String adjectiveRegexString = "()";
     YodaEnvironment yodaEnvironment;
 
-    public YnqHasPropertyRegexInterpreter(Class<? extends Adjective> adjectiveClass, YodaEnvironment yodaEnvironment) {
+    public YnqHasPropertyRegexInterpreter(QualityDegree adjectiveClass, YodaEnvironment yodaEnvironment) {
         this.adjectiveClass = adjectiveClass;
         this.yodaEnvironment = yodaEnvironment;
         try {
-            this.qualityClass = adjectiveClass.newInstance().getQuality();
+            this.qualityClass = adjectiveClass.getQuality();
             this.hasQualityRole = Ontology.qualityDescriptors(qualityClass).getKey();
             Set<String> adjectiveStrings = this.yodaEnvironment.lex.getPOSForClass(adjectiveClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, true);
             this.adjectiveRegexString = "("+String.join("|",adjectiveStrings)+")";
 //            System.err.println(this.adjectiveRegexString);
-        } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
-            System.exit(-1);
         } catch (Lexicon.NoLexiconEntryException e) {
 //            e.printStackTrace();
         }
@@ -78,15 +75,15 @@ public class YnqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
                 if (npInterpretation==null){
                     jsonString = "{\"dialogAct\":\"YNQuestion\",\"verb\":{" +
                             "\"Patient\":{\"class\":\"UnknownThingWithRoles\",\"" +
-                            hasQualityRole.getSimpleName() +
-                            "\":{\"class\":\"" + adjectiveClass.getSimpleName() + "\"}},\"class\":\"HasProperty\"}}";
+                            hasQualityRole.name +
+                            "\":{\"class\":\"" + adjectiveClass.name + "\"}},\"class\":\"HasProperty\"}}";
                 }
                 else {
                     jsonString = "{\"dialogAct\":\"YNQuestion\",\"verb\":{\"Agent\":" +
                             npInterpretation.getKey().toJSONString() +
                             ",\"Patient\":{\"class\":\"UnknownThingWithRoles\",\"" +
-                            hasQualityRole.getSimpleName() +
-                            "\":{\"class\":\"" + adjectiveClass.getSimpleName() + "\"}},\"class\":\"HasProperty\"}}";
+                            hasQualityRole.name +
+                            "\":{\"class\":\"" + adjectiveClass.name + "\"}},\"class\":\"HasProperty\"}}";
                 }
 
                 return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString),

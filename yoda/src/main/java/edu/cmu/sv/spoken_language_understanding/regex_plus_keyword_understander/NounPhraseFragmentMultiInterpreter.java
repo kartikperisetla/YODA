@@ -1,6 +1,6 @@
 package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander;
 
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasName;
+import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.NBestDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;

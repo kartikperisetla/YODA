@@ -76,24 +76,33 @@ public class NaturalLanguageGenerator {
     * to be encoded locally.
     * */
     public static PhraseGenerationRoutine getAppropriatePhraseGenerationRoutine(JSONObject constraints){
-        JSONObject tmpConstraints = SemanticsModel.parseJSON(constraints.toJSONString());
-        if (constraints.get("class").equals(YodaSkeletonOntologyRegistry.webResource.name) &&
+        Map<Object, JSONObject> prepositionDescriptors = new HashMap<>();
+        Map<Object, JSONObject> adjectiveDescriptors = new HashMap<>();
+
+        String className = (String) constraints.get("class");
+        for (Object key : constraints.keySet()) {
+            if (key.equals("refType") || key.equals("class"))
+                continue;
+            if (!Ontology.roleNameMap.containsKey(key))
+                continue;
+            String keyString = (String)key;
+            if (Ontology.qualityNameMap.containsKey(keyString.substring(3)) && Ontology.qualityNameMap.get(keyString.substring(3)).secondArgumentClassConstraint==null)
+                adjectiveDescriptors.put(key, (JSONObject) constraints.get(key));
+            else if (Ontology.qualityNameMap.containsKey(keyString.substring(3)) && Ontology.qualityNameMap.get(keyString.substring(3)).secondArgumentClassConstraint!=null)
+                prepositionDescriptors.put(key, (JSONObject) constraints.get(key));
+        }
+
+        if (className.equals(YodaSkeletonOntologyRegistry.webResource.name) &&
                 constraints.keySet().size()==2 &&
                 constraints.containsKey(YodaSkeletonOntologyRegistry.hasUri.name)){
             return new DefiniteReferenceGenerator();
-        } else if (constraints.get("class").equals(YodaSkeletonOntologyRegistry.unknownThingWithRoles.name) &&
+        } else if (className.equals(YodaSkeletonOntologyRegistry.unknownThingWithRoles.name) &&
                 constraints.keySet().size()==2 &&
-                Adjective.class.isAssignableFrom(Ontology.thingNameMap.get(
-                        ((JSONObject) constraints.get(
-                                constraints.keySet().stream().filter(x -> !x.equals("class")).findAny().get())).
-                        get("class")))){
+                adjectiveDescriptors.size()>0) {
             return new AdjectiveGenerator();
-        } else if (constraints.get("class").equals(YodaSkeletonOntologyRegistry.unknownThingWithRoles.name) &&
+        } else if (className.equals(YodaSkeletonOntologyRegistry.unknownThingWithRoles.name) &&
                 constraints.keySet().size()==2 &&
-                Preposition.class.isAssignableFrom(Ontology.thingNameMap.get(
-                        ((JSONObject) constraints.get(
-                                constraints.keySet().stream().filter(x -> !x.equals("class")).findAny().get())).
-                                get("class")))) {
+                prepositionDescriptors.size()>0) {
             return new PrepositionGenerator();
         } else if (constraints.containsKey("class") &&
                 constraints.keySet().size()==1) {

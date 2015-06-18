@@ -2,8 +2,7 @@ package edu.cmu.sv.system_action.dialog_act.core_dialog_acts;
 
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
+import edu.cmu.sv.domain.ontology2.Noun2;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 
 import java.util.HashMap;
@@ -26,7 +25,7 @@ public class WHQuestion extends DialogAct {
         return descriptionParameters;
     }
     static{
-        individualParameters.put("topic_individual", Noun.class);
+        individualParameters.put("topic_individual", Noun2.class);
     }
     @Override
     public Map<String, Object> getClassParameters() {

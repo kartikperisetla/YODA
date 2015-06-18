@@ -2,7 +2,7 @@ package edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences;
 
 import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.dialog_state_tracking.*;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasValue;
+import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Accept;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
@@ -46,7 +46,7 @@ public class ConfirmGroundingSuggestionInference extends DialogStateUpdateInfere
                         // copy suggestion and ground the discourse unit
                         SemanticsModel newSpokenByThemHypothesis = predecessor.getSpokenByMe().deepCopy();
                         SemanticsModel.unwrap((JSONObject) newSpokenByThemHypothesis.newGetSlotPathFiller(duAnalysis.suggestionPath),
-                                HasValue.class.getSimpleName());
+                                YodaSkeletonOntologyRegistry.hasValue.name);
                         Utils.returnToGround(predecessor, newSpokenByThemHypothesis, timeStamp);
 
                         // collect the result

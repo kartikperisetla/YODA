@@ -1,9 +1,7 @@
 package edu.cmu.sv.dialog_state_tracking;
 
 import edu.cmu.sv.database.ReferenceResolution;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.Requested;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.Suggested;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasValue;
+import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.utils.Assert;
@@ -68,7 +66,7 @@ public class DiscourseAnalysis {
             Assert.verify(discourseUnit.spokenByMe!=null);
             Assert.verify(discourseUnit.groundTruth != null);
             Set<String> suggestionPaths = discourseUnit.getSpokenByMe().
-                    findAllPathsToClass(Suggested.class.getSimpleName());
+                    findAllPathsToClass(YodaSkeletonOntologyRegistry.suggested.name);
             Assert.verify(suggestionPaths.size() == 0);
             Set<String> requestPaths = discourseUnit.spokenByMe.findAllPathsToClass(YodaSkeletonOntologyRegistry.requested.name);
             Assert.verify(requestPaths.size()==1);
@@ -80,20 +78,20 @@ public class DiscourseAnalysis {
         analyseValidity();
         if (discourseUnit.initiator.equals("user")) {
             Set<String> suggestionPaths = discourseUnit.getSpokenByMe().
-                    findAllPathsToClass(Suggested.class.getSimpleName());
+                    findAllPathsToClass(YodaSkeletonOntologyRegistry.suggested.name);
             Assert.verify(suggestionPaths.size() == 1);
             suggestionPath = new LinkedList<>(suggestionPaths).get(0);
             suggestedContent = (JSONObject) discourseUnit.getSpokenByMe().deepCopy().
-                    newGetSlotPathFiller(suggestionPath + "." + HasValue.class.getSimpleName());
+                    newGetSlotPathFiller(suggestionPath + "." + YodaSkeletonOntologyRegistry.hasValue.name);
             groundedSuggestionIndividual = (JSONObject) discourseUnit.groundInterpretation.
                     newGetSlotPathFiller(suggestionPath);
         } else { //discourseUnitHypothesis.initiator.equals("system")
             Set<String> suggestionPaths = discourseUnit.getSpokenByThem().
-                    findAllPathsToClass(Suggested.class.getSimpleName());
+                    findAllPathsToClass(YodaSkeletonOntologyRegistry.suggested.name);
             Assert.verify(suggestionPaths.size() == 1);
             suggestionPath = new LinkedList<>(suggestionPaths).get(0);
             suggestedContent = (JSONObject) discourseUnit.getSpokenByThem().deepCopy().
-                    newGetSlotPathFiller(suggestionPath + "." + HasValue.class.getSimpleName());
+                    newGetSlotPathFiller(suggestionPath + "." + YodaSkeletonOntologyRegistry.hasValue.name);
             groundedSuggestionIndividual = (JSONObject) discourseUnit.groundTruth.
                     newGetSlotPathFiller(suggestionPath);
         }

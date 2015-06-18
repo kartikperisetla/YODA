@@ -1,9 +1,6 @@
 package edu.cmu.sv.natural_language_generation.top_level_templates;
 
-import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Agent;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Patient;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.HasProperty;
+import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
 import edu.cmu.sv.natural_language_generation.PhraseGenerationRoutine;
 import edu.cmu.sv.natural_language_generation.TopLevelNLGTemplate;
@@ -24,8 +21,8 @@ public class StatementTopLevelNLGTemplate implements TopLevelNLGTemplate {
         JSONObject patientConstraint;
 
         JSONObject verbConstraint = (JSONObject) constraints.newGetSlotPathFiller("verb");
-        agentConstraint = (JSONObject) verbConstraint.get(Agent.class.getSimpleName());
-        patientConstraint = (JSONObject) verbConstraint.get(Patient.class.getSimpleName());
+        agentConstraint = (JSONObject) verbConstraint.get(YodaSkeletonOntologyRegistry.agent.name);
+        patientConstraint = (JSONObject) verbConstraint.get(YodaSkeletonOntologyRegistry.patient.name);
 
         if (!verbConstraint.get("class").equals(YodaSkeletonOntologyRegistry.hasProperty.name))
             throw new Error("can only generate statements for "+YodaSkeletonOntologyRegistry.hasProperty.name+":\n"+constraints);
@@ -41,12 +38,12 @@ public class StatementTopLevelNLGTemplate implements TopLevelNLGTemplate {
         SemanticsModel ansModel = new SemanticsModel("{\"dialogAct\":\""+Statement.class.getSimpleName()+
                 "\", \"verb\": {\"class\":\""+
                 YodaSkeletonOntologyRegistry.hasProperty.name+"\", \""+
-                Agent.class.getSimpleName()+"\":"+empty+", \""+
-                Patient.class.getSimpleName()+"\":"+empty+"}}");
+                YodaSkeletonOntologyRegistry.agent.name+"\":"+empty+", \""+
+                YodaSkeletonOntologyRegistry.patient.name+"\":"+empty+"}}");
 
-        ansModel.extendAndOverwriteAtPoint("verb." + Agent.class.getSimpleName(),
+        ansModel.extendAndOverwriteAtPoint("verb." + YodaSkeletonOntologyRegistry.agent.name,
                 new SemanticsModel(agentPhraseContent.getRight().toJSONString()));
-        ansModel.extendAndOverwriteAtPoint("verb." + Patient.class.getSimpleName(),
+        ansModel.extendAndOverwriteAtPoint("verb." + YodaSkeletonOntologyRegistry.patient.name,
                 new SemanticsModel(patientPhraseContent.getRight().toJSONString()));
         return new ImmutablePair<>(ansString, ansModel);
     }

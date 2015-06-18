@@ -1,8 +1,6 @@
 package edu.cmu.sv.natural_language_generation.top_level_templates;
 
-import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Patient;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.HasProperty;
+import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
 import edu.cmu.sv.natural_language_generation.TopLevelNLGTemplate;
 import edu.cmu.sv.semantics.SemanticsModel;
@@ -20,7 +18,7 @@ public class SearchReturnedNothingNLGTemplate implements TopLevelNLGTemplate {
     public ImmutablePair<String, SemanticsModel> generate(SemanticsModel constraints, YodaEnvironment yodaEnvironment) {
         JSONObject patientConstraint;
         JSONObject verbConstraint = (JSONObject) constraints.newGetSlotPathFiller("verb");
-        patientConstraint = (JSONObject) verbConstraint.get(Patient.class.getSimpleName());
+        patientConstraint = (JSONObject) verbConstraint.get(YodaSkeletonOntologyRegistry.patient.name);
 
         String ansString = "i don't know of ";
 
@@ -34,9 +32,9 @@ public class SearchReturnedNothingNLGTemplate implements TopLevelNLGTemplate {
         SemanticsModel ansObject = new SemanticsModel("{\"dialogAct\":\""+SearchReturnedNothing.class.getSimpleName()+
                 "\", \"verb\": {\"class\":\""+
                 YodaSkeletonOntologyRegistry.hasProperty.name+"\", \""+
-                Patient.class.getSimpleName()+"\":"+empty+"}}");
+                YodaSkeletonOntologyRegistry.patient.name+"\":"+empty+"}}");
 
-        ansObject.extendAndOverwriteAtPoint("verb." + Patient.class.getSimpleName(), new SemanticsModel(patient.toJSONString()));
+        ansObject.extendAndOverwriteAtPoint("verb." + YodaSkeletonOntologyRegistry.patient.name, new SemanticsModel(patient.toJSONString()));
         return new ImmutablePair<>(ansString, ansObject);
     }
 }

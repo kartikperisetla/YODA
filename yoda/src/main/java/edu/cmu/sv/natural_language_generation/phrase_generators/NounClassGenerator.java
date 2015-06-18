@@ -1,7 +1,7 @@
 package edu.cmu.sv.natural_language_generation.phrase_generators;
 
 import edu.cmu.sv.database.Ontology;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
+import edu.cmu.sv.domain.ontology2.Noun2;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.natural_language_generation.PhraseGenerationRoutine;
 import edu.cmu.sv.semantics.SemanticsModel;
@@ -15,8 +15,8 @@ import org.json.simple.JSONObject;
 public class NounClassGenerator implements PhraseGenerationRoutine {
     @Override
     public ImmutablePair<String, JSONObject> generate(JSONObject constraints, YodaEnvironment yodaEnvironment) {
-        Class<? extends Thing> nounClass;
-        nounClass = Ontology.thingNameMap.get((String) constraints.get("class"));
+        Noun2 nounClass;
+        nounClass = Ontology.nounNameMap.get((String) constraints.get("class"));
 
         String singularNounForm = null;
         try {

@@ -1,23 +1,16 @@
 package edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences;
 
 import edu.cmu.sv.dialog_state_tracking.*;
-import edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences.DialogStateUpdateInference;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.Suggested;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasValue;
+import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestConfirmValue;
 import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.utils.NBestDistribution;
-import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.json.simple.JSONObject;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -85,7 +78,7 @@ public class GiveGroundingSuggestionInference extends DialogStateUpdateInference
                             newSpokenByMeHypothesis.extendAndOverwriteAtPoint(attachmentPoint, suggestion.deepCopy());
                         }
                         SemanticsModel.wrap((JSONObject) newSpokenByMeHypothesis.newGetSlotPathFiller(attachmentPoint),
-                                Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
+                                YodaSkeletonOntologyRegistry.suggested.name, YodaSkeletonOntologyRegistry.hasValue.name);
 
                         // determine newGroundTruth by copying groundInterpretation, then
                         // overwrite at the attachment point with the suggestion
@@ -98,7 +91,7 @@ public class GiveGroundingSuggestionInference extends DialogStateUpdateInference
                             newGroundTruth.extendAndOverwriteAtPoint(attachmentPoint, groundedSuggestion.deepCopy());
                         }
 //                        SemanticsModel.wrap((JSONObject) newGroundTruth.newGetSlotPathFiller(attachmentPoint),
-//                                Suggested.class.getSimpleName(), HasValue.class.getSimpleName());
+//                                YodaSkeletonOntologyRegistry.suggested.name, YodaSkeletonOntologyRegistry.hasValue.name);
 
                         Utils.unground(updatedPredecessor, newSpokenByMeHypothesis, newGroundTruth, timeStamp);
                         Double score = Utils.discourseUnitContextProbability(newDialogState, updatedPredecessor);

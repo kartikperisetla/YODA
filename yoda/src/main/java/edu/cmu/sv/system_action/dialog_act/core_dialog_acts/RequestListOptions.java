@@ -4,8 +4,7 @@ import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.dialog_state_tracking.Utils;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
+import edu.cmu.sv.domain.ontology2.Verb2;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import org.json.simple.JSONObject;
@@ -23,8 +22,8 @@ public class RequestListOptions extends DialogAct {
     static Map<String, Object> pathParameters = new HashMap<>();
 
     static{
-        descriptionParameters.put("asserted_role_description", Thing.class);
-        classParameters.put("verb_class", Verb.class);
+        descriptionParameters.put("asserted_role_description", Object.class);
+        classParameters.put("verb_class", Verb2.class);
     }
 
     @Override

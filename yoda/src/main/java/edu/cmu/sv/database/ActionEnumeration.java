@@ -1,9 +1,9 @@
 package edu.cmu.sv.database;
 
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
+import edu.cmu.sv.domain.ontology2.Noun2;
+import edu.cmu.sv.domain.ontology2.Role2;
+import edu.cmu.sv.domain.ontology2.Verb2;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.utils.Assert;
@@ -43,7 +43,8 @@ public class ActionEnumeration {
         String focusConstraintString = "";
         for (String parameter : dialogAct.getIndividualParameters().keySet()) {
             variableEnumerationString += "?" + parameter + " ";
-            classConstraintString += "?" + parameter + " rdf:type base:" + dialogAct.getIndividualParameters().get(parameter).getSimpleName() + " .\n";
+            classConstraintString += "?" + parameter + " rdf:type base:" +
+                    ((Noun2)dialogAct.getIndividualParameters().get(parameter)).name + " .\n";
             if (focusConstraint == FOCUS_CONSTRAINT.IN_FOCUS)
                 focusConstraintString += "?" + parameter + " rdf:type dst:InFocus .\n";
         }
@@ -108,10 +109,10 @@ public class ActionEnumeration {
                 ans.add(contextDiscourseUnit.getFromInitiator(path));
         } else {
             String[] roles = path.split("\\.");
-            Class<? extends Role> lastRole = Ontology.roleNameMap.get(roles[roles.length-1]);
-            for (Class<? extends Thing> thingClass : Ontology.thingNameMap.values()){
+            Role2 lastRole = Ontology.roleNameMap.get(roles[roles.length-1]);
+            for (Object thingClass : Ontology.thingNameMap.values()){
                 if (Ontology.inRange(lastRole, thingClass)){
-                    JSONObject description = SemanticsModel.parseJSON("{\"class\":\""+thingClass.getSimpleName()+"\"}");
+                    JSONObject description = SemanticsModel.parseJSON("{\"class\":\""+((Noun2)thingClass).name+"\"}");
                     ans.add(description);
                     // todo: by name
 
@@ -138,26 +139,24 @@ public class ActionEnumeration {
 //            verbClassSet = Ontology.verbs;
 //        }
 
-        for (Class<? extends Verb> verbClass : Ontology.verbs) {
+        for (Verb2 verbClass : Ontology.verbs) {
             if (verbConstraint != null && !Ontology.thingNameMap.get(verbConstraint).equals(verbClass))
                 continue;
-            if (verbClass==Verb.class)
-                continue;
             Map<String, Set<Object>> possibleBindingsPerVariable = new HashMap<>();
-            possibleBindingsPerVariable.put("verb_class", new HashSet<>(Arrays.asList(verbClass.getSimpleName())));
+            possibleBindingsPerVariable.put("verb_class", new HashSet<>(Arrays.asList(verbClass.name)));
 
             if (dialogAct.getPathParameters().containsKey("given_role_path")) {
                 possibleBindingsPerVariable.put("given_role_path",
-                        Ontology.roleClasses.stream().
+                        Ontology.roles.stream().
                                 filter(x -> Ontology.inDomain(x, verbClass)).
-                                map(x -> "verb." + x.getSimpleName()).
+                                map(x -> "verb." + x.name).
                                 collect(Collectors.toSet()));
             }
             if (dialogAct.getPathParameters().containsKey("requested_role_path")) {
                 possibleBindingsPerVariable.put("requested_role_path",
-                        Ontology.roleClasses.stream().
+                        Ontology.roles.stream().
                                 filter(x -> Ontology.inDomain(x, verbClass)).
-                                map(x -> "verb." + x.getSimpleName()).
+                                map(x -> "verb." + x.name).
                                 collect(Collectors.toSet()));
             }
 

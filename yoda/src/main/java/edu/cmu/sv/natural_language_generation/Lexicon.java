@@ -1,5 +1,7 @@
 package edu.cmu.sv.natural_language_generation;
 
+import edu.cmu.sv.domain.ontology2.Noun2;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -66,9 +68,9 @@ public class Lexicon {
         return ans;
     }
 
-    public  Set<String> getPOSForClassHierarchy(Class cls,
-                                                      LexicalEntry.PART_OF_SPEECH partOfSpeech,
-                                                      boolean allowUnderstandingOnly) throws NoLexiconEntryException {
+    public  Set<String> getPOSForClassHierarchy(Noun2 cls,
+                                                LexicalEntry.PART_OF_SPEECH partOfSpeech,
+                                                boolean allowUnderstandingOnly) throws NoLexiconEntryException {
         try {
             Set<String> ans = getPOSForClass((Object)cls, partOfSpeech, allowUnderstandingOnly);
             if (ans.size()==0){
@@ -76,7 +78,9 @@ public class Lexicon {
             }
             return ans;
         } catch (NoLexiconEntryException e){
-            return getPOSForClassHierarchy(cls.getSuperclass(), partOfSpeech, allowUnderstandingOnly);
+            if (cls.directParent!=null)
+                return getPOSForClassHierarchy(cls.directParent, partOfSpeech, allowUnderstandingOnly);
+            return new HashSet<>();
         }
     }
 

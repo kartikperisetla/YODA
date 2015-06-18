@@ -1,10 +1,7 @@
 package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander;
 
-import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Time;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasAmPm;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasHour;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasSingleMinute;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasTenMinute;
+
+import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -94,7 +91,7 @@ public class TimeInterpreter implements MiniLanguageInterpreter{
     @Override
     public Pair<JSONObject, Double> interpret(List<String> tokens, YodaEnvironment yodaEnvironment) {
         JSONObject ans = new JSONObject();
-        ans.put("class", Time.class.getSimpleName());
+        ans.put("class", YodaSkeletonOntologyRegistry.timeNounClass.name);
         List<String> remainingTokens = new LinkedList<>(tokens);
         for (String token : remainingTokens){
             if (hourMap.containsKey(token)){

@@ -1,9 +1,9 @@
 package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander;
 
 import edu.cmu.sv.database.Ontology;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasAtTime;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
+import edu.cmu.sv.domain.ontology2.Role2;
+import edu.cmu.sv.domain.ontology2.Verb2;
+import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.spoken_language_understanding.Tokenizer;
@@ -20,16 +20,16 @@ import java.util.regex.Pattern;
  * Created by David Cohen on 1/21/15.
  */
 public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
-    Class<? extends Verb> verbClass;
+    Verb2 verbClass;
     String verbRegexString = "()";
     String adjectiveRegexString = "()";
-    Map<Class<? extends Role>, String> roleObj1PrefixPatterns = new HashMap<>();
-    Map<Class<? extends Role>, String> roleObj2PrefixPatterns = new HashMap<>();
-    Map<Class<? extends Role>, Boolean> r1HasBlankPrefix = new HashMap<>();
-    Map<Class<? extends Role>, Boolean> r2HasBlankPrefix = new HashMap<>();
+    Map<Role2, String> roleObj1PrefixPatterns = new HashMap<>();
+    Map<Role2, String> roleObj2PrefixPatterns = new HashMap<>();
+    Map<Role2, Boolean> r1HasBlankPrefix = new HashMap<>();
+    Map<Role2, Boolean> r2HasBlankPrefix = new HashMap<>();
     YodaEnvironment yodaEnvironment;
 
-    public CommandMultiInterpreter(Class<? extends Verb> verbClass, YodaEnvironment yodaEnvironment) {
+    public CommandMultiInterpreter(Verb2 verbClass, YodaEnvironment yodaEnvironment) {
         this.verbClass = verbClass;
         this.yodaEnvironment = yodaEnvironment;
 
@@ -51,7 +51,7 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
         adjectiveRegexString = "("+String.join("|",verbAdjectiveStrings)+")";
 
         // get role prefixes
-        for (Class<? extends Role> roleClass : Ontology.roleClasses) {
+        for (Role2 roleClass : Ontology.roles) {
             if (Ontology.inDomain(roleClass, verbClass)) {
                 Set<String> roleObj1PrefixStrings = new HashSet<>();
                 Set<String> roleObj2PrefixStrings = new HashSet<>();
@@ -99,7 +99,7 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
                 if (!negationMatcher.matches()) {
                     String obj1String = matcher.group(3).trim();
                     System.err.println("obj1string:" + obj1String);
-                    for (Class<? extends Role> roleClass : r1HasBlankPrefix.keySet()) {
+                    for (Role2 roleClass : r1HasBlankPrefix.keySet()) {
                         String rolePrefixRegexString = roleObj1PrefixPatterns.containsKey(roleClass) ? roleObj1PrefixPatterns.get(roleClass) : "()";
                         if (r1HasBlankPrefix.get(roleClass))
                             rolePrefixRegexString = new StringBuilder(rolePrefixRegexString).insert(rolePrefixRegexString.length() - 1, "|").toString();
@@ -108,7 +108,7 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
                         if (matcher2.matches()) {
                             String npString = matcher2.group(2);
                             Pair<JSONObject, Double> npInterpretation;
-                            if (roleClass.equals(HasAtTime.class))
+                            if (roleClass.equals(YodaSkeletonOntologyRegistry.hasAtTime))
                                 npInterpretation = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
                                         timeInterpreter.interpret(Tokenizer.tokenize(npString), yodaEnvironment);
                             else
@@ -118,9 +118,9 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
                             if (npInterpretation == null)
                                 continue;
 
-                            String jsonString = "{\"dialogAct\":\"Command\",\"verb\":{\"class\":\"" + verbClass.getSimpleName() + "\"}}";
+                            String jsonString = "{\"dialogAct\":\"Command\",\"verb\":{\"class\":\"" + verbClass.name + "\"}}";
                             JSONObject hyp = SemanticsModel.parseJSON(jsonString);
-                            ((JSONObject) hyp.get("verb")).put(roleClass.getSimpleName(), npInterpretation.getKey());
+                            ((JSONObject) hyp.get("verb")).put(roleClass.name, npInterpretation.getKey());
                             ans.put(hyp, RegexPlusKeywordUnderstander.regexInterpreterWeight);
                         }
                     }
@@ -149,7 +149,7 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
                     if (!negationMatcher.matches()) {
                         String obj1String = matcher.group(3).trim();
                         System.err.println("obj1string:" + obj1String);
-                        for (Class<? extends Role> roleClass : r1HasBlankPrefix.keySet()) {
+                        for (Role2 roleClass : r1HasBlankPrefix.keySet()) {
                             String rolePrefixRegexString = roleObj1PrefixPatterns.containsKey(roleClass) ? roleObj1PrefixPatterns.get(roleClass) : "()";
                             if (r1HasBlankPrefix.get(roleClass))
                                 rolePrefixRegexString = new StringBuilder(rolePrefixRegexString).insert(rolePrefixRegexString.length() - 1, "|").toString();
@@ -158,7 +158,7 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
                             if (matcher2.matches()) {
                                 String npString = matcher2.group(2);
                                 Pair<JSONObject, Double> npInterpretation;
-                                if (roleClass.equals(HasAtTime.class))
+                                if (roleClass.equals(YodaSkeletonOntologyRegistry.hasAtTime))
                                     npInterpretation = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
                                             timeInterpreter.interpret(Tokenizer.tokenize(npString), yodaEnvironment);
                                 else
@@ -168,9 +168,9 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
                                 if (npInterpretation == null)
                                     continue;
 
-                                String jsonString = "{\"dialogAct\":\"Command\",\"verb\":{\"class\":\"" + verbClass.getSimpleName() + "\"}}";
+                                String jsonString = "{\"dialogAct\":\"Command\",\"verb\":{\"class\":\"" + verbClass.name + "\"}}";
                                 JSONObject hyp = SemanticsModel.parseJSON(jsonString);
-                                ((JSONObject) hyp.get("verb")).put(roleClass.getSimpleName(), npInterpretation.getKey());
+                                ((JSONObject) hyp.get("verb")).put(roleClass.name, npInterpretation.getKey());
                                 ans.put(hyp, RegexPlusKeywordUnderstander.regexInterpreterWeight);
                             }
                         }
@@ -198,8 +198,8 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
                         String twoRoleString = matcher.group(3).trim();
                         System.err.println("twoRoleString:" + twoRoleString);
 
-                        for (Class<? extends Role> roleClass1 : roleObj1PrefixPatterns.keySet()) {
-                            for (Class<? extends Role> roleClass2 : roleObj2PrefixPatterns.keySet()) {
+                        for (Role2 roleClass1 : roleObj1PrefixPatterns.keySet()) {
+                            for (Role2 roleClass2 : roleObj2PrefixPatterns.keySet()) {
                                 Pattern multiRolePattern = Pattern.compile(roleObj1PrefixPatterns.get(roleClass1) +
                                         " (.+) " +
                                         roleObj2PrefixPatterns.get(roleClass2) +
@@ -213,7 +213,7 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
                                     String objString1 = matcher2.group(2);
                                     String objString2 = matcher2.group(4);
                                     Pair<JSONObject, Double> npInterpretation1;
-                                    if (roleClass1.equals(HasAtTime.class))
+                                    if (roleClass1.equals(YodaSkeletonOntologyRegistry.hasAtTime))
                                         npInterpretation1 = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
                                                 timeInterpreter.interpret(Tokenizer.tokenize(objString1), yodaEnvironment);
                                     else
@@ -221,7 +221,7 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
                                                 nounPhraseInterpreter.interpret(Tokenizer.tokenize(objString1), yodaEnvironment);
 
                                     Pair<JSONObject, Double> npInterpretation2;
-                                    if (roleClass2.equals(HasAtTime.class))
+                                    if (roleClass2.equals(YodaSkeletonOntologyRegistry.hasAtTime))
                                         npInterpretation2 = ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).
                                                 timeInterpreter.interpret(Tokenizer.tokenize(objString2), yodaEnvironment);
                                     else
@@ -231,10 +231,10 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
                                     if (npInterpretation1 == null || npInterpretation2 == null)
                                         continue;
 
-                                    String jsonString = "{\"dialogAct\":\"Command\",\"verb\":{\"class\":\"" + verbClass.getSimpleName() + "\"}}";
+                                    String jsonString = "{\"dialogAct\":\"Command\",\"verb\":{\"class\":\"" + verbClass.name + "\"}}";
                                     JSONObject hyp = SemanticsModel.parseJSON(jsonString);
-                                    ((JSONObject) hyp.get("verb")).put(roleClass1.getSimpleName(), npInterpretation1.getKey());
-                                    ((JSONObject) hyp.get("verb")).put(roleClass2.getSimpleName(), npInterpretation2.getKey());
+                                    ((JSONObject) hyp.get("verb")).put(roleClass1.name, npInterpretation1.getKey());
+                                    ((JSONObject) hyp.get("verb")).put(roleClass2.name, npInterpretation2.getKey());
                                     ans.put(hyp, RegexPlusKeywordUnderstander.regexInterpreterWeight);
                                 }
                             }

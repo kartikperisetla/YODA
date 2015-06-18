@@ -1,11 +1,10 @@
 package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander;
 
-import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.database.Ontology;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.ThingWithRoles;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
+import edu.cmu.sv.domain.ontology2.Quality2;
+import edu.cmu.sv.domain.ontology2.QualityDegree;
+import edu.cmu.sv.domain.ontology2.Role2;
+import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.spoken_language_understanding.Tokenizer;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -24,24 +23,23 @@ import java.util.stream.Collectors;
  * Created by David Cohen on 1/21/15.
  */
 public class WhqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
-    Class<? extends TransientQuality> qualityClass;
-    Class<? extends Role> hasQualityRole;
+    Quality2 qualityClass;
+    Role2 hasQualityRole;
     String adjectiveRegexString = "()";
     String qualityNounRegexString = "()";
     YodaEnvironment yodaEnvironment;
 
-    public WhqHasPropertyRegexInterpreter(Class<? extends TransientQuality> qualityClass, YodaEnvironment yodaEnvironment) {
+    public WhqHasPropertyRegexInterpreter(Quality2 qualityClass, YodaEnvironment yodaEnvironment) {
         this.qualityClass = qualityClass;
         this.yodaEnvironment = yodaEnvironment;
-        Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> descriptor = Ontology.qualityDescriptors(qualityClass);
+        Pair<Role2, Set<QualityDegree>> descriptor = Ontology.qualityDescriptors(qualityClass);
         this.hasQualityRole = descriptor.getKey();
-        Set<Class<? extends Adjective>> adjectiveClasses = descriptor.getRight().stream().
-                filter(Adjective.class::isAssignableFrom).
-                map(x -> (Class<? extends Adjective>) x).
+        Set<QualityDegree> adjectiveClasses = descriptor.getRight().stream().
+                filter(x -> x.getQuality().secondArgumentClassConstraint == null).
                 collect(Collectors.toSet());
 
         Set<String> adjectiveStrings = new HashSet<>();
-        for (Class<? extends Adjective> adjectiveClass : adjectiveClasses) {
+        for (QualityDegree adjectiveClass : adjectiveClasses) {
             try {
                 adjectiveStrings.addAll(this.yodaEnvironment.lex.getPOSForClass(adjectiveClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, true));
             } catch (Lexicon.NoLexiconEntryException e) {}
@@ -71,7 +69,7 @@ public class WhqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
                         npInterpretation.getKey().toJSONString()+
                         ",\"Patient\":" +
                         "{\"class\":\"Requested\",\"HasValue\":{\"class\":\"" +
-                        qualityClass.getSimpleName() + "\"}},\"class\":\"HasProperty\"}}";
+                        qualityClass.name + "\"}},\"class\":\"HasProperty\"}}";
                 return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), RegexPlusKeywordUnderstander.regexInterpreterWeight);
             }
         }
@@ -88,7 +86,7 @@ public class WhqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
                 String jsonString = "{\"dialogAct\":\"WHQuestion\",\"verb\":{\"Agent\":"+
                         npInterpretation.getKey().toJSONString()+", \"Patient\":" +
                         "{\"class\":\"Requested\",\"HasValue\":{\"class\":\"" +
-                        qualityClass.getSimpleName() + "\"}},\"class\":\"HasProperty\"}}";
+                        qualityClass.name + "\"}},\"class\":\"HasProperty\"}}";
                 return new ImmutablePair<>(SemanticsModel.parseJSON(jsonString), RegexPlusKeywordUnderstander.regexInterpreterWeight);
             }
         }

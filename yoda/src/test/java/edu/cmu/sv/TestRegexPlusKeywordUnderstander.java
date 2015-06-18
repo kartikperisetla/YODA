@@ -10,11 +10,6 @@ import edu.cmu.sv.domain.smart_house.SmartHouseLexicon;
 import edu.cmu.sv.domain.smart_house.SmartHouseNonDialogTaskRegistry;
 import edu.cmu.sv.domain.smart_house.SmartHouseOntologyRegistry;
 import edu.cmu.sv.domain.smart_house.data.SmartHouseSLUDataset;
-import edu.cmu.sv.domain.yelp_phoenix.YelpPhoenixDatabaseRegistry;
-import edu.cmu.sv.domain.yelp_phoenix.YelpPhoenixLexicon;
-import edu.cmu.sv.domain.yelp_phoenix.YelpPhoenixNonDialogTaskRegistry;
-import edu.cmu.sv.domain.yelp_phoenix.YelpPhoenixOntologyRegistry;
-import edu.cmu.sv.domain.yelp_phoenix.data.YelpPhoenixSLUDataset;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonLexicon;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.domain.yoda_skeleton.data.YodaSkeletonSLUDataset;
@@ -42,8 +37,7 @@ public class TestRegexPlusKeywordUnderstander {
     @Test
     public void Test() throws FileNotFoundException, UnsupportedEncodingException {
 //        testYodaSkeletonSLU();
-        testYelpPhoenixSLU();
-//        testSmartHouseSLU();
+        testSmartHouseSLU();
 //        runUnderstander();
     }
 
@@ -72,37 +66,37 @@ public class TestRegexPlusKeywordUnderstander {
     }
 
 
-
-    public void testYelpPhoenixSLU() throws FileNotFoundException, UnsupportedEncodingException {
-        YodaEnvironment yodaEnvironment = YodaEnvironment.dialogTestingEnvironment();
-
-        List<DomainSpec> domainSpecs = new LinkedList<>();
-        domainSpecs.add(new DomainSpec(
-                "YODA skeleton domain",
-                new YodaSkeletonLexicon(),
-                new YodaSkeletonOntologyRegistry(),
-                new NonDialogTaskRegistry(),
-                new DatabaseRegistry()));
-        // yelp phoenix domain
-        domainSpecs.add(new DomainSpec(
-                "Yelp Phoenix domain",
-                new YelpPhoenixLexicon(),
-                new YelpPhoenixOntologyRegistry(),
-                new YelpPhoenixNonDialogTaskRegistry(),
-                new YelpPhoenixDatabaseRegistry()));
-
-        for (DomainSpec spec : domainSpecs) {
-            System.err.println("loading domain spec ..." + spec.getDomainName());
-            yodaEnvironment.loadDomain(spec);
-        }
-        Ontology.finalizeOntology();
-        DialogRegistry.finalizeDialogRegistry();
-        ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).constructTemplates();
-        System.err.println("done loading domain");
-
-        SLUDataset tmp = new YelpPhoenixSLUDataset();
-        yodaEnvironment.slu.evaluate(yodaEnvironment, tmp);
-    }
+//
+//    public void testYelpPhoenixSLU() throws FileNotFoundException, UnsupportedEncodingException {
+//        YodaEnvironment yodaEnvironment = YodaEnvironment.dialogTestingEnvironment();
+//
+//        List<DomainSpec> domainSpecs = new LinkedList<>();
+//        domainSpecs.add(new DomainSpec(
+//                "YODA skeleton domain",
+//                new YodaSkeletonLexicon(),
+//                new YodaSkeletonOntologyRegistry(),
+//                new NonDialogTaskRegistry(),
+//                new DatabaseRegistry()));
+//        // yelp phoenix domain
+//        domainSpecs.add(new DomainSpec(
+//                "Yelp Phoenix domain",
+//                new YelpPhoenixLexicon(),
+//                new YelpPhoenixOntologyRegistry(),
+//                new YelpPhoenixNonDialogTaskRegistry(),
+//                new YelpPhoenixDatabaseRegistry()));
+//
+//        for (DomainSpec spec : domainSpecs) {
+//            System.err.println("loading domain spec ..." + spec.getDomainName());
+//            yodaEnvironment.loadDomain(spec);
+//        }
+//        Ontology.finalizeOntology();
+//        DialogRegistry.finalizeDialogRegistry();
+//        ((RegexPlusKeywordUnderstander) yodaEnvironment.slu).constructTemplates();
+//        System.err.println("done loading domain");
+//
+//        SLUDataset tmp = new YelpPhoenixSLUDataset();
+//        yodaEnvironment.slu.evaluate(yodaEnvironment, tmp);
+//    }
 
     public void testSmartHouseSLU() throws FileNotFoundException, UnsupportedEncodingException{
         YodaEnvironment yodaEnvironment = YodaEnvironment.dialogTestingEnvironment();

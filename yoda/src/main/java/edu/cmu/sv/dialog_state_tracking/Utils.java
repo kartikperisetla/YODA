@@ -1,10 +1,9 @@
 package edu.cmu.sv.dialog_state_tracking;
 
 import edu.cmu.sv.database.Ontology;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.Role;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.Verb;
+import edu.cmu.sv.domain.ontology2.Noun2;
+import edu.cmu.sv.domain.ontology2.Role2;
+import edu.cmu.sv.domain.ontology2.Verb2;
 import edu.cmu.sv.semantics.SemanticsModel;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
@@ -54,52 +53,47 @@ public class Utils {
     /*
     * return Triple<slotPathsToResolve, pathsToInfer, alreadyResolvedPaths>
     * */
-    public static Triple<Set<String>, Set<String>, Set<String>> resolutionInformation(DiscourseUnit discourseUnit){
-        try {
-            Set<String> slotPathsToResolve = new HashSet<>();
-            SemanticsModel spokenByThem = discourseUnit.getSpokenByThem();
-            SemanticsModel currentGroundedInterpretation = discourseUnit.getGroundInterpretation();
-            String verb = (String) spokenByThem.newGetSlotPathFiller("verb.class");
-            Class<? extends Verb> verbClass = Ontology.verbNameMap.get(verb);
-            Set<Class<? extends Role>> requiredGroundedRoles = verbClass.newInstance().getRequiredGroundedRoles();
-            Set<Class<? extends Role>> requiredDescriptions = verbClass.newInstance().getRequiredDescriptions();
+    public static Triple<Set<String>, Set<String>, Set<String>> resolutionInformation(DiscourseUnit discourseUnit) {
 
-            for (String path : spokenByThem.getAllInternalNodePaths().stream().
-                    sorted((x, y) -> Integer.compare(x.length(), y.length())).collect(Collectors.toList())) {
-                if (slotPathsToResolve.contains(path)
-                        || Arrays.asList("", "dialogAct", "verb").contains(path)
-                        || slotPathsToResolve.stream().anyMatch(x -> path.startsWith(x)))
-                    continue;
-                if (!Noun.class.isAssignableFrom(Ontology.thingNameMap.get(((JSONObject) spokenByThem.newGetSlotPathFiller(path)).get("class"))))
-                    continue;
-                if (requiredDescriptions.stream().map(x -> "verb." + x.getSimpleName()).collect(Collectors.toList()).contains(path))
-                    continue;
-                slotPathsToResolve.add(path);
-            }
+        Set<String> slotPathsToResolve = new HashSet<>();
+        SemanticsModel spokenByThem = discourseUnit.getSpokenByThem();
+        SemanticsModel currentGroundedInterpretation = discourseUnit.getGroundInterpretation();
+        String verb = (String) spokenByThem.newGetSlotPathFiller("verb.class");
+        Verb2 verbClass = Ontology.verbNameMap.get(verb);
+        Set<Role2> requiredGroundedRoles = verbClass.getRequiredGroundedRoles();
+        Set<Role2> requiredDescriptions = verbClass.getRequiredDescriptions();
 
-
-            // collect the paths that have already been resolved
-            Set<String> alreadyResolvedPaths;
-            if (currentGroundedInterpretation!=null) {
-                alreadyResolvedPaths = slotPathsToResolve.stream().filter(x -> currentGroundedInterpretation.newGetSlotPathFiller(x) != null).collect(Collectors.toSet());
-            } else {
-                alreadyResolvedPaths = new HashSet<>();
-            }
-            slotPathsToResolve.removeAll(alreadyResolvedPaths);
-
-            //todo: add roles missing from prepositions
-            Set<String> pathsToInfer = requiredGroundedRoles.stream().
-                    map(x -> "verb." + x.getSimpleName()).
-                    filter(x -> !alreadyResolvedPaths.contains(x)).
-                    filter(x -> !slotPathsToResolve.contains(x)).
-                    collect(Collectors.toSet());
-
-            return new ImmutableTriple<>(slotPathsToResolve, pathsToInfer, alreadyResolvedPaths);
-        } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
-            System.exit(0);
+        for (String path : spokenByThem.getAllInternalNodePaths().stream().
+                sorted((x, y) -> Integer.compare(x.length(), y.length())).collect(Collectors.toList())) {
+            if (slotPathsToResolve.contains(path)
+                    || Arrays.asList("", "dialogAct", "verb").contains(path)
+                    || slotPathsToResolve.stream().anyMatch(x -> path.startsWith(x)))
+                continue;
+            if (!Ontology.nounNameMap.containsKey(((JSONObject) spokenByThem.newGetSlotPathFiller(path)).get("class")))
+                continue;
+            if (requiredDescriptions.stream().map(x -> "verb." + x.name).collect(Collectors.toList()).contains(path))
+                continue;
+            slotPathsToResolve.add(path);
         }
-        return null;
+
+
+        // collect the paths that have already been resolved
+        Set<String> alreadyResolvedPaths;
+        if (currentGroundedInterpretation != null) {
+            alreadyResolvedPaths = slotPathsToResolve.stream().filter(x -> currentGroundedInterpretation.newGetSlotPathFiller(x) != null).collect(Collectors.toSet());
+        } else {
+            alreadyResolvedPaths = new HashSet<>();
+        }
+        slotPathsToResolve.removeAll(alreadyResolvedPaths);
+
+        //todo: add roles missing from prepositions
+        Set<String> pathsToInfer = requiredGroundedRoles.stream().
+                map(x -> "verb." + x.name).
+                filter(x -> !alreadyResolvedPaths.contains(x)).
+                filter(x -> !slotPathsToResolve.contains(x)).
+                collect(Collectors.toSet());
+
+        return new ImmutableTriple<>(slotPathsToResolve, pathsToInfer, alreadyResolvedPaths);
     }
 
 
@@ -109,19 +103,13 @@ public class Utils {
             String lastRoleName = slotPath.split("\\.")[slotPath.split("\\.").length-1];
             if (!Ontology.roleNameMap.containsKey(lastRoleName))
                 continue;
-            if (!Ontology.thingNameMap.containsKey(rangeClassName))
+            if (!Ontology.nounNameMap.containsKey(rangeClassName))
                 continue;
-            Class<? extends Role> roleClass = Ontology.roleNameMap.get(lastRoleName);
-            Class<? extends Thing> contentClass = Ontology.thingNameMap.get(rangeClassName);
-            Set<Class<? extends Thing>> range = new HashSet<>();
-            try {
-                range = roleClass.newInstance().getRange();
-            } catch ( InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
-                System.exit(0);
-            }
-            for (Class<? extends Thing> rangeCls : range) {
-                if (rangeCls.isAssignableFrom(contentClass)) {
+            Role2 roleClass = Ontology.roleNameMap.get(lastRoleName);
+            Noun2 contentClass = Ontology.nounNameMap.get(rangeClassName);
+            Set<Object> range = roleClass.getRange();
+            for (Object rangeCls : range) {
+                if (rangeCls instanceof Noun2 && Ontology.nounInherits(contentClass, (Noun2) rangeCls)) {
                     ans.add(slotPath);
                     break;
                 }
