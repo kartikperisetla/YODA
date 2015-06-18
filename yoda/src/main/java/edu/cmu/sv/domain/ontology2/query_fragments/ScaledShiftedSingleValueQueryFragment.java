@@ -32,8 +32,8 @@ public class ScaledShiftedSingleValueQueryFragment implements QueryFragment{
             ans += "1.0 - ";
         ans += "(";
         ans += "( ?i_"+databaseProperty+" - "+minInput+" ) * "+scale+" )";
-        ans += ") AS "+resultVariable;
-        ans += ")";
+        ans += " AS "+resultVariable;
+        ans += ") ";
         return ans;
     }
 

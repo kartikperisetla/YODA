@@ -33,14 +33,14 @@ public class OrderedStringsQueryFragment implements QueryFragment{
     public String getSparqlQueryFragment(String firstArgument, String secondArgument, String resultVariable) {
         String ans = firstArgument+" base:"+databaseProperty+" ?i_"+databaseProperty+" . ";
         ans += "BIND( ";
-        String ending = " AS "+resultVariable+")";
+        String ending = " AS "+resultVariable+") ";
         for (int i = 0; i < orderedValues.size(); i++) {
             String value = orderedValues.get(i);
-            ans += "IF ( ?i_"+databaseProperty+" = \""+value+"\", "+1.0*i / (orderedValues.size()-1)+",";
+            ans += "IF ( ?i_"+databaseProperty+" = \""+value+"\", "+1.0*i / (orderedValues.size()-1)+", ";
             if (i==orderedValues.size()-1){
                 ans += " 1.0)";
             } else {
-                ending += ")";
+                ending = ")"+ending;
             }
         }
         return ans + ending;

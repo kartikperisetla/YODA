@@ -68,8 +68,8 @@ public class SmartHouseOntologyRegistry implements OntologyRegistry{
 
     public static Quality2 powerState = new Quality2("PowerState", appliance, null,
             new OrderedStringsQueryFragment("power_state", Arrays.asList("off", "on")));
-    public static QualityDegree on = new QualityDegree("On", 1.0, 100.0, cleanliness);
-    public static QualityDegree off = new QualityDegree("Off", 0.0, 100.0, cleanliness);
+    public static QualityDegree on = new QualityDegree("On", 1.0, 100.0, powerState);
+    public static QualityDegree off = new QualityDegree("Off", 0.0, 100.0, powerState);
 
     public static Quality2 containedBy = new Quality2("ContainedBy", appliance, room,
             new BinaryRelationQueryFragment("in_room"));

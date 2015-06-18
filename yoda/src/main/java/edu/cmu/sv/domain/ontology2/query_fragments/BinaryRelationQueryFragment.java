@@ -24,7 +24,7 @@ public class BinaryRelationQueryFragment implements QueryFragment{
                 "} UNION {\n"+
                 "?x rdf:type base:Noun ."+
                 "FILTER NOT EXISTS {"+firstArgument+" base:"+databaseProperty+" "+secondArgument+" }\n"+
-                "BIND (0.0 AS "+resultVariable+")\n}";
+                "BIND (0.0 AS "+resultVariable+")\n} ";
     }
 
 //// OLD EXAMPLE from ContainedBy

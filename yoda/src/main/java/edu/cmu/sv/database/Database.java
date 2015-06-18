@@ -320,6 +320,7 @@ public class Database {
             String queryString = prefixes + "SELECT ?fuzzy_mapped_quality WHERE {" +
                     qualityClass.queryFragment.getSparqlQueryFragment("<"+firstArgument+">", "<"+secondArgument+">","?transient_quality") +
                     "BIND(base:LinearFuzzyMap("+center+", "+slope+", ?transient_quality) AS ?fuzzy_mapped_quality)}";
+//            System.err.println("Database.evaluateQualityDegree: queryString:\n"+queryString);
             Double ans = null;
             synchronized (connection) {
                 log(queryString);

@@ -140,6 +140,8 @@ public class ReferenceResolution {
             queryString += referenceResolutionHelper(reference, 0).getKey();
             queryString += "} \nORDER BY DESC(?score0) \nLIMIT 10";
 
+//            System.err.println("RefRes.resolveReference: queryString:\n"+queryString);
+
             yodaEnvironment.db.log(queryString);
             Database.getLogger().info(MongoLogHandler.createSimpleRecord("reference resolution query", queryString).toJSONString());
 //        Database.getLogger().info("Reference resolution query:\n" + queryString);

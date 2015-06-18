@@ -2,7 +2,7 @@ package edu.cmu.sv.system_action.dialog_act.core_dialog_acts;
 
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
-import edu.cmu.sv.domain.ontology2.Noun2;
+import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 
 import java.util.HashMap;
@@ -25,7 +25,7 @@ public class YNQuestion extends DialogAct {
         return descriptionParameters;
     }
     static{
-        individualParameters.put("topic_individual", Noun2.class);
+        individualParameters.put("topic_individual", YodaSkeletonOntologyRegistry.rootNoun);
     }
     @Override
     public Map<String, Object> getClassParameters() {
