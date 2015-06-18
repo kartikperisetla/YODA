@@ -112,7 +112,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
                     Class<? extends TransientQuality> qualityClass = prepositionClass.newInstance().getQuality();
                     Pair<Class<? extends Role>, Set<Class<? extends ThingWithRoles>>> descriptor = Ontology.qualityDescriptors(qualityClass);
                     JSONObject intermediateObject = SemanticsModel.parseJSON("{\"class\":\""+cls.getSimpleName()+"\"}");
-                    intermediateObject.put(InRelationTo.class.getSimpleName(), entity2JSON);
+                    intermediateObject.put(YodaSkeletonOntologyRegistry.inRelationTo.name, entity2JSON);
                     entity1JSON.put(descriptor.getKey().getSimpleName(), intermediateObject);
 
                 } catch (InstantiationException | IllegalAccessException e) {
@@ -173,10 +173,10 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
 
         // default to UnknownThingWithRoles
         if (!entity1JSON.containsKey("class")){
-            entity1JSON.put("class", UnknownThingWithRoles.class.getSimpleName());
+            entity1JSON.put("class", YodaSkeletonOntologyRegistry.unknownThingWithRoles.name);
         }
         if (entity2String!=null && !entity2JSON.containsKey("class")){
-            entity2JSON.put("class", UnknownThingWithRoles.class.getSimpleName());
+            entity2JSON.put("class", YodaSkeletonOntologyRegistry.unknownThingWithRoles.name);
         }
         return new ImmutablePair<>(entity1JSON,
                 RegexPlusKeywordUnderstander.nounPhraseInterpreterWeight * namedEntityScore);

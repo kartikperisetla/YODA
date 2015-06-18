@@ -4,17 +4,11 @@ import com.google.common.primitives.Doubles;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.dialog_state_tracking.Utils;
+import edu.cmu.sv.domain.ontology2.Noun2;
+import edu.cmu.sv.domain.ontology2.Quality2;
+import edu.cmu.sv.domain.ontology2.QualityDegree;
+import edu.cmu.sv.domain.ontology2.Role2;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.Thing;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.WebResource;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Noun;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.noun.Time;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.preposition.Preposition;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.quality.TransientQuality;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.*;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.has_quality_subroles.HasQualityRole;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.HypothesisSetManagement;
 import edu.cmu.sv.utils.NBestDistribution;
@@ -80,44 +74,39 @@ public class ReferenceResolution {
         return null;
     }
 
-    public static StringDistribution inferRole(YodaEnvironment yodaEnvironment,
-                                               Class<? extends Role> roleClass){
+    public static StringDistribution inferRole(YodaEnvironment yodaEnvironment, Role2 roleClass) {
         StringDistribution ans = new StringDistribution();
-        try {
-            // find out what classes are acceptable to fill this role
-            Set<Class<? extends Thing>> range = roleClass.newInstance().getRange();
+        // find out what classes are acceptable to fill this role
+        Set<Noun2> range = roleClass.getRange().stream().map(x -> (Noun2) x).collect(Collectors.toSet());
 
-            // query the most salient objects of that class (only look for DST in focus fillers)
-            String queryString = Database.prefixes + "SELECT DISTINCT ?x0 ?score0 WHERE {\n";
-            queryString += "?x0 rdf:type dst:InFocus .\n";
-            queryString += "{ " + String.join(" UNION ", range.stream().map(x -> "{ ?x0 rdf:type base:"+x.getSimpleName()+" } ").collect(Collectors.toList()))+ "} \n";
-            queryString += "?x0 dst:salience ?score0 . \n";
-            queryString += "} \nORDER BY DESC(?score0) \nLIMIT 10";
+        // query the most salient objects of that class (only look for DST in focus fillers)
+        String queryString = Database.prefixes + "SELECT DISTINCT ?x0 ?score0 WHERE {\n";
+        queryString += "?x0 rdf:type dst:InFocus .\n";
+        queryString += "{ " + String.join(" UNION ", range.stream().map(x -> "{ ?x0 rdf:type base:" + x.name + " } ").collect(Collectors.toList())) + "} \n";
+        queryString += "?x0 dst:salience ?score0 . \n";
+        queryString += "} \nORDER BY DESC(?score0) \nLIMIT 10";
 
-            yodaEnvironment.db.log(queryString);
-            Database.getLogger().info(MongoLogHandler.createSimpleRecord("role inference query", queryString).toJSONString());
+        yodaEnvironment.db.log(queryString);
+        Database.getLogger().info(MongoLogHandler.createSimpleRecord("role inference query", queryString).toJSONString());
 //            Database.getLogger().info("role inference query:\n"+queryString);
-            try {
-                TupleQuery query = yodaEnvironment.db.connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
-                TupleQueryResult result = query.evaluate();
+        try {
+            TupleQuery query = yodaEnvironment.db.connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+            TupleQueryResult result = query.evaluate();
 
-                while (result.hasNext()){
-                    BindingSet bindings = result.next();
-                    ans.put(bindings.getValue("x0").stringValue(),
-                            Double.parseDouble(bindings.getValue("score0").stringValue()));
-                }
-                result.close();
-            } catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {
-                e.printStackTrace();
-                System.exit(0);
+            while (result.hasNext()) {
+                BindingSet bindings = result.next();
+                ans.put(bindings.getValue("x0").stringValue(),
+                        Double.parseDouble(bindings.getValue("score0").stringValue()));
             }
-
-            ans.put(unfilledJunkString, missingRoleNotInferredPenalty);
-            ans.normalize();
-        } catch (InstantiationException | IllegalAccessException e) {
+            result.close();
+        } catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {
             e.printStackTrace();
             System.exit(0);
         }
+
+        ans.put(unfilledJunkString, missingRoleNotInferredPenalty);
+        ans.normalize();
+
 //        System.out.printf("role inference marginal:" + ans);
         return ans;
     }
@@ -134,7 +123,7 @@ public class ReferenceResolution {
             return cachedAns;
 
         StringDistribution ans = new StringDistribution();
-        if (reference.get("class").equals(Time.class.getSimpleName())){
+        if (reference.get("class").equals(YodaSkeletonOntologyRegistry.timeNounClass.name)){
             LocalDateTime referencePoint = LocalDateTime.now();
 //            System.err.println("now:" + referencePoint.toString());
             referencePoint = referencePoint.with(new NextTimeAdjuster(reference));
@@ -196,16 +185,16 @@ public class ReferenceResolution {
 
         public NextTimeAdjuster(JSONObject timeDescription) {
             this.timeDescription = timeDescription;
-            if (timeDescription.containsKey(HasAmPm.class.getSimpleName()))
-                AmPm = (String) timeDescription.get(HasAmPm.class.getSimpleName());
-            if (timeDescription.containsKey(HasHour.class.getSimpleName()))
-                hour = (long) timeDescription.get(HasHour.class.getSimpleName());
-            if (timeDescription.containsKey(HasTenMinute.class.getSimpleName())) {
-                tenMinute = (long) timeDescription.get(HasTenMinute.class.getSimpleName());
+            if (timeDescription.containsKey(YodaSkeletonOntologyRegistry.hasAmPm.name))
+                AmPm = (String) timeDescription.get(YodaSkeletonOntologyRegistry.hasAmPm.name);
+            if (timeDescription.containsKey(YodaSkeletonOntologyRegistry.hasHour.name))
+                hour = (long) timeDescription.get(YodaSkeletonOntologyRegistry.hasHour.name);
+            if (timeDescription.containsKey(YodaSkeletonOntologyRegistry.hasTenMinute.name)) {
+                tenMinute = (long) timeDescription.get(YodaSkeletonOntologyRegistry.hasTenMinute.name);
                 minuteOfHour += 10*tenMinute;
             }
-            if (timeDescription.containsKey(HasSingleMinute.class.getSimpleName())) {
-                singleMinute = (long) timeDescription.get(HasSingleMinute.class.getSimpleName());
+            if (timeDescription.containsKey(YodaSkeletonOntologyRegistry.hasSingleMinute.name)) {
+                singleMinute = (long) timeDescription.get(YodaSkeletonOntologyRegistry.hasSingleMinute.name);
                 minuteOfHour += singleMinute;
             }
         }
@@ -257,143 +246,130 @@ public class ReferenceResolution {
     * tmpVarIndex is used so that temporary variables within the query don't have naming conflicts
     * */
     private static Pair<String, Integer> referenceResolutionHelper(JSONObject reference,
-                                                                   Integer tmpVarIndex){
-        try {
-            int referenceIndex = tmpVarIndex;
-            tmpVarIndex ++;
-            String ans = "";
+                                                                   Integer tmpVarIndex) {
 
-            if (Noun.class.isAssignableFrom(Ontology.thingNameMap.get((String) reference.get("class")))) {
-                ans += "?x" + referenceIndex + " rdf:type base:" + reference.get("class") + " .\n";
-            }
-            List<String> scoresToAccumulate = new LinkedList<>();
+        int referenceIndex = tmpVarIndex;
+        tmpVarIndex++;
+        String ans = "";
 
-            // if not a named entity, weight by salience
-            if (! reference.keySet().contains(YodaSkeletonOntologyRegistry.hasName.name)) {
-                scoresToAccumulate.add("?score"+tmpVarIndex);
-                ans += "{{OPTIONAL { ?x" + referenceIndex + " dst:salience ?score" + tmpVarIndex + " }}\n" +
-                        "UNION\n" +
-                        "{OPTIONAL { FILTER NOT EXISTS { ?x" + referenceIndex + " dst:salience ?score" + tmpVarIndex + " } " +
-                        "BIND(" + minFocusSalience + " AS ?score" + tmpVarIndex + " ) }}}\n";
-                tmpVarIndex++;
-            }
+        if (Ontology.thingNameMap.get(reference.get("class")) instanceof Noun2) {
+            ans += "?x" + referenceIndex + " rdf:type base:" + reference.get("class") + " .\n";
+        }
+        List<String> scoresToAccumulate = new LinkedList<>();
 
-            for (Object key : reference.keySet()) {
-                if (key.equals("class")) {
-                    continue;
-                } else if (key.equals(YodaSkeletonOntologyRegistry.hasUri.name)){
+        // if not a named entity, weight by salience
+        if (!reference.keySet().contains(YodaSkeletonOntologyRegistry.hasName.name)) {
+            scoresToAccumulate.add("?score" + tmpVarIndex);
+            ans += "{{OPTIONAL { ?x" + referenceIndex + " dst:salience ?score" + tmpVarIndex + " }}\n" +
+                    "UNION\n" +
+                    "{OPTIONAL { FILTER NOT EXISTS { ?x" + referenceIndex + " dst:salience ?score" + tmpVarIndex + " } " +
+                    "BIND(" + minFocusSalience + " AS ?score" + tmpVarIndex + " ) }}}\n";
+            tmpVarIndex++;
+        }
+
+        for (Object key : reference.keySet()) {
+            if (key.equals("class")) {
+                continue;
+            } else if (key.equals(YodaSkeletonOntologyRegistry.hasUri.name)) {
 //                    ans += "FILTER (?x"+referenceIndex+" = <"+reference.get(YodaSkeletonOntologyRegistry.hasUri.name)+"> ) .\n";
 //                    ans += "FILTER ( sameTerm (?x"+referenceIndex+", <"+reference.get(YodaSkeletonOntologyRegistry.hasUri.name)+">) ) .\n";
 //                    ans += "BIND (<"+reference.get(YodaSkeletonOntologyRegistry.hasUri.name)+"> AS ?x"+referenceIndex+")\n";
-                } else if (key.equals("refType")){
-                    if (reference.get(key).equals("pronoun")){
-                        ans += "?x rdf:type dst:InFocus . \n";
-                    } else {
-                        throw new Error("unknown / unhandled reference type"+ reference.get(key));
-                    }
-                } else if (HasQualityRole.class.isAssignableFrom(Ontology.roleNameMap.get((String) key))) {
-                    double center;
-                    double slope;
-                    Class<? extends TransientQuality> qualityClass;
-                    Class<? extends Thing> qualityDegreeClass = Ontology.thingNameMap.
-                            get((String) ((JSONObject) reference.get(key)).get("class"));
-                    List<String> entityURIs = new LinkedList<>();
-                    entityURIs.add("?x" + referenceIndex);
-                    if (Adjective.class.isAssignableFrom(qualityDegreeClass)) {
-                        Adjective adjective = (Adjective) qualityDegreeClass.newInstance();
-                        center = adjective.getCenter();
-                        slope = adjective.getSlope();
-                        qualityClass = adjective.getQuality();
-                    } else {
-                        continue;
-                    }
-                    scoresToAccumulate.add("?score" + tmpVarIndex);
-                    entityURIs.add("?transient_quality" + tmpVarIndex);
-                    ans += qualityClass.newInstance().getQualityCalculatorSPARQLQuery().apply(entityURIs) +
-                            "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
-                    ans += "FILTER(?score"+tmpVarIndex+" > "+.5+")\n";
-                } else if (HasName.class.equals(Ontology.roleNameMap.get((String) key))) {
-                    String similarityString = null;
-                    if (!(reference.get(YodaSkeletonOntologyRegistry.hasName.name) instanceof String)){
-                        ans += "base:" + ((JSONObject)reference.get(YodaSkeletonOntologyRegistry.hasName.name)).
-                                get(YodaSkeletonOntologyRegistry.hasUri.name) + " rdf:value ?tmpV" + tmpVarIndex + " . \n";
-                        similarityString = "?tmpV"+tmpVarIndex;
-                    } else {
-                        similarityString = (String)reference.get(YodaSkeletonOntologyRegistry.hasName.name);
-                    }
-
-                    ans += "?x" + referenceIndex + " rdfs:label ?tmp" + tmpVarIndex + " . \n" +
-                            "BIND(base:" + StringSimilarity.class.getSimpleName() +
-                            "(?tmp" + tmpVarIndex + ", \""+ similarityString + "\") AS ?score" + tmpVarIndex + ")\n";
-                    ans += "FILTER(?score"+tmpVarIndex+" > "+StringSimilarity.possibleMatchThreshold+")\n";
-
-                    scoresToAccumulate.add("?score"+tmpVarIndex);
+            } else if (key.equals("refType")) {
+                if (reference.get(key).equals("pronoun")) {
+                    ans += "?x rdf:type dst:InFocus . \n";
                 } else {
-                    throw new Error("this role isn't handled:" + key);
+                    throw new Error("unknown / unhandled reference type" + reference.get(key));
                 }
-                tmpVarIndex++;
-            }
-
-            for (Object key : reference.keySet()) {
-                if (key.equals("class") || key.equals("refType") || key.equals(YodaSkeletonOntologyRegistry.hasUri.name))
+            } else if (Ontology.roleNameMap.containsKey(key) && Ontology.roleNameMap.get(key).isQualityRole) {
+                double center;
+                double slope;
+                QualityDegree qualityDegreeClass = Ontology.qualityDegreeNameMap.
+                        get((String) ((JSONObject) reference.get(key)).get("class"));
+                Quality2 qualityClass = qualityDegreeClass.getQuality();
+                if (qualityClass.secondArgumentClassConstraint == null) {
+                    center = qualityDegreeClass.getCenter();
+                    slope = qualityDegreeClass.getSlope();
+                } else {
                     continue;
-                if (Ontology.roleNameMap.get((String) key).isQualityRole) {
-                    double center;
-                    double slope;
-                    Class<? extends TransientQuality> qualityClass;
-                    Class<? extends Thing> qualityDegreeClass = Ontology.thingNameMap.
-                            get((String) ((JSONObject) reference.get(key)).get("class"));
-                    List<String> entityURIs = new LinkedList<>();
-                    entityURIs.add("?x" + referenceIndex);
-                    if (Preposition.class.isAssignableFrom(qualityDegreeClass)) {
-                        Preposition preposition = (Preposition) qualityDegreeClass.newInstance();
-                        center = preposition.getCenter();
-                        slope = preposition.getSlope();
-                        qualityClass = preposition.getQuality();
-                        //recursively resolveDiscourseUnit the child to this PP, add the child's variable to entityURIs
-                        JSONObject nestedNP = (JSONObject) ((JSONObject) reference.get(key)).get(InRelationTo.class.getSimpleName());
-                        if (nestedNP.containsKey(YodaSkeletonOntologyRegistry.hasUri.name)){
-                            String nestedUri = (String) nestedNP.get(YodaSkeletonOntologyRegistry.hasUri.name);
-                            tmpVarIndex++;
-//                            entityURIs.add("?x" + tmpVarIndex);
-                            entityURIs.add("<"+nestedUri+">");
-                            entityURIs.add("?transient_quality" + tmpVarIndex);
-                            scoresToAccumulate.add("?score" + tmpVarIndex);
-                            ans += qualityClass.newInstance().getQualityCalculatorSPARQLQuery().apply(entityURIs) +
-                                    "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
-                            ans += "FILTER(?score"+tmpVarIndex+" > "+.5+")\n";
-                        } else {
-                            tmpVarIndex++;
-                            entityURIs.add("?x" + tmpVarIndex);
-                            scoresToAccumulate.add("?score" + tmpVarIndex);
-                            Pair<String, Integer> updates = referenceResolutionHelper(nestedNP,tmpVarIndex);
-                            ans += "{\nSELECT DISTINCT ?x" + tmpVarIndex + " ?score" + tmpVarIndex + " WHERE {\n";
-                            ans += updates.getKey();
-                            ans += "}\nORDER BY DESC(?score" + tmpVarIndex+ ")\n" + "LIMIT 5\n} .\n";
-                            tmpVarIndex = updates.getRight();
-                            scoresToAccumulate.add("?score" + tmpVarIndex);
-                            entityURIs.add("?transient_quality" + tmpVarIndex);
-                            ans += qualityClass.newInstance().getQualityCalculatorSPARQLQuery().apply(entityURIs) +
-                                    "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
-                            ans += "FILTER(?score"+tmpVarIndex+" > "+.5+")\n";
-                        }
-                    } else {
-                        continue;
-                    }
                 }
-                tmpVarIndex++;
+                scoresToAccumulate.add("?score" + tmpVarIndex);
+                ans += qualityClass.queryFragment.getSparqlQueryFragment("?x" + referenceIndex, null, "?transient_quality" + tmpVarIndex) +
+                        "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
+                ans += "FILTER(?score" + tmpVarIndex + " > " + .5 + ")\n";
+            } else if (YodaSkeletonOntologyRegistry.hasName.equals(Ontology.roleNameMap.get(key))) {
+                String similarityString = null;
+                if (!(reference.get(YodaSkeletonOntologyRegistry.hasName.name) instanceof String)) {
+                    ans += "base:" + ((JSONObject) reference.get(YodaSkeletonOntologyRegistry.hasName.name)).
+                            get(YodaSkeletonOntologyRegistry.hasUri.name) + " rdf:value ?tmpV" + tmpVarIndex + " . \n";
+                    similarityString = "?tmpV" + tmpVarIndex;
+                } else {
+                    similarityString = (String) reference.get(YodaSkeletonOntologyRegistry.hasName.name);
+                }
+
+                ans += "?x" + referenceIndex + " rdfs:label ?tmp" + tmpVarIndex + " . \n" +
+                        "BIND(base:" + StringSimilarity.class.getSimpleName() +
+                        "(?tmp" + tmpVarIndex + ", \"" + similarityString + "\") AS ?score" + tmpVarIndex + ")\n";
+                ans += "FILTER(?score" + tmpVarIndex + " > " + StringSimilarity.possibleMatchThreshold + ")\n";
+
+                scoresToAccumulate.add("?score" + tmpVarIndex);
+            } else {
+                throw new Error("this role isn't handled:" + key);
             }
-
-            ans += "BIND(base:" + Product.class.getSimpleName() + "(";
-            ans += String.join(", ", scoresToAccumulate);
-            ans += ") AS ?score" + referenceIndex + ")\n";
-
-            return new ImmutablePair<>(ans, tmpVarIndex);
-
-        } catch (InstantiationException | IllegalAccessException e){
-            e.printStackTrace();
-            throw new Error();
+            tmpVarIndex++;
         }
+
+        for (Object key : reference.keySet()) {
+            if (key.equals("class") || key.equals("refType") || key.equals(YodaSkeletonOntologyRegistry.hasUri.name))
+                continue;
+            if (Ontology.roleNameMap.containsKey(key) && Ontology.roleNameMap.get(key).isQualityRole) {
+                double center;
+                double slope;
+
+                QualityDegree qualityDegreeClass = Ontology.qualityDegreeNameMap.
+                        get((String) ((JSONObject) reference.get(key)).get("class"));
+                Quality2 qualityClass = qualityDegreeClass.getQuality();
+                if (qualityClass.secondArgumentClassConstraint != null) {
+                    center = qualityDegreeClass.getCenter();
+                    slope = qualityDegreeClass.getSlope();
+                    //recursively resolveDiscourseUnit the child to this PP, add the child's variable to entityURIs
+                    JSONObject nestedNP = (JSONObject) ((JSONObject) reference.get(key)).get(YodaSkeletonOntologyRegistry.inRelationTo.name);
+                    if (nestedNP.containsKey(YodaSkeletonOntologyRegistry.hasUri.name)) {
+                        String nestedUri = (String) nestedNP.get(YodaSkeletonOntologyRegistry.hasUri.name);
+                        tmpVarIndex++;
+                        scoresToAccumulate.add("?score" + tmpVarIndex);
+                        ans += qualityClass.queryFragment.getSparqlQueryFragment("?x" + referenceIndex, "<" + nestedUri + ">", "?transient_quality" + tmpVarIndex) +
+                                "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
+                        ans += "FILTER(?score" + tmpVarIndex + " > " + .5 + ")\n";
+                    } else {
+                        List<String> entityURIs = new LinkedList<>();
+                        entityURIs.add("?x" + referenceIndex);
+                        tmpVarIndex++;
+                        entityURIs.add("?x" + tmpVarIndex);
+                        scoresToAccumulate.add("?score" + tmpVarIndex);
+                        Pair<String, Integer> updates = referenceResolutionHelper(nestedNP, tmpVarIndex);
+                        ans += "{\nSELECT DISTINCT ?x" + tmpVarIndex + " ?score" + tmpVarIndex + " WHERE {\n";
+                        ans += updates.getKey();
+                        ans += "}\nORDER BY DESC(?score" + tmpVarIndex + ")\n" + "LIMIT 5\n} .\n";
+                        tmpVarIndex = updates.getRight();
+                        scoresToAccumulate.add("?score" + tmpVarIndex);
+                        entityURIs.add("?transient_quality" + tmpVarIndex);
+                        ans += qualityClass.queryFragment.getSparqlQueryFragment(entityURIs.get(0), entityURIs.get(1), entityURIs.get(2)) +
+                                "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
+                        ans += "FILTER(?score" + tmpVarIndex + " > " + .5 + ")\n";
+                    }
+                } else {
+                    continue;
+                }
+            }
+            tmpVarIndex++;
+        }
+
+        ans += "BIND(base:" + Product.class.getSimpleName() + "(";
+        ans += String.join(", ", scoresToAccumulate);
+        ans += ") AS ?score" + referenceIndex + ")\n";
+
+        return new ImmutablePair<>(ans, tmpVarIndex);
+
     }
 
     /*
@@ -401,100 +377,87 @@ public class ReferenceResolution {
     * Any nested noun phrases in the description must be grounded in advance (WebResources)
     * Salience is not part of this computation
     * */
-    public static Double descriptionMatch(YodaEnvironment yodaEnvironment, JSONObject individual, JSONObject description){
-        try {
-            String queryString = yodaEnvironment.db.prefixes + "SELECT ?score WHERE {\n";
-            String individualURI = (String) individual.get(YodaSkeletonOntologyRegistry.hasUri.name);
-            int tmpVarIndex = 0;
-            List<String> scoresToAccumulate = new LinkedList<>();
-            for (Object key : description.keySet()) {
-                if (key.equals("class")) {
-                    if (description.get(key).equals(UnknownThingWithRoles.class.getSimpleName()))
-                        continue;
-                    queryString += "<" + individualURI + "> rdf:type base:" + description.get(key) + " . \n";
+    public static Double descriptionMatch(YodaEnvironment yodaEnvironment, JSONObject individual, JSONObject description) {
+
+        String queryString = yodaEnvironment.db.prefixes + "SELECT ?score WHERE {\n";
+        String individualURI = (String) individual.get(YodaSkeletonOntologyRegistry.hasUri.name);
+        int tmpVarIndex = 0;
+        List<String> scoresToAccumulate = new LinkedList<>();
+        for (Object key : description.keySet()) {
+            if (key.equals("class")) {
+                if (description.get(key).equals(YodaSkeletonOntologyRegistry.unknownThingWithRoles.name))
+                    continue;
+                queryString += "<" + individualURI + "> rdf:type base:" + description.get(key) + " . \n";
 //                    queryString += "BIND(IF({<" + individualURI + "> rdf:type base:" + description.get(key) + "}, 1.0, 0.0) AS ?score"+tmpVarIndex+")\n";
 //                    System.out.println("requiring individual to have type: base:"+description.get(key));
-                } else if (key.equals("refType")){
-                    continue;
-                } else if (HasQualityRole.class.isAssignableFrom(Ontology.roleNameMap.get((String) key))) {
-                    double center;
-                    double slope;
-                    Class<? extends TransientQuality> qualityClass;
-                    Class<? extends Thing> qualityDegreeClass = Ontology.thingNameMap.
-                            get((String) ((JSONObject) description.get(key)).get("class"));
-                    List<String> entityURIs = new LinkedList<>();
-                    entityURIs.add("<"+individualURI+">");
-                    if (Preposition.class.isAssignableFrom(qualityDegreeClass)) {
-                        Preposition preposition = (Preposition) qualityDegreeClass.newInstance();
-                        center = preposition.getCenter();
-                        slope = preposition.getSlope();
-                        qualityClass = preposition.getQuality();
-                        String nestedURI = ((String) ((JSONObject) ((JSONObject) description.get(key)).
-                                get(InRelationTo.class.getSimpleName())).get(YodaSkeletonOntologyRegistry.hasUri.name));
-                        entityURIs.add("<"+nestedURI+">");
-                    } else if (Adjective.class.isAssignableFrom(qualityDegreeClass)) {
-                        Adjective adjective = (Adjective) qualityDegreeClass.newInstance();
-                        center = adjective.getCenter();
-                        slope = adjective.getSlope();
-                        qualityClass = adjective.getQuality();
-                    } else {
-                        throw new Error("degreeClass is neither an adjective nor a Preposition class");
-                    }
-                    entityURIs.add("?transient_quality"+tmpVarIndex);
-                    queryString += qualityClass.newInstance().getQualityCalculatorSPARQLQuery().apply(entityURIs) +
-                            "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
-                    scoresToAccumulate.add("?score"+tmpVarIndex);
-                } else if (HasName.class.equals(Ontology.roleNameMap.get((String) key))) {
-                    String similarityString = null;
-                    if (!(description.get(YodaSkeletonOntologyRegistry.hasName.name) instanceof String)){
-                        queryString += "base:" + ((JSONObject)description.get(YodaSkeletonOntologyRegistry.hasName.name)).
-                                get(YodaSkeletonOntologyRegistry.hasUri.name) + " rdf:value ?tmpV" + tmpVarIndex + " . \n";
-                        similarityString = "?tmpV"+tmpVarIndex;
-                    } else {
-                        similarityString = (String)description.get(YodaSkeletonOntologyRegistry.hasName.name);
-                    }
-
-                    queryString += "<"+individualURI+"> rdfs:label ?tmp" + tmpVarIndex + " . \n" +
-                            "BIND(base:" + StringSimilarity.class.getSimpleName() +
-                            "(?tmp" + tmpVarIndex + ", \"" + similarityString + "\") AS ?score" + tmpVarIndex + ")\n";
-                    scoresToAccumulate.add("?score"+tmpVarIndex);
+            } else if (key.equals("refType")) {
+                continue;
+            } else if (Ontology.roleNameMap.containsKey(key) && Ontology.roleNameMap.get(key).isQualityRole) {
+                double center;
+                double slope;
+                QualityDegree qualityDegreeClass = Ontology.qualityDegreeNameMap.
+                        get((String) ((JSONObject) description.get(key)).get("class"));
+                Quality2 qualityClass = qualityDegreeClass.getQuality();
+                String firstArgument = "<" + individualURI + ">";
+                String secondArgument = null;
+                if (qualityClass.secondArgumentClassConstraint != null) {
+                    center = qualityDegreeClass.getCenter();
+                    slope = qualityDegreeClass.getSlope();
+                    String nestedURI = ((String) ((JSONObject) ((JSONObject) description.get(key)).
+                            get(YodaSkeletonOntologyRegistry.inRelationTo.name)).get(YodaSkeletonOntologyRegistry.hasUri.name));
+                    secondArgument = "<" + nestedURI + ">";
+                } else {
+                    center = qualityDegreeClass.getCenter();
+                    slope = qualityDegreeClass.getSlope();
                 }
-                tmpVarIndex++;
+                queryString += qualityClass.queryFragment.getSparqlQueryFragment(firstArgument, secondArgument, "?transient_quality" + tmpVarIndex) +
+                        "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
+                scoresToAccumulate.add("?score" + tmpVarIndex);
+            } else if (YodaSkeletonOntologyRegistry.hasName.equals(Ontology.roleNameMap.get((String) key))) {
+                String similarityString = null;
+                if (!(description.get(YodaSkeletonOntologyRegistry.hasName.name) instanceof String)) {
+                    queryString += "base:" + ((JSONObject) description.get(YodaSkeletonOntologyRegistry.hasName.name)).
+                            get(YodaSkeletonOntologyRegistry.hasUri.name) + " rdf:value ?tmpV" + tmpVarIndex + " . \n";
+                    similarityString = "?tmpV" + tmpVarIndex;
+                } else {
+                    similarityString = (String) description.get(YodaSkeletonOntologyRegistry.hasName.name);
+                }
+
+                queryString += "<" + individualURI + "> rdfs:label ?tmp" + tmpVarIndex + " . \n" +
+                        "BIND(base:" + StringSimilarity.class.getSimpleName() +
+                        "(?tmp" + tmpVarIndex + ", \"" + similarityString + "\") AS ?score" + tmpVarIndex + ")\n";
+                scoresToAccumulate.add("?score" + tmpVarIndex);
             }
+            tmpVarIndex++;
+        }
 
 
+        queryString += "BIND(base:" + Product.class.getSimpleName() + "(";
+        queryString += String.join(", ", scoresToAccumulate);
+        queryString += ") AS ?score)\n";
+        queryString += "}";
 
-            queryString += "BIND(base:" + Product.class.getSimpleName() + "(";
-            queryString += String.join(", ", scoresToAccumulate);
-            queryString += ") AS ?score)\n";
-            queryString += "}";
-
-            yodaEnvironment.db.log(queryString);
-            Database.getLogger().info(MongoLogHandler.createSimpleRecord("description match query", queryString).toJSONString());
+        yodaEnvironment.db.log(queryString);
+        Database.getLogger().info(MongoLogHandler.createSimpleRecord("description match query", queryString).toJSONString());
 //            Database.getLogger().info("Description match query:\n"+queryString);
 
-            Double ans = null;
-            try {
-                TupleQuery query = yodaEnvironment.db.connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString, Database.baseURI);
-                TupleQueryResult result = query.evaluate();
+        Double ans = null;
+        try {
+            TupleQuery query = yodaEnvironment.db.connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString, Database.baseURI);
+            TupleQueryResult result = query.evaluate();
 
-                if (result.hasNext()){
-                    BindingSet bindings = result.next();
-                    ans = Double.parseDouble(bindings.getValue("score").stringValue());
+            if (result.hasNext()) {
+                BindingSet bindings = result.next();
+                ans = Double.parseDouble(bindings.getValue("score").stringValue());
 //                    Database.getLogger().info("Description match result:"+ans);
-                }
-                result.close();
-            } catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {
-                e.printStackTrace();
-                System.exit(0);
             }
-
-            return ans;
-
-        } catch (InstantiationException | IllegalAccessException e) {
+            result.close();
+        } catch (RepositoryException | QueryEvaluationException | MalformedQueryException e) {
             e.printStackTrace();
-            throw new Error();
+            System.exit(0);
         }
+
+        return ans;
     }
 
     public static Pair<Map<String, DiscourseUnit>, StringDistribution> resolveDiscourseUnit(DiscourseUnit hypothesis, YodaEnvironment yodaEnvironment) {
@@ -580,7 +543,7 @@ public class ReferenceResolution {
                     Set<String> patientsInGroundedDiscourseUnit = new HashSet<>();
                     if (currentDiscourseUnit.getGroundInterpretation() != null) {
                         Set<String> pathsToGroundedIndividuals =
-                                currentDiscourseUnit.getGroundInterpretation().findAllPathsToClass(WebResource.class.getSimpleName());
+                                currentDiscourseUnit.getGroundInterpretation().findAllPathsToClass(YodaSkeletonOntologyRegistry.webResource.name);
                         pathsToGroundedIndividuals.forEach(x ->
                                 individualsInGroundedDiscourseUnit.add((String) currentDiscourseUnit.
                                         getGroundInterpretation().
@@ -594,7 +557,7 @@ public class ReferenceResolution {
                     }
                     if (currentDiscourseUnit.getGroundTruth() != null) {
                         Set<String> pathsToGroundedIndividuals =
-                                currentDiscourseUnit.getGroundTruth().findAllPathsToClass(WebResource.class.getSimpleName());
+                                currentDiscourseUnit.getGroundTruth().findAllPathsToClass(YodaSkeletonOntologyRegistry.webResource.name);
                         pathsToGroundedIndividuals.forEach(x ->
                                 individualsInGroundedDiscourseUnit.add((String) currentDiscourseUnit.
                                         getGroundTruth().

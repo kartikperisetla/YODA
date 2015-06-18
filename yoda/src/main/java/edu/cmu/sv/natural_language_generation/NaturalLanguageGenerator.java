@@ -2,11 +2,6 @@ package edu.cmu.sv.natural_language_generation;
 
 import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.adjective.Adjective;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.UnknownThingWithRoles;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.misc.WebResource;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.preposition.Preposition;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.role.HasURI;
 import edu.cmu.sv.natural_language_generation.phrase_generators.*;
 import edu.cmu.sv.natural_language_generation.top_level_templates.*;
 import edu.cmu.sv.semantics.SemanticsModel;

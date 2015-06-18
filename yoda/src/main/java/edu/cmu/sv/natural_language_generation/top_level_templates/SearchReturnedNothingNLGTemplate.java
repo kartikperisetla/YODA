@@ -30,7 +30,7 @@ public class SearchReturnedNothingNLGTemplate implements TopLevelNLGTemplate {
         JSONObject patient = patientPhrase.getRight();
         ansString += patientPhrase.getLeft();
 
-        String empty = "{\"class\":\""+UnknownThingWithRoles.class.getSimpleName()+"\"}";
+        String empty = "{\"class\":\""+YodaSkeletonOntologyRegistry.unknownThingWithRoles.name+"\"}";
         SemanticsModel ansObject = new SemanticsModel("{\"dialogAct\":\""+SearchReturnedNothing.class.getSimpleName()+
                 "\", \"verb\": {\"class\":\""+
                 YodaSkeletonOntologyRegistry.hasProperty.name+"\", \""+

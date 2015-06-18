@@ -180,7 +180,7 @@ public class RewardAndCostCalculator {
                 boolean anyMatches = false;
 //                System.err.println("contextDU:");
 //                System.err.println(contextDiscourseUnit);
-                for (String path : contextDiscourseUnit.getGroundInterpretation().findAllPathsToClass(WebResource.class.getSimpleName())){
+                for (String path : contextDiscourseUnit.getGroundInterpretation().findAllPathsToClass(YodaSkeletonOntologyRegistry.webResource.name)){
                     if (contextDiscourseUnit.getGroundInterpretation().newGetSlotPathFiller(path+"."+ YodaSkeletonOntologyRegistry.hasUri.name).equals(valueURI)){
                         anyMatches = true;
                         break;
@@ -249,7 +249,7 @@ public class RewardAndCostCalculator {
                 Double discourseUnitConfidence = Utils.discourseUnitContextProbability(dialogState, contextDiscourseUnit);
 //                discourseUnitConfidence *= Math.pow(.1, Utils.numberOfLinksRespondingToDiscourseUnit(contextDiscourseUnit, dialogStateHypothesis));
                 boolean anyMatches = false;
-                for (String path : contextDiscourseUnit.getGroundInterpretation().findAllPathsToClass(WebResource.class.getSimpleName())){
+                for (String path : contextDiscourseUnit.getGroundInterpretation().findAllPathsToClass(YodaSkeletonOntologyRegistry.webResource.name)){
 //                    System.out.println("path:"+path);
                     if (contextDiscourseUnit.getGroundInterpretation().newGetSlotPathFiller(path+"."+ YodaSkeletonOntologyRegistry.hasUri.name).equals(valueUri)){
                         anyMatches = true;

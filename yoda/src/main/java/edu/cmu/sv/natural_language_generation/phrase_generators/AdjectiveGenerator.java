@@ -34,7 +34,7 @@ public class AdjectiveGenerator implements PhraseGenerationRoutine {
             adjectiveString = yodaEnvironment.lex.getPOSForClass(adjectiveClass, Lexicon.LexicalEntry.PART_OF_SPEECH.ADJECTIVE, false).stream().findAny().get();
 
             JSONObject tmp = SemanticsModel.parseJSON("{\"class\":\"" + adjectiveClass.getSimpleName() + "\"}");
-            SemanticsModel.wrap(tmp, UnknownThingWithRoles.class.getSimpleName(), hasQualityRole);
+            SemanticsModel.wrap(tmp, YodaSkeletonOntologyRegistry.unknownThingWithRoles.name, hasQualityRole);
             return new ImmutablePair<>(adjectiveString, tmp);
 
         } catch (Lexicon.NoLexiconEntryException e) {}

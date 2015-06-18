@@ -98,16 +98,16 @@ public class TimeInterpreter implements MiniLanguageInterpreter{
         List<String> remainingTokens = new LinkedList<>(tokens);
         for (String token : remainingTokens){
             if (hourMap.containsKey(token)){
-                ans.put(HasHour.class.getSimpleName(), hourMap.get(token));
+                ans.put(YodaSkeletonOntologyRegistry.hasHour.name, hourMap.get(token));
                 remainingTokens.remove(token);
                 break;
             }
         }
 
-        if (ans.containsKey(HasHour.class.getSimpleName())) {
+        if (ans.containsKey(YodaSkeletonOntologyRegistry.hasHour.name)) {
             for (String token : remainingTokens) {
                 if (tenMinuteMap.containsKey(token)) {
-                    ans.put(HasTenMinute.class.getSimpleName(), tenMinuteMap.get(token));
+                    ans.put(YodaSkeletonOntologyRegistry.hasTenMinute.name, tenMinuteMap.get(token));
                     remainingTokens.remove(token);
                     break;
                 }
@@ -115,7 +115,7 @@ public class TimeInterpreter implements MiniLanguageInterpreter{
 
             for (String token : remainingTokens) {
                 if (singleMinuteMap.containsKey(token)) {
-                    ans.put(HasSingleMinute.class.getSimpleName(), singleMinuteMap.get(token));
+                    ans.put(YodaSkeletonOntologyRegistry.hasSingleMinute.name, singleMinuteMap.get(token));
                     remainingTokens.remove(token);
                     break;
                 }
@@ -124,7 +124,7 @@ public class TimeInterpreter implements MiniLanguageInterpreter{
 
         for (String token : remainingTokens){
             if (amPmMap.containsKey(token)){
-                ans.put(HasAmPm.class.getSimpleName(), amPmMap.get(token));
+                ans.put(YodaSkeletonOntologyRegistry.hasAmPm.name, amPmMap.get(token));
                 remainingTokens.remove(token);
                 break;
             }

@@ -5,7 +5,6 @@ import edu.cmu.sv.database.ActionEnumeration;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
-import edu.cmu.sv.domain.yoda_skeleton.ontology.verb.HasProperty;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.SystemAction;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
