@@ -3,10 +3,7 @@ package edu.cmu.sv.domain.yoda_skeleton;
 import edu.cmu.sv.domain.OntologyRegistry;
 import edu.cmu.sv.domain.ontology2.*;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by David Cohen on 3/3/15.
@@ -79,7 +76,7 @@ public class YodaSkeletonOntologyRegistry implements OntologyRegistry{
 
     // define verbs
     public static Verb2 hasProperty = new Verb2("HasProperty", Arrays.asList(agent), Arrays.asList(patient));
-    public static Verb2 exist = new Verb2("Exist", Arrays.asList(agent), new LinkedHashSet<>());
+    public static Verb2 exist = new Verb2("Exist", new LinkedList<>(), Arrays.asList(agent));
 
 
     static{

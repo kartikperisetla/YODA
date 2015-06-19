@@ -109,7 +109,8 @@ public class Utils {
             Noun2 contentClass = Ontology.nounNameMap.get(rangeClassName);
             Set<Object> range = roleClass.getRange();
             for (Object rangeCls : range) {
-                if (rangeCls instanceof Noun2 && Ontology.nounInherits(contentClass, (Noun2) rangeCls)) {
+                if (rangeCls instanceof Noun2 && (Ontology.nounInherits((Noun2) rangeCls, contentClass) ||
+                        Ontology.nounInherits(contentClass, (Noun2) rangeCls))) {
                     ans.add(slotPath);
                     break;
                 }

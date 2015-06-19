@@ -42,7 +42,6 @@ public class GiveGroundingSuggestionInference extends DialogStateUpdateInference
                         continue;
                     }
 
-
                     JSONObject daContent = (JSONObject) hypModel.newGetSlotPathFiller("topic");
                     JSONObject groundedDaContent = (JSONObject) groundedHypModel.newGetSlotPathFiller("topic");
 
@@ -56,6 +55,8 @@ public class GiveGroundingSuggestionInference extends DialogStateUpdateInference
                     possiblePointsOfAttachment.addAll(slotPathsToResolve);
                     possiblePointsOfAttachment.addAll(slotPathsToInfer);
                     possiblePointsOfAttachment.addAll(alreadyResolvedPaths);
+//                    System.err.println("GiveGroundingSuggestionInference: possible points of attachment:"+possiblePointsOfAttachment);
+//                    System.err.println("GiveGroundingSuggestionInference: filter by class:" + daContent.get("class"));
                     Set<String> attachmentPaths = Utils.filterSlotPathsByRangeClass(possiblePointsOfAttachment,
                             (String)daContent.get("class"));
 
@@ -63,6 +64,8 @@ public class GiveGroundingSuggestionInference extends DialogStateUpdateInference
                     SemanticsModel groundedSuggestion = new SemanticsModel(groundedDaContent.toJSONString());
 
                     for (String attachmentPoint : attachmentPaths) {
+//                        System.err.println("GiveGroundingSuggestionInference: attachmentPoint:"+attachmentPoint);
+
                         DialogState newDialogState = currentState.deepCopy();
                         DiscourseUnit updatedPredecessor = newDialogState.discourseUnitHypothesisMap.get(predecessorId);
 
