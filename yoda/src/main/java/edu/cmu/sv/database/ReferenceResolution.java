@@ -4,10 +4,10 @@ import com.google.common.primitives.Doubles;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.dialog_state_tracking.Utils;
-import edu.cmu.sv.domain.ontology2.Noun2;
-import edu.cmu.sv.domain.ontology2.Quality2;
-import edu.cmu.sv.domain.ontology2.QualityDegree;
-import edu.cmu.sv.domain.ontology2.Role2;
+import edu.cmu.sv.domain.ontology.Noun;
+import edu.cmu.sv.domain.ontology.Quality;
+import edu.cmu.sv.domain.ontology.QualityDegree;
+import edu.cmu.sv.domain.ontology.Role;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.utils.HypothesisSetManagement;
@@ -74,10 +74,10 @@ public class ReferenceResolution {
         return null;
     }
 
-    public static StringDistribution inferRole(YodaEnvironment yodaEnvironment, Role2 roleClass) {
+    public static StringDistribution inferRole(YodaEnvironment yodaEnvironment, Role roleClass) {
         StringDistribution ans = new StringDistribution();
         // find out what classes are acceptable to fill this role
-        Set<Noun2> range = roleClass.getRange().stream().map(x -> (Noun2) x).collect(Collectors.toSet());
+        Set<Noun> range = roleClass.getRange().stream().map(x -> (Noun) x).collect(Collectors.toSet());
 
         // query the most salient objects of that class (only look for DST in focus fillers)
         String queryString = Database.prefixes + "SELECT DISTINCT ?x0 ?score0 WHERE {\n";
@@ -254,7 +254,7 @@ public class ReferenceResolution {
         tmpVarIndex++;
         String ans = "";
 
-        if (Ontology.thingNameMap.get(reference.get("class")) instanceof Noun2) {
+        if (Ontology.thingNameMap.get(reference.get("class")) instanceof Noun) {
             ans += "?x" + referenceIndex + " rdf:type base:" + reference.get("class") + " .\n";
         }
         List<String> scoresToAccumulate = new LinkedList<>();
@@ -287,7 +287,7 @@ public class ReferenceResolution {
                 double slope;
                 QualityDegree qualityDegreeClass = Ontology.qualityDegreeNameMap.
                         get((String) ((JSONObject) reference.get(key)).get("class"));
-                Quality2 qualityClass = qualityDegreeClass.getQuality();
+                Quality qualityClass = qualityDegreeClass.getQuality();
                 if (qualityClass.secondArgumentClassConstraint == null) {
                     center = qualityDegreeClass.getCenter();
                     slope = qualityDegreeClass.getSlope();
@@ -329,7 +329,7 @@ public class ReferenceResolution {
 
                 QualityDegree qualityDegreeClass = Ontology.qualityDegreeNameMap.
                         get((String) ((JSONObject) reference.get(key)).get("class"));
-                Quality2 qualityClass = qualityDegreeClass.getQuality();
+                Quality qualityClass = qualityDegreeClass.getQuality();
                 if (qualityClass.secondArgumentClassConstraint != null) {
                     center = qualityDegreeClass.getCenter();
                     slope = qualityDegreeClass.getSlope();
@@ -399,7 +399,7 @@ public class ReferenceResolution {
                 double slope;
                 QualityDegree qualityDegreeClass = Ontology.qualityDegreeNameMap.
                         get((String) ((JSONObject) description.get(key)).get("class"));
-                Quality2 qualityClass = qualityDegreeClass.getQuality();
+                Quality qualityClass = qualityDegreeClass.getQuality();
                 String firstArgument = "<" + individualURI + ">";
                 String secondArgument = null;
                 if (qualityClass.secondArgumentClassConstraint != null) {

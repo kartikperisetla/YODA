@@ -1,7 +1,7 @@
 package edu.cmu.sv.natural_language_generation.phrase_generators;
 
 import edu.cmu.sv.database.Ontology;
-import edu.cmu.sv.domain.ontology2.Noun2;
+import edu.cmu.sv.domain.ontology.Noun;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
@@ -20,7 +20,7 @@ import java.util.Map;
 public class IndefiniteDescriptionGenerator implements PhraseGenerationRoutine {
     @Override
     public ImmutablePair<String, JSONObject> generate(JSONObject constraints, YodaEnvironment yodaEnvironment) {
-        Noun2 nounClass = null;
+        Noun nounClass = null;
         Map<Object, JSONObject> prepositionDescriptors = new HashMap<>();
         Map<Object, JSONObject> adjectiveDescriptors = new HashMap<>();
         if (constraints.containsKey("class")) {

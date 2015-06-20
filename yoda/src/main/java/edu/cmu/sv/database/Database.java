@@ -2,9 +2,9 @@ package edu.cmu.sv.database;
 
 
 import edu.cmu.sv.domain.DatabaseRegistry;
-import edu.cmu.sv.domain.ontology2.Noun2;
-import edu.cmu.sv.domain.ontology2.Quality2;
-import edu.cmu.sv.domain.ontology2.QualityDegree;
+import edu.cmu.sv.domain.ontology.Noun;
+import edu.cmu.sv.domain.ontology.Quality;
+import edu.cmu.sv.domain.ontology.QualityDegree;
 import edu.cmu.sv.yoda_environment.MongoLogHandler;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -143,11 +143,11 @@ public class Database {
     * Insert all direct parent-child relationships (assume that the database does its own class hierarchy inference)
     * Insert rdfs:class and rdfs:property as required
     * */
-    private void generateClassHierarchy(Set<Noun2> nouns)
+    private void generateClassHierarchy(Set<Noun> nouns)
             throws MalformedQueryException, RepositoryException, UpdateExecutionException {
 
         String insertString = prefixes+"INSERT DATA {\n";
-        for (Noun2 nounClass : nouns) {
+        for (Noun nounClass : nouns) {
             insertString += "base:" + nounClass.name + " rdf:type rdfs:Class .\n";
             if (nounClass.directParent != null)
                 insertString += "base:" + nounClass.name + " rdfs:subClassOf base:" + nounClass.directParent.name + " .\n";
@@ -258,14 +258,14 @@ public class Database {
 
     public String mostSpecificClass(String entityName){
         String queryString = prefixes + "SELECT ?x WHERE { <"+entityName+"> rdf:type ?x . }";
-        Set<Noun2> nounClasses = runQuerySelectX(queryString).stream().
+        Set<Noun> nounClasses = runQuerySelectX(queryString).stream().
                 map(Database::getLocalName).
                 filter(x -> Ontology.nounNameMap.containsKey(x)).
                 map(Ontology.nounNameMap::get).
                 collect(Collectors.toSet());
-        for (Noun2 nounClass : nounClasses){
+        for (Noun nounClass : nounClasses){
             boolean anyChildren = false;
-            for (Noun2 nounClass2 : nounClasses){
+            for (Noun nounClass2 : nounClasses){
                 if (nounClass==nounClass2)
                     continue;
                 if (Ontology.nounInherits(nounClass, nounClass2)){
@@ -313,7 +313,7 @@ public class Database {
         try {
             double center;
             double slope;
-            Quality2 qualityClass = degreeClass.getQuality();
+            Quality qualityClass = degreeClass.getQuality();
             center = degreeClass.getCenter();
             slope = degreeClass.getSlope();
 

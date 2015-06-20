@@ -1,9 +1,9 @@
 package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander;
 
 import edu.cmu.sv.database.Ontology;
-import edu.cmu.sv.domain.ontology2.Quality2;
-import edu.cmu.sv.domain.ontology2.QualityDegree;
-import edu.cmu.sv.domain.ontology2.Role2;
+import edu.cmu.sv.domain.ontology.Quality;
+import edu.cmu.sv.domain.ontology.QualityDegree;
+import edu.cmu.sv.domain.ontology.Role;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.spoken_language_understanding.Tokenizer;
@@ -22,8 +22,8 @@ import java.util.regex.Pattern;
  */
 public class YnqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
     QualityDegree adjectiveClass;
-    Quality2 qualityClass;
-    Role2 hasQualityRole;
+    Quality qualityClass;
+    Role hasQualityRole;
     String adjectiveRegexString = "()";
     YodaEnvironment yodaEnvironment;
 

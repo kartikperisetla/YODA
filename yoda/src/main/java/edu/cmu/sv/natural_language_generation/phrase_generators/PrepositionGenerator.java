@@ -1,7 +1,7 @@
 package edu.cmu.sv.natural_language_generation.phrase_generators;
 
 import edu.cmu.sv.database.Ontology;
-import edu.cmu.sv.domain.ontology2.QualityDegree;
+import edu.cmu.sv.domain.ontology.QualityDegree;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;

@@ -1,8 +1,8 @@
 package edu.cmu.sv.natural_language_generation.top_level_templates;
 
 import edu.cmu.sv.database.Ontology;
-import edu.cmu.sv.domain.ontology2.Noun2;
-import edu.cmu.sv.domain.ontology2.Role2;
+import edu.cmu.sv.domain.ontology.Noun;
+import edu.cmu.sv.domain.ontology.Role;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.natural_language_generation.TopLevelNLGTemplate;
@@ -29,7 +29,7 @@ public class RequestRoleNLGTemplate implements TopLevelNLGTemplate {
     public ImmutablePair<String, SemanticsModel> generate(SemanticsModel constraints, YodaEnvironment yodaEnvironment) {
         String verbClassString;
         String requestedSlotPath;
-        Role2 roleClass;
+        Role roleClass;
 
         JSONObject verbObject = (JSONObject)constraints.newGetSlotPathFiller("verb");
         verbClassString = (String)verbObject.get("class");
@@ -45,9 +45,9 @@ public class RequestRoleNLGTemplate implements TopLevelNLGTemplate {
             Set<Object> classesInRange = roleClass.getRange();
             for (Object cls : classesInRange){
                 try {
-                    if (!(cls instanceof Noun2))
+                    if (!(cls instanceof Noun))
                         continue;
-                    whString = yodaEnvironment.lex.getPOSForClassHierarchy((Noun2)cls, Lexicon.LexicalEntry.PART_OF_SPEECH.WH_PRONOUN, false).
+                    whString = yodaEnvironment.lex.getPOSForClassHierarchy((Noun)cls, Lexicon.LexicalEntry.PART_OF_SPEECH.WH_PRONOUN, false).
                             stream().findAny().get();
                     break;
                 } catch(Lexicon.NoLexiconEntryException e){}

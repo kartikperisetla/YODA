@@ -1,6 +1,6 @@
-package edu.cmu.sv.domain.ontology2.query_fragments;
+package edu.cmu.sv.domain.ontology.query_fragments;
 
-import edu.cmu.sv.domain.ontology2.QueryFragment;
+import edu.cmu.sv.domain.ontology.QueryFragment;
 
 /**
  * Created by David Cohen on 6/16/15.

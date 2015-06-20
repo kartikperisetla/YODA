@@ -4,7 +4,7 @@ import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.dialog_state_tracking.Utils;
-import edu.cmu.sv.domain.ontology2.Verb2;
+import edu.cmu.sv.domain.ontology.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import org.json.simple.JSONObject;
@@ -23,7 +23,7 @@ public class SearchReturnedNothing extends DialogAct {
 
     static{
         descriptionParameters.put("asserted_role_description", Object.class);
-        classParameters.put("verb_class", Verb2.class);
+        classParameters.put("verb_class", Verb.class);
     }
 
     @Override

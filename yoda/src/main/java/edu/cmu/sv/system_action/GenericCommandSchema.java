@@ -1,6 +1,6 @@
 package edu.cmu.sv.system_action;
 
-import edu.cmu.sv.domain.ontology2.Verb2;
+import edu.cmu.sv.domain.ontology.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import org.json.simple.JSONObject;
@@ -9,10 +9,10 @@ import org.json.simple.JSONObject;
  * Created by David Cohen on 12/19/14.
  */
 public class GenericCommandSchema extends ActionSchema {
-    private Verb2 verbClass;
+    private Verb verbClass;
     private Class<? extends NonDialogTask> taskClass;
 
-    public GenericCommandSchema(Verb2 verbClass, Class<? extends NonDialogTask> taskClass) {
+    public GenericCommandSchema(Verb verbClass, Class<? extends NonDialogTask> taskClass) {
         this.verbClass = verbClass;
         this.taskClass = taskClass;
     }

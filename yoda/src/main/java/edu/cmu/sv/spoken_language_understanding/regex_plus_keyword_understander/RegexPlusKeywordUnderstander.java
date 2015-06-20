@@ -4,9 +4,9 @@ import com.google.common.primitives.Doubles;
 import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.database.ReferenceResolution;
 import edu.cmu.sv.dialog_state_tracking.Turn;
-import edu.cmu.sv.domain.ontology2.Quality2;
-import edu.cmu.sv.domain.ontology2.QualityDegree;
-import edu.cmu.sv.domain.ontology2.Verb2;
+import edu.cmu.sv.domain.ontology.Quality;
+import edu.cmu.sv.domain.ontology.QualityDegree;
+import edu.cmu.sv.domain.ontology.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.spoken_language_understanding.SpokenLanguageUnderstander;
 import edu.cmu.sv.spoken_language_understanding.Tokenizer;
@@ -84,10 +84,10 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
                 continue;
             languageInterpreters.add(new YnqHasPropertyRegexInterpreter(adjectiveClass, yodaEnvironment));
         }
-        for (Quality2 qualityClass : Ontology.qualities){
+        for (Quality qualityClass : Ontology.qualities){
             languageInterpreters.add(new WhqHasPropertyRegexInterpreter(qualityClass, yodaEnvironment));
         }
-        for (Verb2 verbClass : Ontology.verbs){
+        for (Verb verbClass : Ontology.verbs){
             multiLanguageInterpreters.add(new CommandMultiInterpreter(verbClass, yodaEnvironment));
             languageInterpreters.add(new CommandKeywordInterpreter(verbClass, yodaEnvironment));
         }

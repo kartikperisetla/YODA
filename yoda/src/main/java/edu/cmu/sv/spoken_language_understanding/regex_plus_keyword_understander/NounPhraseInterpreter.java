@@ -1,10 +1,10 @@
 package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander;
 
 import edu.cmu.sv.database.Ontology;
-import edu.cmu.sv.domain.ontology2.Noun2;
-import edu.cmu.sv.domain.ontology2.Quality2;
-import edu.cmu.sv.domain.ontology2.QualityDegree;
-import edu.cmu.sv.domain.ontology2.Role2;
+import edu.cmu.sv.domain.ontology.Noun;
+import edu.cmu.sv.domain.ontology.Quality;
+import edu.cmu.sv.domain.ontology.QualityDegree;
+import edu.cmu.sv.domain.ontology.Role;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.semantics.SemanticsModel;
@@ -24,8 +24,8 @@ import java.util.stream.Collectors;
  */
 public class NounPhraseInterpreter implements MiniLanguageInterpreter{
     Map<QualityDegree, String> prepositionSeparatorRegexStringMap = new HashMap<>();
-    Map<Noun2, Set<String>> pronounStringSetMap = new HashMap<>();
-    Map<Noun2, Set<String>> nounStringSetMap = new HashMap<>();
+    Map<Noun, Set<String>> pronounStringSetMap = new HashMap<>();
+    Map<Noun, Set<String>> nounStringSetMap = new HashMap<>();
     Map<QualityDegree, Set<String>> adjectiveStringSetMap = new HashMap<>();
     YodaEnvironment yodaEnvironment;
 
@@ -45,7 +45,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
             } catch (Lexicon.NoLexiconEntryException e) {}
         }
 
-        for (Noun2 nounClass : Ontology.nouns) {
+        for (Noun nounClass : Ontology.nouns) {
             try {
                 Set<String> pronounStrings = this.yodaEnvironment.lex.getPOSForClass(nounClass,
                         Lexicon.LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, false);
@@ -56,7 +56,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
             } catch (Lexicon.NoLexiconEntryException e) {}
         }
 
-        for (Noun2 nounClass : Ontology.nouns) {
+        for (Noun nounClass : Ontology.nouns) {
             Set<String> nounStrings = new HashSet<>();
             try {
                 nounStrings.addAll(this.yodaEnvironment.lex.getPOSForClass(nounClass,
@@ -108,8 +108,8 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
                 entity2String = matcher.group(3).trim();
                 prepositionClass = cls;
 
-                Quality2 qualityClass = prepositionClass.getQuality();
-                Pair<Role2, Set<QualityDegree>> descriptor = Ontology.qualityDescriptors(qualityClass);
+                Quality qualityClass = prepositionClass.getQuality();
+                Pair<Role, Set<QualityDegree>> descriptor = Ontology.qualityDescriptors(qualityClass);
                 JSONObject intermediateObject = SemanticsModel.parseJSON("{\"class\":\"" + cls.name + "\"}");
                 intermediateObject.put(YodaSkeletonOntologyRegistry.inRelationTo.name, entity2JSON);
                 entity1JSON.put(descriptor.getKey().name, intermediateObject);
@@ -184,11 +184,11 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         Double bestNounCoverage = 0.0;
         Double totalAdjectiveCoverage = 0.0;
 
-        Noun2 nounClass = null;
+        Noun nounClass = null;
         Set<QualityDegree> adjectiveClasses = new HashSet<>();
 
         // get class from pronoun
-        for (Noun2 cls : pronounStringSetMap.keySet()){
+        for (Noun cls : pronounStringSetMap.keySet()){
             Double coverage = Utils.stringSetBestCoverage(entityString, pronounStringSetMap.get(cls));
             if (coverage > pronounCoverage){
                 pronounCoverage = coverage;
@@ -198,7 +198,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         }
 
         // get class from noun
-        for (Noun2 cls : nounStringSetMap.keySet()) {
+        for (Noun cls : nounStringSetMap.keySet()) {
             Double coverage = Utils.stringSetBestCoverage(entityString, nounStringSetMap.get(cls));
             if (coverage > bestNounCoverage){
                 bestNounCoverage = coverage;
@@ -217,8 +217,8 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
 
         // create sub-JSON object for adjectives
         for (QualityDegree cls : adjectiveClasses) {
-            Quality2 qualityClass = cls.getQuality();
-            Pair<Role2, Set<QualityDegree>> descriptor = Ontology.qualityDescriptors(qualityClass);
+            Quality qualityClass = cls.getQuality();
+            Pair<Role, Set<QualityDegree>> descriptor = Ontology.qualityDescriptors(qualityClass);
             ans.put(descriptor.getKey().name, SemanticsModel.parseJSON("{\"class\":\"" + cls.name + "\"}"));
         }
 

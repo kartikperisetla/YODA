@@ -1,9 +1,9 @@
 package edu.cmu.sv.dialog_state_tracking;
 
 import edu.cmu.sv.database.Ontology;
-import edu.cmu.sv.domain.ontology2.Noun2;
-import edu.cmu.sv.domain.ontology2.Role2;
-import edu.cmu.sv.domain.ontology2.Verb2;
+import edu.cmu.sv.domain.ontology.Noun;
+import edu.cmu.sv.domain.ontology.Role;
+import edu.cmu.sv.domain.ontology.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
@@ -59,9 +59,9 @@ public class Utils {
         SemanticsModel spokenByThem = discourseUnit.getSpokenByThem();
         SemanticsModel currentGroundedInterpretation = discourseUnit.getGroundInterpretation();
         String verb = (String) spokenByThem.newGetSlotPathFiller("verb.class");
-        Verb2 verbClass = Ontology.verbNameMap.get(verb);
-        Set<Role2> requiredGroundedRoles = verbClass.getRequiredGroundedRoles();
-        Set<Role2> requiredDescriptions = verbClass.getRequiredDescriptions();
+        Verb verbClass = Ontology.verbNameMap.get(verb);
+        Set<Role> requiredGroundedRoles = verbClass.getRequiredGroundedRoles();
+        Set<Role> requiredDescriptions = verbClass.getRequiredDescriptions();
 
         for (String path : spokenByThem.getAllInternalNodePaths().stream().
                 sorted((x, y) -> Integer.compare(x.length(), y.length())).collect(Collectors.toList())) {
@@ -105,12 +105,12 @@ public class Utils {
                 continue;
             if (!Ontology.nounNameMap.containsKey(rangeClassName))
                 continue;
-            Role2 roleClass = Ontology.roleNameMap.get(lastRoleName);
-            Noun2 contentClass = Ontology.nounNameMap.get(rangeClassName);
+            Role roleClass = Ontology.roleNameMap.get(lastRoleName);
+            Noun contentClass = Ontology.nounNameMap.get(rangeClassName);
             Set<Object> range = roleClass.getRange();
             for (Object rangeCls : range) {
-                if (rangeCls instanceof Noun2 && (Ontology.nounInherits((Noun2) rangeCls, contentClass) ||
-                        Ontology.nounInherits(contentClass, (Noun2) rangeCls))) {
+                if (rangeCls instanceof Noun && (Ontology.nounInherits((Noun) rangeCls, contentClass) ||
+                        Ontology.nounInherits(contentClass, (Noun) rangeCls))) {
                     ans.add(slotPath);
                     break;
                 }

@@ -1,4 +1,4 @@
-package edu.cmu.sv.domain.ontology2;
+package edu.cmu.sv.domain.ontology;
 
 /**
  * Created by David Cohen on 6/16/15.

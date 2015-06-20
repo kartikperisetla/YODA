@@ -1,7 +1,7 @@
 package edu.cmu.sv.domain.yoda_skeleton;
 
 import edu.cmu.sv.domain.OntologyRegistry;
-import edu.cmu.sv.domain.ontology2.*;
+import edu.cmu.sv.domain.ontology.*;
 
 import java.util.*;
 
@@ -10,29 +10,29 @@ import java.util.*;
  */
 public class YodaSkeletonOntologyRegistry implements OntologyRegistry{
 
-    public Set<Verb2> verbs = new HashSet<>();
-    public Set<Role2> roles = new HashSet<>();
-    public Set<Noun2> nouns = new HashSet<>();
-    public Set<Quality2> qualities = new HashSet<>();
+    public Set<Verb> verbs = new HashSet<>();
+    public Set<Role> roles = new HashSet<>();
+    public Set<Noun> nouns = new HashSet<>();
+    public Set<Quality> qualities = new HashSet<>();
     public Set<QualityDegree> qualityDegrees = new HashSet<>();
 
     @Override
-    public Set<Verb2> getVerbs() {
+    public Set<Verb> getVerbs() {
         return verbs;
     }
 
     @Override
-    public Set<Role2> getRoles() {
+    public Set<Role> getRoles() {
         return roles;
     }
 
     @Override
-    public Set<Noun2> getNouns() {
+    public Set<Noun> getNouns() {
         return nouns;
     }
 
     @Override
-    public Set<Quality2> getQualities() {
+    public Set<Quality> getQualities() {
         return qualities;
     }
 
@@ -42,41 +42,41 @@ public class YodaSkeletonOntologyRegistry implements OntologyRegistry{
     }
 
     // define misc 'nouns'
-    public static Noun2 nonHearing = new Noun2("NonHearing", null);
-    public static Noun2 nonUnderstanding = new Noun2("NonUnderstanding", null);
-    public static Noun2 requested = new Noun2("Requested", null);
-    public static Noun2 suggested = new Noun2("Suggested", null);
-    public static Noun2 unknownThingWithRoles = new Noun2("UnknownThingWithRoles", null);
-    public static Noun2 webResource = new Noun2("WebResource", null);
+    public static Noun nonHearing = new Noun("NonHearing", null);
+    public static Noun nonUnderstanding = new Noun("NonUnderstanding", null);
+    public static Noun requested = new Noun("Requested", null);
+    public static Noun suggested = new Noun("Suggested", null);
+    public static Noun unknownThingWithRoles = new Noun("UnknownThingWithRoles", null);
+    public static Noun webResource = new Noun("WebResource", null);
 
     // the skeleton ontology roles are public & static so that they can be referred to in code easily
     // this is needed to define their lexical information
-    public static Role2 agent = new Role2("Agent", false);
-    public static Role2 patient = new Role2("Patient", false);
-    public static Role2 hasAtTime = new Role2("HasAtTime", false);
-    public static Role2 hasHour = new Role2("HasHour", false);
-    public static Role2 hasTenMinute = new Role2("HasTenMinute", false);
-    public static Role2 hasSingleMinute = new Role2("HasSingleMinute", false);
-    public static Role2 hasAmPm = new Role2("HasAmPm", false);
-    public static Role2 hasName = new Role2("HasName", false);
-    public static Role2 hasValue = new Role2("HasValue", false);
-    public static Role2 hasUri = new Role2("HasURI", false);
+    public static Role agent = new Role("Agent", false);
+    public static Role patient = new Role("Patient", false);
+    public static Role hasAtTime = new Role("HasAtTime", false);
+    public static Role hasHour = new Role("HasHour", false);
+    public static Role hasTenMinute = new Role("HasTenMinute", false);
+    public static Role hasSingleMinute = new Role("HasSingleMinute", false);
+    public static Role hasAmPm = new Role("HasAmPm", false);
+    public static Role hasName = new Role("HasName", false);
+    public static Role hasValue = new Role("HasValue", false);
+    public static Role hasUri = new Role("HasURI", false);
     // todo: every preposition should be automatically added to inRelationTo's domain
-    public static Role2 inRelationTo = new Role2("InRelationTo", false);
+    public static Role inRelationTo = new Role("InRelationTo", false);
 
 
     // define root noun hierarchy
-    public static Noun2 rootNoun = new Noun2("Noun", null);
-    public static Noun2 physicalNoun = new Noun2("PhysicalNoun", rootNoun);
-    public static Noun2 nonPhysicalNoun = new Noun2("NonPhysicalNoun", rootNoun);
-    public static Noun2 person = new Noun2("Person", physicalNoun);
-    public static Noun2 timeNounClass = new Noun2("Time", nonPhysicalNoun);
-    public static Noun2 place = new Noun2("Place", physicalNoun);
+    public static Noun rootNoun = new Noun("Noun", null);
+    public static Noun physicalNoun = new Noun("PhysicalNoun", rootNoun);
+    public static Noun nonPhysicalNoun = new Noun("NonPhysicalNoun", rootNoun);
+    public static Noun person = new Noun("Person", physicalNoun);
+    public static Noun timeNounClass = new Noun("Time", nonPhysicalNoun);
+    public static Noun place = new Noun("Place", physicalNoun);
 
 
     // define verbs
-    public static Verb2 hasProperty = new Verb2("HasProperty", Arrays.asList(agent), Arrays.asList(patient));
-    public static Verb2 exist = new Verb2("Exist", new LinkedList<>(), Arrays.asList(agent));
+    public static Verb hasProperty = new Verb("HasProperty", Arrays.asList(agent), Arrays.asList(patient));
+    public static Verb exist = new Verb("Exist", new LinkedList<>(), Arrays.asList(agent));
 
 
     static{

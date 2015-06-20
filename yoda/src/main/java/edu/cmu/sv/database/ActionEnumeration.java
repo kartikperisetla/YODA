@@ -1,9 +1,9 @@
 package edu.cmu.sv.database;
 
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
-import edu.cmu.sv.domain.ontology2.Noun2;
-import edu.cmu.sv.domain.ontology2.Role2;
-import edu.cmu.sv.domain.ontology2.Verb2;
+import edu.cmu.sv.domain.ontology.Noun;
+import edu.cmu.sv.domain.ontology.Role;
+import edu.cmu.sv.domain.ontology.Verb;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
 import edu.cmu.sv.utils.Assert;
@@ -44,7 +44,7 @@ public class ActionEnumeration {
         for (String parameter : dialogAct.getIndividualParameters().keySet()) {
             variableEnumerationString += "?" + parameter + " ";
             classConstraintString += "?" + parameter + " rdf:type base:" +
-                    ((Noun2)dialogAct.getIndividualParameters().get(parameter)).name + " .\n";
+                    ((Noun)dialogAct.getIndividualParameters().get(parameter)).name + " .\n";
             if (focusConstraint == FOCUS_CONSTRAINT.IN_FOCUS)
                 focusConstraintString += "?" + parameter + " rdf:type dst:InFocus .\n";
         }
@@ -109,10 +109,10 @@ public class ActionEnumeration {
                 ans.add(contextDiscourseUnit.getFromInitiator(path));
         } else {
             String[] roles = path.split("\\.");
-            Role2 lastRole = Ontology.roleNameMap.get(roles[roles.length-1]);
+            Role lastRole = Ontology.roleNameMap.get(roles[roles.length-1]);
             for (Object thingClass : Ontology.thingNameMap.values()){
                 if (Ontology.inRange(lastRole, thingClass)){
-                    JSONObject description = SemanticsModel.parseJSON("{\"class\":\""+((Noun2)thingClass).name+"\"}");
+                    JSONObject description = SemanticsModel.parseJSON("{\"class\":\""+((Noun)thingClass).name+"\"}");
                     ans.add(description);
                     // todo: by name
 
@@ -139,7 +139,7 @@ public class ActionEnumeration {
 //            verbClassSet = Ontology.verbs;
 //        }
 
-        for (Verb2 verbClass : Ontology.verbs) {
+        for (Verb verbClass : Ontology.verbs) {
             if (verbConstraint != null && !Ontology.thingNameMap.get(verbConstraint).equals(verbClass))
                 continue;
             Map<String, Set<Object>> possibleBindingsPerVariable = new HashMap<>();

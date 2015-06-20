@@ -1,8 +1,8 @@
 package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander;
 
 import edu.cmu.sv.database.Ontology;
-import edu.cmu.sv.domain.ontology2.Role2;
-import edu.cmu.sv.domain.ontology2.Verb2;
+import edu.cmu.sv.domain.ontology.Role;
+import edu.cmu.sv.domain.ontology.Verb;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.semantics.SemanticsModel;
@@ -20,16 +20,16 @@ import java.util.regex.Pattern;
  * Created by David Cohen on 1/21/15.
  */
 public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
-    Verb2 verbClass;
+    Verb verbClass;
     String verbRegexString = "()";
     String adjectiveRegexString = "()";
-    Map<Role2, String> roleObj1PrefixPatterns = new HashMap<>();
-    Map<Role2, String> roleObj2PrefixPatterns = new HashMap<>();
-    Map<Role2, Boolean> r1HasBlankPrefix = new HashMap<>();
-    Map<Role2, Boolean> r2HasBlankPrefix = new HashMap<>();
+    Map<Role, String> roleObj1PrefixPatterns = new HashMap<>();
+    Map<Role, String> roleObj2PrefixPatterns = new HashMap<>();
+    Map<Role, Boolean> r1HasBlankPrefix = new HashMap<>();
+    Map<Role, Boolean> r2HasBlankPrefix = new HashMap<>();
     YodaEnvironment yodaEnvironment;
 
-    public CommandMultiInterpreter(Verb2 verbClass, YodaEnvironment yodaEnvironment) {
+    public CommandMultiInterpreter(Verb verbClass, YodaEnvironment yodaEnvironment) {
         this.verbClass = verbClass;
         this.yodaEnvironment = yodaEnvironment;
 
@@ -51,7 +51,7 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
         adjectiveRegexString = "("+String.join("|",verbAdjectiveStrings)+")";
 
         // get role prefixes
-        for (Role2 roleClass : Ontology.roles) {
+        for (Role roleClass : Ontology.roles) {
             if (Ontology.inDomain(roleClass, verbClass)) {
                 Set<String> roleObj1PrefixStrings = new HashSet<>();
                 Set<String> roleObj2PrefixStrings = new HashSet<>();
@@ -99,7 +99,7 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
                 if (!negationMatcher.matches()) {
                     String obj1String = matcher.group(3).trim();
                     System.err.println("obj1string:" + obj1String);
-                    for (Role2 roleClass : r1HasBlankPrefix.keySet()) {
+                    for (Role roleClass : r1HasBlankPrefix.keySet()) {
                         String rolePrefixRegexString = roleObj1PrefixPatterns.containsKey(roleClass) ? roleObj1PrefixPatterns.get(roleClass) : "()";
                         if (r1HasBlankPrefix.get(roleClass))
                             rolePrefixRegexString = new StringBuilder(rolePrefixRegexString).insert(rolePrefixRegexString.length() - 1, "|").toString();
@@ -149,7 +149,7 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
                     if (!negationMatcher.matches()) {
                         String obj1String = matcher.group(3).trim();
                         System.err.println("obj1string:" + obj1String);
-                        for (Role2 roleClass : r1HasBlankPrefix.keySet()) {
+                        for (Role roleClass : r1HasBlankPrefix.keySet()) {
                             String rolePrefixRegexString = roleObj1PrefixPatterns.containsKey(roleClass) ? roleObj1PrefixPatterns.get(roleClass) : "()";
                             if (r1HasBlankPrefix.get(roleClass))
                                 rolePrefixRegexString = new StringBuilder(rolePrefixRegexString).insert(rolePrefixRegexString.length() - 1, "|").toString();
@@ -198,8 +198,8 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
                         String twoRoleString = matcher.group(3).trim();
                         System.err.println("twoRoleString:" + twoRoleString);
 
-                        for (Role2 roleClass1 : roleObj1PrefixPatterns.keySet()) {
-                            for (Role2 roleClass2 : roleObj2PrefixPatterns.keySet()) {
+                        for (Role roleClass1 : roleObj1PrefixPatterns.keySet()) {
+                            for (Role roleClass2 : roleObj2PrefixPatterns.keySet()) {
                                 Pattern multiRolePattern = Pattern.compile(roleObj1PrefixPatterns.get(roleClass1) +
                                         " (.+) " +
                                         roleObj2PrefixPatterns.get(roleClass2) +

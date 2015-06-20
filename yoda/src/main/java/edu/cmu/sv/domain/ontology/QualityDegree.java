@@ -1,4 +1,4 @@
-package edu.cmu.sv.domain.ontology2;
+package edu.cmu.sv.domain.ontology;
 
 /**
  * Created by David Cohen on 6/16/15.
@@ -11,9 +11,9 @@ public class QualityDegree {
     public String name;
     public double center;
     public double slope;
-    public Quality2 quality;
+    public Quality quality;
 
-    public QualityDegree(String name, double center, double slope, Quality2 quality) {
+    public QualityDegree(String name, double center, double slope, Quality quality) {
         this.name = name;
         this.center = center;
         this.slope = slope;
@@ -29,7 +29,7 @@ public class QualityDegree {
         return slope;
     }
 
-    public Quality2 getQuality() {
+    public Quality getQuality() {
         return quality;
     }
 }

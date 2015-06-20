@@ -4,10 +4,10 @@ import com.google.common.collect.Iterables;
 import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.database.ReferenceResolution;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
-import edu.cmu.sv.domain.ontology2.Quality2;
-import edu.cmu.sv.domain.ontology2.QualityDegree;
-import edu.cmu.sv.domain.ontology2.Role2;
-import edu.cmu.sv.domain.ontology2.Verb2;
+import edu.cmu.sv.domain.ontology.Quality;
+import edu.cmu.sv.domain.ontology.QualityDegree;
+import edu.cmu.sv.domain.ontology.Role;
+import edu.cmu.sv.domain.ontology.Verb;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.ActionSchema;
@@ -53,9 +53,9 @@ public class ActionAnalysis {
 
         SemanticsModel groundedMeaning = discourseUnit.getGroundInterpretation();
         String verb = (String) groundedMeaning.newGetSlotPathFiller("verb.class");
-        Verb2 verbClass = Ontology.verbNameMap.get(verb);
+        Verb verbClass = Ontology.verbNameMap.get(verb);
 
-        for (Role2 requiredRole : Iterables.concat(verbClass.getRequiredDescriptions(), verbClass.getRequiredGroundedRoles())) {
+        for (Role requiredRole : Iterables.concat(verbClass.getRequiredDescriptions(), verbClass.getRequiredGroundedRoles())) {
             if (groundedMeaning.newGetSlotPathFiller("verb." + requiredRole.name) == null) {
                 missingRequiredVerbSlots.add("verb." + requiredRole.name);
             }
@@ -67,13 +67,13 @@ public class ActionAnalysis {
             if (dialogActString.equals(YNQuestion.class.getSimpleName()) || dialogActString.equals(WHQuestion.class.getSimpleName())){
                 if (verbClass.equals(YodaSkeletonOntologyRegistry.hasProperty)) {
                     String entityURI = (String) groundedMeaning.newGetSlotPathFiller("verb.Agent.HasURI");
-                    Quality2 requestedQualityClass;
+                    Quality requestedQualityClass;
                     if (dialogActString.equals(WHQuestion.class.getSimpleName())) {
                         requestedQualityClass = Ontology.qualityNameMap.get(
                                         (String) groundedMeaning.newGetSlotPathFiller("verb.Patient.HasValue.class"));
                     } else {
                         Set<Object> patientRoles = ((JSONObject) groundedMeaning.newGetSlotPathFiller("verb.Patient")).keySet();
-                        Role2 suggestedRole = null;
+                        Role suggestedRole = null;
                         for (Object role : patientRoles) {
                             if (Ontology.roleNameMap.containsKey(role) && Ontology.roleNameMap.get(role).isQualityRole) {
                                 suggestedRole = Ontology.roleNameMap.get(role);
@@ -94,7 +94,7 @@ public class ActionAnalysis {
 
                     boolean dontKnow = false;
                     StringDistribution adjectiveScores = new StringDistribution();
-                    Pair<Role2, Set<QualityDegree>> descriptor = Ontology.qualityDescriptors(requestedQualityClass);
+                    Pair<Role, Set<QualityDegree>> descriptor = Ontology.qualityDescriptors(requestedQualityClass);
                     for (QualityDegree adjectiveClass : descriptor.getRight()) {
                         Double degreeOfMatch = yodaEnvironment.db.evaluateQualityDegree(entityURI, null, adjectiveClass);
                         if (degreeOfMatch == null) {

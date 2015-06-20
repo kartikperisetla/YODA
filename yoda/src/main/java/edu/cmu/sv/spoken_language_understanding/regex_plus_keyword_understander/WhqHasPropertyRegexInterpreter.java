@@ -1,9 +1,9 @@
 package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander;
 
 import edu.cmu.sv.database.Ontology;
-import edu.cmu.sv.domain.ontology2.Quality2;
-import edu.cmu.sv.domain.ontology2.QualityDegree;
-import edu.cmu.sv.domain.ontology2.Role2;
+import edu.cmu.sv.domain.ontology.Quality;
+import edu.cmu.sv.domain.ontology.QualityDegree;
+import edu.cmu.sv.domain.ontology.Role;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.spoken_language_understanding.Tokenizer;
@@ -23,16 +23,16 @@ import java.util.stream.Collectors;
  * Created by David Cohen on 1/21/15.
  */
 public class WhqHasPropertyRegexInterpreter implements MiniLanguageInterpreter {
-    Quality2 qualityClass;
-    Role2 hasQualityRole;
+    Quality qualityClass;
+    Role hasQualityRole;
     String adjectiveRegexString = "()";
     String qualityNounRegexString = "()";
     YodaEnvironment yodaEnvironment;
 
-    public WhqHasPropertyRegexInterpreter(Quality2 qualityClass, YodaEnvironment yodaEnvironment) {
+    public WhqHasPropertyRegexInterpreter(Quality qualityClass, YodaEnvironment yodaEnvironment) {
         this.qualityClass = qualityClass;
         this.yodaEnvironment = yodaEnvironment;
-        Pair<Role2, Set<QualityDegree>> descriptor = Ontology.qualityDescriptors(qualityClass);
+        Pair<Role, Set<QualityDegree>> descriptor = Ontology.qualityDescriptors(qualityClass);
         this.hasQualityRole = descriptor.getKey();
         Set<QualityDegree> adjectiveClasses = descriptor.getRight().stream().
                 filter(x -> x.getQuality().secondArgumentClassConstraint == null).

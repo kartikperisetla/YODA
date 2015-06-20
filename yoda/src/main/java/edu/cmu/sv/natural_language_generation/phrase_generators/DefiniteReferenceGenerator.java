@@ -1,9 +1,9 @@
 package edu.cmu.sv.natural_language_generation.phrase_generators;
 
 import edu.cmu.sv.database.Ontology;
-import edu.cmu.sv.domain.ontology2.Quality2;
-import edu.cmu.sv.domain.ontology2.QualityDegree;
-import edu.cmu.sv.domain.ontology2.Role2;
+import edu.cmu.sv.domain.ontology.Quality;
+import edu.cmu.sv.domain.ontology.QualityDegree;
+import edu.cmu.sv.domain.ontology.Role;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
@@ -59,7 +59,7 @@ public class DefiniteReferenceGenerator implements PhraseGenerationRoutine {
         } catch (Lexicon.NoLexiconEntryException e) {}
 
         if (expandAdj){
-            for (Quality2 qualityClass : Ontology.qualitiesForClass.get(
+            for (Quality qualityClass : Ontology.qualitiesForClass.get(
                     Ontology.thingNameMap.get(mostSpecificClass))) {
                 if (adjString!=null)
                     break;
@@ -71,7 +71,7 @@ public class DefiniteReferenceGenerator implements PhraseGenerationRoutine {
                     if (!expandAdj)
                         continue;
 
-                    Pair<Role2, Set<QualityDegree>> descriptor = Ontology.qualityDescriptors(qualityClass);
+                    Pair<Role, Set<QualityDegree>> descriptor = Ontology.qualityDescriptors(qualityClass);
                     for (QualityDegree adjectiveClass : descriptor.getRight()) {
                         if (adjString!=null)
                             break;

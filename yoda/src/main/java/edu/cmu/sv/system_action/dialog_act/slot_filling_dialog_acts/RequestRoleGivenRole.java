@@ -3,7 +3,7 @@ package edu.cmu.sv.system_action.dialog_act.slot_filling_dialog_acts;
 import edu.cmu.sv.dialog_management.RewardAndCostCalculator;
 import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
-import edu.cmu.sv.domain.ontology2.Verb2;
+import edu.cmu.sv.domain.ontology.Verb;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
@@ -26,7 +26,7 @@ public class RequestRoleGivenRole extends DialogAct{
     }
 
     static{
-        classParameters.put("verb_class", Verb2.class);
+        classParameters.put("verb_class", Verb.class);
         pathParameters.put("requested_role_path", Object.class);
         pathParameters.put("given_role_path", Object.class);
         descriptionParameters.put("given_role_description", Object.class);

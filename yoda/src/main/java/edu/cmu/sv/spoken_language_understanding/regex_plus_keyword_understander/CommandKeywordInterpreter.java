@@ -1,8 +1,8 @@
 package edu.cmu.sv.spoken_language_understanding.regex_plus_keyword_understander;
 
 import edu.cmu.sv.database.Ontology;
-import edu.cmu.sv.domain.ontology2.Role2;
-import edu.cmu.sv.domain.ontology2.Verb2;
+import edu.cmu.sv.domain.ontology.Role;
+import edu.cmu.sv.domain.ontology.Verb;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
@@ -18,12 +18,12 @@ import java.util.regex.Pattern;
  * Created by David Cohen on 1/21/15.
  */
 public class CommandKeywordInterpreter implements MiniLanguageInterpreter {
-    Verb2 verbClass;
+    Verb verbClass;
     String verbRegexString = "()";
-    Map<Role2, String> roleObj1PrefixPatterns = new HashMap<>();
+    Map<Role, String> roleObj1PrefixPatterns = new HashMap<>();
     YodaEnvironment yodaEnvironment;
 
-    public CommandKeywordInterpreter(Verb2 verbClass, YodaEnvironment yodaEnvironment) {
+    public CommandKeywordInterpreter(Verb verbClass, YodaEnvironment yodaEnvironment) {
         this.verbClass = verbClass;
         this.yodaEnvironment = yodaEnvironment;
         Set<String> verbNounStrings = new HashSet<>();
@@ -34,7 +34,7 @@ public class CommandKeywordInterpreter implements MiniLanguageInterpreter {
             verbNounStrings.addAll(this.yodaEnvironment.lex.getPOSForClass(verbClass, Lexicon.LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, true));
         } catch (Lexicon.NoLexiconEntryException e) {}
         this.verbRegexString = "("+String.join("|",verbNounStrings)+")";
-        for (Role2 roleClass : Ontology.roles) {
+        for (Role roleClass : Ontology.roles) {
             if (Ontology.inDomain(roleClass, verbClass)) {
                 try {
                     Set<String> roleObj1PrefixStrings = this.yodaEnvironment.lex.getPOSForClass(roleClass, Lexicon.LexicalEntry.PART_OF_SPEECH.AS_OBJECT_PREFIX, true);
