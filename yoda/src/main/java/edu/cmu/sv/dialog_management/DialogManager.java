@@ -8,10 +8,7 @@ import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.SystemAction;
 import edu.cmu.sv.system_action.dialog_act.DialogAct;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Acknowledge;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.DontKnow;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.SearchReturnedNothing;
-import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Statement;
+import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.*;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.ClarificationDialogAct;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.utils.HypothesisSetManagement;
@@ -143,6 +140,12 @@ public class DialogManager implements Runnable {
                         Double currentReward = enumeratedDontKnow.reward(currentDialogState, contextDiscourseUnit) *
                                 dialogStateDistribution.get(currentDialogState);
                         accumulateReward(actionExpectedReward, enumeratedDontKnow, currentReward);
+                    } else if (!contextDiscourseUnit.actionAnalysis.responseStatement.isEmpty() &&
+                            contextDiscourseUnit.actionAnalysis.responseStatement.get("dialogAct").equals(Reject.class.getSimpleName())) {
+                        Reject enumeratedReject = new Reject();
+                        Double currentReward = enumeratedReject.reward(currentDialogState, contextDiscourseUnit) *
+                                dialogStateDistribution.get(currentDialogState);
+                        accumulateReward(actionExpectedReward, enumeratedReject, currentReward);
                     }
 
                     // slot-filling dialog acts

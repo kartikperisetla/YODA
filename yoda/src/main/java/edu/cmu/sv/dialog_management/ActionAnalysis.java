@@ -4,8 +4,6 @@ import com.google.common.collect.Iterables;
 import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.database.ReferenceResolution;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
-import edu.cmu.sv.domain.ontology.Quality;
-import edu.cmu.sv.domain.ontology.QualityDegree;
 import edu.cmu.sv.domain.ontology.Role;
 import edu.cmu.sv.domain.ontology.Verb;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
@@ -15,7 +13,6 @@ import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.*;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
-import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
 import java.util.HashMap;
@@ -66,58 +63,26 @@ public class ActionAnalysis {
         if (missingRequiredVerbSlots.size()==0) {
             if (dialogActString.equals(YNQuestion.class.getSimpleName()) || dialogActString.equals(WHQuestion.class.getSimpleName())){
                 if (verbClass.equals(YodaSkeletonOntologyRegistry.hasProperty)) {
-                    String entityURI = (String) groundedMeaning.newGetSlotPathFiller("verb.Agent.HasURI");
-                    Quality requestedQualityClass;
-                    if (dialogActString.equals(WHQuestion.class.getSimpleName())) {
-                        requestedQualityClass = Ontology.qualityNameMap.get(
-                                        (String) groundedMeaning.newGetSlotPathFiller("verb.Patient.HasValue.class"));
+                    JSONObject agent = (JSONObject)(groundedMeaning.newGetSlotPathFiller("verb.Agent"));
+                    JSONObject patient = (JSONObject)(groundedMeaning.newGetSlotPathFiller("verb.Patient"));
+                    Double match = ReferenceResolution.descriptionMatch(yodaEnvironment, agent, patient);
+//                    System.err.println("ActionAnalysis: grounded meaning:"+groundedMeaning);
+//                    System.err.println("ActionAnalysis: Description match:"+match);
+
+                    if (match==null){
+                        responseStatement.put("dialogAct", DontKnow.class.getSimpleName());
                     } else {
-                        Set<Object> patientRoles = ((JSONObject) groundedMeaning.newGetSlotPathFiller("verb.Patient")).keySet();
-                        Role suggestedRole = null;
-                        for (Object role : patientRoles) {
-                            if (Ontology.roleNameMap.containsKey(role) && Ontology.roleNameMap.get(role).isQualityRole) {
-                                suggestedRole = Ontology.roleNameMap.get(role);
-                                break;
-                            }
-                        }
-                        if (suggestedRole == null) {
-                            throw new Error("no role has been suggested");
-                        }
-                        requestedQualityClass = Ontology.qualityNameMap.get(suggestedRole.name.substring(3));
-                    }
-
-                    // todo: replace with new quality argument accessor interface
-                    Object firstQualityArgument = requestedQualityClass.firstArgumentClassConstraint;
-                    Object secondQualityArgument = requestedQualityClass.secondArgumentClassConstraint;
-                    if (secondQualityArgument != null)
-                        throw new Error("the requested quality isn't an adjective");
-
-                    boolean dontKnow = false;
-                    StringDistribution adjectiveScores = new StringDistribution();
-                    Pair<Role, Set<QualityDegree>> descriptor = Ontology.qualityDescriptors(requestedQualityClass);
-                    for (QualityDegree adjectiveClass : descriptor.getRight()) {
-                        Double degreeOfMatch = yodaEnvironment.db.evaluateQualityDegree(entityURI, null, adjectiveClass);
-                        if (degreeOfMatch == null) {
-                            dontKnow = true;
-                            responseStatement.put("dialogAct", DontKnow.class.getSimpleName());
-                        } else {
-                            adjectiveScores.put(adjectiveClass.name, degreeOfMatch);
-                        }
-                    }
-
-                    if (!dontKnow) {
-                        QualityDegree adjectiveClass = Ontology.qualityDegreeNameMap.get(adjectiveScores.getTopHypothesis());
-                        if (adjectiveClass == null) {
-                            responseStatement.put("dialogAct", DontKnow.class.getSimpleName());
-                        } else {
-                            JSONObject description = SemanticsModel.parseJSON("{\"class\":\"" + adjectiveClass.name + "\"}");
-                            SemanticsModel.wrap(description, YodaSkeletonOntologyRegistry.unknownThingWithRoles.name,
-                                    descriptor.getLeft().name);
+                        if (match > .5) {
                             responseStatement.put("dialogAct", Statement.class.getSimpleName());
-                            responseStatement.put("verb.Agent", SemanticsModel.parseJSON(Ontology.webResourceWrap(entityURI)));
-                            responseStatement.put("verb.Patient", description);
+                            responseStatement.put("verb.Agent", SemanticsModel.parseJSON(agent.toJSONString()));
+                            JSONObject responseDescription = SemanticsModel.parseJSON(patient.toJSONString());
+                            responseDescription.put("refType", "indefinite");
+                            responseStatement.put("verb.Patient", SemanticsModel.parseJSON(responseDescription.toJSONString()));
+                        } else {
+                            responseStatement.put("dialogAct", Reject.class.getSimpleName());
                         }
                     }
+
                 } else if (verbClass.equals(YodaSkeletonOntologyRegistry.exist)){
                     JSONObject searchDescription = (JSONObject) groundedMeaning.newGetSlotPathFiller("verb.Agent");
 //                    System.err.println("ActionAnalysis.grounded meaning:" + groundedMeaning);

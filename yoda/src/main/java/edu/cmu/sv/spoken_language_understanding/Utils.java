@@ -12,7 +12,8 @@ import java.util.regex.Pattern;
 public class Utils {
     public static double stringSetBestCoverage(String phrase, Set<String> matchingStrings){
         double ans = 0.0;
-        int adjustedLength = phrase.replace("any ","").replace("the ","").replace("some ","").trim().length();
+        int adjustedLength = phrase.replaceAll("\\Aa ","").replaceAll("\\Aan ","").replaceAll("\\Aany ","").
+                replaceAll("\\Athe ","").replaceAll("\\Asome ","").trim().length();
         for (String matchingString : matchingStrings) {
             Pattern regexPattern = Pattern.compile("(.+ | |)" + matchingString + "( .+| |)");
             Matcher matcher = regexPattern.matcher(phrase);

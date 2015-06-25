@@ -40,16 +40,8 @@ public class DontKnow extends DialogAct {
         double probabilityInterpretedCorrectly = Utils.discourseUnitContextProbability(dialogState, discourseUnit);
         boolean answerObliged = RewardAndCostCalculator.answerObliged(discourseUnit);
         boolean answerNotProvided = !RewardAndCostCalculator.answerAlreadyProvided(discourseUnit, dialogState);
-
-//        System.out.println("Statement reward: " + statementReward +
-//                ", probability interpreted correctly:" + probabilityInterpretedCorrectly +
-//        ", answer obliged:" + answerObliged + ", answer not provided:" + answerNotProvided);
         double ans = ( statementReward * probabilityInterpretedCorrectly) +
                 (answerObliged && answerNotProvided ? RewardAndCostCalculator.penaltyForIgnoringUserRequest : 0);
-//        System.out.println("Statement reward:" + ans);
         return ans;
-
-
-
     }
 }

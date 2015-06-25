@@ -107,9 +107,11 @@ public class RewardAndCostCalculator {
             String dialogActString = (String)discourseUnit.actionAnalysis.responseStatement.get("dialogAct");
             if (dialogActString.equals(DontKnow.class.getSimpleName()) && dialogAct instanceof DontKnow) {
                 probabilityAppropriateInContext = 1.0;
-            } else if (dialogActString.equals(DontKnow.class.getSimpleName())
-                    || dialogAct instanceof DontKnow) {
-                probabilityAppropriateInContext = 0.0;
+            } else if (dialogActString.equals(Reject.class.getSimpleName()) && dialogAct instanceof Reject) {
+                probabilityAppropriateInContext = 1.0;
+//            } else if (dialogActString.equals(DontKnow.class.getSimpleName())
+//                    || dialogAct instanceof DontKnow) {
+//                probabilityAppropriateInContext = 0.0;
             } else if (dialogActString.equals(SearchReturnedNothing.class.getSimpleName())
                     && dialogAct.getBoundClasses().get("verb_class").equals(YodaSkeletonOntologyRegistry.hasProperty.name)
                     && SemanticsModel.contentEqual(

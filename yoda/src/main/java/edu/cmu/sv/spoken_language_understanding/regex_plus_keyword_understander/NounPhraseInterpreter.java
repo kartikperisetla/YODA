@@ -113,27 +113,46 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
                 JSONObject intermediateObject = SemanticsModel.parseJSON("{\"class\":\"" + cls.name + "\"}");
                 intermediateObject.put(YodaSkeletonOntologyRegistry.inRelationTo.name, entity2JSON);
                 entity1JSON.put(descriptor.getKey().name, intermediateObject);
-
                 break;
+            } else {
+                Pattern regexPattern2 = Pattern.compile(prepositionSeparatorRegexStringMap.get(cls) + "(.+)");
+                Matcher matcher2 = regexPattern2.matcher(" "+utterance);
+                if (matcher2.matches()) {
+                    entity1String = null;
+                    entity2String = matcher2.group(2).trim();
+                    prepositionClass = cls;
+
+                    Quality qualityClass = prepositionClass.getQuality();
+                    Pair<Role, Set<QualityDegree>> descriptor = Ontology.qualityDescriptors(qualityClass);
+                    JSONObject intermediateObject = SemanticsModel.parseJSON("{\"class\":\"" + cls.name + "\"}");
+                    intermediateObject.put(YodaSkeletonOntologyRegistry.inRelationTo.name, entity2JSON);
+                    entity1JSON.put(descriptor.getKey().name, intermediateObject);
+                    break;
+                }
             }
+
         }
 
         Double entity1CoverageScore = null;
         Double entity2CoverageScore = null;
 
-        Pair<Map<String, Object>, Double> entity1classAndAdjectives = getClassAdjectivesAndRemaining(entity1String);
-        entity1JSON.putAll(entity1classAndAdjectives.getLeft());
-        entity1CoverageScore = entity1classAndAdjectives.getRight();
+        if (entity1String!=null) {
+            Pair<Map<String, Object>, Double> entity1classAndAdjectives = getClassAdjectivesAndRemaining(entity1String);
+            entity1JSON.putAll(entity1classAndAdjectives.getLeft());
+            entity1CoverageScore = entity1classAndAdjectives.getRight();
+        }
         if (entity2String!=null) {
             Pair<Map<String, Object>, Double> entity2classAndAdjectives = getClassAdjectivesAndRemaining(entity2String);
             entity2JSON.putAll(entity2classAndAdjectives.getLeft());
             entity2CoverageScore = entity2classAndAdjectives.getRight();
         }
 
-        double namedEntityScore = 1.0;
+        double coverageScore = 1.0;
+        coverageScore *= (entity1CoverageScore == null) ? 1.0 : ((entity1CoverageScore > .75) ? entity1CoverageScore : 1.0);
+        coverageScore *= (entity2CoverageScore == null) ? 1.0 : ((entity2CoverageScore > .75) ? entity2CoverageScore : 1.0);
 
         // check for named entities
-        if (entity1JSON.isEmpty() || entity1CoverageScore < .75)
+        if (entity1JSON.isEmpty() || (entity1CoverageScore!=null && entity1CoverageScore < .75))
             entity1JSON.put(YodaSkeletonOntologyRegistry.hasName.name, entity1String);
         if (entity2String!=null && (entity2JSON.isEmpty() || entity2CoverageScore < .75))
             entity2JSON.put(YodaSkeletonOntologyRegistry.hasName.name, entity2String);
@@ -144,28 +163,6 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
         if (entity2JSON.containsKey(YodaSkeletonOntologyRegistry.hasName.name) && !entity2JSON.containsKey("class"))
             entity2JSON.put("class", YodaSkeletonOntologyRegistry.rootNoun.name);
 
-//        // If we think there's a named entity, score it based on how well its string matches known NEs
-//        if (entity2JSON.containsKey(YodaSkeletonOntologyRegistry.hasName.name)){
-//            StringDistribution referenceDistribution =
-//                    ReferenceResolution.resolveReference(yodaEnvironment, entity2JSON, false, false);
-//            namedEntityScore *= Doubles.min(1.0,
-//                    referenceDistribution.get(referenceDistribution.getTopHypothesis()) /
-//                            RegexPlusKeywordUnderstander.normalNamedEntityStringSimilarity /
-//                            ReferenceResolution.minFocusSalience);
-//        }
-//        if (entity1JSON.containsKey(YodaSkeletonOntologyRegistry.hasName.name)){
-//            StringDistribution referenceDistribution =
-//                    ReferenceResolution.resolveReference(yodaEnvironment, entity1JSON, false, false);
-//            namedEntityScore *= Doubles.min(1.0,
-//                    referenceDistribution.get(referenceDistribution.getTopHypothesis()) /
-//                            RegexPlusKeywordUnderstander.normalNamedEntityStringSimilarity /
-//                            ReferenceResolution.minFocusSalience);
-//        }
-
-//        namedEntityScore = Math.pow(namedEntityScore, 3);
-//        System.err.println("NPInterpreter: input string:" + utterance);
-//        System.err.println("NPInterpreter: namedEntityScore:" + namedEntityScore);
-
         // default to UnknownThingWithRoles
         if (!entity1JSON.containsKey("class")){
             entity1JSON.put("class", YodaSkeletonOntologyRegistry.unknownThingWithRoles.name);
@@ -174,7 +171,7 @@ public class NounPhraseInterpreter implements MiniLanguageInterpreter{
             entity2JSON.put("class", YodaSkeletonOntologyRegistry.unknownThingWithRoles.name);
         }
         return new ImmutablePair<>(entity1JSON,
-                RegexPlusKeywordUnderstander.nounPhraseInterpreterWeight * namedEntityScore);
+                RegexPlusKeywordUnderstander.nounPhraseInterpreterWeight * coverageScore);
     }
 
     private Pair<Map<String, Object>, Double> getClassAdjectivesAndRemaining(String entityString){

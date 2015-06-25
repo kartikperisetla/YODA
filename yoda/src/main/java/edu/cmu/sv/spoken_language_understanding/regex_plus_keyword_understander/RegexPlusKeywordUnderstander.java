@@ -42,6 +42,7 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
     public static final double keywordInterpreterWeight = 0.5;
     public static final double regexInterpreterWeight = .9;
     public static final double namedEntityFragmentWeight = 0.5;
+    public static final double namedEntityPenalty = 0.75;
     public static final double nounPhraseInterpreterWeight = 1.0;
     public static final double timeInterpreterWeight = 1.0;
     public static final double simpleStringMatchInterpreterWeight = 1.0;
@@ -93,8 +94,8 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
         }
 //        languageInterpreters.add(new NamedEntityFragmentInterpreter(PointOfInterest.class));
         multiLanguageInterpreters.add(new NounPhraseFragmentMultiInterpreter(nounPhraseInterpreter));
+        multiLanguageInterpreters.add(new YnqHasPropertyRegexMultiInterpreter(yodaEnvironment));
         languageInterpreters.add(new TimeFragmentInterpreter(timeInterpreter));
-
 
         // add OOC / OOD interpreters
         languageInterpreters.add(new RequestSearchAlternativeInterpreter());

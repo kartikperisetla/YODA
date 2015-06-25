@@ -78,9 +78,12 @@ public class NBestDistribution<T> {
 
     @Override
     public String toString() {
-        return "NBestDistribution{" +
-                "internalDistribution=" + internalDistribution +
-                '}';
+        String ans = "NBestDistribution{" +
+                "internalDistribution:\n";
+        for (T key : internalDistribution.keySet()){
+            ans += internalDistribution.get(key)+ ", "+key+"\n";
+        }
+        return ans+'}';
     }
 
 

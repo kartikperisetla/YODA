@@ -24,8 +24,6 @@ public class SearchReturnedNothingNLGTemplate implements TopLevelNLGTemplate {
 
         ImmutablePair<String, JSONObject> patientPhrase = NaturalLanguageGenerator.getAppropriatePhraseGenerationRoutine(patientConstraint).
                 generate(patientConstraint, yodaEnvironment);
-        System.err.println("SearchReturnedNothingNLG:paitentPhrase:\n"+patientPhrase);
-        System.err.println("patientconstraint"+patientConstraint);
 
         JSONObject patient = patientPhrase.getRight();
         ansString += patientPhrase.getLeft();
