@@ -50,18 +50,18 @@ public class YodaSkeletonOntologyRegistry implements OntologyRegistry{
 
     // the skeleton ontology roles are public & static so that they can be referred to in code easily
     // this is needed to define their lexical information
-    public static Role agent = new Role("Agent", false);
-    public static Role patient = new Role("Patient", false);
-    public static Role hasAtTime = new Role("HasAtTime", false);
-    public static Role hasHour = new Role("HasHour", false);
-    public static Role hasTenMinute = new Role("HasTenMinute", false);
-    public static Role hasSingleMinute = new Role("HasSingleMinute", false);
-    public static Role hasAmPm = new Role("HasAmPm", false);
-    public static Role hasName = new Role("HasName", false);
-    public static Role hasValue = new Role("HasValue", false);
-    public static Role hasUri = new Role("HasURI", false);
+    public static Role agent = new Role("Agent", false, false);
+    public static Role patient = new Role("Patient", false, false);
+    public static Role hasAtTime = new Role("HasAtTime", false, false);
+    public static Role hasHour = new Role("HasHour", false, false);
+    public static Role hasTenMinute = new Role("HasTenMinute", false, false);
+    public static Role hasSingleMinute = new Role("HasSingleMinute", false, false);
+    public static Role hasAmPm = new Role("HasAmPm", false, false);
+    public static Role hasName = new Role("HasName", false, false);
+    public static Role hasValue = new Role("HasValue", false, false);
+    public static Role hasUri = new Role("HasURI", false, false);
     // todo: every preposition should be automatically added to inRelationTo's domain
-    public static Role inRelationTo = new Role("InRelationTo", false);
+    public static Role inRelationTo = new Role("InRelationTo", false, false);
 
 
     // define root noun hierarchy

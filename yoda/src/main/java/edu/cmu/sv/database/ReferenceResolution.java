@@ -339,8 +339,14 @@ public class ReferenceResolution {
                         String nestedUri = (String) nestedNP.get(YodaSkeletonOntologyRegistry.hasUri.name);
                         tmpVarIndex++;
                         scoresToAccumulate.add("?score" + tmpVarIndex);
-                        ans += qualityClass.queryFragment.getSparqlQueryFragment("?x" + referenceIndex, "<" + nestedUri + ">", "?transient_quality" + tmpVarIndex) +
-                                "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
+
+                        if (Ontology.roleNameMap.get(key).isInverseRole) {
+                            ans += qualityClass.queryFragment.getSparqlQueryFragment("<" + nestedUri + ">", "?x" + referenceIndex, "?transient_quality" + tmpVarIndex) +
+                                    "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
+                        } else {
+                            ans += qualityClass.queryFragment.getSparqlQueryFragment("?x" + referenceIndex, "<" + nestedUri + ">", "?transient_quality" + tmpVarIndex) +
+                                    "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
+                        }
                         ans += "FILTER(?score" + tmpVarIndex + " > " + .5 + ")\n";
                     } else {
                         List<String> entityURIs = new LinkedList<>();
@@ -355,8 +361,13 @@ public class ReferenceResolution {
                         tmpVarIndex = updates.getRight();
                         scoresToAccumulate.add("?score" + tmpVarIndex);
                         entityURIs.add("?transient_quality" + tmpVarIndex);
-                        ans += qualityClass.queryFragment.getSparqlQueryFragment(entityURIs.get(0), entityURIs.get(1), entityURIs.get(2)) +
-                                "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
+                        if (Ontology.roleNameMap.get(key).isInverseRole) {
+                            ans += qualityClass.queryFragment.getSparqlQueryFragment(entityURIs.get(1), entityURIs.get(0), entityURIs.get(2)) +
+                                    "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
+                        } else {
+                            ans += qualityClass.queryFragment.getSparqlQueryFragment(entityURIs.get(0), entityURIs.get(1), entityURIs.get(2)) +
+                                    "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
+                        }
                         ans += "FILTER(?score" + tmpVarIndex + " > " + .5 + ")\n";
                     }
                 } else {
@@ -407,7 +418,12 @@ public class ReferenceResolution {
                     slope = qualityDegreeClass.getSlope();
                     String nestedURI = ((String) ((JSONObject) ((JSONObject) description.get(key)).
                             get(YodaSkeletonOntologyRegistry.inRelationTo.name)).get(YodaSkeletonOntologyRegistry.hasUri.name));
-                    secondArgument = "<" + nestedURI + ">";
+                    if (Ontology.roleNameMap.get(key).isInverseRole){
+                        secondArgument = firstArgument;
+                        firstArgument = "<" + nestedURI + ">";
+                    } else {
+                        secondArgument = "<" + nestedURI + ">";
+                    }
                 } else {
                     center = qualityDegreeClass.getCenter();
                     slope = qualityDegreeClass.getSlope();

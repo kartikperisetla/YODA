@@ -33,6 +33,7 @@ import java.util.logging.SimpleFormatter;
 public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
 
     public NounPhraseInterpreter nounPhraseInterpreter;
+    public RelationInterpreter relationInterpreter;
     public TimeInterpreter timeInterpreter;
     YodaEnvironment yodaEnvironment;
     Set<MiniLanguageInterpreter> languageInterpreters = new HashSet<>();
@@ -76,6 +77,7 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
 
     public void constructTemplates(){
         nounPhraseInterpreter = new NounPhraseInterpreter(yodaEnvironment);
+        relationInterpreter = new RelationInterpreter(yodaEnvironment);
         timeInterpreter = new TimeInterpreter(yodaEnvironment);
 
         // add regex interpreters

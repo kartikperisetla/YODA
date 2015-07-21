@@ -48,8 +48,8 @@ public class SmartHouseOntologyRegistry implements OntologyRegistry{
         return qualityDegrees;
     }
 
-    public static Role component = new Role("Component", false);
-    public static Role hasRoom = new Role("HasRoom", false);
+    public static Role component = new Role("Component", false, false);
+    public static Role hasRoom = new Role("HasRoom", false, false);
 
     public static Noun appliance = new Noun("Appliance", YodaSkeletonOntologyRegistry.physicalNoun);
     public static Noun airConditioner = new Noun("AirConditioner", appliance);

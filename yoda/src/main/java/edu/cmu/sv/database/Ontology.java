@@ -39,12 +39,19 @@ public class Ontology {
 
     public static void finalizeOntology() {
 
-        // create has-quality roles
+        // create has-quality roles and inverse has-quality roles
         for (Quality qualityClass : qualities){
-            Role hasQualityRole = new Role("Has"+qualityClass.name, true);
+            Role hasQualityRole = new Role("Has"+qualityClass.name, true, false);
             hasQualityRole.getDomain().addAll(Arrays.asList(qualityClass.firstArgumentClassConstraint));
             hasQualityRole.getRange().addAll(Arrays.asList(qualityClass.secondArgumentClassConstraint));
             roles.add(hasQualityRole);
+
+            if (qualityClass.secondArgumentClassConstraint!=null) {
+                Role inverseHasQualityRole = new Role("InverseHas" + qualityClass.name, true, true);
+                inverseHasQualityRole.getRange().addAll(Arrays.asList(qualityClass.firstArgumentClassConstraint));
+                inverseHasQualityRole.getDomain().addAll(Arrays.asList(qualityClass.secondArgumentClassConstraint));
+                roles.add(inverseHasQualityRole);
+            }
         }
 
         // finalize Roles
