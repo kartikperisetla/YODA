@@ -4,6 +4,8 @@ import com.google.common.collect.Iterables;
 import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.database.ReferenceResolution;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
+import edu.cmu.sv.domain.ontology.Quality;
+import edu.cmu.sv.domain.ontology.QualityDegree;
 import edu.cmu.sv.domain.ontology.Role;
 import edu.cmu.sv.domain.ontology.Verb;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
@@ -61,7 +63,7 @@ public class ActionAnalysis {
         responseStatement = new HashMap<>();
 
         if (missingRequiredVerbSlots.size()==0) {
-            if (dialogActString.equals(YNQuestion.class.getSimpleName()) || dialogActString.equals(WHQuestion.class.getSimpleName())){
+            if (dialogActString.equals(YNQuestion.class.getSimpleName())){
                 if (verbClass.equals(YodaSkeletonOntologyRegistry.hasProperty)) {
                     JSONObject agent = (JSONObject)(groundedMeaning.newGetSlotPathFiller("verb.Agent"));
                     JSONObject patient = (JSONObject)(groundedMeaning.newGetSlotPathFiller("verb.Patient"));
@@ -100,6 +102,32 @@ public class ActionAnalysis {
                         responseStatement.put("verb.Agent", SemanticsModel.parseJSON(Ontology.webResourceWrap(bestRecommendation)));
                         responseStatement.put("verb.Patient", responseDescription);
 //                    System.out.println("ActionAnalysis: response statement:\n" + responseStatement);
+                    }
+                }
+            } else if (dialogActString.equals(WHQuestion.class.getSimpleName())){
+                if (verbClass.equals(YodaSkeletonOntologyRegistry.hasProperty)) {
+                    // todo: handle binary qualities
+                    String agentUri = (String) groundedMeaning.newGetSlotPathFiller("verb.Agent.HasURI");
+                    Quality requestedQualityClass = Ontology.qualityNameMap.get(
+                            (String)groundedMeaning.newGetSlotPathFiller("verb.Patient.HasValue.class"));
+                    Set<QualityDegree> possibleDegrees = requestedQualityClass.getQualityDegrees();
+                    QualityDegree bestDegree = null;
+                    double bestDegreeTruth = -1.0;
+                    for (QualityDegree degree : possibleDegrees){
+                        Double currentTruth = yodaEnvironment.db.evaluateQualityDegree(agentUri, null, degree);
+                        if (currentTruth!=null && currentTruth > bestDegreeTruth){
+                            bestDegreeTruth = currentTruth;
+                            bestDegree = degree;
+                        }
+                    }
+                    if (bestDegreeTruth > .5){
+                        responseStatement.put("dialogAct", Statement.class.getSimpleName());
+                        responseStatement.put("verb.Agent", SemanticsModel.parseJSON(Ontology.webResourceWrap(agentUri)));
+                        responseStatement.put("verb.Patient",
+                                SemanticsModel.parseJSON("{\"class\":\""+YodaSkeletonOntologyRegistry.unknownThingWithRoles.name+"\"," +
+                                        "\"Has"+requestedQualityClass.name+"\":{\"class\":\""+bestDegree.name+"\"}}"));
+                    } else {
+                        responseStatement.put("dialogAct", DontKnow.class.getSimpleName());
                     }
                 }
             }

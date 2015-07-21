@@ -145,9 +145,9 @@ public class Utils {
     * Update the discourse unit by un-grounding it
     * */
     public static void unground(DiscourseUnit predecessor,
-                                      SemanticsModel newSpokenByOther,
-                                      SemanticsModel groundedByOther,
-                                      long timeStamp){
+                                SemanticsModel newSpokenByOther,
+                                SemanticsModel groundedByOther,
+                                long timeStamp){
         if (predecessor.initiator.equals("user")){
             predecessor.spokenByMe = newSpokenByOther;
             predecessor.groundTruth = groundedByOther;

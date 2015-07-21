@@ -30,13 +30,15 @@ public class RequestSlotInference extends DialogStateUpdateInference {
                     RequestRole.class.getSimpleName().equals(dialogAct)) {
                 for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
                     DiscourseUnit predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId);
-                    String requestPath;
                     String givenPath = null;
                     JSONObject givenContent;
+                    String requestPath;
+                    DiscourseAnalysis analysis;
                     try {
                         Assert.verify(!predecessor.initiator.equals("system"));
-                        DiscourseAnalysis analysis = new DiscourseAnalysis(predecessor, yodaEnvironment);
+                        analysis = new DiscourseAnalysis(predecessor, yodaEnvironment);
                         analysis.analyseValidity();
+//                        analysis.analyseSlotFilling();
                         JSONObject verbObject = (JSONObject) hypModel.newGetSlotPathFiller("verb");
                         Set<String> requestPaths = hypModel.findAllPathsToClass(YodaSkeletonOntologyRegistry.requested.name);
                         Assert.verify(requestPaths.size() == 1);

@@ -63,7 +63,7 @@ public class DiscourseAnalysis {
     public void analyseSlotFilling() throws Assert.AssertException {
         analyseValidity();
         if (discourseUnit.initiator.equals("user")){
-            Assert.verify(discourseUnit.spokenByMe!=null);
+            Assert.verify(discourseUnit.spokenByMe != null);
             Assert.verify(discourseUnit.groundTruth != null);
             Set<String> suggestionPaths = discourseUnit.getSpokenByMe().
                     findAllPathsToClass(YodaSkeletonOntologyRegistry.suggested.name);
