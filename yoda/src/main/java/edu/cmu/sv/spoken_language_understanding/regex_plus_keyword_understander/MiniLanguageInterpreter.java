@@ -18,4 +18,7 @@ public interface MiniLanguageInterpreter {
     public static final String ynqTagRegexString = "(right|is n't it|aren't they|isn't that right|no|are they|is it)";
     public static final String negationRegexString = "(not|no|n't)";
     public static final String putInStateVerbRegexString = "(turn|set|make|put|switch)";
+    public static final String haveRegexString = "(have|has)";
+    public static final String doRegexString = "(do|does)";
+    public static final String whatString = "(what|which)";
 }

@@ -65,13 +65,12 @@ public class ActionAnalysis {
         if (missingRequiredVerbSlots.size()==0) {
             if (dialogActString.equals(YNQuestion.class.getSimpleName())){
                 if (verbClass.equals(YodaSkeletonOntologyRegistry.hasProperty)) {
-                    JSONObject agent = (JSONObject)(groundedMeaning.newGetSlotPathFiller("verb.Agent"));
-                    JSONObject patient = (JSONObject)(groundedMeaning.newGetSlotPathFiller("verb.Patient"));
+                    // Done: "is x y?"
+                    JSONObject agent = (JSONObject) (groundedMeaning.newGetSlotPathFiller("verb.Agent"));
+                    JSONObject patient = (JSONObject) (groundedMeaning.newGetSlotPathFiller("verb.Patient"));
                     Double match = ReferenceResolution.descriptionMatch(yodaEnvironment, agent, patient);
-//                    System.err.println("ActionAnalysis: grounded meaning:"+groundedMeaning);
-//                    System.err.println("ActionAnalysis: Description match:"+match);
 
-                    if (match==null){
+                    if (match == null) {
                         responseStatement.put("dialogAct", DontKnow.class.getSimpleName());
                     } else {
                         if (match > .5) {
@@ -84,29 +83,11 @@ public class ActionAnalysis {
                             responseStatement.put("dialogAct", Reject.class.getSimpleName());
                         }
                     }
-
-                } else if (verbClass.equals(YodaSkeletonOntologyRegistry.exist)){
-                    JSONObject searchDescription = (JSONObject) groundedMeaning.newGetSlotPathFiller("verb.Agent");
-//                    System.err.println("ActionAnalysis.grounded meaning:" + groundedMeaning);
-                    StringDistribution recommendations = ReferenceResolution.resolveReference(yodaEnvironment, searchDescription, false, true);
-//                    System.err.println("recommendations:" + recommendations);
-                    String bestRecommendation = recommendations.getTopHypothesis();
-                    JSONObject responseDescription = SemanticsModel.parseJSON(searchDescription.toJSONString());
-                    if (bestRecommendation==null){
-                        responseDescription.put("refType", "indefinite");
-                        responseStatement.put("dialogAct", SearchReturnedNothing.class.getSimpleName());
-                        responseStatement.put("verb.Patient", responseDescription);
-                    } else {
-                        responseDescription.put("refType", "indefinite");
-                        responseStatement.put("dialogAct", Statement.class.getSimpleName());
-                        responseStatement.put("verb.Agent", SemanticsModel.parseJSON(Ontology.webResourceWrap(bestRecommendation)));
-                        responseStatement.put("verb.Patient", responseDescription);
-//                    System.out.println("ActionAnalysis: response statement:\n" + responseStatement);
-                    }
                 }
             } else if (dialogActString.equals(WHQuestion.class.getSimpleName())){
                 if (verbClass.equals(YodaSkeletonOntologyRegistry.hasProperty)) {
-                    // todo: handle binary qualities
+                    // DONE: "how x is y?"
+                    // TODO: "how x to z is y?", "how x is y to z?" (handle PP in patient)
                     String agentUri = (String) groundedMeaning.newGetSlotPathFiller("verb.Agent.HasURI");
                     Quality requestedQualityClass = Ontology.qualityNameMap.get(
                             (String)groundedMeaning.newGetSlotPathFiller("verb.Patient.HasValue.class"));
@@ -128,6 +109,28 @@ public class ActionAnalysis {
                                         "\"Has"+requestedQualityClass.name+"\":{\"class\":\""+bestDegree.name+"\"}}"));
                     } else {
                         responseStatement.put("dialogAct", DontKnow.class.getSimpleName());
+                    }
+                } else if (verbClass.equals(YodaSkeletonOntologyRegistry.exist)){
+                    // DONE: "are there any x?", "are there any y x?", "are there any x near y?"
+                    // TODO: "does x have any y?"
+                    // TODO: "what x does y have", "what are y's xes", "what x are there?"
+
+                    JSONObject searchDescription = (JSONObject) groundedMeaning.newGetSlotPathFiller("verb.Agent");
+//                    System.err.println("ActionAnalysis.grounded meaning:" + groundedMeaning);
+                    StringDistribution recommendations = ReferenceResolution.resolveReference(yodaEnvironment, searchDescription, false, true);
+//                    System.err.println("recommendations:" + recommendations);
+                    String bestRecommendation = recommendations.getTopHypothesis();
+                    JSONObject responseDescription = SemanticsModel.parseJSON(searchDescription.toJSONString());
+                    if (bestRecommendation==null){
+                        responseDescription.put("refType", "indefinite");
+                        responseStatement.put("dialogAct", SearchReturnedNothing.class.getSimpleName());
+                        responseStatement.put("verb.Patient", responseDescription);
+                    } else {
+                        responseDescription.put("refType", "indefinite");
+                        responseStatement.put("dialogAct", Statement.class.getSimpleName());
+                        responseStatement.put("verb.Agent", SemanticsModel.parseJSON(Ontology.webResourceWrap(bestRecommendation)));
+                        responseStatement.put("verb.Patient", responseDescription);
+//                    System.out.println("ActionAnalysis: response statement:\n" + responseStatement);
                     }
                 }
             }

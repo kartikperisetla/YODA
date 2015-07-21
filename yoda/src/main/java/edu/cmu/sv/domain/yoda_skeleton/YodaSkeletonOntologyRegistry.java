@@ -46,7 +46,6 @@ public class YodaSkeletonOntologyRegistry implements OntologyRegistry{
     public static Noun nonUnderstanding = new Noun("NonUnderstanding", null);
     public static Noun requested = new Noun("Requested", null);
     public static Noun suggested = new Noun("Suggested", null);
-    public static Noun unknownThingWithRoles = new Noun("UnknownThingWithRoles", null);
     public static Noun webResource = new Noun("WebResource", null);
 
     // the skeleton ontology roles are public & static so that they can be referred to in code easily
@@ -66,7 +65,8 @@ public class YodaSkeletonOntologyRegistry implements OntologyRegistry{
 
 
     // define root noun hierarchy
-    public static Noun rootNoun = new Noun("Noun", null);
+    public static Noun unknownThingWithRoles = new Noun("UnknownThingWithRoles", null);
+    public static Noun rootNoun = new Noun("Noun", unknownThingWithRoles);
     public static Noun physicalNoun = new Noun("PhysicalNoun", rootNoun);
     public static Noun nonPhysicalNoun = new Noun("NonPhysicalNoun", rootNoun);
     public static Noun person = new Noun("Person", physicalNoun);
@@ -85,6 +85,7 @@ public class YodaSkeletonOntologyRegistry implements OntologyRegistry{
         agent.getRange().addAll(Arrays.asList(rootNoun));
         patient.getDomain().addAll(Arrays.asList(hasProperty));
         patient.getRange().addAll(Arrays.asList(person));
+
         // todo: hasAtTime should allow any verb, but I currently have no verb hierarchy
         hasAtTime.getDomain().addAll(Arrays.asList(hasProperty, exist));
         hasAtTime.getRange().addAll(Arrays.asList(timeNounClass));

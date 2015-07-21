@@ -87,6 +87,18 @@ public class Ontology {
         return false;
     }
 
+    // return a number from 0 to 1 which estimates the likelihood that some linguistic constraint
+    // would be used to refer to the filler of a role which has some ontological constraint
+    public static double semanticConstraintMatch(Noun linguisticConstraint, Noun ontologicalConstraint){
+        if (linguisticConstraint==null || ontologicalConstraint==null)
+            return 0.0;
+        else if (linguisticConstraint==ontologicalConstraint)
+            return 1.0;
+        else
+            return Double.max(.75*semanticConstraintMatch(linguisticConstraint.directParent, ontologicalConstraint),
+                    .75*semanticConstraintMatch(linguisticConstraint, ontologicalConstraint.directParent));
+    }
+
     /*
     * Returns the HasQualityRole, and the set of QualityDegree instances
     * corresponding to a given quality class

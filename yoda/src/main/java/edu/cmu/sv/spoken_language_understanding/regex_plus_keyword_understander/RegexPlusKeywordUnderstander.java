@@ -79,7 +79,7 @@ public class RegexPlusKeywordUnderstander implements SpokenLanguageUnderstander{
         timeInterpreter = new TimeInterpreter(yodaEnvironment);
 
         // add regex interpreters
-        languageInterpreters.add(new YnqExistRegexInterpreter());
+        languageInterpreters.add(new WhqExistRegexInterpreter());
         for (QualityDegree adjectiveClass : Ontology.qualityDegrees){
             if (adjectiveClass.getQuality().secondArgumentClassConstraint!=null)
                 continue;
