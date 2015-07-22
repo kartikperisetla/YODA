@@ -20,7 +20,6 @@ public class WhqExistRegexInterpreter implements MiniLanguageInterpreter {
 
     @Override
     public Pair<JSONObject, Double> interpret(List<String> tokens, YodaEnvironment yodaEnvironment) {
-        System.err.println("WhqExistRegexInterpreter: here!!");
         String utterance = String.join(" ", tokens);
         Pattern regexPattern = Pattern.compile(startingPolitenessRegexString + whqExistsPrefixRegexString + "(.+?)" + endingPolitenessRegexString);
         Matcher matcher = regexPattern.matcher(utterance);
@@ -56,26 +55,26 @@ public class WhqExistRegexInterpreter implements MiniLanguageInterpreter {
 
 
             if (matcher3.matches()) {
-                System.err.println("WhqExistRegexInterpreter: here1");
+//                System.err.println("WhqExistRegexInterpreter: here1");
                 roleString = matcher3.group(3);
                 nestedPhraseString = matcher3.group(5);
             } else if (matcher4.matches()){
-                System.err.println("WhqExistRegexInterpreter: here2");
+//                System.err.println("WhqExistRegexInterpreter: here2");
                 roleString = matcher4.group(5);
                 nestedPhraseString = matcher4.group(3);
             } else if (matcher5.matches()){
-                System.err.println("WhqExistRegexInterpreter: here3");
+//                System.err.println("WhqExistRegexInterpreter: here3");
                 roleString = matcher5.group(6);
                 nestedPhraseString = matcher5.group(4);
             }
-            System.err.println("WhqExistRegexInterpreter: here4");
+//            System.err.println("WhqExistRegexInterpreter: here4");
 
             if (nestedPhraseString!=null){
                 NBestDistribution<JSONObject> interpretedInverseRelations =
                         ((RegexPlusKeywordUnderstander)yodaEnvironment.slu).relationInterpreter.interpret(
                                 Tokenizer.tokenize(roleString), Tokenizer.tokenize(nestedPhraseString));
                 if (interpretedInverseRelations.internalDistribution.size()>0) {
-                    JSONObject ans = SemanticsModel.parseJSON("{\"dialogAct\":\"WHQuestion\",\"verb\":{\"class\":\"Exist\", \"Patient\":" +
+                    JSONObject ans = SemanticsModel.parseJSON("{\"dialogAct\":\"WHQuestion\",\"verb\":{\"class\":\"Exist\", \"Agent\":" +
                             interpretedInverseRelations.getTopHypothesis().toJSONString() + "}}");
                     return new ImmutablePair<>(ans, interpretedInverseRelations.get(interpretedInverseRelations.getTopHypothesis()));
                 }

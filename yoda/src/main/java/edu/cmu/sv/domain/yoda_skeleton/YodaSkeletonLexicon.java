@@ -31,7 +31,9 @@ public class YodaSkeletonLexicon extends Lexicon {
             {
                 LexicalEntry entry = new LexicalEntry();
                 entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "place");
+                entry.add(LexicalEntry.PART_OF_SPEECH.SINGULAR_NOUN, "location");
                 entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "places");
+                entry.add(LexicalEntry.PART_OF_SPEECH.PLURAL_NOUN, "locations");
                 entry.add(LexicalEntry.PART_OF_SPEECH.WH_PRONOUN, "where");
                 entry.add(LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, "there");
                 entry.add(LexicalEntry.PART_OF_SPEECH.S3_PRONOUN, "here");

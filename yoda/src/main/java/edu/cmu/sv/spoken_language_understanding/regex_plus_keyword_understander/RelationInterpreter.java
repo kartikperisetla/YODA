@@ -9,6 +9,7 @@ import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.spoken_language_understanding.Utils;
 import edu.cmu.sv.utils.NBestDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
@@ -61,8 +62,7 @@ public class RelationInterpreter {
                 ((RegexPlusKeywordUnderstander)yodaEnvironment.slu).nounPhraseInterpreter.interpret(npTokens, yodaEnvironment);
         Noun domainNoun = Ontology.nounNameMap.get(npInterpretation.getLeft().get("class"));
 
-
-        NBestDistribution<QualityDegree> relationDistribution = new NBestDistribution<>();
+        NBestDistribution<Pair<QualityDegree, Noun>> relationDistribution = new NBestDistribution<>();
 
         //// determine relation distribution based on lexicon and semantic constraints
         // get relation from quality degree lexicon
@@ -73,7 +73,9 @@ public class RelationInterpreter {
                 continue;
             Double coverage = Utils.stringSetBestCoverage(String.join(" ", relationTokens), qualityDegreeStringMap.get(cls));
             if (coverage > 0) {
-                relationDistribution.put(cls, Double.max(relationDistribution.get(cls), coverage*constraintMatch));
+                relationDistribution.put(new ImmutablePair<>(cls, cls.getQuality().secondArgumentClassConstraint),
+                        Double.max(relationDistribution.get(new ImmutablePair<>(cls, cls.getQuality().secondArgumentClassConstraint)),
+                                coverage*constraintMatch));
             }
         }
 
@@ -88,18 +90,19 @@ public class RelationInterpreter {
                 if (constraintMatch < .0001)
                     continue;
                 if (coverage > 0) {
-                    relationDistribution.put(qualityDegree, Double.max(relationDistribution.get(qualityDegree), coverage));
+                    relationDistribution.put(new ImmutablePair<>(qualityDegree, cls),
+                            Double.max(relationDistribution.get(new ImmutablePair<>(qualityDegree, cls)),coverage));
                 }
             }
         }
 
         relationDistribution.normalize();
         NBestDistribution<JSONObject> ans = new NBestDistribution<>();
-        for (QualityDegree qualityDegree : relationDistribution.keySet()){
-            ans.put(SemanticsModel.parseJSON("{\"class\":\""+ YodaSkeletonOntologyRegistry.unknownThingWithRoles.name+"\"," +
-                    "\"InverseHas"+qualityDegree.getQuality().name+"\":{\"class\":\""+qualityDegree.name+"\"," +
+        for (Pair<QualityDegree, Noun> relationInfo : relationDistribution.keySet()){
+            ans.put(SemanticsModel.parseJSON("{\"class\":\""+ relationInfo.getRight().name+"\"," +
+                    "\"InverseHas"+relationInfo.getLeft().getQuality().name+"\":{\"class\":\""+relationInfo.getLeft().name+"\"," +
                     "\""+YodaSkeletonOntologyRegistry.inRelationTo.name+"\":"+npInterpretation.getLeft()+"}}"),
-                    relationDistribution.get(qualityDegree));
+                    relationDistribution.get(relationInfo));
         }
         return ans;
     }
