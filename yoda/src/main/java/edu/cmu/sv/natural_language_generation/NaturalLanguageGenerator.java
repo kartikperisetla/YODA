@@ -1,6 +1,8 @@
 package edu.cmu.sv.natural_language_generation;
 
 import edu.cmu.sv.database.Ontology;
+import edu.cmu.sv.domain.ontology.Quality;
+import edu.cmu.sv.domain.ontology.Role;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.natural_language_generation.phrase_generators.*;
 import edu.cmu.sv.natural_language_generation.top_level_templates.*;
@@ -77,6 +79,7 @@ public class NaturalLanguageGenerator {
     * */
     public static PhraseGenerationRoutine getAppropriatePhraseGenerationRoutine(JSONObject constraints){
         Map<Object, JSONObject> prepositionDescriptors = new HashMap<>();
+        Map<Object, JSONObject> inverseRelationDescriptors = new HashMap<>();
         Map<Object, JSONObject> adjectiveDescriptors = new HashMap<>();
 
         String className = (String) constraints.get("class");
@@ -85,11 +88,20 @@ public class NaturalLanguageGenerator {
                 continue;
             if (!Ontology.roleNameMap.containsKey(key))
                 continue;
-            String keyString = (String)key;
-            if (Ontology.qualityNameMap.containsKey(keyString.substring(3)) && Ontology.qualityNameMap.get(keyString.substring(3)).secondArgumentClassConstraint==null)
-                adjectiveDescriptors.put(key, (JSONObject) constraints.get(key));
-            else if (Ontology.qualityNameMap.containsKey(keyString.substring(3)) && Ontology.qualityNameMap.get(keyString.substring(3)).secondArgumentClassConstraint!=null)
-                prepositionDescriptors.put(key, (JSONObject) constraints.get(key));
+            Role currentRole = Ontology.roleNameMap.get(key);
+            if (currentRole.isQualityRole){
+                Quality currentQuality = Ontology.qualityNameMap.get(currentRole.getQualityName());
+                if (currentQuality.secondArgumentClassConstraint!=null) {
+                    if (currentRole.isInverseRole) {
+                        inverseRelationDescriptors.put(key, (JSONObject) constraints.get(key));
+                    } else {
+                        prepositionDescriptors.put(key, (JSONObject) constraints.get(key));
+                    }
+                } else {
+                    adjectiveDescriptors.put(key, (JSONObject) constraints.get(key));
+                }
+            }
+
         }
 
         if (className.equals(YodaSkeletonOntologyRegistry.webResource.name) &&
@@ -104,6 +116,10 @@ public class NaturalLanguageGenerator {
                 constraints.keySet().size()==2 &&
                 prepositionDescriptors.size()>0) {
             return new PrepositionGenerator();
+        } else if (className.equals(YodaSkeletonOntologyRegistry.unknownThingWithRoles.name) &&
+                constraints.keySet().size()==2 &&
+                inverseRelationDescriptors.size()>0) {
+            return new InverseRelationGenerator();
         } else if (constraints.containsKey("class") &&
                 constraints.keySet().size()==1) {
             return new NounClassGenerator();

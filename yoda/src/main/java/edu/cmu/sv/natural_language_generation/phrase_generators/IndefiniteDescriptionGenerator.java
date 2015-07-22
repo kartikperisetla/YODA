@@ -2,6 +2,8 @@ package edu.cmu.sv.natural_language_generation.phrase_generators;
 
 import edu.cmu.sv.database.Ontology;
 import edu.cmu.sv.domain.ontology.Noun;
+import edu.cmu.sv.domain.ontology.Quality;
+import edu.cmu.sv.domain.ontology.Role;
 import edu.cmu.sv.domain.yoda_skeleton.YodaSkeletonOntologyRegistry;
 import edu.cmu.sv.natural_language_generation.Lexicon;
 import edu.cmu.sv.natural_language_generation.NaturalLanguageGenerator;
@@ -22,6 +24,7 @@ public class IndefiniteDescriptionGenerator implements PhraseGenerationRoutine {
     public ImmutablePair<String, JSONObject> generate(JSONObject constraints, YodaEnvironment yodaEnvironment) {
         Noun nounClass = null;
         Map<Object, JSONObject> prepositionDescriptors = new HashMap<>();
+        Map<Object, JSONObject> inverseRelationDescriptors = new HashMap<>();
         Map<Object, JSONObject> adjectiveDescriptors = new HashMap<>();
         if (constraints.containsKey("class")) {
             nounClass = Ontology.nounNameMap.get((String) constraints.get("class"));
@@ -31,11 +34,19 @@ public class IndefiniteDescriptionGenerator implements PhraseGenerationRoutine {
                 continue;
             if (!Ontology.roleNameMap.containsKey(key))
                 continue;
-            String keyString = (String)key;
-            if (Ontology.qualityNameMap.containsKey(keyString.substring(3)) && Ontology.qualityNameMap.get(keyString.substring(3)).secondArgumentClassConstraint==null)
-                adjectiveDescriptors.put(key, (JSONObject) constraints.get(key));
-            else if (Ontology.qualityNameMap.containsKey(keyString.substring(3)) && Ontology.qualityNameMap.get(keyString.substring(3)).secondArgumentClassConstraint!=null)
-                prepositionDescriptors.put(key, (JSONObject) constraints.get(key));
+            Role currentRole = Ontology.roleNameMap.get(key);
+            if (currentRole.isQualityRole){
+                Quality currentQuality = Ontology.qualityNameMap.get(currentRole.getQualityName());
+                if (currentQuality.secondArgumentClassConstraint!=null) {
+                    if (currentRole.isInverseRole) {
+                        inverseRelationDescriptors.put(key, (JSONObject) constraints.get(key));
+                    } else {
+                        prepositionDescriptors.put(key, (JSONObject) constraints.get(key));
+                    }
+                } else {
+                    adjectiveDescriptors.put(key, (JSONObject) constraints.get(key));
+                }
+            }
         }
 
         String ans = "";
@@ -90,6 +101,21 @@ public class IndefiniteDescriptionGenerator implements PhraseGenerationRoutine {
                 ans += "and ";
 
             ans += prepPhrase.getLeft();
+            ansObject.extendAndOverwrite(new SemanticsModel(prepPhrase.getRight().toJSONString()));
+        }
+
+        // add inverse relations
+        for (Object key : inverseRelationDescriptors.keySet()){
+            JSONObject prepositionContent = SemanticsModel.parseJSON(inverseRelationDescriptors.get(key).toJSONString());
+            SemanticsModel.wrap(prepositionContent, YodaSkeletonOntologyRegistry.unknownThingWithRoles.name, (String) key);
+            ImmutablePair<String, JSONObject> prepPhrase = NaturalLanguageGenerator.getAppropriatePhraseGenerationRoutine(prepositionContent).
+                    generate(prepositionContent, yodaEnvironment);
+
+            if (nounClass == null &&
+                    adjectiveDescriptors.size() > 1)
+                ans += "and";
+
+            ans += " "+prepPhrase.getLeft();
             ansObject.extendAndOverwrite(new SemanticsModel(prepPhrase.getRight().toJSONString()));
         }
 

@@ -28,4 +28,13 @@ public class Role {
         this.isQualityRole = isQualityRole;
         this.isInverseRole = isInverseRole;
     }
+
+    public String getQualityName(){
+        if (!isQualityRole)
+            throw new Error("Can't get quality name for a role that isn't a quality role:"+name);
+        if (isInverseRole)
+            return name.substring("InverseHas".length());
+        else
+            return name.substring("Has".length());
+    }
 }
