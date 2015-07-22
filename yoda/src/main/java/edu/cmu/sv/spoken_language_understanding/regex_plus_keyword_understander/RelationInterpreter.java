@@ -62,6 +62,7 @@ public class RelationInterpreter {
                 ((RegexPlusKeywordUnderstander)yodaEnvironment.slu).nounPhraseInterpreter.interpret(npTokens, yodaEnvironment);
         Noun domainNoun = Ontology.nounNameMap.get(npInterpretation.getLeft().get("class"));
 
+        NBestDistribution<Pair<QualityDegree, Noun>> inverseRelationDistribution = new NBestDistribution<>();
         NBestDistribution<Pair<QualityDegree, Noun>> relationDistribution = new NBestDistribution<>();
 
         //// determine relation distribution based on lexicon and semantic constraints
@@ -73,9 +74,9 @@ public class RelationInterpreter {
                 continue;
             Double coverage = Utils.stringSetBestCoverage(String.join(" ", relationTokens), qualityDegreeStringMap.get(cls));
             if (coverage > 0) {
-                relationDistribution.put(new ImmutablePair<>(cls, cls.getQuality().secondArgumentClassConstraint),
-                        Double.max(relationDistribution.get(new ImmutablePair<>(cls, cls.getQuality().secondArgumentClassConstraint)),
-                                coverage*constraintMatch));
+                inverseRelationDistribution.put(new ImmutablePair<>(cls, cls.getQuality().secondArgumentClassConstraint),
+                        Double.max(inverseRelationDistribution.get(new ImmutablePair<>(cls, cls.getQuality().secondArgumentClassConstraint)),
+                                coverage * constraintMatch));
             }
         }
 
@@ -86,24 +87,34 @@ public class RelationInterpreter {
                 if (qualityDegree.getQuality().secondArgumentClassConstraint==null)
                     continue;
                 Noun qualityDomainConstraint = qualityDegree.quality.firstArgumentClassConstraint;
-                double constraintMatch = Ontology.semanticConstraintMatch(domainNoun, qualityDomainConstraint);
-                if (constraintMatch < .0001)
+                Noun qualityRangeConstraint = qualityDegree.quality.secondArgumentClassConstraint;
+                double constraintMatch = Ontology.semanticConstraintMatch(domainNoun, qualityRangeConstraint);
+                double inverseConstraintMatch = Ontology.semanticConstraintMatch(domainNoun, qualityDomainConstraint);
+                if (inverseConstraintMatch < .0001)
                     continue;
                 if (coverage > 0) {
+                    inverseRelationDistribution.put(new ImmutablePair<>(qualityDegree, cls),
+                            Double.max(inverseRelationDistribution.get(new ImmutablePair<>(qualityDegree, cls)), coverage * inverseConstraintMatch));
                     relationDistribution.put(new ImmutablePair<>(qualityDegree, cls),
-                            Double.max(relationDistribution.get(new ImmutablePair<>(qualityDegree, cls)),coverage));
+                            Double.max(relationDistribution.get(new ImmutablePair<>(qualityDegree, cls)), coverage * constraintMatch));
                 }
             }
         }
 
-        relationDistribution.normalize();
         NBestDistribution<JSONObject> ans = new NBestDistribution<>();
-        for (Pair<QualityDegree, Noun> relationInfo : relationDistribution.keySet()){
+        for (Pair<QualityDegree, Noun> relationInfo : inverseRelationDistribution.keySet()){
             ans.put(SemanticsModel.parseJSON("{\"class\":\""+ relationInfo.getRight().name+"\"," +
                     "\"InverseHas"+relationInfo.getLeft().getQuality().name+"\":{\"class\":\""+relationInfo.getLeft().name+"\"," +
                     "\""+YodaSkeletonOntologyRegistry.inRelationTo.name+"\":"+npInterpretation.getLeft()+"}}"),
+                    inverseRelationDistribution.get(relationInfo));
+        }
+        for (Pair<QualityDegree, Noun> relationInfo : relationDistribution.keySet()){
+            ans.put(SemanticsModel.parseJSON("{\"class\":\""+ relationInfo.getRight().name+"\"," +
+                            "\"Has"+relationInfo.getLeft().getQuality().name+"\":{\"class\":\""+relationInfo.getLeft().name+"\"," +
+                            "\""+YodaSkeletonOntologyRegistry.inRelationTo.name+"\":"+npInterpretation.getLeft()+"}}"),
                     relationDistribution.get(relationInfo));
         }
+        ans.normalize();
         return ans;
     }
 }
