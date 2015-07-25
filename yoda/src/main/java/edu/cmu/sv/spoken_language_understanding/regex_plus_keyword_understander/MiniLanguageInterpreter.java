@@ -14,7 +14,7 @@ public interface MiniLanguageInterpreter {
     public Pair<JSONObject, Double> interpret(List<String> tokens, YodaEnvironment yodaEnvironment);
     public static final String possessivePrepositionRegexString = "(of|at|for|of|to|in|belonging to|by|)";
     public static final String startingPolitenessRegexString = "(please |could you |if you would |if you could |possibly |if it is possible |if it 's possible |would you |)";
-    public static final String endingPolitenessRegexString = "(please|could you|if you would|if you could|possibly|if it is possible|if it 's possible|would you|ok|)";
+    public static final String endingPolitenessRegexString = "(please|could you|if you would|if you could|possibly|if it is possible|if it 's possible|would you|ok|)+";
     public static final String ynqTagRegexString = "(right|is n't it|aren't they|isn't that right|no|are they|is it)";
     public static final String negationRegexString = "(not|no|n't)";
     public static final String putInStateVerbRegexString = "(turn|set|make|put|switch)";

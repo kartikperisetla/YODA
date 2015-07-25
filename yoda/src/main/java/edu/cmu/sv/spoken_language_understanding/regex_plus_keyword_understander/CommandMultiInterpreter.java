@@ -88,17 +88,17 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
 
         if (!adjectiveRegexString.equals("()")) {
             Pattern regexPattern = Pattern.compile("(.* |)" +
-                    MiniLanguageInterpreter.putInStateVerbRegexString + "(.+?)" + adjectiveRegexString + MiniLanguageInterpreter.endingPolitenessRegexString);
+                    MiniLanguageInterpreter.putInStateVerbRegexString + "(.+?)" + adjectiveRegexString +"\\s"+ MiniLanguageInterpreter.endingPolitenessRegexString);
             Matcher matcher = regexPattern.matcher(utterance);
             if (matcher.matches()) {
-                System.err.println("CommandMultiInterpreter: Adjective form initial match");
+//                System.err.println("CommandMultiInterpreter: Adjective form initial match");
                 String phraseIntroString = matcher.group(1).trim();
-                System.err.println("phrase intro string:" + phraseIntroString);
+//                System.err.println("phrase intro string:" + phraseIntroString);
                 Pattern negationPattern = Pattern.compile("(.* |)" + MiniLanguageInterpreter.negationRegexString + "( .*|)");
                 Matcher negationMatcher = negationPattern.matcher(phraseIntroString);
                 if (!negationMatcher.matches()) {
                     String obj1String = matcher.group(3).trim();
-                    System.err.println("obj1string:" + obj1String);
+//                    System.err.println("obj1string:" + obj1String);
                     for (Role roleClass : r1HasBlankPrefix.keySet()) {
                         String rolePrefixRegexString = roleObj1PrefixPatterns.containsKey(roleClass) ? roleObj1PrefixPatterns.get(roleClass) : "()";
                         if (r1HasBlankPrefix.get(roleClass))
@@ -141,14 +141,14 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
                         verbRegexString + "(.+?)" + MiniLanguageInterpreter.endingPolitenessRegexString);
                 Matcher matcher = regexPattern.matcher(utterance);
                 if (matcher.matches()) {
-                    System.err.println("CommandMultiInterpreter: 1-role initial match");
+//                    System.err.println("CommandMultiInterpreter: 1-role initial match");
                     String phraseIntroString = matcher.group(1).trim();
-                    System.err.println("phrase intro string:" + phraseIntroString);
+//                    System.err.println("phrase intro string:" + phraseIntroString);
                     Pattern negationPattern = Pattern.compile("(.* |)" + MiniLanguageInterpreter.negationRegexString + "( .*|)");
                     Matcher negationMatcher = negationPattern.matcher(phraseIntroString);
                     if (!negationMatcher.matches()) {
                         String obj1String = matcher.group(3).trim();
-                        System.err.println("obj1string:" + obj1String);
+//                        System.err.println("obj1string:" + obj1String);
                         for (Role roleClass : r1HasBlankPrefix.keySet()) {
                             String rolePrefixRegexString = roleObj1PrefixPatterns.containsKey(roleClass) ? roleObj1PrefixPatterns.get(roleClass) : "()";
                             if (r1HasBlankPrefix.get(roleClass))
@@ -188,15 +188,15 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
                         verbRegexString + "(.+?)" + MiniLanguageInterpreter.endingPolitenessRegexString);
                 Matcher matcher = regexPattern.matcher(utterance);
                 if (matcher.matches()) {
-                    System.err.println("CommandMultiInterpreter: 2-role initial match");
+//                    System.err.println("CommandMultiInterpreter: 2-role initial match");
                     String phraseIntroString = matcher.group(1).trim();
-                    System.err.println("phrase intro string:" + phraseIntroString);
+//                    System.err.println("phrase intro string:" + phraseIntroString);
                     Pattern negationPattern = Pattern.compile("(.* |)" + MiniLanguageInterpreter.negationRegexString + "( .*|)");
                     Matcher negationMatcher = negationPattern.matcher(phraseIntroString);
                     if (!negationMatcher.matches()) {
 
                         String twoRoleString = matcher.group(3).trim();
-                        System.err.println("twoRoleString:" + twoRoleString);
+//                        System.err.println("twoRoleString:" + twoRoleString);
 
                         for (Role roleClass1 : roleObj1PrefixPatterns.keySet()) {
                             for (Role roleClass2 : roleObj2PrefixPatterns.keySet()) {
