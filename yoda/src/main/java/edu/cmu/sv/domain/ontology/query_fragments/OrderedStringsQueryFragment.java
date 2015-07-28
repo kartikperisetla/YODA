@@ -30,7 +30,7 @@ public class OrderedStringsQueryFragment implements QueryFragment{
     }
 
     @Override
-    public String getSparqlQueryFragment(String firstArgument, String secondArgument, String resultVariable) {
+    public String getResolutionSparqlQueryFragment(String firstArgument, String secondArgument, String resultVariable) {
         String ans = firstArgument+" base:"+databaseProperty+" ?i_"+databaseProperty+" . ";
         ans += "BIND( ";
         String ending = " AS "+resultVariable+") ";

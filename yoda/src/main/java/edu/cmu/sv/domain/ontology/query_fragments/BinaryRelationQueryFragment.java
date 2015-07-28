@@ -17,7 +17,13 @@ public class BinaryRelationQueryFragment implements QueryFragment{
     }
 
     @Override
-    public String getSparqlQueryFragment(String firstArgument, String secondArgument, String resultVariable) {
+    public String getResolutionSparqlQueryFragment(String firstArgument, String secondArgument, String resultVariable) {
+        return  firstArgument + " base:"+databaseProperty+" "+ secondArgument+" .\n"+
+                "BIND (1.0 AS "+resultVariable+")";
+    }
+
+    @Override
+    public String getDegreeMatchSparqlQueryFragment(String firstArgument, String secondArgument, String resultVariable) {
         return  "{\n"+
                 firstArgument + " base:"+databaseProperty+" "+ secondArgument+" .\n"+
                 "BIND (1.0 AS "+resultVariable+") \n"+
@@ -26,6 +32,8 @@ public class BinaryRelationQueryFragment implements QueryFragment{
                 "FILTER NOT EXISTS {"+firstArgument+" base:"+databaseProperty+" "+secondArgument+" }\n"+
                 "BIND (0.0 AS "+resultVariable+")\n} ";
     }
+
+
 
 //// OLD EXAMPLE from ContainedBy
 //    "{\n"+

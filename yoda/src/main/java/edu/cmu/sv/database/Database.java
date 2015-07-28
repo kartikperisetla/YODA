@@ -318,7 +318,7 @@ public class Database {
             slope = degreeClass.getSlope();
 
             String queryString = prefixes + "SELECT ?fuzzy_mapped_quality WHERE {" +
-                    qualityClass.queryFragment.getSparqlQueryFragment("<"+firstArgument+">", "<"+secondArgument+">","?transient_quality") +
+                    qualityClass.queryFragment.getResolutionSparqlQueryFragment("<" + firstArgument + ">", "<" + secondArgument + ">", "?transient_quality") +
                     "BIND(base:LinearFuzzyMap("+center+", "+slope+", ?transient_quality) AS ?fuzzy_mapped_quality)}";
 //            System.err.println("Database.evaluateQualityDegree: queryString:\n"+queryString);
             Double ans = null;

@@ -35,7 +35,9 @@ public class PrepositionGenerator implements PhraseGenerationRoutine{
         try {
             ppString = yodaEnvironment.lex.getPOSForClass(prepositionClass,
                     Lexicon.LexicalEntry.PART_OF_SPEECH.PREPOSITION, false).stream().findAny().get();
-        } catch (Lexicon.NoLexiconEntryException e) {}
+        } catch (Lexicon.NoLexiconEntryException e) {
+            ppString = "of";
+        }
 
         JSONObject ansJSON = SemanticsModel.parseJSON("{\"class\":\"" + prepositionClass.name + "\"}");
         SemanticsModel.wrap(ansJSON, YodaSkeletonOntologyRegistry.unknownThingWithRoles.name, hasQualityRole);

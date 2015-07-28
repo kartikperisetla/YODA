@@ -295,7 +295,7 @@ public class ReferenceResolution {
                     continue;
                 }
                 scoresToAccumulate.add("?score" + tmpVarIndex);
-                ans += qualityClass.queryFragment.getSparqlQueryFragment("?x" + referenceIndex, null, "?transient_quality" + tmpVarIndex) +
+                ans += qualityClass.queryFragment.getResolutionSparqlQueryFragment("?x" + referenceIndex, null, "?transient_quality" + tmpVarIndex) +
                         "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
                 ans += "FILTER(?score" + tmpVarIndex + " > " + .5 + ")\n";
             } else if (YodaSkeletonOntologyRegistry.hasName.equals(Ontology.roleNameMap.get(key))) {
@@ -341,10 +341,10 @@ public class ReferenceResolution {
                         scoresToAccumulate.add("?score" + tmpVarIndex);
 
                         if (Ontology.roleNameMap.get(key).isInverseRole) {
-                            ans += qualityClass.queryFragment.getSparqlQueryFragment("<" + nestedUri + ">", "?x" + referenceIndex, "?transient_quality" + tmpVarIndex) +
+                            ans += qualityClass.queryFragment.getResolutionSparqlQueryFragment("<" + nestedUri + ">", "?x" + referenceIndex, "?transient_quality" + tmpVarIndex) +
                                     "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
                         } else {
-                            ans += qualityClass.queryFragment.getSparqlQueryFragment("?x" + referenceIndex, "<" + nestedUri + ">", "?transient_quality" + tmpVarIndex) +
+                            ans += qualityClass.queryFragment.getResolutionSparqlQueryFragment("?x" + referenceIndex, "<" + nestedUri + ">", "?transient_quality" + tmpVarIndex) +
                                     "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
                         }
                         ans += "FILTER(?score" + tmpVarIndex + " > " + .5 + ")\n";
@@ -362,10 +362,10 @@ public class ReferenceResolution {
                         scoresToAccumulate.add("?score" + tmpVarIndex);
                         entityURIs.add("?transient_quality" + tmpVarIndex);
                         if (Ontology.roleNameMap.get(key).isInverseRole) {
-                            ans += qualityClass.queryFragment.getSparqlQueryFragment(entityURIs.get(1), entityURIs.get(0), entityURIs.get(2)) +
+                            ans += qualityClass.queryFragment.getResolutionSparqlQueryFragment(entityURIs.get(1), entityURIs.get(0), entityURIs.get(2)) +
                                     "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
                         } else {
-                            ans += qualityClass.queryFragment.getSparqlQueryFragment(entityURIs.get(0), entityURIs.get(1), entityURIs.get(2)) +
+                            ans += qualityClass.queryFragment.getResolutionSparqlQueryFragment(entityURIs.get(0), entityURIs.get(1), entityURIs.get(2)) +
                                     "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
                         }
                         ans += "FILTER(?score" + tmpVarIndex + " > " + .5 + ")\n";
@@ -428,7 +428,7 @@ public class ReferenceResolution {
                     center = qualityDegreeClass.getCenter();
                     slope = qualityDegreeClass.getSlope();
                 }
-                queryString += qualityClass.queryFragment.getSparqlQueryFragment(firstArgument, secondArgument, "?transient_quality" + tmpVarIndex) +
+                queryString += qualityClass.queryFragment.getDegreeMatchSparqlQueryFragment(firstArgument, secondArgument, "?transient_quality" + tmpVarIndex) +
                         "BIND(base:LinearFuzzyMap(" + center + ", " + slope + ", ?transient_quality" + tmpVarIndex + ") AS ?score" + tmpVarIndex + ")\n";
                 scoresToAccumulate.add("?score" + tmpVarIndex);
             } else if (YodaSkeletonOntologyRegistry.hasName.equals(Ontology.roleNameMap.get((String) key))) {

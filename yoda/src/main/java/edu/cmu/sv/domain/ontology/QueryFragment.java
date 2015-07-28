@@ -17,5 +17,8 @@ public interface QueryFragment {
 //    * The input list should be able to contain either variables: ?XXX or URIs: <http://sdfs.sdfsdf.sdfsdf#lkjssdf>
 //    * */
 //    java.util.function.Function<List<String>, String> getQualityCalculatorSPARQLQuery();
-    String getSparqlQueryFragment(String firstArgument, String secondArgument, String resultVariable);
+    String getResolutionSparqlQueryFragment(String firstArgument, String secondArgument, String resultVariable);
+    default String getDegreeMatchSparqlQueryFragment(String firstArgument, String secondArgument, String resultVariable){
+        return getResolutionSparqlQueryFragment(firstArgument, secondArgument, resultVariable);
+    }
 }
