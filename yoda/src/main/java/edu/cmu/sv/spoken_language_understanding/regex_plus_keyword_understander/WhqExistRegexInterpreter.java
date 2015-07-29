@@ -42,11 +42,11 @@ public class WhqExistRegexInterpreter implements MiniLanguageInterpreter {
             String nestedPhraseString = null;
             String roleString = null;
             // "what X does Y have?"
-            Pattern regexPattern3 = Pattern.compile(startingPolitenessRegexString + whatString + "(.+?)" + doRegexString + "(.+?)" + haveRegexString + ".*" + endingPolitenessRegexString);
+            Pattern regexPattern3 = Pattern.compile(startingPolitenessRegexString + whatString + " (.+?)" + doRegexString + " (.+?)" + haveRegexString + ".*" + endingPolitenessRegexString);
             Matcher matcher3 = regexPattern3.matcher(utterance);
 
             // "does y have any x?"
-            Pattern regexPattern4 = Pattern.compile(startingPolitenessRegexString + doRegexString + "(.+?)" + haveRegexString+ "(.+?)" + endingPolitenessRegexString);
+            Pattern regexPattern4 = Pattern.compile(startingPolitenessRegexString + doRegexString + " (.+?)" + haveRegexString+ " (.+?)" + endingPolitenessRegexString);
             Matcher matcher4 = regexPattern4.matcher(utterance);
 
             // "what are y's xes?"
@@ -62,6 +62,8 @@ public class WhqExistRegexInterpreter implements MiniLanguageInterpreter {
 //                System.err.println("WhqExistRegexInterpreter: here2");
                 roleString = matcher4.group(5);
                 nestedPhraseString = matcher4.group(3);
+//                System.err.println("role string:" + roleString);
+//                System.err.println("nested phrase string:" + nestedPhraseString);
             } else if (matcher5.matches()){
 //                System.err.println("WhqExistRegexInterpreter: here3");
                 roleString = matcher5.group(6);
