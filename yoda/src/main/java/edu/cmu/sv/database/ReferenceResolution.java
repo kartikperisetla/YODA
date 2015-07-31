@@ -598,20 +598,37 @@ public class ReferenceResolution {
                     }
                 }
             }
-            System.err.println("salience from dialog state:" + salienceFromDialogState);
+//            System.err.println("salience from dialog state:" + salienceFromDialogState);
             // todo: retain / collect salience for objects not in the immediate discourse history
 
             // clear dst focus
-            String deleteString = Database.prefixes + "DELETE {?x rdf:type dst:InFocus} WHERE {?x rdf:type dst:InFocus . }";
+            {
+                String deleteString = Database.prefixes + "DELETE {?x rdf:type dst:InFocus} WHERE {?x rdf:type dst:InFocus . }";
 //            Database.getLogger().info("DST delete:\n" + deleteString);
-            Database.getLogger().info(MongoLogHandler.createSimpleRecord("DST salience delete", deleteString).toJSONString());
-            try {
-                Update update = yodaEnvironment.db.connection.prepareUpdate(
-                        QueryLanguage.SPARQL, deleteString, Database.dstFocusURI);
-                update.execute();
-            } catch (RepositoryException | UpdateExecutionException | MalformedQueryException e) {
-                e.printStackTrace();
-                System.exit(0);
+                Database.getLogger().info(MongoLogHandler.createSimpleRecord("DST focus delete", deleteString).toJSONString());
+                try {
+                    Update update = yodaEnvironment.db.connection.prepareUpdate(
+                            QueryLanguage.SPARQL, deleteString, Database.dstFocusURI);
+                    update.execute();
+                } catch (RepositoryException | UpdateExecutionException | MalformedQueryException e) {
+                    e.printStackTrace();
+                    System.exit(0);
+                }
+            }
+
+            // clear salience
+            {
+                String deleteString = Database.prefixes + "DELETE {?x dst:salience ?y} WHERE {?x dst:salience ?y. }";
+//            Database.getLogger().info("DST delete:\n" + deleteString);
+                Database.getLogger().info(MongoLogHandler.createSimpleRecord("DST salience delete", deleteString).toJSONString());
+                try {
+                    Update update = yodaEnvironment.db.connection.prepareUpdate(
+                            QueryLanguage.SPARQL, deleteString, Database.dstFocusURI);
+                    update.execute();
+                } catch (RepositoryException | UpdateExecutionException | MalformedQueryException e) {
+                    e.printStackTrace();
+                    System.exit(0);
+                }
             }
 
             // new salience / dst focus
