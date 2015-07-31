@@ -88,7 +88,7 @@ public class CommandMultiInterpreter implements MiniMultiLanguageInterpreter {
 
         if (!adjectiveRegexString.equals("()")) {
             Pattern regexPattern = Pattern.compile("(.* |)" +
-                    MiniLanguageInterpreter.putInStateVerbRegexString + "(.+?)" + adjectiveRegexString +"\\s"+ MiniLanguageInterpreter.endingPolitenessRegexString);
+                    MiniLanguageInterpreter.putInStateVerbRegexString + "(.+?)" + adjectiveRegexString +"(|\\s+"+MiniLanguageInterpreter.endingPolitenessRegexString+")");
             Matcher matcher = regexPattern.matcher(utterance);
             if (matcher.matches()) {
 //                System.err.println("CommandMultiInterpreter: Adjective form initial match");

@@ -15,11 +15,17 @@ public class SmartHouseSLUDataset extends SLUDataset {
                 new SemanticsModel("{\"dialogAct\":\"Command\",\"verb\":{\"Component\":{\"class\":\"AirConditioner\"},\"class\":\"TurnOnAppliance\"}}")));
         add(new ImmutablePair<>("turn it on",
                 new SemanticsModel("{\"dialogAct\":\"Command\",\"verb\":{\"Component\":{\"refType\":\"pronoun\",\"class\":\"Noun\"},\"class\":\"TurnOnAppliance\"}}")));
+        add(new ImmutablePair<>("could you turn it on please",
+                new SemanticsModel("{\"dialogAct\":\"Command\",\"verb\":{\"Component\":{\"refType\":\"pronoun\",\"class\":\"Noun\"},\"class\":\"TurnOnAppliance\"}}")));
         add(new ImmutablePair<>("turn it off",
                 new SemanticsModel("{\"dialogAct\":\"Command\",\"verb\":{\"Component\":{\"refType\":\"pronoun\",\"class\":\"Noun\"},\"class\":\"TurnOffAppliance\"}}")));
         add(new ImmutablePair<>("switch it on",
                 new SemanticsModel("{\"dialogAct\":\"Command\",\"verb\":{\"Component\":{\"refType\":\"pronoun\",\"class\":\"Noun\"},\"class\":\"TurnOnAppliance\"}}")));
         add(new ImmutablePair<>("is the security system on",
                 new SemanticsModel("{\"dialogAct\":\"YNQuestion\",\"verb\":{\"Agent\":{\"class\":\"SecuritySystem\"},\"Patient\":{\"HasPowerState\":{\"class\":\"On\"},\"class\":\"UnknownThingWithRoles\"},\"class\":\"HasProperty\"}}")));
+        add(new ImmutablePair<>("turn on",
+                new SemanticsModel("{\"dialogAct\":\"Command\",\"verb\":{\"class\":\"TurnOnAppliance\"}}")));
+        add(new ImmutablePair<>("what are the kitchen's appliances",
+                new SemanticsModel("{\"dialogAct\":\"WHQuestion\",\"verb\":{\"Agent\":{\"class\":\"Appliance\",\"HasContainedBy\":{\"InRelationTo\":{\"class\":\"Kitchen\"},\"class\":\"IsContainedBy\"}},\"class\":\"Exist\"}}")));
     }
 }
