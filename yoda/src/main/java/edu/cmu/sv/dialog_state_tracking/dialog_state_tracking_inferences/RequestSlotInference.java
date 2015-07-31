@@ -30,6 +30,7 @@ public class RequestSlotInference extends DialogStateUpdateInference {
                     RequestRole.class.getSimpleName().equals(dialogAct)) {
                 for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
                     DiscourseUnit predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId);
+                    double contextAppropriateness = Utils.discourseUnitContextProbability(currentState, predecessor);
                     String givenPath = null;
                     JSONObject givenContent;
                     String requestPath;
@@ -78,8 +79,7 @@ public class RequestSlotInference extends DialogStateUpdateInference {
                             SemanticsModel.parseJSON("{\"class\":\""+ YodaSkeletonOntologyRegistry.requested.name+"\"}"));
 
                     Utils.unground(updatedPredecessor, newSpokenByMeHypothesis, turn.groundedSystemMeaning, timeStamp);
-                    Double score = givenMatch *
-                            Utils.discourseUnitContextProbability(newDialogState, updatedPredecessor);
+                    Double score = givenMatch * contextAppropriateness;
                     resultHypotheses.put(newDialogState, score);
 
                 }

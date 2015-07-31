@@ -5,20 +5,13 @@ import edu.cmu.sv.dialog_state_tracking.DialogState;
 import edu.cmu.sv.dialog_state_tracking.DiscourseUnit;
 import edu.cmu.sv.dialog_state_tracking.Turn;
 import edu.cmu.sv.dialog_state_tracking.Utils;
-import edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences.DialogStateUpdateInference;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.ActionSchema;
 import edu.cmu.sv.system_action.non_dialog_task.NonDialogTask;
 import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.utils.NBestDistribution;
-import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by David Cohen on 12/21/14.
@@ -37,7 +30,7 @@ public class TakeRequestedActionInference extends DialogStateUpdateInference {
             if (DialogRegistry.nonDialogTasks.contains(DialogRegistry.actionNameMap.get(dialogAct))) {
                 for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
                     DiscourseUnit predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId);
-
+                    double contextAppropriateness = Utils.discourseUnitContextProbability(currentState, predecessor);
 
                     try {
                         boolean anyMatchingSchema = false;
@@ -76,7 +69,7 @@ public class TakeRequestedActionInference extends DialogStateUpdateInference {
                             put(newDiscourseUnitId, newDUHypothesis);
                     newDialogState.getArgumentationLinks().add(
                             new DialogState.ArgumentationLink(predecessorId, newDiscourseUnitId));
-                    resultHypotheses.put(newDialogState, Utils.discourseUnitContextProbability(newDialogState, predecessor));
+                    resultHypotheses.put(newDialogState, contextAppropriateness);
                 }
 
             }

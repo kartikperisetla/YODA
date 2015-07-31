@@ -38,6 +38,8 @@ public class AnswerInference extends DialogStateUpdateInference {
                     SearchReturnedNothing.class.getSimpleName()).contains(dialogAct)) {
                 for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
                     DiscourseUnit predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId);
+                    double contextAppropriateness = Utils.discourseUnitContextProbability(currentState, predecessor);
+
                     try {
                         Assert.verify(!predecessor.initiator.equals("system"));
                         String predecessorDialogAct = predecessor.spokenByThem.getSlotPathFiller("dialogAct");
@@ -60,7 +62,7 @@ public class AnswerInference extends DialogStateUpdateInference {
                             put(newDiscourseUnitId, newDUHypothesis);
                     newDialogState.getArgumentationLinks().add(
                             new DialogState.ArgumentationLink(predecessorId, newDiscourseUnitId));
-                    ans.put(newDialogState, Utils.discourseUnitContextProbability(newDialogState, predecessor));
+                    ans.put(newDialogState, contextAppropriateness);
                 }
 
             }

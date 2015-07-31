@@ -3,7 +3,6 @@ package edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences;
 import edu.cmu.sv.database.ReferenceResolution;
 import edu.cmu.sv.dialog_management.DialogRegistry;
 import edu.cmu.sv.dialog_state_tracking.*;
-import edu.cmu.sv.dialog_state_tracking.dialog_state_tracking_inferences.DialogStateUpdateInference;
 import edu.cmu.sv.semantics.SemanticsModel;
 import edu.cmu.sv.system_action.dialog_act.core_dialog_acts.Fragment;
 import edu.cmu.sv.system_action.dialog_act.grounding_dialog_acts.RequestConfirmValue;
@@ -11,11 +10,9 @@ import edu.cmu.sv.utils.Assert;
 import edu.cmu.sv.utils.NBestDistribution;
 import edu.cmu.sv.utils.StringDistribution;
 import edu.cmu.sv.yoda_environment.YodaEnvironment;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONObject;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -41,6 +38,7 @@ public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpda
                 if (DialogRegistry.dialogActNameMap.get(dialogAct).equals(Fragment.class)) {
                     for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
                         DiscourseUnit predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId).deepCopy();
+                        double contextAppropriateness = Utils.discourseUnitContextProbability(currentState, predecessor);
 
                         JSONObject correctionContent;
                         DiscourseAnalysis duAnalysis = new DiscourseAnalysis(predecessor, yodaEnvironment);
@@ -77,8 +75,7 @@ public class ReiterateIgnoreGroundingSuggestionInference extends DialogStateUpda
                             currentDu.actionAnalysis.update(yodaEnvironment, currentDu);
 
                             Double score = groundedHypotheses.getRight().get(groundedDuKey) *
-                                    penaltyForThisInference * sluScore *
-                                    Utils.discourseUnitContextProbability(newDialogState, currentDu);
+                                    penaltyForThisInference * sluScore * contextAppropriateness;
                             resultHypotheses.put(newDialogState, score);
                         }
                     }

@@ -21,9 +21,13 @@ public class Utils {
 
     public static double discourseUnitContextProbability(DialogState dialogState,
                                                          DiscourseUnit predecessor){
-        return Math.pow(.1, numberOfIntermediateDiscourseUnitsBySpeaker(predecessor, dialogState, "system")) *
-                Math.pow(.1, numberOfIntermediateDiscourseUnitsBySpeaker(predecessor, dialogState, "user")) *
+        return discourseUnitRecency(dialogState, predecessor) *
                 Math.pow(.1, numberOfLinksRespondingToDiscourseUnit(predecessor, dialogState));
+    }
+
+    public static double discourseUnitRecency(DialogState dialogState, DiscourseUnit predecessor){
+        return Math.pow(.1, numberOfIntermediateDiscourseUnitsBySpeaker(predecessor, dialogState, "system")) *
+                Math.pow(.1, numberOfIntermediateDiscourseUnitsBySpeaker(predecessor, dialogState, "user"));
     }
 
     public static int numberOfIntermediateDiscourseUnitsBySpeaker(DiscourseUnit predecessorDu,

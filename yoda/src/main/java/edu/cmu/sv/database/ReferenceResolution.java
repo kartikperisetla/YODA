@@ -556,7 +556,7 @@ public class ReferenceResolution {
                 for (String duIdentifier : discourseUnits.keySet()) {
                     DiscourseUnit currentDiscourseUnit = discourseUnits.get(duIdentifier);
                     double salienceBoost = dialogStateDistribution.get(currentDialogState) *
-                            Utils.discourseUnitContextProbability(currentDialogState, currentDiscourseUnit);
+                            Utils.discourseUnitRecency(currentDialogState, currentDiscourseUnit);
                     Set<String> individualsInGroundedDiscourseUnit = new HashSet<>();
                     Set<String> patientsInGroundedDiscourseUnit = new HashSet<>();
                     if (currentDiscourseUnit.getGroundInterpretation() != null) {
@@ -598,7 +598,7 @@ public class ReferenceResolution {
                     }
                 }
             }
-
+            System.err.println("salience from dialog state:" + salienceFromDialogState);
             // todo: retain / collect salience for objects not in the immediate discourse history
 
             // clear dst focus

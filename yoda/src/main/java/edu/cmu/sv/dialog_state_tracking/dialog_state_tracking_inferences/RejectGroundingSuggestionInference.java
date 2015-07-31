@@ -32,6 +32,7 @@ public class RejectGroundingSuggestionInference extends DialogStateUpdateInferen
                     for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
                         DialogState newDialogState = currentState.deepCopy();
                         DiscourseUnit predecessor = newDialogState.discourseUnitHypothesisMap.get(predecessorId);
+                        double contextAppropriateness = Utils.discourseUnitContextProbability(currentState, predecessor);
 
                         DiscourseAnalysis duAnalysis = new DiscourseAnalysis(predecessor, yodaEnvironment);
                         try {
@@ -51,7 +52,7 @@ public class RejectGroundingSuggestionInference extends DialogStateUpdateInferen
 
                         // collect the result
                         Double score = (duAnalysis.groundMatch ? penaltyForNonGroundedMatch : 1.0) * sluScore *
-                                Utils.discourseUnitContextProbability(newDialogState, predecessor);
+                                contextAppropriateness;
                         ans.put(newDialogState, score);
                     }
 

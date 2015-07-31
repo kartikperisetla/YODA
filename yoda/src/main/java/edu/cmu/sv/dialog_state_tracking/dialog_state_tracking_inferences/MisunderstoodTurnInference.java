@@ -49,6 +49,8 @@ public class MisunderstoodTurnInference extends DialogStateUpdateInference {
             if (dialogAct.equals(RequestFixMisunderstanding.class.getSimpleName())) {
                 for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
                     DiscourseUnit predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId);
+                    double contextAppropriateness = Utils.discourseUnitContextProbability(currentState, predecessor);
+
                     try {
                         Assert.verify(!predecessor.initiator.equals("system"));
                         String predecessorDialogAct = predecessor.spokenByThem.getSlotPathFiller("dialogAct");
@@ -59,8 +61,7 @@ public class MisunderstoodTurnInference extends DialogStateUpdateInference {
 
                     DialogState newDialogState = currentState.deepCopy();
                     newDialogState.getDiscourseUnitHypothesisMap().remove(predecessorId);
-                    resultHypotheses.put(newDialogState, Utils.discourseUnitContextProbability(
-                            currentState, currentState.getDiscourseUnitHypothesisMap().get(predecessorId)));
+                    resultHypotheses.put(newDialogState, contextAppropriateness);
                 }
             }
         }

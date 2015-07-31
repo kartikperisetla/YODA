@@ -33,6 +33,8 @@ public class GiveGroundingSuggestionInference extends DialogStateUpdateInference
             if (RequestConfirmValue.class.getSimpleName().equals(dialogAct)) {
                 for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
                     DiscourseUnit predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId);
+                    double contextAppropriateness = Utils.discourseUnitContextProbability(currentState, predecessor);
+
                     try{
                         Assert.verify(!predecessor.initiator.equals("system"));
                         DiscourseAnalysis analysis = new DiscourseAnalysis(predecessor, yodaEnvironment);
@@ -97,8 +99,7 @@ public class GiveGroundingSuggestionInference extends DialogStateUpdateInference
 //                                YodaSkeletonOntologyRegistry.suggested.name, YodaSkeletonOntologyRegistry.hasValue.name);
 
                         Utils.unground(updatedPredecessor, newSpokenByMeHypothesis, newGroundTruth, timeStamp);
-                        Double score = Utils.discourseUnitContextProbability(newDialogState, updatedPredecessor);
-                        resultHypotheses.put(newDialogState, score);
+                        resultHypotheses.put(newDialogState, contextAppropriateness);
                     }
                 }
             }

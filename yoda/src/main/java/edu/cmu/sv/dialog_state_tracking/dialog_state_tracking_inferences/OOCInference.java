@@ -50,6 +50,7 @@ public class OOCInference extends DialogStateUpdateInference {
             if (DialogRegistry.oocResponseDialogActs.contains(DialogRegistry.dialogActNameMap.get(dialogAct))) {
                 for (String predecessorId : currentState.discourseUnitHypothesisMap.keySet()) {
                     DiscourseUnit predecessor = currentState.discourseUnitHypothesisMap.get(predecessorId);
+                    double contextAppropriateness = Utils.discourseUnitContextProbability(currentState, predecessor);
                     try {
                         Assert.verify(!predecessor.initiator.equals("system"));
                         String predecessorDialogAct = predecessor.spokenByThem.getSlotPathFiller("dialogAct");
@@ -62,8 +63,7 @@ public class OOCInference extends DialogStateUpdateInference {
 
                     DialogState newDialogState = currentState.deepCopy();
                     newDialogState.getDiscourseUnitHypothesisMap().remove(predecessorId);
-                    resultHypotheses.put(newDialogState, Utils.discourseUnitContextProbability(
-                            currentState, currentState.getDiscourseUnitHypothesisMap().get(predecessorId)));
+                    resultHypotheses.put(newDialogState, contextAppropriateness);
                 }
             }
         }

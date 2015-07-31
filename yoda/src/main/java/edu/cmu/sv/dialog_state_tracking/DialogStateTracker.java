@@ -117,7 +117,7 @@ public class DialogStateTracker implements Runnable {
                     newDialogStateDistribution.internalDistribution.put(new DialogState(), 1.0);
                 }
 
-                dialogStateNBestDistribution = HypothesisSetManagement.keepRatioDistribution(newDialogStateDistribution, .05, 5);
+                dialogStateNBestDistribution = HypothesisSetManagement.keepRatioDistribution(newDialogStateDistribution, .01, 5);
                 dialogStateNBestDistribution.normalize();
                 ReferenceResolution.updateSalience(yodaEnvironment, dialogStateNBestDistribution);
                 ReferenceResolution.clearCache();
