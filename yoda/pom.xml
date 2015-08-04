@@ -4,7 +4,7 @@
 
   <groupId>edu.cmu.sv</groupId>
   <artifactId>yoda</artifactId>
-  <version>0.6.13</version>
+  <version>0.7.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>${project.groupId}:${project.artifactId}</name>
